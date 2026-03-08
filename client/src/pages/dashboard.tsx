@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { format } from "date-fns";
-import { ShieldAlert, AlertTriangle, TerminalSquare, Plus, Activity, ServerCrash } from "lucide-react";
+import { ShieldAlert, AlertTriangle, TerminalSquare, Plus, Activity, ServerCrash, FileDown } from "lucide-react";
 import { useTestRuns, useCreateTestRun } from "@/hooks/use-test-runs";
 import { useAllViolations } from "@/hooks/use-violations";
 import { Card, Badge, Button, Table, Th, Td } from "@/components/ui-components";
@@ -52,14 +52,22 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold tracking-tight mb-1 text-white">Security Operation Center</h1>
           <p className="text-muted-foreground font-mono text-sm">Monitoring Tor FSM state integrity across sandboxed environments</p>
         </div>
-        <Button onClick={handleCreateRun} disabled={isCreating} className="shrink-0">
-          {isCreating ? (
-            <Activity className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <Plus className="w-4 h-4 mr-2" />
-          )}
-          {isCreating ? "Initializing..." : "Initialize Sandbox Run"}
-        </Button>
+        <div className="flex items-center gap-3">
+          <a href="/api/download/proposal" download>
+            <Button variant="outline" className="shrink-0">
+              <FileDown className="w-4 h-4 mr-2" />
+              Proje Onerisi (DOCX)
+            </Button>
+          </a>
+          <Button onClick={handleCreateRun} disabled={isCreating} className="shrink-0">
+            {isCreating ? (
+              <Activity className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Plus className="w-4 h-4 mr-2" />
+            )}
+            {isCreating ? "Initializing..." : "Initialize Sandbox Run"}
+          </Button>
+        </div>
       </div>
 
       {/* Metrics Row */}

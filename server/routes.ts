@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import type { Server } from "http";
+import path from "path";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
@@ -190,6 +191,11 @@ export async function registerRoutes(
       }
       res.status(500).json({ message: "Internal server error" });
     }
+  });
+
+  app.get('/api/download/proposal', (req, res) => {
+    const filePath = path.resolve('client/public/Proje_Onerisi_Plani.docx');
+    res.download(filePath, 'Proje_Onerisi_Plani.docx');
   });
 
   return httpServer;
