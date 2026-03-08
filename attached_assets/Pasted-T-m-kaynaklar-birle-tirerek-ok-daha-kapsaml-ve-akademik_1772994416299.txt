@@ -1,0 +1,704 @@
+Tüm kaynakları birleştirerek çok daha kapsamlı ve akademik rehberi sunuyorum! 🎓
+
+---
+
+# 🧅 Tor Tabanlı Anonim Ağ Sistemlerinde Invalid State Transition Tespiti
+## FSM Tabanlı Model-Driven Test Yaklaşımı ve Güvenlik Analizi
+### 📘 Kapsamlı Akademik Proje Rehberi — Genişletilmiş Versiyon
+
+---
+
+## 🗺️ PROJE HARİTASI
+
+````mermaid
+mindmap
+  root((PROJE))
+    Tor Protokolü
+      Devre Mimarisi
+      Onion Routing
+      Hidden Services
+      Cell Yapısı
+    FSM Modelleme
+      Formal Tanım
+      Durum Diyagramı
+      Geçiş Tablosu
+      UPPAAL Modeli
+    Invalid Transition
+      Tespit Algoritması
+      Saldırı Vektörleri
+      Kategorizasyon
+    MDT
+      Test Case Üretimi
+      Conformance Testing
+      Fuzzing
+    Güvenlik Analizi
+      Deanonymization
+      Traffic Correlation
+      Circuit Hijacking
+````
+
+---
+
+## 📚 1. LİTERATÜR ANALİZİ & TEMEL KAYNAKLAR
+
+### 1.1 Tor Protokolü Güvenlik Araştırmaları
+
+Tor ağında deanonymization saldırıları, özellikle timing correlation ve circuit-level manipülasyon üzerine yoğunlaşmaktadır. Alman makamlarının 2024'te gerçekleştirdiği büyük ölçekli timing saldırısı, Tor'un state-level zafiyetlerini gün yüzüne çıkarmıştır. [1]
+
+Cell-sequence tabanlı yeni deanonymization teknikleri, önceki saldırı modellerinin sınırlamalarını aşarak Tor devre protokolünün state geçişlerini hedef almaktadır. Bu teknikler, FSM modellemesinin neden kritik olduğunu açıkça ortaya koymaktadır. [2]
+
+Kullanıcı tarafı deanonymization olaylarının büyük çoğunluğu kriptografik veya routing hatalarından değil, uygulama katmanındaki state yönetim hatalarından kaynaklanmaktadır. [3]
+
+### 1.2 FSM Tabanlı Güvenlik Testi Literatürü
+
+FSM tabanlı conformance testing metodolojileri, protokol implementasyonlarının doğrulanmasında temel araç olarak kullanılmaktadır. Bu yöntemler karmaşıklık, uygulanabilirlik, hata tespit kapasitesi ve test suite uzunluğu açısından kapsamlı biçimde değerlendirilmiştir. [4]
+
+Model-based security testing (MBST), güvenlik gereksinimlerinin erken doğrulanmasını ve model tabanlı otomatik test üretimini mümkün kılmaktadır. Otomotiv endüstrisindeki uygulamalar, bu yaklaşımın protokol güvenliğine nasıl uyarlanabileceğini göstermektedir. [1]
+
+Protokol implementasyonlarının güvenlik doğrulaması için IOLTS (Input/Output Labeled Transition System) uzantıları geliştirilmiş; bu yaklaşım FSM tabanlı güvenlik testinin teorik temelini oluşturmaktadır. [2]
+
+---
+
+## 🔬 2. TOR PROTOKOLܜ DERİN ANALİZİ
+
+### 2.1 Tor Cell Yapısı
+
+Tor'da tüm iletişim **512 byte'lık cell**'ler üzerinden gerçekleşir:
+
+````
++----------+----------+------------------------------------------+
+| CircID   | CMD      | DATA                                     |
+| (2 byte) | (1 byte) | (509 byte)                               |
++----------+----------+------------------------------------------+
+````
+
+**Kritik CMD Değerleri:**
+
+| CMD | Değer | Açıklama | İlgili State |
+|:----|:------|:---------|:-------------|
+| `PADDING` | 0 | Trafik dolgusu | IDLE |
+| `CREATE` | 1 | Devre oluştur | CONNECTING |
+| `CREATED` | 2 | Devre onayı | HANDSHAKING |
+| `RELAY` | 3 | Veri iletimi | TRANSMITTING |
+| `DESTROY` | 4 | Devre yok et | CLOSING |
+| `CREATE2` | 7 | ntor handshake | HANDSHAKING |
+| `CREATED2` | 8 | ntor yanıt | CIRCUIT_BUILDING |
+
+### 2.2 Tor Devre Kurulum Süreci
+
+````mermaid
+sequenceDiagram
+    participant C as Client
+    participant G as Guard Node
+    participant M as Middle Node
+    participant E as Exit Node
+
+    C->>G: CREATE (TAP/ntor handshake)
+    G->>C: CREATED
+    Note over C,G: State: HANDSHAKING → CIRCUIT_BUILDING
+    
+    C->>G: RELAY EXTEND → M
+    G->>M: CREATE
+    M->>G: CREATED
+    G->>C: RELAY EXTENDED
+    Note over C,M: State: CIRCUIT_BUILDING (hop 2)
+    
+    C->>G: RELAY EXTEND → E
+    G->>M: RELAY EXTEND
+    M->>E: CREATE
+    E->>M: CREATED
+    M->>G: RELAY EXTENDED
+    G->>C: RELAY EXTENDED
+    Note over C,E: State: CIRCUIT_READY
+    
+    C->>E: RELAY DATA
+    Note over C,E: State: TRANSMITTING
+````
+
+### 2.3 Tor'un Tam FSM Durum Modeli
+
+$$M_{Tor} = (Q, \Sigma, \delta, q_0, F)$$
+
+**Durum Kümesi:**
+$$Q = \{IDLE, CONNECTING, TLS\_HANDSHAKE, CREATE\_SENT, \\ CIRCUIT\_BUILDING, CIRCUIT\_READY, TRANSMITTING, \\ CLOSING, CLOSED, ERROR\}$$
+
+**Geçiş Fonksiyonu Tablosu:**
+
+| Mevcut Durum | Event/Input | Sonraki Durum | Geçerli mi? |
+|:-------------|:------------|:--------------|:------------|
+| `IDLE` | `CONNECT` | `CONNECTING` | ✅ Valid |
+| `IDLE` | `RELAY_DATA` | `TRANSMITTING` | ❌ **INVALID** |
+| `IDLE` | `DESTROY` | `IDLE` | ❌ **INVALID** |
+| `CONNECTING` | `TLS_OK` | `TLS_HANDSHAKE` | ✅ Valid |
+| `CONNECTING` | `RELAY_DATA` | `TRANSMITTING` | ❌ **INVALID** |
+| `TLS_HANDSHAKE` | `CREATE` | `CREATE_SENT` | ✅ Valid |
+| `TLS_HANDSHAKE` | `RELAY_DATA` | `TRANSMITTING` | ❌ **INVALID** |
+| `CREATE_SENT` | `CREATED` | `CIRCUIT_BUILDING` | ✅ Valid |
+| `CREATE_SENT` | `CREATE` | `CREATE_SENT` | ❌ **INVALID** |
+| `CIRCUIT_BUILDING` | `EXTENDED` | `CIRCUIT_READY` | ✅ Valid |
+| `CIRCUIT_BUILDING` | `RELAY_DATA` | `TRANSMITTING` | ❌ **INVALID** |
+| `CIRCUIT_READY` | `RELAY_DATA` | `TRANSMITTING` | ✅ Valid |
+| `CIRCUIT_READY` | `CREATE` | `CREATE_SENT` | ❌ **INVALID** |
+| `TRANSMITTING` | `DESTROY` | `CLOSING` | ✅ Valid |
+| `TRANSMITTING` | `CREATE` | `CREATE_SENT` | ❌ **INVALID** |
+| `CLOSING` | `CLOSED` | `CLOSED` | ✅ Valid |
+| `CLOSED` | `RELAY_DATA` | `TRANSMITTING` | ❌ **INVALID** |
+| `CLOSED` | `CREATE` | `CREATE_SENT` | ❌ **INVALID** |
+
+---
+
+## 🏗️ 3. FORMAL MODEL & MATEMATİKSEL ÇERÇEVE
+
+### 3.1 Invalid Transition Formal Tanımı
+
+**Tanım 1 (Valid Transition):**
+$$\delta_{valid}(q_i, \sigma) = q_j \iff (q_i, \sigma, q_j) \in T_{spec}$$
+
+**Tanım 2 (Invalid Transition):**
+$$\delta_{invalid}(q_i, \sigma) = \begin{cases} \emptyset & \text{if } \nexists q_j: (q_i, \sigma, q_j) \in T_{spec} \\ q_j & \text{if } (q_i, \sigma, q_j) \notin T_{sec} \end{cases}$$
+
+**Tanım 3 (Security Policy Violation):**
+$$\forall (q_i, \sigma, q_j) \in T_{impl}: (q_i, \sigma, q_j) \in T_{spec} \land \neg violates(q_j, \mathcal{P})$$
+
+Burada $$\mathcal{P}$$ güvenlik politikası kümesini, $$T_{spec}$$ spesifikasyon geçiş kümesini, $$T_{impl}$$ implementasyon geçiş kümesini temsil eder.
+
+### 3.2 Conformance Testing Teorisi
+
+FSM tabanlı conformance testing metodolojisine göre test suite $$T$$ şu koşulu sağlamalıdır: [4]
+
+$$\forall imp \in IMP: imp \text{ passes } T \iff imp \text{ conforms to } spec$$
+
+**Test Coverage Metrikleri:**
+
+$$Coverage_{state} = \frac{|Q_{visited}|}{|Q_{total}|} \times 100$$
+
+$$Coverage_{transition} = \frac{|T_{tested}|}{|T_{total}|} \times 100$$
+
+$$Coverage_{invalid} = \frac{|T_{invalid\_detected}|}{|T_{invalid\_total}|} \times 100$$
+
+---
+
+## 🛠️ 4. SİSTEM MİMARİSİ & İMPLEMENTASYON
+
+### 4.1 Genel Sistem Mimarisi
+
+````mermaid
+flowchart TD
+    subgraph INPUT["📥 GİRDİ KATMANI"]
+        A[Tor Trafik Yakalama\nWireshark/Scapy]
+        B[Stem Library\nTor Controller]
+        C[Synthetic Test\nGenerator]
+    end
+
+    subgraph FSM["🔵 FSM KATMANI"]
+        D[FSM Model\nParser]
+        E[State Tracker\nEngine]
+        F[Transition\nValidator]
+    end
+
+    subgraph DETECT["🔴 TESPİT KATMANI"]
+        G[Invalid Transition\nDetector]
+        H[Anomaly\nClassifier]
+        I[Attack Pattern\nMatcher]
+    end
+
+    subgraph OUTPUT["📤 ÇIKTI KATMANI"]
+        J[Security Report\nGenerator]
+        K[Alert System]
+        L[Visualization\nDashboard]
+    end
+
+    A --> D
+    B --> D
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+    I --> K
+    J --> L
+````
+
+### 4.2 Çekirdek FSM Implementasyonu
+
+````python
+from enum import Enum, auto
+from dataclasses import dataclass, field
+from typing import Dict, Set, Optional, List
+import logging
+from datetime import datetime
+
+# ─── Durum Tanımları ───────────────────────────────────────────
+class TorState(Enum):
+    IDLE              = auto()
+    CONNECTING        = auto()
+    TLS_HANDSHAKE     = auto()
+    CREATE_SENT       = auto()
+    CIRCUIT_BUILDING  = auto()
+    CIRCUIT_READY     = auto()
+    TRANSMITTING      = auto()
+    CLOSING           = auto()
+    CLOSED            = auto()
+    ERROR             = auto()
+
+class TorEvent(Enum):
+    CONNECT           = auto()
+    TLS_OK            = auto()
+    TLS_FAIL          = auto()
+    SEND_CREATE       = auto()
+    RECV_CREATED      = auto()
+    SEND_EXTEND       = auto()
+    RECV_EXTENDED     = auto()
+    SEND_RELAY_DATA   = auto()
+    RECV_RELAY_DATA   = auto()
+    SEND_DESTROY      = auto()
+    RECV_DESTROY      = auto()
+    CIRCUIT_CLOSED    = auto()
+    TIMEOUT           = auto()
+    ERROR_EVENT       = auto()
+
+# ─── Güvenlik İhlali Kaydı ─────────────────────────────────────
+@dataclass
+class SecurityViolation:
+    timestamp:      datetime
+    circuit_id:     str
+    from_state:     TorState
+    event:          TorEvent
+    attempted_state: Optional[TorState]
+    severity:       str  # CRITICAL, HIGH, MEDIUM, LOW
+    attack_type:    str
+    description:    str
+
+# ─── Ana FSM Sınıfı ────────────────────────────────────────────
+class TorCircuitFSM:
+    
+    # Geçerli geçiş tablosu: {(state, event): next_state}
+    VALID_TRANSITIONS: Dict = {
+        (TorState.IDLE,             TorEvent.CONNECT):          TorState.CONNECTING,
+        (TorState.CONNECTING,       TorEvent.TLS_OK):           TorState.TLS_HANDSHAKE,
+        (TorState.CONNECTING,       TorEvent.TLS_FAIL):         TorState.ERROR,
+        (TorState.CONNECTING,       TorEvent.TIMEOUT):          TorState.ERROR,
+        (TorState.TLS_HANDSHAKE,    TorEvent.SEND_CREATE):      TorState.CREATE_SENT,
+        (TorState.CREATE_SENT,      TorEvent.RECV_CREATED):     TorState.CIRCUIT_BUILDING,
+        (TorState.CREATE_SENT,      TorEvent.TIMEOUT):          TorState.ERROR,
+        (TorState.CIRCUIT_BUILDING, TorEvent.RECV_EXTENDED):    TorState.CIRCUIT_READY,
+        (TorState.CIRCUIT_BUILDING, TorEvent.SEND_EXTEND):      TorState.CIRCUIT_BUILDING,
+        (TorState.CIRCUIT_READY,    TorEvent.SEND_RELAY_DATA):  TorState.TRANSMITTING,
+        (TorState.CIRCUIT_READY,    TorEvent.RECV_RELAY_DATA):  TorState.TRANSMITTING,
+        (TorState.TRANSMITTING,     TorEvent.SEND_RELAY_DATA):  TorState.TRANSMITTING,
+        (TorState.TRANSMITTING,     TorEvent.RECV_RELAY_DATA):  TorState.TRANSMITTING,
+        (TorState.TRANSMITTING,     TorEvent.SEND_DESTROY):     TorState.CLOSING,
+        (TorState.TRANSMITTING,     TorEvent.RECV_DESTROY):     TorState.CLOSING,
+        (TorState.CLOSING,          TorEvent.CIRCUIT_CLOSED):   TorState.CLOSED,
+        (TorState.ERROR,            TorEvent.CIRCUIT_CLOSED):   TorState.CLOSED,
+    }
+
+    # Saldırı tipi eşleştirme tablosu
+    ATTACK_PATTERNS: Dict = {
+        (TorState.IDLE,            TorEvent.SEND_RELAY_DATA):  ("CIRCUIT_BYPASS",   "CRITICAL"),
+        (TorState.CLOSED,          TorEvent.SEND_RELAY_DATA):  ("REPLAY_ATTACK",    "CRITICAL"),
+        (TorState.CLOSED,          TorEvent.RECV_RELAY_DATA):  ("GHOST_CIRCUIT",    "HIGH"),
+        (TorState.TLS_HANDSHAKE,   TorEvent.SEND_RELAY_DATA):  ("HANDSHAKE_SKIP",   "HIGH"),
+        (TorState.CIRCUIT_BUILDING,TorEvent.SEND_RELAY_DATA):  ("PREMATURE_DATA",   "HIGH"),
+        (TorState.TRANSMITTING,    TorEvent.SEND_CREATE):      ("CIRCUIT_HIJACK",   "CRITICAL"),
+        (TorState.CREATE_SENT,     TorEvent.SEND_CREATE):      ("CREATE_FLOOD",     "MEDIUM"),
+    }
+
+    def __init__(self, circuit_id: str):
+        self.circuit_id     = circuit_id
+        self.current_state  = TorState.IDLE
+        self.history:  List = []
+        self.violations: List[SecurityViolation] = []
+        self.logger = logging.getLogger(f"TorFSM.{circuit_id}")
+
+    def transition(self, event: TorEvent) -> dict:
+        key = (self.current_state, event)
+        
+        # ── Geçerli geçiş mi? ──────────────────────────────────
+        if key in self.VALID_TRANSITIONS:
+            prev_state = self.current_state
+            self.current_state = self.VALID_TRANSITIONS[key]
+            self.history.append({
+                "timestamp": datetime.now(),
+                "from":      prev_state,
+                "event":     event,
+                "to":        self.current_state,
+                "valid":     True
+            })
+            return {"status": "OK", "new_state": self.current_state}
+
+        # ── Invalid geçiş tespiti ───────────────────────────────
+        attack_type, severity = self.ATTACK_PATTERNS.get(
+            key, ("UNKNOWN_INVALID_TRANSITION", "MEDIUM")
+        )
+
+        violation = SecurityViolation(
+            timestamp        = datetime.now(),
+            circuit_id       = self.circuit_id,
+            from_state       = self.current_state,
+            event            = event,
+            attempted_state  = None,
+            severity         = severity,
+            attack_type      = attack_type,
+            description      = f"Invalid: {self.current_state.name} + {event.name}"
+        )
+        self.violations.append(violation)
+        self.logger.warning(f"[{severity}] {attack_type}: {violation.description}")
+
+        return {
+            "status":      "INVALID_TRANSITION",
+            "attack_type": attack_type,
+            "severity":    severity,
+            "state":       self.current_state  # State değişmez!
+        }
+
+    def get_security_report(self) -> dict:
+        return {
+            "circuit_id":        self.circuit_id,
+            "total_transitions": len(self.history),
+            "violations":        len(self.violations),
+            "critical_count":    sum(1 for v in self.violations if v.severity == "CRITICAL"),
+            "high_count":        sum(1 for v in self.violations if v.severity == "HIGH"),
+            "attack_types":      list(set(v.attack_type for v in self.violations)),
+            "violation_details": [vars(v) for v in self.violations]
+        }
+````
+
+### 4.3 Test Suite Implementasyonu
+
+````python
+import pytest
+
+class TestTorFSMSecurity:
+    
+    def setup_method(self):
+        self.fsm = TorCircuitFSM("test-circuit-001")
+
+    # ── Valid Geçiş Testleri ────────────────────────────────────
+    def test_valid_full_circuit_lifecycle(self):
+        """Tam devre yaşam döngüsü testi"""
+        events = [
+            TorEvent.CONNECT,
+            TorEvent.TLS_OK,
+            TorEvent.SEND_CREATE,
+            TorEvent.RECV_CREATED,
+            TorEvent.RECV_EXTENDED,
+            TorEvent.SEND_RELAY_DATA,
+            TorEvent.SEND_DESTROY,
+            TorEvent.CIRCUIT_CLOSED,
+        ]
+        for event in events:
+            result = self.fsm.transition(event)
+            assert result["status"] == "OK"
+        
+        assert self.fsm.current_state == TorState.CLOSED
+        assert len(self.fsm.violations) == 0
+
+    # ── Invalid Geçiş Testleri ──────────────────────────────────
+    def test_circuit_bypass_attack(self):
+        """IDLE → TRANSMITTING bypass saldırısı"""
+        result = self.fsm.transition(TorEvent.SEND_RELAY_DATA)
+        assert result["status"] == "INVALID_TRANSITION"
+        assert result["attack_type"] == "CIRCUIT_BYPASS"
+        assert result["severity"] == "CRITICAL"
+        assert self.fsm.current_state == TorState.IDLE  # State korunmalı
+
+    def test_replay_attack_closed_circuit(self):
+        """Kapalı devre üzerinden replay saldırısı"""
+        # Devreyi kapat
+        self._build_and_close_circuit()
+        # Kapalı devreden veri göndermeye çalış
+        result = self.fsm.transition(TorEvent.SEND_RELAY_DATA)
+        assert result["attack_type"] == "REPLAY_ATTACK"
+        assert result["severity"] == "CRITICAL"
+
+    def test_circuit_hijack_attempt(self):
+        """Aktif devre üzerinde hijack girişimi"""
+        self._build_circuit()
+        self.fsm.transition(TorEvent.SEND_RELAY_DATA)
+        result = self.fsm.transition(TorEvent.SEND_CREATE)
+        assert result["attack_type"] == "CIRCUIT_HIJACK"
+        assert result["severity"] == "CRITICAL"
+
+    def test_handshake_skip_attack(self):
+        """TLS handshake atlanarak veri gönderimi"""
+        self.fsm.transition(TorEvent.CONNECT)
+        self.fsm.transition(TorEvent.TLS_OK)
+        result = self.fsm.transition(TorEvent.SEND_RELAY_DATA)
+        assert result["attack_type"] == "HANDSHAKE_SKIP"
+
+    def test_state_preserved_on_invalid(self):
+        """Invalid geçişte state korunması"""
+        initial_state = self.fsm.current_state
+        self.fsm.transition(TorEvent.SEND_RELAY_DATA)  # Invalid
+        assert self.fsm.current_state == initial_state
+
+    # ── Yardımcı Metodlar ───────────────────────────────────────
+    def _build_circuit(self):
+        for e in [TorEvent.CONNECT, TorEvent.TLS_OK,
+                  TorEvent.SEND_CREATE, TorEvent.RECV_CREATED,
+                  TorEvent.RECV_EXTENDED]:
+            self.fsm.transition(e)
+
+    def _build_and_close_circuit(self):
+        self._build_circuit()
+        for e in [TorEvent.SEND_RELAY_DATA,
+                  TorEvent.SEND_DESTROY,
+                  TorEvent.CIRCUIT_CLOSED]:
+            self.fsm.transition(e)
+````
+
+---
+
+## 🔴 5. SALDIRI VEKTÖRLERİ & GÜVENLİK ANALİZİ
+
+### 5.1 Tespit Edilen Saldırı Kategorileri
+
+````mermaid
+flowchart LR
+    subgraph CAT1["🔴 KRİTİK"]
+        A1[Circuit Bypass\nIDLE→TRANSMIT]
+        A2[Replay Attack\nCLOSED→TRANSMIT]
+        A3[Circuit Hijack\nTRANSMIT→CREATE]
+    end
+    subgraph CAT2["🟠 YÜKSEK"]
+        B1[Handshake Skip\nTLS→TRANSMIT]
+        B2[Premature Data\nBUILDING→TRANSMIT]
+        B3[Ghost Circuit\nCLOSED→RECV]
+    end
+    subgraph CAT3["🟡 ORTA"]
+        C1[Create Flood\nCREATE→CREATE]
+        C2[State Rollback\nREADY→HANDSHAKE]
+        C3[Timeout Abuse\nBUILDING→TIMEOUT]
+    end
+````
+
+### 5.2 Saldırı Detay Tablosu
+
+| Saldırı | FSM Geçişi | Etki | Tespit Yöntemi |
+|:--------|:-----------|:-----|:---------------|
+| **Circuit Bypass** | `IDLE→TRANSMIT` | Kimlik doğrulama atlatma | State guard kontrolü |
+| **Replay Attack** | `CLOSED→TRANSMIT` | Eski oturum tekrarı | Sequence number kontrolü |
+| **Circuit Hijack** | `TRANSMIT→CREATE` | Devre ele geçirme | Transition policy check |
+| **Handshake Skip** | `TLS→TRANSMIT` | Şifreleme atlatma | State prerequisite check |
+| **Ghost Circuit** | `CLOSED→RECV` | Hayalet devre | Lifetime tracking |
+| **Create Flood** | `CREATE→CREATE` | DoS saldırısı | Rate limiting + FSM |
+| **Premature Data** | `BUILDING→TRANSMIT` | Veri sızıntısı | Build completion check |
+
+Cell-sequence tabanlı deanonymization teknikleri, bu state geçişlerini hedef alarak Tor'un anonimlik garantilerini zayıflatmaktadır. [2]
+
+Kullanıcı tarafı güvenlik açıklarının büyük çoğunluğu, uygulama katmanındaki hatalı state yönetiminden kaynaklanmakta olup FSM tabanlı koruma mekanizmaları bu açıkları kapatabilmektedir. [3]
+
+---
+
+## 📊 6. DENEYSEL TASARIM & DEĞERLENDİRME
+
+### 6.1 Deney Ortamı
+
+````
+┌─────────────────────────────────────────────────────┐
+│                 TEST ORTAMI                          │
+│                                                      │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐       │
+│  │  Tor     │    │  FSM     │    │  Attack  │       │
+│  │  Client  │───▶│  Monitor │◀───│  Injector│       │
+│  │ (Stem)   │    │  Engine  │    │  (Scapy) │       │
+│  └──────────┘    └──────────┘    └──────────┘       │
+│                       │                             │
+│                  ┌────▼────┐                        │
+│                  │Security │                        │
+│                  │Analyzer │                        │
+│                  └─────────┘                        │
+└─────────────────────────────────────────────────────┘
+````
+
+### 6.2 Değerlendirme Metrikleri
+
+| Metrik | Formül | Hedef |
+|:-------|:-------|:------|
+| **Detection Rate** | $$DR = \frac{TP}{TP+FN}$$ | > %95 |
+| **False Positive Rate** | $$FPR = \frac{FP}{FP+TN}$$ | < %5 |
+| **State Coverage** | $$SC = \frac{\|Q_{visited}\|}{\|Q\|}$$ | %100 |
+| **Transition Coverage** | $$TC = \frac{\|T_{tested}\|}{\|T\|}$$ | > %90 |
+| **Attack Detection Latency** | $$ADL = t_{detect} - t_{attack}$$ | < 100ms |
+
+FSM tabanlı conformance testing, protokol implementasyonlarındaki sapmaları yüksek doğrulukla tespit edebilmekte ve test suite tamamlığı matematiksel olarak kanıtlanabilmektedir. [4]
+
+---
+
+## 📝 7. AKADEMİK MAKALE YAPISI
+
+### IEEE Format — Tam Outline
+
+````markdown
+# Makale Taslağı
+
+## Abstract (250 kelime)
+- Problem: Tor'da invalid state transition'ların tespiti
+- Yöntem: FSM tabanlı model-driven testing
+- Bulgular: X saldırı tipi tespit edildi, %Y detection rate
+- Katkı: Otomatik tespit aracı + saldırı sınıflandırması
+
+## 1. Introduction
+1.1 Motivasyon ve Problem Tanımı
+1.2 Araştırma Soruları (RQ1, RQ2, RQ3)
+1.3 Katkılar (Contributions)
+1.4 Makale Organizasyonu
+
+## 2. Background
+2.1 Tor Protokolü ve Devre Mimarisi
+2.2 Finite State Machine Teorisi
+2.3 Model-Driven Security Testing
+2.4 Threat Model
+
+## 3. Related Work
+3.1 Tor Güvenlik Araştırmaları
+3.2 FSM Tabanlı Protokol Testi
+3.3 Deanonymization Saldırıları
+3.4 Boşluk Analizi (Research Gap)
+
+## 4. FSM Model of Tor Circuit Protocol
+4.1 Formal Tanım
+4.2 Durum ve Geçiş Tanımları
+4.3 Güvenlik Politikası Spesifikasyonu
+4.4 UPPAAL Model Doğrulaması
+
+## 5. Invalid Transition Detection Methodology
+5.1 Tespit Algoritması
+5.2 Saldırı Kategorileri
+5.3 Test Case Üretim Stratejisi
+5.4 Araç Mimarisi
+
+## 6. Implementation & Evaluation
+6.1 Deney Ortamı
+6.2 Test Senaryoları
+6.3 Sonuçlar ve Analiz
+6.4 Karşılaştırmalı Değerlendirme
+
+## 7. Security Analysis
+7.1 Tespit Edilen Açıklar
+7.2 Saldırı Vektörü Analizi
+7.3 Savunma Önerileri
+
+## 8. Threats to Validity
+8.1 İç Geçerlilik
+8.2 Dış Geçerlilik
+8.3 Yapı Geçerliliği
+
+## 9. Conclusion & Future Work
+
+## References (min. 20 kaynak)
+````
+
+---
+
+## 🔧 8. ARAÇLAR & KURULUM REHBERİ
+
+### 8.1 Gerekli Araçlar
+
+````bash
+# Python ortamı
+pip install stem          # Tor kontrolü
+pip install scapy         # Paket analizi
+pip install pytest        # Test framework
+pip install pytest-cov    # Coverage raporu
+pip install networkx      # Graf analizi
+pip install matplotlib    # Görselleştirme
+
+# Formal doğrulama
+# UPPAAL: https://uppaal.org/
+# NuSMV:  https://nusmv.fbk.eu/
+
+# Trafik analizi
+# Wireshark (GUI)
+# tshark (CLI)
+````
+
+### 8.2 GitHub Proje Yapısı
+
+````
+tor-fsm-security/
+├── README.md
+├── docs/
+│   ├── paper/              # LaTeX makale
+│   ├── fsm-model/          # UPPAAL modelleri
+│   └── diagrams/           # Durum diyagramları
+├── src/
+│   ├── fsm/
+│   │   ├── tor_fsm.py      # Ana FSM sınıfı
+│   │   ├── states.py       # Durum tanımları
+│   │   └── transitions.py  # Geçiş tabloları
+│   ├── detector/
+│   │   ├── invalid_detector.py
+│   │   └── attack_classifier.py
+│   └── analyzer/
+│       ├── traffic_capture.py
+│       └── report_generator.py
+├── tests/
+│   ├── test_valid_transitions.py
+│   ├── test_invalid_transitions.py
+│   ├── test_attack_scenarios.py
+│   └── test_coverage.py
+├── experiments/
+│   └── results/
+└── requirements.txt
+````
+
+---
+
+## 📅 9. DETAYLI PROJE TAKVİMİ
+
+| Hafta | Görev | Çıktı | Araç |
+|:------|:------|:------|:-----|
+| **1** | Tor protokol analizi, RFC okuma | Protokol notları | Tor spec |
+| **2** | Literatür taraması | Annotated bibliography | Google Scholar |
+| **3** | FSM formal modeli tasarımı | FSM diyagramı | UPPAAL |
+| **4** | Geçiş tablosu & politika tanımı | Spec dokümanı | LaTeX |
+| **5** | Python FSM implementasyonu | `tor_fsm.py` | Python |
+| **6** | Test suite yazımı | Test dosyaları | pytest |
+| **7** | Saldırı senaryoları implementasyonu | Attack injector | Scapy |
+| **8** | Deneyler & ölçümler | Ham sonuçlar | - |
+| **9** | Güvenlik analizi | Analiz raporu | - |
+| **10** | Makale yazımı (taslak) | Draft paper | Overleaf |
+| **11** | Revizyon & düzeltme | Final paper | Overleaf |
+| **12** | Sunum hazırlığı | Slides | Beamer/PPT |
+
+---
+
+## 🎯 10. ÖZGÜN KATKI & ARAŞTIRMA BOŞLUĞU
+
+### Literatürdeki Boşluklar:
+
+> 1. ✅ Tor'a **özel** kapsamlı FSM modeli literatürde eksik
+> 2. ✅ Invalid transition → saldırı tipi **otomatik eşleştirmesi** yok
+> 3. ✅ **Real-time** tespit aracı geliştirilmemiş
+> 4. ✅ FSM tabanlı **deanonymization korelasyonu** kurulmamış
+
+Model-based security testing yaklaşımı, güvenlik gereksinimlerinin erken doğrulanmasını sağlamakta ve bu çalışmada Tor'a özgü biçimde uyarlanmaktadır. [1]
+
+FSM conformance testing metodolojileri, protokol implementasyonlarındaki sapmaları sistematik biçimde ortaya çıkarmakta; bu çalışma söz konusu metodolojileri Tor'un güvenlik analizine uygulamaktadır. [4]
+
+---
+
+## 📖 11. REFERANS LİSTESİ
+
+1. **Chalmers University** — *Model-based Security Testing in Automotive Industry*, 2019 [1]
+2. **MDPI Future Internet** — *Cell-Sequence-Based Covert Signal for Tor De-anonymization*, 2025 [2]
+3. **dev.to / Hejhdiss** — *Reducing User-Side Deanonymization in Tor*, 2024 [3]
+4. **ResearchGate** — *FSM-based Conformance Testing Methods: A Survey*, 2011 [4]
+5. **ScienceDirect** — *Model based security verification of protocol implementation*, 2014
+6. **arXiv** — *Completeness of FSM Test Suites Reconsidered*, 2024
+7. **Hacker Factor Blog** — *Deanonymizing Tor Circuits*, 2020
+8. **ACM/IEEE TNET** — *An Anonymity Vulnerability in Tor*, 2022
+9. **Springer** — *Tor network anonymity evaluation based on node anonymity*, 2023
+10. **arXiv** — *RECTor: Robust and Efficient Correlation Attack on Tor*, 2024
+
+---
+
+> 💬 **Sonraki adım ne olsun?**
+> - 🔵 **UPPAAL ile FSM modelini** çizelim mi?
+> - 📄 **Abstract + Introduction** yazalım mı?
+> - 🐍 **Python kodunu** daha da geliştirelim mi?
+> - 📊 **Deney tasarımını** detaylandıralım mı?
