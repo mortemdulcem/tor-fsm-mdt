@@ -168,6 +168,11 @@ export async function registerRoutes(
     try {
       const input = api.fsm.simulate.input.parse(req.body);
       
+      const testRun = await storage.getTestRun(input.testRunId);
+      if (!testRun) {
+        return res.status(404).json({ message: "Test run not found" });
+      }
+
       // Run simulation asynchronously
       storage.updateTestRunStatus(input.testRunId, 'running').then(() => {
         runSimulation(input.testRunId, input.count).then(() => {

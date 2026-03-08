@@ -3,7 +3,8 @@ import { useRoute } from "wouter";
 import { format } from "date-fns";
 import { 
   ArrowLeft, Terminal, ShieldAlert, Cpu, 
-  Zap, AlertTriangle, ArrowRight, PlayCircle
+  Zap, AlertTriangle, ArrowRight, PlayCircle,
+  Network, ShieldCheck
 } from "lucide-react";
 import { Link } from "wouter";
 import { useTestRun } from "@/hooks/use-test-runs";
