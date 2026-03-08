@@ -1,0 +1,234 @@
+Topladığım tüm kaynakları birleştirerek kapsamlı akademik rehberi sunuyorum! 🎓
+
+---
+
+# 🧅 Tor Tabanlı FSM Invalid State Transition Tespiti
+## Kapsamlı Proje Rehberi
+
+---
+
+## 📌 1. PROJE TANIMI & KAPSAMI
+
+Bu proje üç ana eksen üzerine kuruludur:
+
+```
+Tor Protokolü  →  FSM Modelleme  →  Invalid Transition Tespiti  →  Güvenlik Analizi
+```
+
+### 🎯 Araştırma Soruları:
+1. Tor'un protokol durumları FSM ile nasıl modellenir?
+2. Hangi state transition'lar "invalid" sayılır?
+3. Model-Driven Testing bu tespiti nasıl otomatize eder?
+4. Güvenlik açıkları bu geçişlerle nasıl ilişkilendirilir?
+
+---
+
+## 📚 2. TEMEL KAVRAMLAR
+
+### 🔵 A) Tor Protokolü Durum Makinesi
+
+Tor devresi şu temel durumlardan geçer:
+
+| Durum | Açıklama |
+|:------|:---------|
+| `IDLE` | Bağlantı yok |
+| `CONNECTING` | Guard node'a bağlanıyor |
+| `HANDSHAKING` | TLS el sıkışması |
+| `CIRCUIT_BUILDING` | Devre inşa ediliyor |
+| `CIRCUIT_READY` | Devre hazır |
+| `TRANSMITTING` | Veri aktarımı |
+| `CLOSING` | Bağlantı kapatılıyor |
+| `CLOSED` | Kapalı |
+
+Tor ağı, devre kurulumu ve veri iletiminde belirli durum geçişlerine sahip olup bu geçişlerin modellenmesi güvenlik analizi için kritiktir. [1]
+
+### 🔴 B) Invalid State Transition Nedir?
+
+> Bir FSM'de tanımlı olmayan veya güvenlik politikasını ihlal eden durum geçişleridir.
+
+**Örnekler:**
+- `IDLE → TRANSMITTING` (handshake atlanması)
+- `CIRCUIT_BUILDING → HANDSHAKING` (geri dönüş)
+- `CLOSED → TRANSMITTING` (kapalı devreden veri)
+
+Bu tür geçişler, FSM tabanlı güvenlik açığı modellemesinde kritik bulgular olarak değerlendirilmektedir. [2]
+
+### 🟢 C) Model-Driven Testing (MDT)
+
+Model-Driven Security Testing; güvenlik testi, risk odaklı test ve model tabanlı test yaklaşımlarını birleştiren bir metodolojidur. [3]
+
+---
+
+## 🏗️ 3. MİMARİ & METODOLOJİ
+
+### Proje Akışı:
+
+````mermaid
+flowchart TD
+    A[Tor Protokol Analizi] --> B[FSM Modeli Oluştur]
+    B --> C[Valid Transition Tablosu]
+    B --> D[Invalid Transition Tablosu]
+    C --> E[Test Case Üret]
+    D --> E
+    E --> F[Model-Driven Test Çalıştır]
+    F --> G[Güvenlik Açığı Tespiti]
+    G --> H[Raporlama & Analiz]
+````
+
+---
+
+## 🔬 4. TEKNİK YAPI
+
+### 📐 FSM Formal Tanımı
+
+FSM şu 5-tuple ile tanımlanır:
+
+$$M = (Q, \Sigma, \delta, q_0, F)$$
+
+Burada:
+- $$Q$$ = Durum kümesi (IDLE, CONNECTING, ...)
+- $$\Sigma$$ = Giriş alfabesi (events)
+- $$\delta: Q \times \Sigma \rightarrow Q$$ = Geçiş fonksiyonu
+- $$q_0$$ = Başlangıç durumu
+- $$F$$ = Kabul durumları kümesi
+
+**Invalid transition:** $$\delta(q_i, \sigma) = \emptyset$$ veya güvenlik politikasını ihlal eden $$\delta(q_i, \sigma) = q_j$$
+
+### 🛡️ Güvenlik Açığı Kategorileri
+
+Tor ağında tespit edilen başlıca saldırı vektörleri:
+
+| Saldırı Tipi | FSM Karşılığı | Risk |
+|:-------------|:--------------|:-----|
+| Trapper Attack | Deanonymization | Yüksek |
+| Traffic Correlation | TRANSMITTING state manipülasyonu | Yüksek |
+| Circuit Hijacking | CIRCUIT_BUILDING bypass | Kritik |
+| Replay Attack | HANDSHAKING tekrarı | Orta |
+
+Tor ağı, AS-level ve Node-level saldırganlar tarafından deanonymization saldırılarına karşı savunmasız olabilmektedir. [4]
+
+---
+
+## 🧪 5. TEST STRATEJİSİ
+
+### Test Seviyeleri:
+
+**1️⃣ Unit Test**
+- Her FSM durumunu izole test et
+- Valid/invalid geçişleri doğrula
+
+**2️⃣ Integration Test**
+- Devre kurulum sürecini uçtan uca test et
+- Node zinciri geçişlerini kontrol et
+
+**3️⃣ Security Test**
+- Fuzzing ile beklenmedik input'lar gönder
+- Boundary state'leri zorla
+
+### Test Case Örneği:
+
+````python
+# Invalid Transition Test Case
+def test_invalid_transition_idle_to_transmit():
+    fsm = TorCircuitFSM()
+    fsm.set_state("IDLE")
+    
+    # Bu geçiş INVALID olmalı
+    result = fsm.transition("TRANSMIT_DATA")
+    
+    assert result == TransitionError.INVALID
+    assert fsm.current_state == "IDLE"  # State değişmemeli
+    assert fsm.security_log.contains("INVALID_TRANSITION")
+````
+
+---
+
+## 🛠️ 6. KULLANILACAK ARAÇLAR & TEKNOLOJİLER
+
+| Kategori | Araç | Amaç |
+|:---------|:-----|:-----|
+| **FSM Modelleme** | UPPAAL, NuSMV | Formal model oluşturma |
+| **Test Otomasyonu** | Python + pytest | Test senaryoları |
+| **Tor Analizi** | Stem Library | Tor kontrolü |
+| **Trafik Analizi** | Wireshark, Scapy | Paket yakalama |
+| **Dokümantasyon** | LaTeX, Overleaf | Makale yazımı |
+| **Versiyon Kontrol** | GitHub | Kod yönetimi |
+
+---
+
+## 📖 7. AKADEMİK KAYNAKLAR
+
+### Mutlaka Okumanız Gereken Makaleler:
+
+1. **"Methodically Modeling the Tor Network"** — USENIX CSET 2012
+   - Tor ağının sistematik modellenmesi [1]
+
+2. **"A Data-Driven FSM Model for Analyzing Security Vulnerabilities"** — Microsoft Research
+   - FSM ile güvenlik açığı analizi [2]
+
+3. **"Risk-driven Security Testing using Risk Analysis with Threat Modeling"** — PMC
+   - Model-Based Security Testing metodolojisi [3]
+
+4. **"An Anonymity Vulnerability in Tor"** — ACM/IEEE TNET 2022
+   - Tor'da anonimlik açıkları [4]
+
+---
+
+## 📝 8. MAKALE YAPISI (IEEE Formatı)
+
+````markdown
+# Makale Bölümleri
+
+1. **Abstract** (~250 kelime)
+   - Problem, yöntem, bulgular, katkı
+
+2. **Introduction** (~1 sayfa)
+   - Motivasyon, araştırma soruları, katkılar
+
+3. **Background & Related Work** (~1.5 sayfa)
+   - Tor protokolü, FSM, MDT literatürü
+
+4. **FSM Model of Tor** (~1.5 sayfa)
+   - Formal tanım, durum diyagramı, geçiş tablosu
+
+5. **Invalid Transition Detection Methodology** (~2 sayfa)
+   - Test yaklaşımı, algoritma, araçlar
+
+6. **Security Analysis** (~1.5 sayfa)
+   - Bulgular, açıklar, kategoriler
+
+7. **Evaluation** (~1 sayfa)
+   - Metrikler, karşılaştırma
+
+8. **Conclusion & Future Work** (~0.5 sayfa)
+
+9. **References** (min. 15 kaynak)
+````
+
+---
+
+## ⏱️ 9. PROJE TAKVİMİ
+
+| Hafta | Görev |
+|:------|:------|
+| **1-2** | Literatür taraması, Tor protokol analizi |
+| **3-4** | FSM modelinin tasarımı |
+| **5-6** | Test senaryolarının yazılması |
+| **7-8** | Implementasyon & test çalıştırma |
+| **9-10** | Güvenlik analizi & bulgular |
+| **11-12** | Makale yazımı & revizyon |
+
+---
+
+## 🎯 10. ÖZGÜN KATKI ÖNERİLERİ
+
+> Makalenin kabul edilebilmesi için özgün katkı şart!
+
+1. ✅ **Tor'a özel FSM modeli** — Literatürde tam kapsamlı yok
+2. ✅ **Otomatik invalid transition detector** — Tool katkısı
+3. ✅ **Güvenlik açığı → FSM geçişi eşleştirme tablosu** — Yeni sınıflandırma
+4. ✅ **Real Tor trafiği üzerinde validasyon** — Pratik katkı
+
+---
+
+> 💬 **Hangi bölümden başlayalım? FSM modelini mi çizelim, yoksa Abstract'ı mı yazalım?** 🚀
