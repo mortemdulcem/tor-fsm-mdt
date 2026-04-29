@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 1710" width="1900" height="1710">
+  <defs>
+    <filter id="dropShadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.12"/>
+    </filter>
+    <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e6ebf2" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+  <rect width="1900" height="1710" fill="#ffffff"/>
+  <rect x="0" y="80" width="1900" height="1630" fill="url(#gridPattern)"/>
+  
+    <rect x="0" y="0" width="1900" height="80" fill="#0e1c2f"/>
+    <text x="32" y="40" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="22" font-weight="700" fill="#ffffff">
+      Soru 2 — SimpleCar E-Satis Sistemi
+    </text>
+    <text x="32" y="64" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="13" font-style="italic" fill="#a8b8d0">
+      Strategy + Chain of Responsibility + Command Oruntuleri
+    </text>
+    <text x="1868" y="40" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="13" fill="#a8b8d0">
+      Sinif Diyagrami
+    </text>
+    <text x="1868" y="64" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11" fill="#7a8aa0">
+      Nesneye Yonelik Yazilim Gelistirme — 2025-2026 Bahar
+    </text>
+  
+  <g class="rel-association">
+<path d="M 400 297 L 340 253" fill="none" stroke="#202a3a" stroke-width="1.5"
+     stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="352,246 340,253 352,260" fill="none" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="378" y="309" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">0..*</text>
+<text x="362" y="249" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">1</text>
+<g>
+      <text x="370" y="271" text-anchor="middle"
+        font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" font-style="italic" fill="#36507c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">
+        alici
+      </text>
+    </g>
+</g>
+<g class="rel-association">
+<path d="M 760 238.2 L 820 264" fill="none" stroke="#202a3a" stroke-width="1.5"
+     stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="808,271 820,264 808,257" fill="none" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="782" y="234.2" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">*</text>
+<text x="798" y="276" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">1</text>
+</g>
+<g class="rel-aggregation">
+<path d="M 760 355.79999999999995 L 1140 231" fill="none" stroke="#202a3a" stroke-width="1.5"
+     stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="760,355.79999999999995 769,347.79999999999995 778,355.79999999999995 769,363.79999999999995" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+<text x="782" y="351.79999999999995" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">1</text>
+<text x="1118" y="243" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">1</text>
+<g>
+      <text x="950" y="289.4" text-anchor="middle"
+        font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" font-style="italic" fill="#36507c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">
+        odemeYontemi
+      </text>
+    </g>
+</g>
+<g class="rel-realization">
+<path d="M 1260 410 L 1260 384 L 1204 384 L 1204 338 L 1204 312" fill="none" stroke="#202a3a" stroke-width="1.5"
+    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1204,312 1213,326 1195,326" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+</g>
+<g class="rel-realization">
+<path d="M 1520 410 L 1520 384 L 1300 384 L 1300 338 L 1300 312" fill="none" stroke="#202a3a" stroke-width="1.5"
+    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1300,312 1309,326 1291,326" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+</g>
+<g class="rel-realization">
+<path d="M 1770 410 L 1770 384 L 1396 384 L 1396 338 L 1396 312" fill="none" stroke="#202a3a" stroke-width="1.5"
+    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1396,312 1405,326 1387,326" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+</g>
+<g class="rel-association">
+<path d="M 660 653 L 420 642" fill="none" stroke="#202a3a" stroke-width="1.5"
+     stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="432,635 420,642 432,649" fill="none" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="638" y="665" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">1</text>
+<text x="442" y="638" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">1</text>
+<g>
+      <text x="540" y="643.5" text-anchor="middle"
+        font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" font-style="italic" fill="#36507c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">
+        kontrolZinciri
+      </text>
+    </g>
+</g>
+<g class="rel-composition">
+<path d="M 1120 653 L 1180 631" fill="none" stroke="#202a3a" stroke-width="1.5"
+     stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1120,653 1129,645 1138,653 1129,661" fill="#202a3a" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+<text x="1142" y="649" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">1</text>
+<text x="1158" y="643" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">1</text>
+<g>
+      <text x="1150" y="638" text-anchor="middle"
+        font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" font-style="italic" fill="#36507c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">
+        isleyici
+      </text>
+    </g>
+</g>
+<g class="rel-dependency">
+<path d="M 890 550 L 890 524 L 580 524 L 580 470 L 580 444" fill="none" stroke="#202a3a" stroke-width="1.5"
+    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="587,456 580,444 573,456" fill="none" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter" stroke-linecap="round"/>
+<g>
+      <text x="735" y="493" text-anchor="middle"
+        font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" font-style="italic" fill="#36507c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">
+        isler
+      </text>
+    </g>
+</g>
+<g class="rel-association">
+<path d="M 366 550 L 366 518 L 452 518 L 452 577.6 L 420 577.6" fill="none" stroke="#202a3a" stroke-width="1.5"
+     stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="432,570.6 420,577.6 432,584.6" fill="none" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="358" y="532" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">0..1</text>
+<text x="442" y="573.6" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">0..1</text>
+<g>
+      <text x="452" y="506" text-anchor="middle"
+        font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" font-style="italic" fill="#36507c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">
+        sonraki
+      </text>
+    </g>
+</g>
+<g class="rel-inheritance">
+<path d="M 180 890 L 180 864 L 132 864 L 132 760 L 132 734" fill="none" stroke="#202a3a" stroke-width="1.5"
+     stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="132,734 141,748 123,748" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+</g>
+<g class="rel-inheritance">
+<path d="M 440 890 L 440 864 L 240 864 L 240 760 L 240 734" fill="none" stroke="#202a3a" stroke-width="1.5"
+     stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="240,734 249,748 231,748" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+</g>
+<g class="rel-inheritance">
+<path d="M 700 890 L 700 864 L 348 864 L 348 760 L 348 734" fill="none" stroke="#202a3a" stroke-width="1.5"
+     stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="348,734 357,748 339,748" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+</g>
+<g class="rel-aggregation">
+<path d="M 1340 712 L 1340 738 L 1320 738 L 1320 864 L 1320 890" fill="none" stroke="#202a3a" stroke-width="1.5"
+     stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1340,712 1348,721 1340,730 1332,721" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+<text x="1348" y="738" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">1</text>
+<text x="1312" y="872" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#202a3a">1..*</text>
+<g>
+      <text x="1330" y="797" text-anchor="middle"
+        font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" font-style="italic" fill="#36507c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">
+        komutlar (sirali)
+      </text>
+    </g>
+</g>
+<g class="rel-realization">
+<path d="M 1300 1150 L 1300 1124 L 1236 1124 L 1236 1078 L 1236 1052" fill="none" stroke="#202a3a" stroke-width="1.5"
+    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1236,1052 1245,1066 1227,1066" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+</g>
+<g class="rel-realization">
+<path d="M 1570 1150 L 1570 1124 L 1376 1124 L 1376 1078 L 1376 1052" fill="none" stroke="#202a3a" stroke-width="1.5"
+    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1376,1052 1385,1066 1367,1066" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+</g>
+<g class="rel-realization">
+<path d="M 1404 1370 L 1404 1344 L 1418 1344 L 1418 1078 L 1418 1052" fill="none" stroke="#202a3a" stroke-width="1.5"
+    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1418,1052 1427,1066 1409,1066" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+</g>
+<g class="rel-dependency">
+<path d="M 1180 1231 L 1140 1253" fill="none" stroke="#202a3a" stroke-width="1.5"
+    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1152,1246 1140,1253 1152,1260" fill="none" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter" stroke-linecap="round"/>
+<g>
+      <text x="1160" y="1238" text-anchor="middle"
+        font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" font-style="italic" fill="#36507c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">
+        &lt;&lt;creates&gt;&gt;
+      </text>
+    </g>
+</g>
+<g class="rel-dependency">
+<path d="M 1450 1231 L 1424 1231 L 1424 1294.2 L 1166 1294.2 L 1140 1294.2" fill="none" stroke="#202a3a" stroke-width="1.5"
+    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1152,1287.2 1140,1294.2 1152,1301.2" fill="none" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter" stroke-linecap="round"/>
+<g>
+      <text x="1295" y="1258.6" text-anchor="middle"
+        font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" font-style="italic" fill="#36507c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">
+        &lt;&lt;uses&gt;&gt;
+      </text>
+    </g>
+</g>
+  <g class="cls-Musteri" filter="url(#dropShadow)">
+<rect x="60" y="150" width="280" height="206"
+        rx="6" ry="6" fill="#e8f0fb" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="60" y="150" width="280" height="56"
+        rx="6" ry="6" fill="#1f3b66" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="60" y="198" width="280" height="8"
+        fill="#1f3b66" stroke="none"/>
+<line x1="60" y1="206" x2="340" y2="206"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="200" y="170" text-anchor="middle"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="12" fill="#ffffff">
+      &lt;&lt;entity&gt;&gt;
+    </text>
+<text x="200" y="192" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    Musteri
+  </text>
+<text x="72" y="232" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- id : int</text>
+<text x="72" y="254" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- ad : String</text>
+<text x="72" y="276" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- eposta : String</text>
+<text x="72" y="298" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- hesapBakiyesi : double</text>
+<line x1="60" y1="314" x2="340" y2="314"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="72" y="340" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ bakiyeyiGetir() : double</text>
+</g>
+<g class="cls-Siparis" filter="url(#dropShadow)">
+<rect x="400" y="150" width="360" height="294"
+        rx="6" ry="6" fill="#e8f0fb" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="400" y="150" width="360" height="56"
+        rx="6" ry="6" fill="#1f3b66" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="400" y="198" width="360" height="8"
+        fill="#1f3b66" stroke="none"/>
+<line x1="400" y1="206" x2="760" y2="206"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="580" y="170" text-anchor="middle"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="12" fill="#ffffff">
+      &lt;&lt;entity&gt;&gt;
+    </text>
+<text x="580" y="192" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    Siparis
+  </text>
+<text x="412" y="232" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- id : int</text>
+<text x="412" y="254" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- musteri : Musteri</text>
+<text x="412" y="276" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- miktar : int</text>
+<text x="412" y="298" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- tutar : double</text>
+<text x="412" y="320" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- odemeYontemi : OdemeYontemi</text>
+<text x="412" y="342" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- durum : SiparisDurumu</text>
+<line x1="400" y1="358" x2="760" y2="358"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="412" y="384" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ iptalEt() : void</text>
+<text x="412" y="406" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ tamamlandiOlarakIsaretle() : void</text>
+<text x="412" y="428" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ odemeAl() : boolean</text>
+</g>
+<g class="cls-SiparisDurumu" filter="url(#dropShadow)">
+<rect x="820" y="150" width="260" height="228"
+        rx="6" ry="6" fill="#e9f6ee" stroke="#1c6749" stroke-width="1.6"/>
+<rect x="820" y="150" width="260" height="56"
+        rx="6" ry="6" fill="#1c6749" stroke="#1c6749" stroke-width="1.6"/>
+<rect x="820" y="198" width="260" height="8"
+        fill="#1c6749" stroke="none"/>
+<line x1="820" y1="206" x2="1080" y2="206"
+        stroke="#1c6749" stroke-width="1.6"/>
+<text x="950" y="170" text-anchor="middle"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="12" fill="#ffffff">
+      &lt;&lt;enumeration&gt;&gt;
+    </text>
+<text x="950" y="192" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    SiparisDurumu
+  </text>
+<text x="832" y="232" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">ALINDI</text>
+<text x="832" y="254" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">KONTROL_EDILIYOR</text>
+<text x="832" y="276" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">ONAYLANDI</text>
+<text x="832" y="298" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">IPTAL_EDILDI</text>
+<text x="832" y="320" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">ISLENDI</text>
+<line x1="820" y1="336" x2="1080" y2="336"
+    stroke="#1c6749" stroke-width="1"/>
+</g>
+<g class="cls-OdemeYontemi" filter="url(#dropShadow)">
+<rect x="1140" y="150" width="320" height="162"
+        rx="6" ry="6" fill="#fff8e7" stroke="#9c6914" stroke-width="1.6"/>
+<rect x="1140" y="150" width="320" height="56"
+        rx="6" ry="6" fill="#9c6914" stroke="#9c6914" stroke-width="1.6"/>
+<rect x="1140" y="198" width="320" height="8"
+        fill="#9c6914" stroke="none"/>
+<line x1="1140" y1="206" x2="1460" y2="206"
+        stroke="#9c6914" stroke-width="1.6"/>
+<text x="1300" y="170" text-anchor="middle"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="12" fill="#ffffff">
+      &lt;&lt;interface&gt;&gt;
+    </text>
+<text x="1300" y="192" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    font-style="italic"
+    fill="#ffffff">
+    OdemeYontemi
+  </text>
+<line x1="1140" y1="248" x2="1460" y2="248"
+    stroke="#9c6914" stroke-width="1"/>
+<text x="1152" y="274" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ odemeYap(tutar : double) : boolean</text>
+<text x="1152" y="296" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ adi() : String</text>
+</g>
+<g class="cls-BankaHavalesi" filter="url(#dropShadow)">
+<rect x="1140" y="410" width="240" height="162"
+        rx="6" ry="6" fill="#ffffff" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1140" y="410" width="240" height="56"
+        rx="6" ry="6" fill="#2c5282" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1140" y="458" width="240" height="8"
+        fill="#2c5282" stroke="none"/>
+<line x1="1140" y1="466" x2="1380" y2="466"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="1260" y="452" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    BankaHavalesi
+  </text>
+<text x="1152" y="492" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- ibanNumarasi : String</text>
+<line x1="1140" y1="508" x2="1380" y2="508"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="1152" y="534" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ odemeYap(tutar) : boolean</text>
+<text x="1152" y="556" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ adi() : String</text>
+</g>
+<g class="cls-Paypal" filter="url(#dropShadow)">
+<rect x="1410" y="410" width="220" height="162"
+        rx="6" ry="6" fill="#ffffff" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1410" y="410" width="220" height="56"
+        rx="6" ry="6" fill="#2c5282" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1410" y="458" width="220" height="8"
+        fill="#2c5282" stroke="none"/>
+<line x1="1410" y1="466" x2="1630" y2="466"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="1520" y="452" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    Paypal
+  </text>
+<text x="1422" y="492" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- hesapEpostasi : String</text>
+<line x1="1410" y1="508" x2="1630" y2="508"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="1422" y="534" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ odemeYap(tutar) : boolean</text>
+<text x="1422" y="556" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ adi() : String</text>
+</g>
+<g class="cls-SogukCuzdan" filter="url(#dropShadow)">
+<rect x="1660" y="410" width="220" height="162"
+        rx="6" ry="6" fill="#ffffff" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1660" y="410" width="220" height="56"
+        rx="6" ry="6" fill="#2c5282" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1660" y="458" width="220" height="8"
+        fill="#2c5282" stroke="none"/>
+<line x1="1660" y1="466" x2="1880" y2="466"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="1770" y="452" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    SogukCuzdan
+  </text>
+<text x="1672" y="492" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- cuzdanAdresi : String</text>
+<line x1="1660" y1="508" x2="1880" y2="508"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="1672" y="534" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ odemeYap(tutar) : boolean</text>
+<text x="1672" y="556" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ adi() : String</text>
+</g>
+<g class="cls-SiparisYoneticisi" filter="url(#dropShadow)">
+<rect x="660" y="550" width="460" height="206"
+        rx="6" ry="6" fill="#fbeaf0" stroke="#7b1d3a" stroke-width="1.6"/>
+<rect x="660" y="550" width="460" height="56"
+        rx="6" ry="6" fill="#7b1d3a" stroke="#7b1d3a" stroke-width="1.6"/>
+<rect x="660" y="598" width="460" height="8"
+        fill="#7b1d3a" stroke="none"/>
+<line x1="660" y1="606" x2="1120" y2="606"
+        stroke="#7b1d3a" stroke-width="1.6"/>
+<text x="890" y="570" text-anchor="middle"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="12" fill="#ffffff">
+      &lt;&lt;service&gt;&gt;
+    </text>
+<text x="890" y="592" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    SiparisYoneticisi
+  </text>
+<text x="672" y="632" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- kontrolZinciri : SiparisKontrolu</text>
+<text x="672" y="654" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- isleyici : SiparisIsleyici</text>
+<line x1="660" y1="670" x2="1120" y2="670"
+    stroke="#7b1d3a" stroke-width="1"/>
+<text x="672" y="696" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ siparisAl(s : Siparis) : void</text>
+<text x="672" y="718" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- kontrolleriCalistir(s : Siparis) : boolean</text>
+<text x="672" y="740" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- siparisiIsle(s : Siparis) : void</text>
+</g>
+<g class="cls-SiparisKontrolu" filter="url(#dropShadow)">
+<rect x="60" y="550" width="360" height="184"
+        rx="6" ry="6" fill="#f3edff" stroke="#553c9a" stroke-width="1.6"/>
+<rect x="60" y="550" width="360" height="56"
+        rx="6" ry="6" fill="#553c9a" stroke="#553c9a" stroke-width="1.6"/>
+<rect x="60" y="598" width="360" height="8"
+        fill="#553c9a" stroke="none"/>
+<line x1="60" y1="606" x2="420" y2="606"
+        stroke="#553c9a" stroke-width="1.6"/>
+<text x="240" y="570" text-anchor="middle"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="12" fill="#ffffff">
+      &lt;&lt;abstract&gt;&gt;
+    </text>
+<text x="240" y="592" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    font-style="italic"
+    fill="#ffffff">
+    SiparisKontrolu
+  </text>
+<text x="72" y="632" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a"># sonraki : SiparisKontrolu</text>
+<line x1="60" y1="648" x2="420" y2="648"
+    stroke="#553c9a" stroke-width="1"/>
+<text x="72" y="674" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ setSonraki(k : SiparisKontrolu) : SiparisKontrolu</text>
+<text x="72" y="696" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ kontrolEt(s : Siparis) : boolean</text>
+<text x="72" y="718" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a"># kontroluUygula(s : Siparis) : boolean  {abstract}</text>
+</g>
+<g class="cls-SahtecilikKontrolu" filter="url(#dropShadow)">
+<rect x="60" y="890" width="240" height="140"
+        rx="6" ry="6" fill="#ffffff" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="60" y="890" width="240" height="56"
+        rx="6" ry="6" fill="#2c5282" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="60" y="938" width="240" height="8"
+        fill="#2c5282" stroke="none"/>
+<line x1="60" y1="946" x2="300" y2="946"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="180" y="932" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    SahtecilikKontrolu
+  </text>
+<text x="72" y="972" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- risksKurali : RiskKurali</text>
+<line x1="60" y1="988" x2="300" y2="988"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="72" y="1014" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a"># kontroluUygula(s) : boolean</text>
+</g>
+<g class="cls-LimitKontrolu" filter="url(#dropShadow)">
+<rect x="320" y="890" width="240" height="140"
+        rx="6" ry="6" fill="#ffffff" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="320" y="890" width="240" height="56"
+        rx="6" ry="6" fill="#2c5282" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="320" y="938" width="240" height="8"
+        fill="#2c5282" stroke="none"/>
+<line x1="320" y1="946" x2="560" y2="946"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="440" y="932" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    LimitKontrolu
+  </text>
+<text x="332" y="972" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- ustLimit : double</text>
+<line x1="320" y1="988" x2="560" y2="988"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="332" y="1014" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a"># kontroluUygula(s) : boolean</text>
+</g>
+<g class="cls-BakiyeKontrolu" filter="url(#dropShadow)">
+<rect x="580" y="890" width="240" height="140"
+        rx="6" ry="6" fill="#ffffff" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="580" y="890" width="240" height="56"
+        rx="6" ry="6" fill="#2c5282" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="580" y="938" width="240" height="8"
+        fill="#2c5282" stroke="none"/>
+<line x1="580" y1="946" x2="820" y2="946"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="700" y="932" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    BakiyeKontrolu
+  </text>
+<line x1="580" y1="988" x2="820" y2="988"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="592" y="1014" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a"># kontroluUygula(s) : boolean</text>
+</g>
+<g class="cls-Komut" filter="url(#dropShadow)">
+<rect x="1180" y="890" width="280" height="162"
+        rx="6" ry="6" fill="#fff8e7" stroke="#9c6914" stroke-width="1.6"/>
+<rect x="1180" y="890" width="280" height="56"
+        rx="6" ry="6" fill="#9c6914" stroke="#9c6914" stroke-width="1.6"/>
+<rect x="1180" y="938" width="280" height="8"
+        fill="#9c6914" stroke="none"/>
+<line x1="1180" y1="946" x2="1460" y2="946"
+        stroke="#9c6914" stroke-width="1.6"/>
+<text x="1320" y="910" text-anchor="middle"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="12" fill="#ffffff">
+      &lt;&lt;interface&gt;&gt;
+    </text>
+<text x="1320" y="932" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    font-style="italic"
+    fill="#ffffff">
+    Komut
+  </text>
+<line x1="1180" y1="988" x2="1460" y2="988"
+    stroke="#9c6914" stroke-width="1"/>
+<text x="1192" y="1014" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ calistir(s : Siparis) : void</text>
+<text x="1192" y="1036" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ aciklama() : String</text>
+</g>
+<g class="cls-SiparisIsleyici" filter="url(#dropShadow)">
+<rect x="1180" y="550" width="320" height="162"
+        rx="6" ry="6" fill="#fbeaf0" stroke="#7b1d3a" stroke-width="1.6"/>
+<rect x="1180" y="550" width="320" height="56"
+        rx="6" ry="6" fill="#7b1d3a" stroke="#7b1d3a" stroke-width="1.6"/>
+<rect x="1180" y="598" width="320" height="8"
+        fill="#7b1d3a" stroke="none"/>
+<line x1="1180" y1="606" x2="1500" y2="606"
+        stroke="#7b1d3a" stroke-width="1.6"/>
+<text x="1340" y="570" text-anchor="middle"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="12" fill="#ffffff">
+      &lt;&lt;macro command&gt;&gt;
+    </text>
+<text x="1340" y="592" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    SiparisIsleyici
+  </text>
+<text x="1192" y="632" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- komutlar : List&lt;Komut&gt;</text>
+<line x1="1180" y1="648" x2="1500" y2="648"
+    stroke="#7b1d3a" stroke-width="1"/>
+<text x="1192" y="674" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ komutEkle(k : Komut) : void</text>
+<text x="1192" y="696" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ tumKomutlariCalistir(s : Siparis) : void</text>
+</g>
+<g class="cls-FaturaDuzenle" filter="url(#dropShadow)">
+<rect x="1180" y="1150" width="240" height="162"
+        rx="6" ry="6" fill="#ffffff" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1180" y="1150" width="240" height="56"
+        rx="6" ry="6" fill="#2c5282" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1180" y="1198" width="240" height="8"
+        fill="#2c5282" stroke="none"/>
+<line x1="1180" y1="1206" x2="1420" y2="1206"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="1300" y="1192" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    FaturaDuzenle
+  </text>
+<line x1="1180" y1="1248" x2="1420" y2="1248"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="1192" y="1274" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ calistir(s) : void</text>
+<text x="1192" y="1296" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ aciklama() : String</text>
+</g>
+<g class="cls-FaturaGonder" filter="url(#dropShadow)">
+<rect x="1450" y="1150" width="240" height="162"
+        rx="6" ry="6" fill="#ffffff" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1450" y="1150" width="240" height="56"
+        rx="6" ry="6" fill="#2c5282" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1450" y="1198" width="240" height="8"
+        fill="#2c5282" stroke="none"/>
+<line x1="1450" y1="1206" x2="1690" y2="1206"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="1570" y="1192" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    FaturaGonder
+  </text>
+<line x1="1450" y1="1248" x2="1690" y2="1248"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="1462" y="1274" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ calistir(s) : void</text>
+<text x="1462" y="1296" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ aciklama() : String</text>
+</g>
+<g class="cls-AlacaklaraKaydet" filter="url(#dropShadow)">
+<rect x="1180" y="1370" width="320" height="162"
+        rx="6" ry="6" fill="#ffffff" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1180" y="1370" width="320" height="56"
+        rx="6" ry="6" fill="#2c5282" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="1180" y="1418" width="320" height="8"
+        fill="#2c5282" stroke="none"/>
+<line x1="1180" y1="1426" x2="1500" y2="1426"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="1340" y="1412" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    AlacaklaraKaydet
+  </text>
+<line x1="1180" y1="1468" x2="1500" y2="1468"
+    stroke="#1f3b66" stroke-width="1"/>
+<text x="1192" y="1494" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ calistir(s) : void</text>
+<text x="1192" y="1516" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">+ aciklama() : String</text>
+</g>
+<g class="cls-Fatura" filter="url(#dropShadow)">
+<rect x="880" y="1150" width="260" height="206"
+        rx="6" ry="6" fill="#e8f0fb" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="880" y="1150" width="260" height="56"
+        rx="6" ry="6" fill="#1f3b66" stroke="#1f3b66" stroke-width="1.6"/>
+<rect x="880" y="1198" width="260" height="8"
+        fill="#1f3b66" stroke="none"/>
+<line x1="880" y1="1206" x2="1140" y2="1206"
+        stroke="#1f3b66" stroke-width="1.6"/>
+<text x="1010" y="1170" text-anchor="middle"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="12" fill="#ffffff">
+      &lt;&lt;entity&gt;&gt;
+    </text>
+<text x="1010" y="1192" text-anchor="middle"
+    font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-weight="700" font-size="16"
+    
+    fill="#ffffff">
+    Fatura
+  </text>
+<text x="892" y="1232" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- faturaNo : String</text>
+<text x="892" y="1254" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- tutar : double</text>
+<text x="892" y="1276" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- musteri : Musteri</text>
+<text x="892" y="1298" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" fill="#1a1a1a">- siparis : Siparis</text>
+<line x1="880" y1="1314" x2="1140" y2="1314"
+    stroke="#1f3b66" stroke-width="1"/>
+</g>
+  <g>
+<rect x="20" y="1600" width="1860" height="80" rx="8" ry="8" fill="#f7f9fc" stroke="#cfd6e2"/>
+<text x="32" y="1622" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="13" font-weight="700" fill="#0e1c2f">Notasyon Aciklamasi</text>
+<line x1="36" y1="1650" x2="92" y2="1650" stroke="#202a3a" stroke-width="1.5" />
+<polygon points="92,1650 78,1659 78,1641" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+<text x="102" y="1654" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#202a3a">Inheritance</text>
+<line x1="186" y1="1650" x2="242" y2="1650" stroke="#202a3a" stroke-width="1.5" stroke-dasharray="6,5"/>
+<polygon points="242,1650 228,1659 228,1641" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+<text x="252" y="1654" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#202a3a">Realization</text>
+<line x1="336" y1="1650" x2="392" y2="1650" stroke="#202a3a" stroke-width="1.5" />
+<polygon points="336,1650 345,1642 354,1650 345,1658" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+<text x="402" y="1654" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#202a3a">Aggregation</text>
+<line x1="486" y1="1650" x2="542" y2="1650" stroke="#202a3a" stroke-width="1.5" />
+<polygon points="486,1650 495,1642 504,1650 495,1658" fill="#202a3a" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>
+<text x="552" y="1654" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#202a3a">Composition</text>
+<line x1="636" y1="1650" x2="692" y2="1650" stroke="#202a3a" stroke-width="1.5" />
+<polyline points="680,1657 692,1650 680,1643" fill="none" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="702" y="1654" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#202a3a">Association</text>
+<line x1="786" y1="1650" x2="842" y2="1650" stroke="#202a3a" stroke-width="1.5" stroke-dasharray="6,5"/>
+<polyline points="830,1657 842,1650 830,1643" fill="none" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="852" y="1654" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#202a3a">Dependency</text>
+</g>
+</svg>

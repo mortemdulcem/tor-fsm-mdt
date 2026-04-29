@@ -1,0 +1,512 @@
+// Turkish academic content for the answer document.
+
+export function buildHtml({ diagram1Path, diagram2Path }) {
+  return `<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<title>Ara Sinav Cevap Belgesi</title>
+<style>
+${css()}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="cover">
+  <div class="cover-mark">NYYG · Ara Sinav</div>
+  <h1 class="cover-title">Nesneye Yonelik<br/>Yazilim Gelistirme</h1>
+  <h2 class="cover-subtitle">Ara Sinav Cevap Belgesi</h2>
+  <p class="cover-meta">Bilisim Enstitusu &nbsp;·&nbsp; 2025-2026 Bahar</p>
+  <div class="cover-divider"></div>
+  <table class="cover-table">
+    <tr><td>Teslim Tarihi</td><td>30 Nisan 2026</td></tr>
+    <tr><td>Teslim Format</td><td>PDF</td></tr>
+    <tr><td>Toplam Puan</td><td>100 (2 × 50)</td></tr>
+    <tr><td>Kapsam</td><td>Soru 1: Akilli Ev Sistemi · Soru 2: SimpleCar E-Satis</td></tr>
+  </table>
+  <div class="cover-pattern-grid">
+    <div class="pattern-chip"><b>State</b><span>Calisma Modu</span></div>
+    <div class="pattern-chip"><b>Mediator</b><span>Izleme Motoru</span></div>
+    <div class="pattern-chip"><b>Observer</b><span>Sensor → Motor → Kullanici</span></div>
+    <div class="pattern-chip"><b>Strategy</b><span>Odeme Yontemi</span></div>
+    <div class="pattern-chip"><b>CoR</b><span>Siparis Kontrolleri</span></div>
+    <div class="pattern-chip"><b>Command</b><span>Siparis Isleme Adimlari</span></div>
+  </div>
+  <p class="cover-note">Bu belge, sinavda istenen iki senaryo icin tasarim oruntusu secimleri,
+  gerekceler, sinif diyagramlari, sinif/iliski aciklamalari ve calisma akislarini icermektedir.
+  Her iki diyagramda UML 2.x notasyonu ile cizilmis; goruntuleme/etkilesim katmani, alan modeli ve servis katmani
+  olarak organize edilmistir.</p>
+</section>
+
+<!-- SORU 1 -->
+<section class="page question-page">
+  <header class="q-header">
+    <span class="q-tag">SORU 1 · 50 PUAN</span>
+    <h1>Akilli Ev Yonetim Sistemi</h1>
+    <p class="q-sub">State + Mediator + Observer Oruntulerinin Birlikte Kullanimi</p>
+  </header>
+
+  <h2>1.1 Senaryonun Ozeti</h2>
+  <p>
+  Bir akilli ev cozumunde <em>aydinlatma</em> ve <em>isitma</em> sistemleri ile <em>kapi</em> ve <em>hareket</em>
+  sensorleri yer almaktadir. Tum bilesenler verilerini bir <em>Akilli Ev Izleme Motoru</em>'na aktarir; karsiligindaki
+  talimatlari yerine getirir. Aydinlatma ve isitma sistemleri <em>Guvenli</em> ve <em>Tasarruflu</em> olmak uzere iki
+  calisma sekline sahiptir. Bu iki sekil <em>baglantilidir</em>: bir sistemde tasarruflu mod secilirse digeri de
+  tasarruflu moda gecmek zorundadir; ayni durum guvenli mod icin de gecerlidir. Calisma sekillerine bagli olarak
+  davranis farkli olur (orn. tasarruflu modda isitma 18°C hedefler; guvenli modda 40°C panel sicakligi sabit
+  tutulur). Kullanici, sistemleri mobil veya web uygulamasi uzerinden yonetir; kapi ve hareket sensorlerine ait
+  bildirimler etkin ise dogrudan kullanicinin uygulamasina iletilir.
+  </p>
+
+  <h2>1.2 Senaryodan Cikarilan Tasarim Sorulari</h2>
+  <ol class="num-list">
+    <li><b>Davranis bagimliligi:</b> Aydinlatma ve isitma sistemleri ic durumlarina (modlarina) gore <em>farkli davranir</em>. Guvenli/Tasarruflu modlar, davranisi <em>polimorfik</em> olarak degistirir; <code>if/else</code> ile cozulmesi acik-kapali (OCP) prensibini ihlal eder.</li>
+    <li><b>Sistemler arasi senkronizasyon:</b> Aydinlatma ve isitma <em>birbirini bilmek zorunda</em> degil; ancak modlari <em>birlikte</em> degismelidir. Bu coklu-nesneli koordinasyon dogrudan referansla degil, <em>arabulucu</em> uzerinden gerceklestirilmelidir.</li>
+    <li><b>Olay yayini:</b> Sensorler verilerini iletmeli, fakat kime ileteceklerini <em>bilmek zorunda olmamali</em>. Bu klasik bir <em>yayinci-abone</em> problemidir.</li>
+    <li><b>Bildirim hedefi cogul:</b> Kullanicinin birden fazla istemcisi (mobil/web) olabilir. Bildirimler arayuze bagimli yazilmamalidir.</li>
+  </ol>
+
+  <h2>1.3 Tasarim Oruntusu Secimleri ve Gerekceleri</h2>
+  <table class="design-table">
+    <thead><tr><th>Oruntu</th><th>Uygulanan Yer</th><th>Gerekce</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>State</b><br/><small>(GoF · Behavioral)</small></td>
+        <td><code>CalismaModu</code> arayuzu ile <code>GuvenliMod</code> ve <code>TasarrufluMod</code>;<br/><code>EvSistemi.aktifMod</code> alani uzerinden tasiniyor.</td>
+        <td>Sistemin davranisi <em>ic durumuna</em> gore degisiyor; <code>komutCalistir(...)</code> cagrildiginda farkli davranis sergilenir. Yeni bir mod (orn. <em>UykuModu</em>) eklendiginde <code>EvSistemi</code> kodu degismeden uzatilabilir (OCP).</td>
+      </tr>
+      <tr>
+        <td><b>Mediator</b><br/><small>(GoF · Behavioral)</small></td>
+        <td><code>AkilliEvIzlemeMotoru</code>: tum sistemler ve sensorleri tanir; sistemleri birbirine baglamadan onlarin koordinasyonunu saglar.</td>
+        <td>"Bir mod degisirse digeri de degisir" kurali, sistemler birbirini referans almadan <em>tek bir noktadan</em> uygulanir. Sistemler/sensorler arasi <em>cok-yonlu kosulluluk</em> arabulucuda toplanir; baglilik (coupling) dusurulur.</td>
+      </tr>
+      <tr>
+        <td><b>Observer</b><br/><small>(GoF · Behavioral)</small></td>
+        <td>(a) <code>Sensor</code> &rarr; <code>SensorGozlemcisi</code> arayuzu (motoru icerecek sekilde).<br/>(b) <code>AkilliEvIzlemeMotoru</code> &rarr; <code>KullaniciBildirimAlici</code> arayuzu (mobil/web).</td>
+        <td>Sensorler ve motor, <em>kim dinliyor</em> bilgisinden bagimsiz veri yayar. Kullanici uygulamasi icin yeni bir kanal (orn. e-posta) eklendiginde mevcut kod degismez; yalnizca yeni bir gozlemci eklenir.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <b>Neden tek bir oruntu yeterli degil?</b> &nbsp; State olmadan davranis kosullarla; Mediator olmadan baglantili
+    modlar dogrudan referanslarla; Observer olmadan ise sensor/motor sikica baglanir. Uc oruntu birbirinin
+    kaldiraci olarak <em>dusuk-bagli, yuksek-uyumlu</em> bir mimari uretir.
+  </div>
+
+  <h2 class="break">1.4 Sinif Diyagrami</h2>
+  <figure class="diagram-figure">
+    <img src="${diagram1Path}" alt="Soru 1 sinif diyagrami"/>
+    <figcaption>Sekil 1.1 · Akilli Ev Yonetim Sistemi — Sinif Diyagrami (UML 2.x).
+      Modlar State; izleme motoru Mediator; sensor ve bildirim baglantilari Observer kullanir.</figcaption>
+  </figure>
+
+  <h2 class="break">1.5 Sinif Aciklamalari</h2>
+  <table class="class-table">
+    <thead><tr><th>Sinif / Arayuz</th><th>Stereotip</th><th>Sorumluluk</th></tr></thead>
+    <tbody>
+      <tr><td><code>Kullanici</code></td><td>&laquo;entity&raquo;</td><td>Ev sahibinin kimligini ve bilgi-erisim noktalarini (mobil/web) tasir.</td></tr>
+      <tr><td><code>KullaniciBildirimAlici</code></td><td>&laquo;interface&raquo;</td><td>Bildirim ve durum yansitma yetenegini soyutlar; istemci tipi degisse de motor degismez.</td></tr>
+      <tr><td><code>MobilUygulama</code> · <code>WebUygulamasi</code></td><td>&laquo;concrete&raquo;</td><td><code>KullaniciBildirimAlici</code> arayuzunu uygular; kanal-ozel goruntuleme yapar.</td></tr>
+      <tr><td><code>DurumOzeti</code></td><td>&laquo;value object&raquo;</td><td>Sistem ve sensor durumunun anlik fotografi; degismez (immutable) tasinir.</td></tr>
+      <tr><td><code>AkilliEvIzlemeMotoru</code></td><td>&laquo;mediator&raquo; · &laquo;observer&raquo;</td><td>Sistemleri ve sensorleri kompoze eder; mod senkronizasyonu, komut yonlendirme, sensor olaylarini alma ve bildirim yayini gorevlerini ustlenir.</td></tr>
+      <tr><td><code>EvSistemi</code></td><td>&laquo;abstract&raquo;</td><td>Mod davranisini tutan ortak ust sinif; <code>komutCalistir</code> alt siniflara birakilir.</td></tr>
+      <tr><td><code>AydinlatmaSistemi</code> · <code>IsitmaSistemi</code></td><td>&laquo;concrete&raquo;</td><td>Cihaza ozel davranisi (asgari/maksimum aydinlatma, hedef sicaklik) uygular.</td></tr>
+      <tr><td><code>CalismaModu</code></td><td>&laquo;interface&raquo;</td><td>Ic durumun davranisini soyutlar (State); <code>uygula(sistem)</code> ile sistemi ayarlar.</td></tr>
+      <tr><td><code>GuvenliMod</code> · <code>TasarrufluMod</code></td><td>&laquo;concrete&raquo;</td><td>Iki politik davranis: maksimum kapasite vs. asgari/hedef ayarlar.</td></tr>
+      <tr><td><code>ModTipi</code></td><td>&laquo;enumeration&raquo;</td><td>Kullanici arayuzunden gelen mod tercihi icin tip-guvenli sabitler.</td></tr>
+      <tr><td><code>Sensor</code></td><td>&laquo;abstract&raquo;</td><td>Subject rolu: <code>attach/detach</code> ve <code>bildir</code> ortak davranisini saglar.</td></tr>
+      <tr><td><code>KapiSensoru</code> · <code>HareketSensoru</code></td><td>&laquo;concrete&raquo;</td><td>Donaniml soyutlamalar; <code>olcumGonder</code> implementasyonlari.</td></tr>
+      <tr><td><code>SensorGozlemcisi</code></td><td>&laquo;interface&raquo;</td><td>Sensor olaylarini alacak nesnelere uygulanan Observer arayuzu.</td></tr>
+      <tr><td><code>SensorOlayi</code></td><td>&laquo;value object&raquo;</td><td>Tip, kaynak sensor, veri yuku ve zamani tasiyan degismez olay nesnesi.</td></tr>
+      <tr><td><code>SensorTipi</code></td><td>&laquo;enumeration&raquo;</td><td>Sensorun anlamsal sinifi (KAPI/HAREKET).</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="break">1.6 Tipik Calisma Akislari</h2>
+  <div class="flow-box">
+    <h3>Akis A · Kullanicinin tasarruflu mod talebi</h3>
+    <ol>
+      <li><code>MobilUygulama</code> uzerinden <code>tumModlariAyarla(TASARRUFLU)</code> cagrilir.</li>
+      <li><code>AkilliEvIzlemeMotoru</code> kayitli her <code>EvSistemi</code> icin <code>modAyarla(new TasarrufluMod())</code> cagirir.</li>
+      <li>Her sistem (aydinlatma ve isitma) <em>ayni anda</em> tasarruflu davranisa gecer; sistemler birbirini bilmez, fakat senkronize olur.</li>
+      <li>Motor <code>durumOzetiYayinla()</code> ile guncel <code>DurumOzeti</code>'ni tum bildirim alicilarina yansitir.</li>
+    </ol>
+    <h3>Akis B · Kapi sensorunden bildirim</h3>
+    <ol>
+      <li><code>KapiSensoru.olcumGonder()</code> cagrilir; <code>bildir(new SensorOlayi(KAPI, ...))</code> tetiklenir.</li>
+      <li>Sensor, kayitli tum <code>SensorGozlemcisi</code> nesnelerine olayi iletir; <code>AkilliEvIzlemeMotoru</code> bunlardan biridir.</li>
+      <li>Motor, sensor etkin ise olayi <code>KullaniciBildirimAlici</code> uygulamalarina <code>bildirimGoster(olay)</code> ile yonlendirir.</li>
+      <li>Mobil ve web istemciler bildirimi kullaniciya kanal-ozel bicimde sunar.</li>
+    </ol>
+  </div>
+
+  <h2>1.7 Tasarim Avantajlari</h2>
+  <ul class="bullet-list">
+    <li><b>Acik-Kapali (OCP):</b> Yeni bir mod (UykuModu), yeni bir sensor (Pencere), yeni bir bildirim kanali (E-posta) eklerken mevcut kod degismez.</li>
+    <li><b>Tek Sorumluluk (SRP):</b> Mod davranisi <code>CalismaModu</code> hiyerarsisinde; senkronizasyon politikasi <code>AkilliEvIzlemeMotoru</code>'nda; olay tasimasi <code>Sensor</code> + <code>SensorGozlemcisi</code> ikilisinde.</li>
+    <li><b>Dusuk Baglilik:</b> Sistemler birbirini referans almaz; sensorler kullanici uygulamasini bilmez.</li>
+    <li><b>Test Edilebilirlik:</b> Stub <code>SensorGozlemcisi</code> ya da sahte <code>CalismaModu</code> ile birim test yapilabilir.</li>
+  </ul>
+</section>
+
+<!-- SORU 2 -->
+<section class="page question-page">
+  <header class="q-header">
+    <span class="q-tag">SORU 2 · 50 PUAN</span>
+    <h1>SimpleCar E-Satis Sistemi</h1>
+    <p class="q-sub">Strategy + Chain of Responsibility + Command Oruntulerinin Birlikte Kullanimi</p>
+  </header>
+
+  <h2>2.1 Senaryonun Ozeti</h2>
+  <p>
+  Tek model araba ureten ve satan <em>SimpleCar</em> firmasi yalnizca e-satis yapmaktadir. Siparislerde kullanilan
+  odeme yontemleri <em>banka havalesi</em>, <em>paypal</em> veya <em>soguk cuzdan</em> olabilir; bu yontemler
+  zaman icinde <em>siklikla genisler veya daralir</em>. Her siparis icin <em>sahtecilik</em>, <em>limit</em> ve
+  <em>bakiye</em> kontrolleri yapilmalidir; bu kontroller de zamanla artirilabilir. Herhangi bir kontrolun olumsuz
+  sonuclanmasi siparisi iptal eder. Tum kontroller basariliysa siparis sirasiyla <em>fatura duzenleme</em>,
+  <em>fatura gonderme</em> ve <em>alacaklar listesine kaydetme</em> adimlariyla islenir.
+  </p>
+
+  <h2>2.2 Senaryodan Cikarilan Tasarim Sorulari</h2>
+  <ol class="num-list">
+    <li><b>Algoritma ailesi (odeme):</b> Odeme tek bir davranistir, fakat birden fazla farkli yolla yapilir; ayrica yontemler <em>siklikla genisler</em>. Calisma zamaninda secilebilen ve genisletilebilen bir algoritma ailesi gerekir.</li>
+    <li><b>Asamali ve genisleyebilir kontrol:</b> Kontroller <em>artirilabilir</em>; biri olumsuz olursa zincir kesilmeli ve siparis iptal edilmelidir. Bu, bir <em>sorumluluk zinciri</em> probleminin tipik formudur.</li>
+    <li><b>Sirali tamamlanmasi gereken islem adimlari:</b> Fatura duzenleme &rarr; fatura gonderme &rarr; alacak kaydi adimlari sirayla yapilmalidir; her adim baslibasina kapsullenmis ve test edilebilir bir ilave isi temsil eder. Adim sayisi ileride degisebilir.</li>
+  </ol>
+
+  <h2>2.3 Tasarim Oruntusu Secimleri ve Gerekceleri</h2>
+  <table class="design-table">
+    <thead><tr><th>Oruntu</th><th>Uygulanan Yer</th><th>Gerekce</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Strategy</b><br/><small>(GoF · Behavioral)</small></td>
+        <td><code>OdemeYontemi</code> arayuzu; <code>BankaHavalesi</code>, <code>Paypal</code>, <code>SogukCuzdan</code>.</td>
+        <td>Odeme algoritmasi siparisten <em>bagimsiz</em> olarak yer degistirebilmeli; yeni yontem eklemek mevcut kodu degistirmemeli.</td>
+      </tr>
+      <tr>
+        <td><b>Chain of Responsibility</b><br/><small>(GoF · Behavioral)</small></td>
+        <td><code>SiparisKontrolu</code> soyut sinifi; <code>SahtecilikKontrolu</code>, <code>LimitKontrolu</code>, <code>BakiyeKontrolu</code> halkalari.</td>
+        <td>Her halka <em>basariliysa</em> siradakine devreder; <em>basarisizsa</em> zinciri keser ve siparis iptal edilir. Yeni bir kontrol eklemek tek satir konfigurasyondur (<code>setSonraki</code>).</td>
+      </tr>
+      <tr>
+        <td><b>Command + Macro Command</b><br/><small>(GoF · Behavioral)</small></td>
+        <td><code>Komut</code> arayuzu; <code>FaturaDuzenle</code>, <code>FaturaGonder</code>, <code>AlacaklaraKaydet</code>; <code>SiparisIsleyici</code> sirayla calistirir.</td>
+        <td>Her adim <em>kapsullenmis bir nesne</em>; sira degisikligi, ek adim, geri-alma (undo) gibi ihtiyaclar icin esnek bir altyapi.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <b>Tipik bir hatali tasarim:</b> Odeme yontemini <code>Siparis</code> icine <code>if/switch</code>; kontrolleri
+    tek bir <code>kontrolEt()</code> metodunda <code>if</code>; islem adimlarini sira ile metoda gomerek yazmak,
+    her yeni yontem/kontrol/adim eklemede <em>mevcut kodun</em> degismesine yol acar. Acik-Kapali ve Tek Sorumluluk
+    prensipleri ihlal edilir. Yukaridaki uclu, bu hatayi yapisal olarak engeller.
+  </div>
+
+  <h2 class="break">2.4 Sinif Diyagrami</h2>
+  <figure class="diagram-figure">
+    <img src="${diagram2Path}" alt="Soru 2 sinif diyagrami"/>
+    <figcaption>Sekil 2.1 · SimpleCar E-Satis Sistemi — Sinif Diyagrami (UML 2.x).
+      Odeme yontemleri Strategy; kontroller CoR; siparis isleme adimlari Command (Macro) ile organize edilir.</figcaption>
+  </figure>
+
+  <h2 class="break">2.5 Sinif Aciklamalari</h2>
+  <table class="class-table">
+    <thead><tr><th>Sinif / Arayuz</th><th>Stereotip</th><th>Sorumluluk</th></tr></thead>
+    <tbody>
+      <tr><td><code>Musteri</code></td><td>&laquo;entity&raquo;</td><td>Siparisi veren kisi; bakiye/limit hesaplamalari icin temel bilgi kaynagi.</td></tr>
+      <tr><td><code>Siparis</code></td><td>&laquo;entity&raquo;</td><td>Toplam tutar, miktar, secilen odeme yontemi ve durum bilgisini tasiyan toplama (aggregate root).</td></tr>
+      <tr><td><code>SiparisDurumu</code></td><td>&laquo;enumeration&raquo;</td><td>Siparis yasam dongusunu modelleyen sabitler.</td></tr>
+      <tr><td><code>OdemeYontemi</code></td><td>&laquo;interface&raquo;</td><td>Strategy: <code>odemeYap(tutar)</code> sozlesmesi.</td></tr>
+      <tr><td><code>BankaHavalesi</code> · <code>Paypal</code> · <code>SogukCuzdan</code></td><td>&laquo;concrete&raquo;</td><td>Mevcut odeme stratejileri; yenisi rahatca eklenir.</td></tr>
+      <tr><td><code>SiparisKontrolu</code></td><td>&laquo;abstract&raquo;</td><td>CoR taban sinifi; <code>kontrolEt</code> sablon metodu zincirleme isini ust sinifta tasir.</td></tr>
+      <tr><td><code>SahtecilikKontrolu</code> · <code>LimitKontrolu</code> · <code>BakiyeKontrolu</code></td><td>&laquo;concrete&raquo;</td><td>Tek bir kurali uygulayan kontrol halkalari; bagimsiz birim test yapilabilir.</td></tr>
+      <tr><td><code>Komut</code></td><td>&laquo;interface&raquo;</td><td>Command: <code>calistir(siparis)</code> sozlesmesi.</td></tr>
+      <tr><td><code>FaturaDuzenle</code> · <code>FaturaGonder</code> · <code>AlacaklaraKaydet</code></td><td>&laquo;concrete&raquo;</td><td>Senaryoda istenen sirali uc isleme adimi.</td></tr>
+      <tr><td><code>SiparisIsleyici</code></td><td>&laquo;macro command&raquo;</td><td>Komut listesini <em>sirayla</em> calistirir; ek adim eklemek icin <code>komutEkle</code>.</td></tr>
+      <tr><td><code>SiparisYoneticisi</code></td><td>&laquo;service&raquo;</td><td>Use-case orchestratoru: kontrol zincirini koridor uzerinde calistirir; basarili ise isleyiciyi devreye alir, basarisiz ise siparisi iptal eder.</td></tr>
+      <tr><td><code>Fatura</code></td><td>&laquo;entity&raquo;</td><td>Fatura komutlari arasinda paylasilan veri; siparis ile <em>1-1</em> iliskili.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="break">2.6 Siparis Yasam Dongusu — Akis Senaryosu</h2>
+  <div class="flow-box">
+    <ol>
+      <li>Musteri sepetini onaylar; sistem yeni bir <code>Siparis(durum=ALINDI)</code> olusturur ve secilen <code>OdemeYontemi</code>'ni atar.</li>
+      <li><code>SiparisYoneticisi.siparisAl(s)</code> cagrilir; siparis <code>KONTROL_EDILIYOR</code> durumuna gecer.</li>
+      <li><code>kontrolZinciri.kontrolEt(s)</code> calisir:
+        <ul>
+          <li><code>SahtecilikKontrolu</code> &rarr; basarili ise siradakine,</li>
+          <li><code>LimitKontrolu</code> &rarr; basarili ise siradakine,</li>
+          <li><code>BakiyeKontrolu</code> &rarr; sonuclanir.</li>
+        </ul>
+        Herhangi biri <code>false</code> donerse zincir kesilir, <code>siparis.iptalEt()</code> cagrilir ve durum <code>IPTAL_EDILDI</code> olur.</li>
+      <li>Tum kontroller basarili ise <code>siparis.odemeAl()</code> ile <code>OdemeYontemi.odemeYap(tutar)</code> calistirilir.</li>
+      <li><code>SiparisIsleyici.tumKomutlariCalistir(s)</code> sirayla:
+        <ol type="a">
+          <li><code>FaturaDuzenle</code> &rarr; <code>Fatura</code> nesnesi olusturur,</li>
+          <li><code>FaturaGonder</code> &rarr; faturayi musteriye gonderir,</li>
+          <li><code>AlacaklaraKaydet</code> &rarr; alacaklar defterine kayit acar.</li>
+        </ol>
+      </li>
+      <li>Siparis <code>ISLENDI</code> durumuna alinir; yonetici sonucu doner.</li>
+    </ol>
+  </div>
+
+  <h2>2.7 Genisletilebilirlik Senaryolari</h2>
+  <table class="design-table">
+    <thead><tr><th>Yeni Gereksinim</th><th>Mevcut Tasarimda Yapilacak Tek Sey</th></tr></thead>
+    <tbody>
+      <tr><td>Kripto kart yontemi eklemek</td><td><code>OdemeYontemi</code>'ni uygulayan yeni bir sinif yazmak.</td></tr>
+      <tr><td>KYC kontrolu eklemek</td><td><code>SiparisKontrolu</code>'ndan turetilen yeni bir halka yazip zincire <code>setSonraki</code> ile takmak.</td></tr>
+      <tr><td>Kargo etiketi olusturma adimi eklemek</td><td><code>Komut</code>'u uygulayan yeni bir sinifi <code>SiparisIsleyici.komutEkle</code> ile dahil etmek.</td></tr>
+      <tr><td>Sirali calistirma yerine bazi adimlari paralel calistirma</td><td><code>SiparisIsleyici</code>'yi <code>ParalelSiparisIsleyici</code> olarak alternatiflestirmek (Liskov uyumlu).</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2.8 Sonuc</h2>
+  <p>
+  Onerilen tasarim; siparisin <em>alinmasi, dogrulanmasi ve islenmesi</em> ic akislarini birbirinden ayri,
+  oruntu-tabanli kapsullere yerlestirir. Boylece sik degisen iki gereksinim — <em>odeme yontemleri</em> ve
+  <em>kontrol kurallari</em> — mevcut kodu degistirmeden buyuyebilir; sirali isleme ise net, gozlemlenebilir ve
+  test edilebilir bir komut akisi ile gerceklestirilir.
+  </p>
+</section>
+
+</body>
+</html>
+`;
+}
+
+function css() {
+  return `
+@page { size: A4; margin: 18mm 16mm; }
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+  color: #1a2336;
+  font-size: 11pt;
+  line-height: 1.5;
+  margin: 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+code {
+  font-family: 'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace;
+  font-size: 9.6pt;
+  background: #eef2f8;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: #0e2a4a;
+}
+
+p { margin: 0 0 10px; text-align: justify; }
+
+h1, h2, h3 { color: #0e1c2f; margin: 0; }
+h1 { font-size: 22pt; font-weight: 700; }
+h2 { font-size: 14pt; font-weight: 700; margin: 18pt 0 8pt;
+     border-bottom: 1.5px solid #c8d2e3; padding-bottom: 4pt; }
+h3 { font-size: 12pt; font-weight: 700; margin: 10pt 0 4pt; color: #243355; }
+h2.break { page-break-before: auto; }
+
+ol, ul { margin: 4px 0 12px 22px; padding: 0; }
+ol li, ul li { margin-bottom: 6px; }
+
+/* ========= COVER ========= */
+.cover {
+  page-break-after: always;
+  height: 257mm;
+  padding: 28mm 4mm 0;
+  background:
+     radial-gradient(ellipse at 90% 0%, rgba(85, 60, 154, 0.08), transparent 60%),
+     radial-gradient(ellipse at 0% 100%, rgba(31, 59, 102, 0.10), transparent 60%);
+  position: relative;
+}
+.cover-mark {
+  font-size: 9.5pt;
+  letter-spacing: 0.25em;
+  color: #5a6a86;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.cover-title {
+  font-size: 38pt;
+  font-weight: 800;
+  margin-top: 6mm;
+  line-height: 1.05;
+  color: #0e1c2f;
+  letter-spacing: -0.02em;
+}
+.cover-subtitle {
+  font-size: 18pt;
+  font-weight: 500;
+  margin-top: 4mm;
+  color: #36507c;
+}
+.cover-meta {
+  margin-top: 4mm;
+  color: #5a6a86;
+  font-size: 11pt;
+}
+.cover-divider {
+  width: 80mm;
+  height: 4px;
+  background: linear-gradient(90deg, #1f3b66, #553c9a, #9c6914);
+  margin: 8mm 0 6mm;
+  border-radius: 2px;
+}
+.cover-table {
+  width: 110mm;
+  border-collapse: collapse;
+  margin-top: 4mm;
+  font-size: 10pt;
+}
+.cover-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #d6dde9;
+}
+.cover-table td:first-child {
+  color: #5a6a86;
+  width: 40mm;
+  font-weight: 600;
+}
+.cover-pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 14mm;
+}
+.pattern-chip {
+  border: 1px solid #cfd6e2;
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: #fbfcfe;
+}
+.pattern-chip b {
+  color: #0e1c2f;
+  font-size: 10.5pt;
+  display: block;
+}
+.pattern-chip span {
+  color: #5a6a86;
+  font-size: 9pt;
+}
+.cover-note {
+  margin-top: 12mm;
+  font-size: 9.6pt;
+  color: #4a5872;
+  border-left: 3px solid #1f3b66;
+  padding: 6px 10px;
+  background: #f7f9fc;
+}
+
+/* ========= PAGE / QUESTION HEADER ========= */
+.page { page-break-before: always; }
+.q-header {
+  margin-bottom: 8mm;
+  padding-bottom: 4mm;
+  border-bottom: 2px solid #0e1c2f;
+}
+.q-tag {
+  display: inline-block;
+  background: #0e1c2f;
+  color: #ffffff;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 9pt;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+}
+.q-header h1 {
+  margin-top: 6px;
+  font-size: 24pt;
+}
+.q-sub {
+  color: #5a6a86;
+  font-style: italic;
+  margin: 4px 0 0;
+}
+
+/* ========= TABLES ========= */
+table { border-collapse: collapse; width: 100%; margin: 6pt 0 14pt; }
+.design-table th, .design-table td,
+.class-table th, .class-table td {
+  border: 1px solid #cfd6e2;
+  padding: 7px 9px;
+  vertical-align: top;
+  font-size: 10pt;
+}
+.design-table th, .class-table th {
+  background: #0e1c2f;
+  color: #ffffff;
+  text-align: left;
+}
+.design-table tr:nth-child(even) td,
+.class-table tr:nth-child(even) td {
+  background: #f7f9fc;
+}
+.design-table td:first-child {
+  width: 24%;
+  background: #eef2f8;
+  font-weight: 600;
+}
+.class-table td:nth-child(2) { width: 22%; color: #36507c; font-style: italic; font-size: 9.5pt; }
+.class-table td:first-child { width: 24%; }
+
+/* ========= LISTS ========= */
+.num-list { margin-left: 20px; }
+.bullet-list { margin-left: 20px; }
+
+/* ========= CALLOUT ========= */
+.callout {
+  border-left: 4px solid #1f3b66;
+  background: #eef2f8;
+  padding: 10px 14px;
+  border-radius: 0 6px 6px 0;
+  font-size: 10pt;
+  margin: 10pt 0 14pt;
+}
+.callout.warn {
+  border-left-color: #9c6914;
+  background: #fff8e7;
+}
+
+/* ========= FLOW BOX ========= */
+.flow-box {
+  border: 1px solid #cfd6e2;
+  border-radius: 6px;
+  padding: 10px 16px;
+  background: #fbfcfe;
+  margin: 6pt 0 14pt;
+}
+.flow-box h3 {
+  margin-top: 8pt;
+}
+.flow-box ol > li { margin-bottom: 4px; }
+
+/* ========= DIAGRAM ========= */
+.diagram-figure {
+  margin: 8pt 0 14pt;
+  text-align: center;
+  page-break-inside: avoid;
+}
+.diagram-figure img {
+  width: 100%;
+  height: auto;
+  border: 1px solid #cfd6e2;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(14,28,47,0.08);
+}
+.diagram-figure figcaption {
+  margin-top: 4pt;
+  font-size: 9pt;
+  color: #5a6a86;
+  font-style: italic;
+}
+`;
+}

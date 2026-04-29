@@ -1,0 +1,548 @@
+// Class definitions and relationships for both exam questions.
+// Each class is positioned manually for a clean, well-spaced layout.
+
+// ---------------------------------------------------------------------------
+// SORU 1 — Akilli Ev Cozumu
+// Patterns: State (CalismaModu), Mediator (AkilliEvIzlemeMotoru), Observer (Sensor -> Motor -> Bildirim)
+// Canvas: 1900 x 1500
+// ---------------------------------------------------------------------------
+
+export const soru1 = {
+  width: 1900,
+  height: 1700,
+  title: "Soru 1 — Akilli Ev Yonetim Sistemi",
+  subtitle: "State + Mediator + Observer Oruntuleri",
+  classes: [
+    // ---- Kullanici katmani (ust) ----
+    {
+      id: "Kullanici",
+      kind: "entity",
+      name: "Kullanici",
+      x: 60, y: 60, w: 280,
+      attributes: [
+        "- id : int",
+        "- adSoyad : String",
+        "- eposta : String",
+      ],
+      methods: [
+        "+ uygulamalari() : List",
+      ],
+    },
+    {
+      id: "KullaniciBildirimAlici",
+      kind: "interface",
+      name: "KullaniciBildirimAlici",
+      x: 360, y: 60, w: 320,
+      attributes: [],
+      methods: [
+        "+ bildirimGoster(olay : SensorOlayi) : void",
+        "+ durumYansit(durumOzeti : DurumOzeti) : void",
+      ],
+    },
+    {
+      id: "MobilUygulama",
+      kind: "concrete",
+      name: "MobilUygulama",
+      x: 730, y: 60, w: 240,
+      attributes: ["- cihazId : String"],
+      methods: [
+        "+ bildirimGoster(olay) : void",
+        "+ durumYansit(ozet) : void",
+      ],
+    },
+    {
+      id: "WebUygulamasi",
+      kind: "concrete",
+      name: "WebUygulamasi",
+      x: 1020, y: 60, w: 240,
+      attributes: ["- oturumKimligi : String"],
+      methods: [
+        "+ bildirimGoster(olay) : void",
+        "+ durumYansit(ozet) : void",
+      ],
+    },
+    {
+      id: "DurumOzeti",
+      kind: "value",
+      name: "DurumOzeti",
+      x: 1320, y: 60, w: 240,
+      attributes: [
+        "- sistemDurumlari : Map",
+        "- sensorOkumalari : Map",
+        "- aktifMod : ModTipi",
+      ],
+      methods: [],
+    },
+
+    // ---- Mediator (orta) ----
+    {
+      id: "AkilliEvIzlemeMotoru",
+      kind: "mediator",
+      name: "AkilliEvIzlemeMotoru",
+      x: 540, y: 430, w: 540,
+      stereotype: "<<mediator>> <<observer>>",
+      attributes: [
+        "- sistemler : List<EvSistemi>",
+        "- sensorler : List<Sensor>",
+        "- bildirimAlicilari : List<KullaniciBildirimAlici>",
+        "- aktifModTipi : ModTipi",
+      ],
+      methods: [
+        "+ sistemKaydet(s : EvSistemi) : void",
+        "+ sensorKaydet(s : Sensor) : void",
+        "+ bildirimAliciEkle(b : KullaniciBildirimAlici) : void",
+        "+ tumModlariAyarla(tip : ModTipi) : void",
+        "+ komutGonder(sistemId : int, komut : String) : void",
+        "+ bildirimAl(olay : SensorOlayi) : void",
+        "+ durumOzetiYayinla() : void",
+      ],
+    },
+
+    // ---- Observer altyapisi (sol orta) ----
+    {
+      id: "SensorGozlemcisi",
+      kind: "interface",
+      name: "SensorGozlemcisi",
+      x: 60, y: 430, w: 320,
+      attributes: [],
+      methods: [
+        "+ bildirimAl(olay : SensorOlayi) : void",
+      ],
+    },
+    {
+      id: "SensorOlayi",
+      kind: "value",
+      name: "SensorOlayi",
+      x: 60, y: 660, w: 320,
+      attributes: [
+        "- tip : SensorTipi",
+        "- sensorId : int",
+        "- veri : String",
+        "- zaman : LocalDateTime",
+      ],
+      methods: [],
+    },
+    {
+      id: "SensorTipi",
+      kind: "enum",
+      name: "SensorTipi",
+      x: 60, y: 920, w: 200,
+      attributes: ["KAPI", "HAREKET"],
+      methods: [],
+    },
+
+    // ---- Sensorler (sol alt) ----
+    {
+      id: "Sensor",
+      kind: "abstract",
+      name: "Sensor",
+      x: 290, y: 920, w: 320,
+      attributes: [
+        "# id : int",
+        "# etkin : boolean",
+        "# gozlemciler : List<SensorGozlemcisi>",
+      ],
+      methods: [
+        "+ attach(o : SensorGozlemcisi) : void",
+        "+ detach(o : SensorGozlemcisi) : void",
+        "# bildir(olay : SensorOlayi) : void",
+        "+ olcumGonder() : void  {abstract}",
+      ],
+    },
+    {
+      id: "KapiSensoru",
+      kind: "concrete",
+      name: "KapiSensoru",
+      x: 60, y: 1240, w: 260,
+      attributes: ["- acikMi : boolean"],
+      methods: ["+ olcumGonder() : void"],
+    },
+    {
+      id: "HareketSensoru",
+      kind: "concrete",
+      name: "HareketSensoru",
+      x: 350, y: 1240, w: 260,
+      attributes: ["- hareketAlgilandi : boolean"],
+      methods: ["+ olcumGonder() : void"],
+    },
+
+    // ---- Sistemler (orta alt) ----
+    {
+      id: "EvSistemi",
+      kind: "abstract",
+      name: "EvSistemi",
+      x: 660, y: 920, w: 360,
+      attributes: [
+        "# id : int",
+        "# aktifMod : CalismaModu",
+      ],
+      methods: [
+        "+ modAyarla(mod : CalismaModu) : void",
+        "+ aktifModu() : CalismaModu",
+        "+ durumGetir() : String",
+        "+ komutCalistir(komut : String) : void  {abstract}",
+      ],
+    },
+    {
+      id: "AydinlatmaSistemi",
+      kind: "concrete",
+      name: "AydinlatmaSistemi",
+      x: 660, y: 1240, w: 320,
+      attributes: [
+        "- ortamIsikSeviyesi : int",
+        "- aydinlatmaKapasitesi : int",
+      ],
+      methods: [
+        "+ asgariAydinlatmaUygula() : void",
+        "+ maksimumAydinlatmaUygula() : void",
+        "+ komutCalistir(komut) : void",
+      ],
+    },
+    {
+      id: "IsitmaSistemi",
+      kind: "concrete",
+      name: "IsitmaSistemi",
+      x: 1020, y: 1240, w: 320,
+      attributes: [
+        "- hedefSicaklik : int",
+        "- panelSicakligi : int",
+      ],
+      methods: [
+        "+ sicaklikAyarla(derece : int) : void",
+        "+ komutCalistir(komut) : void",
+      ],
+    },
+
+    // ---- State pattern (sag) ----
+    {
+      id: "CalismaModu",
+      kind: "interface",
+      name: "CalismaModu",
+      x: 1380, y: 920, w: 300,
+      attributes: [],
+      methods: [
+        "+ uygula(sistem : EvSistemi) : void",
+        "+ tipi() : ModTipi",
+      ],
+    },
+    {
+      id: "GuvenliMod",
+      kind: "concrete",
+      name: "GuvenliMod",
+      x: 1380, y: 1170, w: 220,
+      attributes: [],
+      methods: [
+        "+ uygula(sistem) : void",
+        "+ tipi() : ModTipi",
+      ],
+    },
+    {
+      id: "TasarrufluMod",
+      kind: "concrete",
+      name: "TasarrufluMod",
+      x: 1640, y: 1170, w: 220,
+      attributes: [],
+      methods: [
+        "+ uygula(sistem) : void",
+        "+ tipi() : ModTipi",
+      ],
+    },
+    {
+      id: "ModTipi",
+      kind: "enum",
+      name: "ModTipi",
+      x: 1380, y: 1380, w: 220,
+      attributes: ["GUVENLI", "TASARRUFLU"],
+      methods: [],
+    },
+  ],
+  relationships: [
+    // Kullanici uygulamalarini kullanir
+    { from: "Kullanici", fromSide: "right", to: "MobilUygulama", toSide: "left", type: "association", mFrom: "1", mTo: "1..*", label: "kullanir" },
+    // Realizasyonlar (interface implementations)
+    { from: "MobilUygulama", fromSide: "left", to: "KullaniciBildirimAlici", toSide: "right", type: "realization" },
+    { from: "WebUygulamasi", fromSide: "top", fromOffset: 0.5, to: "KullaniciBildirimAlici", toSide: "top", toOffset: 0.7, type: "realization", routing: "orthogonal" },
+    // Mediator → user notification
+    { from: "AkilliEvIzlemeMotoru", fromSide: "top", fromOffset: 0.6, to: "KullaniciBildirimAlici", toSide: "bottom", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "0..*", label: "bildirimAlicilari", routing: "orthogonal" },
+    // Mediator publishes DurumOzeti
+    { from: "AkilliEvIzlemeMotoru", fromSide: "top", fromOffset: 0.9, to: "DurumOzeti", toSide: "bottom", toOffset: 0.5, type: "dependency", label: "<<creates>>", routing: "orthogonal" },
+    // Observer realization
+    { from: "AkilliEvIzlemeMotoru", fromSide: "left", fromOffset: 0.5, to: "SensorGozlemcisi", toSide: "right", toOffset: 0.5, type: "realization" },
+    // Sensor uses observer
+    { from: "Sensor", fromSide: "top", fromOffset: 0.2, to: "SensorGozlemcisi", toSide: "bottom", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "0..*", label: "gozlemciler", routing: "orthogonal" },
+    // Sensor creates SensorOlayi
+    { from: "Sensor", fromSide: "left", fromOffset: 0.5, to: "SensorOlayi", toSide: "right", toOffset: 0.7, type: "dependency", label: "<<creates>>" },
+    // SensorOlayi uses SensorTipi
+    { from: "SensorOlayi", fromSide: "bottom", fromOffset: 0.3, to: "SensorTipi", toSide: "top", toOffset: 0.5, type: "association", mFrom: "1", mTo: "1", routing: "orthogonal" },
+    // Mediator owns Sensor (composition)
+    { from: "AkilliEvIzlemeMotoru", fromSide: "bottom", fromOffset: 0.15, to: "Sensor", toSide: "top", toOffset: 0.6, type: "composition", mFrom: "1", mTo: "1..*", label: "sensorler", routing: "orthogonal" },
+    // Mediator owns EvSistemi (composition)
+    { from: "AkilliEvIzlemeMotoru", fromSide: "bottom", fromOffset: 0.6, to: "EvSistemi", toSide: "top", toOffset: 0.4, type: "composition", mFrom: "1", mTo: "1..*", label: "sistemler", routing: "orthogonal" },
+    // Sensor inheritance
+    { from: "KapiSensoru", fromSide: "top", to: "Sensor", toSide: "bottom", toOffset: 0.3, type: "inheritance", routing: "orthogonal" },
+    { from: "HareketSensoru", fromSide: "top", to: "Sensor", toSide: "bottom", toOffset: 0.7, type: "inheritance", routing: "orthogonal" },
+    // EvSistemi inheritance
+    { from: "AydinlatmaSistemi", fromSide: "top", to: "EvSistemi", toSide: "bottom", toOffset: 0.3, type: "inheritance", routing: "orthogonal" },
+    { from: "IsitmaSistemi", fromSide: "top", to: "EvSistemi", toSide: "bottom", toOffset: 0.7, type: "inheritance", routing: "orthogonal" },
+    // EvSistemi → CalismaModu (State pattern)
+    { from: "EvSistemi", fromSide: "right", fromOffset: 0.3, to: "CalismaModu", toSide: "left", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1", label: "aktifMod" },
+    // CalismaModu realizations
+    { from: "GuvenliMod", fromSide: "top", to: "CalismaModu", toSide: "bottom", toOffset: 0.3, type: "realization", routing: "orthogonal" },
+    { from: "TasarrufluMod", fromSide: "top", to: "CalismaModu", toSide: "bottom", toOffset: 0.7, type: "realization", routing: "orthogonal" },
+    // CalismaModu uses ModTipi
+    { from: "GuvenliMod", fromSide: "bottom", fromOffset: 0.5, to: "ModTipi", toSide: "top", toOffset: 0.3, type: "dependency", routing: "orthogonal" },
+    { from: "TasarrufluMod", fromSide: "bottom", fromOffset: 0.5, to: "ModTipi", toSide: "top", toOffset: 0.7, type: "dependency", routing: "orthogonal" },
+    // Kullanici has Mobile/Web composition
+    { from: "Kullanici", fromSide: "right", fromOffset: 0.7, to: "WebUygulamasi", toSide: "left", toOffset: 0.5, type: "association", mFrom: "1", mTo: "0..*", routing: "orthogonal" },
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// SORU 2 — SimpleCar E-Satis
+// Patterns: Strategy (OdemeYontemi), CoR (SiparisKontrolu), Command + Macro (SiparisIsleyici)
+// ---------------------------------------------------------------------------
+
+export const soru2 = {
+  width: 1900,
+  height: 1620,
+  title: "Soru 2 — SimpleCar E-Satis Sistemi",
+  subtitle: "Strategy + Chain of Responsibility + Command Oruntuleri",
+  classes: [
+    // ---- Domain (ust orta) ----
+    {
+      id: "Musteri",
+      kind: "entity",
+      name: "Musteri",
+      x: 60, y: 60, w: 280,
+      attributes: [
+        "- id : int",
+        "- ad : String",
+        "- eposta : String",
+        "- hesapBakiyesi : double",
+      ],
+      methods: [
+        "+ bakiyeyiGetir() : double",
+      ],
+    },
+    {
+      id: "Siparis",
+      kind: "entity",
+      name: "Siparis",
+      x: 400, y: 60, w: 360,
+      attributes: [
+        "- id : int",
+        "- musteri : Musteri",
+        "- miktar : int",
+        "- tutar : double",
+        "- odemeYontemi : OdemeYontemi",
+        "- durum : SiparisDurumu",
+      ],
+      methods: [
+        "+ iptalEt() : void",
+        "+ tamamlandiOlarakIsaretle() : void",
+        "+ odemeAl() : boolean",
+      ],
+    },
+    {
+      id: "SiparisDurumu",
+      kind: "enum",
+      name: "SiparisDurumu",
+      x: 820, y: 60, w: 260,
+      attributes: [
+        "ALINDI",
+        "KONTROL_EDILIYOR",
+        "ONAYLANDI",
+        "IPTAL_EDILDI",
+        "ISLENDI",
+      ],
+      methods: [],
+    },
+
+    // ---- Strategy: OdemeYontemi (sag ust) ----
+    {
+      id: "OdemeYontemi",
+      kind: "interface",
+      name: "OdemeYontemi",
+      x: 1140, y: 60, w: 320,
+      attributes: [],
+      methods: [
+        "+ odemeYap(tutar : double) : boolean",
+        "+ adi() : String",
+      ],
+    },
+    {
+      id: "BankaHavalesi",
+      kind: "concrete",
+      name: "BankaHavalesi",
+      x: 1140, y: 320, w: 240,
+      attributes: ["- ibanNumarasi : String"],
+      methods: ["+ odemeYap(tutar) : boolean", "+ adi() : String"],
+    },
+    {
+      id: "Paypal",
+      kind: "concrete",
+      name: "Paypal",
+      x: 1410, y: 320, w: 220,
+      attributes: ["- hesapEpostasi : String"],
+      methods: ["+ odemeYap(tutar) : boolean", "+ adi() : String"],
+    },
+    {
+      id: "SogukCuzdan",
+      kind: "concrete",
+      name: "SogukCuzdan",
+      x: 1660, y: 320, w: 220,
+      attributes: ["- cuzdanAdresi : String"],
+      methods: ["+ odemeYap(tutar) : boolean", "+ adi() : String"],
+    },
+
+    // ---- Orchestrator ----
+    {
+      id: "SiparisYoneticisi",
+      kind: "service",
+      name: "SiparisYoneticisi",
+      x: 660, y: 460, w: 460,
+      attributes: [
+        "- kontrolZinciri : SiparisKontrolu",
+        "- isleyici : SiparisIsleyici",
+      ],
+      methods: [
+        "+ siparisAl(s : Siparis) : void",
+        "- kontrolleriCalistir(s : Siparis) : boolean",
+        "- siparisiIsle(s : Siparis) : void",
+      ],
+    },
+
+    // ---- CoR: Kontroller (sol orta) ----
+    {
+      id: "SiparisKontrolu",
+      kind: "abstract",
+      name: "SiparisKontrolu",
+      x: 60, y: 460, w: 360,
+      attributes: [
+        "# sonraki : SiparisKontrolu",
+      ],
+      methods: [
+        "+ setSonraki(k : SiparisKontrolu) : SiparisKontrolu",
+        "+ kontrolEt(s : Siparis) : boolean",
+        "# kontroluUygula(s : Siparis) : boolean  {abstract}",
+      ],
+    },
+    {
+      id: "SahtecilikKontrolu",
+      kind: "concrete",
+      name: "SahtecilikKontrolu",
+      x: 60, y: 800, w: 240,
+      attributes: ["- risksKurali : RiskKurali"],
+      methods: ["# kontroluUygula(s) : boolean"],
+    },
+    {
+      id: "LimitKontrolu",
+      kind: "concrete",
+      name: "LimitKontrolu",
+      x: 320, y: 800, w: 240,
+      attributes: ["- ustLimit : double"],
+      methods: ["# kontroluUygula(s) : boolean"],
+    },
+    {
+      id: "BakiyeKontrolu",
+      kind: "concrete",
+      name: "BakiyeKontrolu",
+      x: 580, y: 800, w: 240,
+      attributes: [],
+      methods: ["# kontroluUygula(s) : boolean"],
+    },
+
+    // ---- Command: Siparis isleme (alt orta-sag) ----
+    {
+      id: "Komut",
+      kind: "interface",
+      name: "Komut",
+      x: 1180, y: 800, w: 280,
+      attributes: [],
+      methods: [
+        "+ calistir(s : Siparis) : void",
+        "+ aciklama() : String",
+      ],
+    },
+    {
+      id: "SiparisIsleyici",
+      kind: "service",
+      name: "SiparisIsleyici",
+      x: 1180, y: 460, w: 320,
+      stereotype: "<<macro command>>",
+      attributes: [
+        "- komutlar : List<Komut>",
+      ],
+      methods: [
+        "+ komutEkle(k : Komut) : void",
+        "+ tumKomutlariCalistir(s : Siparis) : void",
+      ],
+    },
+    {
+      id: "FaturaDuzenle",
+      kind: "concrete",
+      name: "FaturaDuzenle",
+      x: 1180, y: 1060, w: 240,
+      attributes: [],
+      methods: ["+ calistir(s) : void", "+ aciklama() : String"],
+    },
+    {
+      id: "FaturaGonder",
+      kind: "concrete",
+      name: "FaturaGonder",
+      x: 1450, y: 1060, w: 240,
+      attributes: [],
+      methods: ["+ calistir(s) : void", "+ aciklama() : String"],
+    },
+    {
+      id: "AlacaklaraKaydet",
+      kind: "concrete",
+      name: "AlacaklaraKaydet",
+      x: 1180, y: 1280, w: 320,
+      attributes: [],
+      methods: ["+ calistir(s) : void", "+ aciklama() : String"],
+    },
+    {
+      id: "Fatura",
+      kind: "entity",
+      name: "Fatura",
+      x: 880, y: 1060, w: 260,
+      attributes: [
+        "- faturaNo : String",
+        "- tutar : double",
+        "- musteri : Musteri",
+        "- siparis : Siparis",
+      ],
+      methods: [],
+    },
+  ],
+  relationships: [
+    // Domain
+    { from: "Siparis", fromSide: "left", to: "Musteri", toSide: "right", type: "association", mFrom: "0..*", mTo: "1", label: "alici" },
+    { from: "Siparis", fromSide: "right", fromOffset: 0.3, to: "SiparisDurumu", toSide: "left", toOffset: 0.5, type: "association", mFrom: "*", mTo: "1" },
+    // Strategy
+    { from: "Siparis", fromSide: "right", fromOffset: 0.7, to: "OdemeYontemi", toSide: "left", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1", label: "odemeYontemi" },
+    { from: "BankaHavalesi", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.2, type: "realization", routing: "orthogonal" },
+    { from: "Paypal", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.5, type: "realization", routing: "orthogonal" },
+    { from: "SogukCuzdan", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.8, type: "realization", routing: "orthogonal" },
+    // Orchestrator
+    { from: "SiparisYoneticisi", fromSide: "left", fromOffset: 0.5, to: "SiparisKontrolu", toSide: "right", toOffset: 0.5, type: "association", mFrom: "1", mTo: "1", label: "kontrolZinciri" },
+    { from: "SiparisYoneticisi", fromSide: "right", fromOffset: 0.5, to: "SiparisIsleyici", toSide: "left", toOffset: 0.5, type: "composition", mFrom: "1", mTo: "1", label: "isleyici" },
+    { from: "SiparisYoneticisi", fromSide: "top", fromOffset: 0.5, to: "Siparis", toSide: "bottom", toOffset: 0.5, type: "dependency", label: "isler", routing: "orthogonal" },
+    // CoR self link
+    { from: "SiparisKontrolu", fromSide: "top", fromOffset: 0.85, to: "SiparisKontrolu", toSide: "right", toOffset: 0.15, type: "association", mFrom: "0..1", mTo: "0..1", label: "sonraki", routing: "selfLoop" },
+    // CoR inheritance
+    { from: "SahtecilikKontrolu", fromSide: "top", to: "SiparisKontrolu", toSide: "bottom", toOffset: 0.2, type: "inheritance", routing: "orthogonal" },
+    { from: "LimitKontrolu", fromSide: "top", to: "SiparisKontrolu", toSide: "bottom", toOffset: 0.5, type: "inheritance", routing: "orthogonal" },
+    { from: "BakiyeKontrolu", fromSide: "top", to: "SiparisKontrolu", toSide: "bottom", toOffset: 0.8, type: "inheritance", routing: "orthogonal" },
+    // Command aggregation
+    { from: "SiparisIsleyici", fromSide: "bottom", fromOffset: 0.5, to: "Komut", toSide: "top", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1..*", label: "komutlar (sirali)", routing: "orthogonal" },
+    // Command realizations
+    { from: "FaturaDuzenle", fromSide: "top", to: "Komut", toSide: "bottom", toOffset: 0.2, type: "realization", routing: "orthogonal" },
+    { from: "FaturaGonder", fromSide: "top", to: "Komut", toSide: "bottom", toOffset: 0.7, type: "realization", routing: "orthogonal" },
+    { from: "AlacaklaraKaydet", fromSide: "top", fromOffset: 0.7, to: "Komut", toSide: "bottom", toOffset: 0.85, type: "realization", routing: "orthogonal" },
+    // Fatura usage
+    { from: "FaturaDuzenle", fromSide: "left", fromOffset: 0.5, to: "Fatura", toSide: "right", toOffset: 0.5, type: "dependency", label: "<<creates>>" },
+    { from: "FaturaGonder", fromSide: "left", fromOffset: 0.5, to: "Fatura", toSide: "right", toOffset: 0.7, type: "dependency", label: "<<uses>>", routing: "orthogonal" },
+  ],
+};
