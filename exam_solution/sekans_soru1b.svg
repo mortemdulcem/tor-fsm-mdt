@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 1062" width="1900" height="1062">
+  <rect width="1900" height="1062" fill="#fbfaf6"/>
+  
+    <text x="950" y="42" text-anchor="middle" font-family="'EB Garamond','Georgia','Cambria',serif" font-size="22" font-weight="700" fill="#0c0c0c">
+      Sekans 2 — Kullanici Mod Degisikligi
+    </text>
+    <text x="950" y="64" text-anchor="middle" font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#3a3a3a">
+      State + Mediator: tek bir mod degistirimi tum bagli sistemleri ve istemcileri eslestirir
+    </text>
+    <line x1="60" y1="80" x2="1840" y2="80" stroke="#1a1a1a" stroke-width="0.8"/>
+  
+  <line x1="225" y1="170" x2="225" y2="1002" stroke="#3b3b3b" stroke-width="1" stroke-dasharray="5,5"/>
+<line x1="515" y1="170" x2="515" y2="1002" stroke="#3b3b3b" stroke-width="1" stroke-dasharray="5,5"/>
+<line x1="805" y1="170" x2="805" y2="1002" stroke="#3b3b3b" stroke-width="1" stroke-dasharray="5,5"/>
+<line x1="1095" y1="170" x2="1095" y2="1002" stroke="#3b3b3b" stroke-width="1" stroke-dasharray="5,5"/>
+<line x1="1385" y1="170" x2="1385" y2="1002" stroke="#3b3b3b" stroke-width="1" stroke-dasharray="5,5"/>
+<line x1="1675" y1="170" x2="1675" y2="1002" stroke="#3b3b3b" stroke-width="1" stroke-dasharray="5,5"/>
+  <rect x="1089" y="504" width="12" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="1379" y="704" width="12" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="509" y="872" width="12" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="509" y="210" width="12" height="792" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="799" y="804" width="12" height="198" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="799" y="260" width="12" height="742" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="1089" y="404" width="12" height="598" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="1379" y="604" width="12" height="398" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="1669" y="654" width="12" height="348" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="1669" y="454" width="12" height="548" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+<rect x="1669" y="310" width="12" height="692" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.2"/>
+  
+      <rect x="115" y="110" width="220" height="60"
+            fill="#ececec" stroke="#1a1a1a" stroke-width="1.3"/>
+      <text x="225" y="132" text-anchor="middle" font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">&lt;&lt;actor&gt;&gt;</text>
+      <text x="225" y="154" text-anchor="middle"
+            font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="14" fill="#0c0c0c">k : Kullanici</text>
+    
+
+      <rect x="405" y="110" width="220" height="60"
+            fill="#ececec" stroke="#1a1a1a" stroke-width="1.3"/>
+      <text x="515" y="132" text-anchor="middle" font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">&lt;&lt;boundary&gt;&gt;</text>
+      <text x="515" y="154" text-anchor="middle"
+            font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="14" fill="#0c0c0c">u : MobilUygulama</text>
+    
+
+      <rect x="695" y="110" width="220" height="60"
+            fill="#ececec" stroke="#1a1a1a" stroke-width="1.3"/>
+      <text x="805" y="132" text-anchor="middle" font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">&lt;&lt;mediator&gt;&gt;</text>
+      <text x="805" y="154" text-anchor="middle"
+            font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="14" fill="#0c0c0c">m : AkilliEvIzlemeMotoru</text>
+    
+
+      <rect x="985" y="110" width="220" height="60"
+            fill="#ececec" stroke="#1a1a1a" stroke-width="1.3"/>
+      
+      <text x="1095" y="146" text-anchor="middle"
+            font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="14" fill="#0c0c0c">a : AydinlatmaSistemi</text>
+    
+
+      <rect x="1275" y="110" width="220" height="60"
+            fill="#ececec" stroke="#1a1a1a" stroke-width="1.3"/>
+      
+      <text x="1385" y="146" text-anchor="middle"
+            font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="14" fill="#0c0c0c">i : IsitmaSistemi</text>
+    
+
+      <rect x="1565" y="110" width="220" height="60"
+            fill="#ececec" stroke="#1a1a1a" stroke-width="1.3"/>
+      
+      <text x="1675" y="146" text-anchor="middle"
+            font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="14" fill="#0c0c0c">t : TasarrufluMod</text>
+    
+  <line x1="231" y1="210" x2="509" y2="210" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="496,217.5 509,210 496,202.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="370" y="202" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">1: modDegistir(TASARRUFLU)</text>
+<line x1="521" y1="260" x2="799" y2="260" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="786,267.5 799,260 786,252.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="660" y="252" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">2: tumModlariAyarla(TASARRUFLU)</text>
+<line x1="811" y1="310" x2="1669" y2="310" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="1656,317.5 1669,310 1656,302.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="1240" y="302" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">3: &lt;&lt;create&gt;&gt;</text>
+<g>
+        <path d="M 825 326
+                    L 1146.6 326
+                    L 1156.6 336
+                    L 1156.6 356
+                    L 825 356 Z" fill="#faf6e8" stroke="#1a1a1a" stroke-width="1"/>
+        <path d="M 1146.6 326
+                        L 1146.6 336
+                        L 1156.6 336" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+        <text x="833" y="346" font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="11.5" fill="#0c0c0c">Yeni TasarrufluMod nesnesi olusturulur (State)</text>
+      </g>
+<line x1="811" y1="404" x2="1089" y2="404" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="1076,411.5 1089,404 1076,396.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="950" y="396" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">4: modAyarla(t)</text>
+<line x1="1101" y1="454" x2="1669" y2="454" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="1656,461.5 1669,454 1656,446.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="1385" y="446" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">5: uygula(this)</text>
+<line x1="1669" y1="504" x2="1101" y2="504" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="1114,496.5 1101,504 1114,511.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="1385" y="496" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">6: asgariAydinlatmaUygula()</text>
+<line x1="1089" y1="554" x2="811" y2="554" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
+<polyline points="824,546.5 811,554 824,561.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="950" y="546" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">7: (donus)</text>
+<line x1="811" y1="604" x2="1379" y2="604" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="1366,611.5 1379,604 1366,596.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="1095" y="596" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">8: modAyarla(t)</text>
+<line x1="1391" y1="654" x2="1669" y2="654" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="1656,661.5 1669,654 1656,646.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="1530" y="646" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">9: uygula(this)</text>
+<line x1="1669" y1="704" x2="1391" y2="704" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="1404,696.5 1391,704 1404,711.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="1530" y="696" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">10: sicaklikAyarla(18)</text>
+<line x1="1379" y1="754" x2="811" y2="754" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
+<polyline points="824,746.5 811,754 824,761.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="1095" y="746" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">11: (donus)</text>
+<path d="M 811 804 L 871 804 L 871 826 L 815 826"
+        fill="none" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="828,818.5 815,826 828,833.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="819" y="798" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">durumOzetiYayinla()</text>
+<line x1="799" y1="872" x2="521" y2="872" stroke="#1a1a1a" stroke-width="1.3" />
+<polyline points="534,864.5 521,872 534,879.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="660" y="864" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">13: durumYansit(ozet)</text>
+<line x1="509" y1="922" x2="231" y2="922" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
+<polyline points="244,914.5 231,922 244,929.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="370" y="914" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">14: ekran guncelle</text>
+</svg>

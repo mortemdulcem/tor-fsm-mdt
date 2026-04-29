@@ -1,25 +1,28 @@
-// Hand-crafted SVG renderer for UML class diagrams.
-// Renders class boxes (entity, abstract, interface, enum, value, service, mediator)
-// and relationships (inheritance, realization, aggregation, composition, association, dependency)
+// Hand-crafted SVG renderer for UML class & sequence diagrams.
+// Style: textbook / academic monochrome — white boxes, thin black borders,
+// subtle gray header band, serif/sans typography. No flashy colors.
 
-const COLORS = {
-  entity:   { stroke: "#1f3b66", fill: "#e8f0fb", header: "#1f3b66", headerText: "#ffffff" },
-  concrete: { stroke: "#1f3b66", fill: "#ffffff", header: "#2c5282", headerText: "#ffffff" },
-  abstract: { stroke: "#553c9a", fill: "#f3edff", header: "#553c9a", headerText: "#ffffff" },
-  interface:{ stroke: "#9c6914", fill: "#fff8e7", header: "#9c6914", headerText: "#ffffff" },
-  enum:     { stroke: "#1c6749", fill: "#e9f6ee", header: "#1c6749", headerText: "#ffffff" },
-  value:    { stroke: "#5a4632", fill: "#f7f0e6", header: "#5a4632", headerText: "#ffffff" },
-  service:  { stroke: "#7b1d3a", fill: "#fbeaf0", header: "#7b1d3a", headerText: "#ffffff" },
-  mediator: { stroke: "#7b1d3a", fill: "#fbeaf0", header: "#7b1d3a", headerText: "#ffffff" },
+const PALETTE = {
+  border:     "#1a1a1a",
+  borderSoft: "#3b3b3b",
+  headerFill: "#ececec",
+  headerStrong: "#dcdcdc",   // for service / mediator hint
+  textPrimary:"#0c0c0c",
+  textMuted:  "#3a3a3a",
+  textLabel:  "#1c1c1c",
+  background: "#ffffff",
+  paper:      "#fbfaf6",     // very subtle off-white "paper" tone
+  rule:       "#1a1a1a",
 };
 
-const FONT       = "'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif";
+const FONT       = "'EB Garamond','Georgia','Cambria',serif";
+const SANS_FONT  = "'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif";
 const MONO_FONT  = "'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace";
 
 const HEADER_PADDING = 10;
 const ROW_HEIGHT     = 22;
 const SECTION_PAD    = 10;
-const HEADER_HEIGHT  = 56; // stereotype + name + spacer
+const HEADER_HEIGHT  = 56;
 
 function escapeXml(s) {
   return String(s)
@@ -49,48 +52,43 @@ function defaultStereotype(kind) {
 }
 
 function renderClass(c) {
-  const palette = COLORS[c.kind] || COLORS.concrete;
   const h = classBoxHeight(c);
   const stereotype = c.stereotype || defaultStereotype(c.kind);
   const italicName = c.kind === "abstract" || c.kind === "interface";
+  const headerFill = (c.kind === "service" || c.kind === "mediator") ? PALETTE.headerStrong : PALETTE.headerFill;
 
   const attrsTopY = c.y + HEADER_HEIGHT;
   const attrsHeight = SECTION_PAD * 2 + Math.max(1, c.attributes.length) * ROW_HEIGHT;
   const methodsTopY = attrsTopY + attrsHeight;
-  const methodsHeight = SECTION_PAD * 2 + Math.max(1, c.methods.length) * ROW_HEIGHT;
 
   const parts = [];
+  parts.push(`<g class="cls-${escapeXml(c.id)}">`);
 
-  // Drop shadow filter applied via filter ref defined in <defs>
-  parts.push(`<g class="cls-${escapeXml(c.id)}" filter="url(#dropShadow)">`);
-
-  // Outer box
+  // Outer rectangle
   parts.push(`<rect x="${c.x}" y="${c.y}" width="${c.w}" height="${h}"
-        rx="6" ry="6" fill="${palette.fill}" stroke="${palette.stroke}" stroke-width="1.6"/>`);
+        fill="${PALETTE.background}" stroke="${PALETTE.border}" stroke-width="1.3"/>`);
 
-  // Header band
+  // Header band (subtle gray)
   parts.push(`<rect x="${c.x}" y="${c.y}" width="${c.w}" height="${HEADER_HEIGHT}"
-        rx="6" ry="6" fill="${palette.header}" stroke="${palette.stroke}" stroke-width="1.6"/>`);
-  // Square off bottom of header
-  parts.push(`<rect x="${c.x}" y="${c.y + HEADER_HEIGHT - 8}" width="${c.w}" height="8"
-        fill="${palette.header}" stroke="none"/>`);
-  // Bottom border of header
+        fill="${headerFill}" stroke="none"/>`);
+
+  // Header bottom rule
   parts.push(`<line x1="${c.x}" y1="${c.y + HEADER_HEIGHT}" x2="${c.x + c.w}" y2="${c.y + HEADER_HEIGHT}"
-        stroke="${palette.stroke}" stroke-width="1.6"/>`);
+        stroke="${PALETTE.border}" stroke-width="1.3"/>`);
 
   // Stereotype
   if (stereotype) {
-    parts.push(`<text x="${c.x + c.w / 2}" y="${c.y + 20}" text-anchor="middle"
-      font-family="${FONT}" font-style="italic" font-size="12" fill="${palette.headerText}">
+    parts.push(`<text x="${c.x + c.w / 2}" y="${c.y + 21}" text-anchor="middle"
+      font-family="${FONT}" font-style="italic" font-size="13" fill="${PALETTE.textMuted}">
       ${escapeXml(stereotype)}
     </text>`);
   }
 
   // Class name
-  parts.push(`<text x="${c.x + c.w / 2}" y="${c.y + 42}" text-anchor="middle"
-    font-family="${FONT}" font-weight="700" font-size="16"
+  parts.push(`<text x="${c.x + c.w / 2}" y="${c.y + 44}" text-anchor="middle"
+    font-family="${FONT}" font-weight="700" font-size="17"
     ${italicName ? 'font-style="italic"' : ""}
-    fill="${palette.headerText}">
+    fill="${PALETTE.textPrimary}">
     ${escapeXml(c.name)}
   </text>`);
 
@@ -98,27 +96,26 @@ function renderClass(c) {
   for (let i = 0; i < c.attributes.length; i++) {
     const text = c.attributes[i];
     const lineY = attrsTopY + SECTION_PAD + ROW_HEIGHT * i + 16;
-    parts.push(`<text x="${c.x + 12}" y="${lineY}" font-family="${MONO_FONT}" font-size="12.5" fill="#1a1a1a">${escapeXml(text)}</text>`);
+    const italic = /^<<.+>>/.test(text) ? 'font-style="italic"' : "";
+    parts.push(`<text x="${c.x + 12}" y="${lineY}" font-family="${MONO_FONT}" font-size="12.5" ${italic} fill="${PALETTE.textPrimary}">${escapeXml(text)}</text>`);
   }
 
-  // Section divider between attributes and methods
+  // Section divider
   parts.push(`<line x1="${c.x}" y1="${methodsTopY}" x2="${c.x + c.w}" y2="${methodsTopY}"
-    stroke="${palette.stroke}" stroke-width="1"/>`);
+    stroke="${PALETTE.border}" stroke-width="1"/>`);
 
   // Methods section
   for (let i = 0; i < c.methods.length; i++) {
     const text = c.methods[i];
     const lineY = methodsTopY + SECTION_PAD + ROW_HEIGHT * i + 16;
-    parts.push(`<text x="${c.x + 12}" y="${lineY}" font-family="${MONO_FONT}" font-size="12.5" fill="#1a1a1a">${escapeXml(text)}</text>`);
+    const italic = /\{abstract\}/.test(text) ? 'font-style="italic"' : "";
+    parts.push(`<text x="${c.x + 12}" y="${lineY}" font-family="${MONO_FONT}" font-size="12.5" ${italic} fill="${PALETTE.textPrimary}">${escapeXml(text)}</text>`);
   }
 
   parts.push(`</g>`);
   return parts.join("\n");
 }
 
-// ---------------------------------------------------------------------------
-// Anchor point on a class box for a given side and offset.
-// ---------------------------------------------------------------------------
 function anchor(box, side, offset = 0.5) {
   const h = classBoxHeight(box);
   switch (side) {
@@ -138,7 +135,6 @@ function sideNormal(side) {
   }
 }
 
-// Build path d-attribute for a relationship.
 function buildPath(rel, fromBox, toBox) {
   const fromOff = rel.fromOffset ?? 0.5;
   const toOff   = rel.toOffset ?? 0.5;
@@ -146,13 +142,11 @@ function buildPath(rel, fromBox, toBox) {
   const B = anchor(toBox, rel.toSide, toOff);
 
   if (rel.routing === "selfLoop") {
-    // Self-loop: goes out from fromSide perpendicular, then L-shape, then back into toSide of same box.
     const out1 = sideNormal(rel.fromSide);
     const out2 = sideNormal(rel.toSide);
-    const off = 32;
+    const off = 36;
     const p1 = { x: A.x + out1.x * off, y: A.y + out1.y * off };
     const p2 = { x: B.x + out2.x * off, y: B.y + out2.y * off };
-    // The corner sits at the perpendicular intersection of the two stubs.
     const cornerX = (rel.fromSide === "top" || rel.fromSide === "bottom") ? p2.x : p1.x;
     const cornerY = (rel.fromSide === "left" || rel.fromSide === "right") ? p2.y : p1.y;
     return {
@@ -167,17 +161,14 @@ function buildPath(rel, fromBox, toBox) {
   if (rel.routing === "orthogonal") {
     const n1 = sideNormal(rel.fromSide);
     const n2 = sideNormal(rel.toSide);
-    const stub = 26;
+    const stub = 28;
     const p1 = { x: A.x + n1.x * stub, y: A.y + n1.y * stub };
     const p2 = { x: B.x + n2.x * stub, y: B.y + n2.y * stub };
     let cornerX, cornerY;
-    // Decide whether to move horizontally or vertically first based on side normals.
     if (Math.abs(n1.y) > 0) {
-      // Vertical first
       cornerX = p2.x;
       cornerY = p1.y;
     } else {
-      // Horizontal first
       cornerX = p1.x;
       cornerY = p2.y;
     }
@@ -190,7 +181,6 @@ function buildPath(rel, fromBox, toBox) {
     };
   }
 
-  // Direct line
   const n1 = sideNormal(rel.fromSide);
   const n2 = sideNormal(rel.toSide);
   return {
@@ -202,50 +192,43 @@ function buildPath(rel, fromBox, toBox) {
   };
 }
 
-// Render a single decorator (arrow / diamond) at the given point with given direction.
-function renderDecorator(point, dir, type, role /* "start" | "end" */) {
-  // dir is the unit vector pointing FROM the line INTO the box (so for "end", dir points into target box; for "start", dir points into source box).
-  // Normalize
+function renderDecorator(point, dir, type, role) {
   const len = Math.hypot(dir.x, dir.y) || 1;
   const ux = dir.x / len;
   const uy = dir.y / len;
-  // Perpendicular
   const px = -uy;
   const py =  ux;
   const tipX = point.x;
   const tipY = point.y;
 
   if (role === "end" && (type === "inheritance" || type === "realization")) {
-    // Open triangle pointing toward the target (i.e., into target side).
-    const baseLen = 14;
-    const baseHalf = 9;
+    const baseLen = 16;
+    const baseHalf = 10;
     const baseX = tipX - ux * baseLen;
     const baseY = tipY - uy * baseLen;
     const p1x = baseX + px * baseHalf;
     const p1y = baseY + py * baseHalf;
     const p2x = baseX - px * baseHalf;
     const p2y = baseY - py * baseHalf;
-    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${p2x},${p2y}" fill="#ffffff" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>`;
+    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${p2x},${p2y}" fill="#ffffff" stroke="${PALETTE.border}" stroke-width="1.4" stroke-linejoin="miter"/>`;
   }
 
   if (role === "end" && (type === "association" || type === "dependency")) {
-    // Open arrowhead V
-    const baseLen = 12;
-    const baseHalf = 7;
+    const baseLen = 13;
+    const baseHalf = 7.5;
     const baseX = tipX - ux * baseLen;
     const baseY = tipY - uy * baseLen;
     const p1x = baseX + px * baseHalf;
     const p1y = baseY + py * baseHalf;
     const p2x = baseX - px * baseHalf;
     const p2y = baseY - py * baseHalf;
-    return `<polyline points="${p1x},${p1y} ${tipX},${tipY} ${p2x},${p2y}" fill="none" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter" stroke-linecap="round"/>`;
+    return `<polyline points="${p1x},${p1y} ${tipX},${tipY} ${p2x},${p2y}" fill="none" stroke="${PALETTE.border}" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>`;
   }
 
   if (role === "start" && (type === "aggregation" || type === "composition")) {
-    // Diamond pointing into source (whole) side.
-    const baseLen = 18;
-    const baseHalf = 8;
-    const fill = type === "composition" ? "#202a3a" : "#ffffff";
+    const baseLen = 20;
+    const baseHalf = 9;
+    const fill = type === "composition" ? PALETTE.border : "#ffffff";
     const baseX = tipX - ux * baseLen;
     const baseY = tipY - uy * baseLen;
     const midX = tipX - ux * (baseLen / 2);
@@ -254,7 +237,7 @@ function renderDecorator(point, dir, type, role /* "start" | "end" */) {
     const p1y = midY + py * baseHalf;
     const p2x = midX - px * baseHalf;
     const p2y = midY - py * baseHalf;
-    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${baseX},${baseY} ${p2x},${p2y}" fill="${fill}" stroke="#202a3a" stroke-width="1.6" stroke-linejoin="miter"/>`;
+    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${baseX},${baseY} ${p2x},${p2y}" fill="${fill}" stroke="${PALETTE.border}" stroke-width="1.4" stroke-linejoin="miter"/>`;
   }
 
   return "";
@@ -267,14 +250,12 @@ function renderRelationship(rel, classMap) {
   const p = buildPath(rel, fromBox, toBox);
 
   const isDashed = rel.type === "realization" || rel.type === "dependency";
-  const lineStroke = "#202a3a";
 
   const parts = [];
   parts.push(`<g class="rel-${rel.type}">`);
-  parts.push(`<path d="${p.d}" fill="none" stroke="${lineStroke}" stroke-width="1.5"
+  parts.push(`<path d="${p.d}" fill="none" stroke="${PALETTE.border}" stroke-width="1.3"
     ${isDashed ? 'stroke-dasharray="6,5"' : ""} stroke-linejoin="round" stroke-linecap="round"/>`);
 
-  // Decorators
   if (rel.type === "aggregation" || rel.type === "composition") {
     parts.push(renderDecorator(p.start, p.startDir, rel.type, "start"));
   }
@@ -282,23 +263,21 @@ function renderRelationship(rel, classMap) {
     parts.push(renderDecorator(p.end, p.endDir, rel.type, "end"));
   }
 
-  // Multiplicity labels
   if (rel.mFrom) {
     const off = labelOffset(p.start, p.startDir);
-    parts.push(`<text x="${off.x}" y="${off.y}" font-family="${FONT}" font-size="11.5" fill="#202a3a">${escapeXml(rel.mFrom)}</text>`);
+    parts.push(`<text x="${off.x}" y="${off.y}" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(rel.mFrom)}</text>`);
   }
   if (rel.mTo) {
     const off = labelOffset(p.end, p.endDir, true);
-    parts.push(`<text x="${off.x}" y="${off.y}" font-family="${FONT}" font-size="11.5" fill="#202a3a">${escapeXml(rel.mTo)}</text>`);
+    parts.push(`<text x="${off.x}" y="${off.y}" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(rel.mTo)}</text>`);
   }
 
-  // Role label near midpoint
   if (rel.label) {
     const m = p.midpoint;
     parts.push(`<g>
       <text x="${m.x}" y="${m.y - 4}" text-anchor="middle"
-        font-family="${FONT}" font-size="12" font-style="italic" fill="#36507c"
-        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">
+        font-family="${FONT}" font-size="13" font-style="italic" fill="${PALETTE.textPrimary}"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         ${escapeXml(rel.label)}
       </text>
     </g>`);
@@ -309,14 +288,12 @@ function renderRelationship(rel, classMap) {
 }
 
 function labelOffset(pt, dir, end = false) {
-  // Place multiplicity label slightly offset away from line into the source/target box.
   const len = Math.hypot(dir.x, dir.y) || 1;
   const ux = dir.x / len;
   const uy = dir.y / len;
-  // Perpendicular for slight side offset
   const px = -uy;
   const py =  ux;
-  const distAlong = end ? -22 : -22;
+  const distAlong = -22;
   const distSide = 8;
   return {
     x: pt.x + ux * distAlong + px * distSide,
@@ -325,7 +302,7 @@ function labelOffset(pt, dir, end = false) {
 }
 
 // ---------------------------------------------------------------------------
-// Top-level renderer
+// Class diagram top-level
 // ---------------------------------------------------------------------------
 export function renderDiagram(diagram) {
   const W = diagram.width;
@@ -333,48 +310,29 @@ export function renderDiagram(diagram) {
   const classMap = new Map(diagram.classes.map(c => [c.id, c]));
 
   const titleBlock = `
-    <rect x="0" y="0" width="${W}" height="80" fill="#0e1c2f"/>
-    <text x="32" y="40" font-family="${FONT}" font-size="22" font-weight="700" fill="#ffffff">
+    <text x="${W / 2}" y="42" text-anchor="middle" font-family="${FONT}" font-size="22" font-weight="700" fill="${PALETTE.textPrimary}">
       ${escapeXml(diagram.title)}
     </text>
-    <text x="32" y="64" font-family="${FONT}" font-size="13" font-style="italic" fill="#a8b8d0">
+    <text x="${W / 2}" y="64" text-anchor="middle" font-family="${FONT}" font-size="13" font-style="italic" fill="${PALETTE.textMuted}">
       ${escapeXml(diagram.subtitle)}
     </text>
-    <text x="${W - 32}" y="40" text-anchor="end" font-family="${FONT}" font-size="13" fill="#a8b8d0">
-      Sinif Diyagrami
-    </text>
-    <text x="${W - 32}" y="64" text-anchor="end" font-family="${FONT}" font-size="11" fill="#7a8aa0">
-      Nesneye Yonelik Yazilim Gelistirme — 2025-2026 Bahar
-    </text>
+    <line x1="60" y1="80" x2="${W - 60}" y2="80" stroke="${PALETTE.rule}" stroke-width="0.8"/>
   `;
 
-  // Translate diagram content downward to leave room for title block
-  const contentOffsetY = 90;
+  const contentOffsetY = 100;
   diagram.classes.forEach(c => { c.y += contentOffsetY; });
 
   const classSvg = diagram.classes.map(renderClass).join("\n");
   const relSvg = diagram.relationships.map(r => renderRelationship(r, classMap)).join("\n");
 
-  // Reset Y in case render runs again
   diagram.classes.forEach(c => { c.y -= contentOffsetY; });
 
-  const totalHeight = H + 90;
-
-  // Legend
-  const legend = renderLegend(W, totalHeight - 110);
+  const totalHeight = H + 100 + 80;
+  const legend = renderLegend(W, totalHeight - 100);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${totalHeight}" width="${W}" height="${totalHeight}">
-  <defs>
-    <filter id="dropShadow" x="-2%" y="-2%" width="104%" height="104%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.12"/>
-    </filter>
-    <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e6ebf2" stroke-width="0.6"/>
-    </pattern>
-  </defs>
-  <rect width="${W}" height="${totalHeight}" fill="#ffffff"/>
-  <rect x="0" y="80" width="${W}" height="${totalHeight - 80}" fill="url(#gridPattern)"/>
+  <rect width="${W}" height="${totalHeight}" fill="${PALETTE.paper}"/>
   ${titleBlock}
   ${relSvg}
   ${classSvg}
@@ -384,28 +342,27 @@ export function renderDiagram(diagram) {
 
 function renderLegend(W, y) {
   const items = [
-    { label: "Inheritance",   sample: "inheritance" },
-    { label: "Realization",   sample: "realization" },
-    { label: "Aggregation",   sample: "aggregation" },
-    { label: "Composition",   sample: "composition" },
-    { label: "Association",   sample: "association" },
-    { label: "Dependency",    sample: "dependency" },
+    { label: "Kalitim (inheritance)",       sample: "inheritance" },
+    { label: "Gerceklestirme (realization)", sample: "realization" },
+    { label: "Birikim (aggregation)",       sample: "aggregation" },
+    { label: "Olusum (composition)",        sample: "composition" },
+    { label: "Iliski (association)",        sample: "association" },
+    { label: "Bagimlilik (dependency)",     sample: "dependency" },
   ];
-  const startX = 32;
-  const itemW = 150;
+  const startX = 60;
+  const itemW = (W - 120) / items.length;
   const lineY = y + 50;
   const parts = [];
   parts.push(`<g>`);
-  parts.push(`<rect x="20" y="${y}" width="${W - 40}" height="80" rx="8" ry="8" fill="#f7f9fc" stroke="#cfd6e2"/>`);
-  parts.push(`<text x="32" y="${y + 22}" font-family="${FONT}" font-size="13" font-weight="700" fill="#0e1c2f">Notasyon Aciklamasi</text>`);
+  parts.push(`<line x1="60" y1="${y}" x2="${W - 60}" y2="${y}" stroke="${PALETTE.rule}" stroke-width="0.8"/>`);
+  parts.push(`<text x="60" y="${y + 22}" font-family="${FONT}" font-size="13" font-style="italic" fill="${PALETTE.textMuted}">Notasyon Aciklamasi</text>`);
 
   items.forEach((it, i) => {
     const ix = startX + i * itemW;
     const ax = ix + 4;
-    const bx = ix + 60;
+    const bx = ix + 56;
     const dashed = (it.sample === "realization" || it.sample === "dependency") ? 'stroke-dasharray="6,5"' : "";
-    parts.push(`<line x1="${ax}" y1="${lineY}" x2="${bx}" y2="${lineY}" stroke="#202a3a" stroke-width="1.5" ${dashed}/>`);
-    // Decorator
+    parts.push(`<line x1="${ax}" y1="${lineY}" x2="${bx}" y2="${lineY}" stroke="${PALETTE.border}" stroke-width="1.3" ${dashed}/>`);
     const dir = { x: 1, y: 0 };
     const tipPoint = { x: bx, y: lineY };
     if (it.sample === "inheritance" || it.sample === "realization") {
@@ -415,9 +372,215 @@ function renderLegend(W, y) {
     } else if (it.sample === "aggregation" || it.sample === "composition") {
       parts.push(renderDecorator({ x: ax, y: lineY }, { x: -1, y: 0 }, it.sample, "start"));
     }
-    parts.push(`<text x="${bx + 10}" y="${lineY + 4}" font-family="${FONT}" font-size="12" fill="#202a3a">${escapeXml(it.label)}</text>`);
+    parts.push(`<text x="${bx + 10}" y="${lineY + 4}" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(it.label)}</text>`);
   });
 
   parts.push(`</g>`);
   return parts.join("\n");
+}
+
+// ===========================================================================
+// SEQUENCE DIAGRAM RENDERER
+// ===========================================================================
+//
+// data shape:
+// {
+//   width, height, title, subtitle,
+//   actors: [{ id, label, kind: "actor"|"object"|"boundary"|"control"|"entity" }, ...],
+//   messages: [
+//     { from, to, label, kind: "sync"|"async"|"return"|"create"|"self", note? },
+//     { kind: "frag", type: "alt"|"loop"|"opt", label, condition }, // future
+//   ]
+// }
+
+export function renderSequenceDiagram(diagram) {
+  const W = diagram.width;
+  const H = diagram.height;
+
+  const titleBlock = `
+    <text x="${W / 2}" y="42" text-anchor="middle" font-family="${FONT}" font-size="22" font-weight="700" fill="${PALETTE.textPrimary}">
+      ${escapeXml(diagram.title)}
+    </text>
+    <text x="${W / 2}" y="64" text-anchor="middle" font-family="${FONT}" font-size="13" font-style="italic" fill="${PALETTE.textMuted}">
+      ${escapeXml(diagram.subtitle)}
+    </text>
+    <line x1="60" y1="80" x2="${W - 60}" y2="80" stroke="${PALETTE.rule}" stroke-width="0.8"/>
+  `;
+
+  const topPad = 110;
+  const lifelineHeadH = 60;
+  const headTop = topPad;
+  const headBottom = headTop + lifelineHeadH;
+
+  const margin = 80;
+  const usableW = W - margin * 2;
+  const colW = usableW / diagram.actors.length;
+  const lifelineX = diagram.actors.map((_, i) => margin + colW * i + colW / 2);
+
+  // Render headers
+  const headers = diagram.actors.map((a, i) => {
+    const cx = lifelineX[i];
+    const headW = Math.min(220, colW - 40);
+    const x = cx - headW / 2;
+    const stereo = a.kind && a.kind !== "object" ? `<<${a.kind}>>` : null;
+    return `
+      <rect x="${x}" y="${headTop}" width="${headW}" height="${lifelineHeadH}"
+            fill="${PALETTE.headerFill}" stroke="${PALETTE.border}" stroke-width="1.3"/>
+      ${stereo ? `<text x="${cx}" y="${headTop + 22}" text-anchor="middle" font-family="${FONT}" font-style="italic" font-size="12.5" fill="${PALETTE.textMuted}">${escapeXml(stereo)}</text>` : ""}
+      <text x="${cx}" y="${headTop + (stereo ? 44 : 36)}" text-anchor="middle"
+            font-family="${FONT}" font-weight="700" font-size="14" fill="${PALETTE.textPrimary}">${escapeXml(a.label)}</text>
+    `;
+  }).join("\n");
+
+  const actorIndex = new Map(diagram.actors.map((a, i) => [a.id, i]));
+
+  // Compute message Y positions with dynamic spacing per message
+  const msgStartY = headBottom + 40;
+  const baseGap = 50;
+  const selfExtra = 18;     // self-loops need more vertical room (loop has height 22)
+  const noteExtra = 44;     // notes need extra vertical room
+  const messages = diagram.messages;
+  const msgY = [];
+  let cursorY = msgStartY;
+  for (let i = 0; i < messages.length; i++) {
+    msgY.push(cursorY);
+    let gap = baseGap;
+    const m = messages[i];
+    if (m.kind === "self" || (actorIndex.get(m.from) === actorIndex.get(m.to))) gap += selfExtra;
+    if (m.note) gap += noteExtra;
+    cursorY += gap;
+  }
+
+  // Lifelines (dashed vertical lines from below headers down to bottom)
+  const lifelineTop = headBottom;
+  const lifelineBottom = cursorY + 30;
+  const lifelines = lifelineX.map((cx) =>
+    `<line x1="${cx}" y1="${lifelineTop}" x2="${cx}" y2="${lifelineBottom}" stroke="${PALETTE.borderSoft}" stroke-width="1" stroke-dasharray="5,5"/>`
+  ).join("\n");
+
+  // Activation rectangles - track activations per actor with stack
+  const ACT_W = 12;
+  const activations = diagram.actors.map(() => []); // stacks
+  const actRects = [];
+
+  function activate(actorIdx, y) {
+    activations[actorIdx].push(y);
+  }
+  function deactivate(actorIdx, y) {
+    const start = activations[actorIdx].pop();
+    if (start !== undefined) {
+      const cx = lifelineX[actorIdx];
+      actRects.push(`<rect x="${cx - ACT_W/2}" y="${start}" width="${ACT_W}" height="${y - start}" fill="${PALETTE.background}" stroke="${PALETTE.border}" stroke-width="1.2"/>`);
+    }
+  }
+
+  // Render messages
+  const msgSvg = messages.map((m, i) => {
+    const y = msgY[i];
+    const fromIdx = actorIndex.get(m.from);
+    const toIdx = actorIndex.get(m.to);
+    if (fromIdx === undefined || toIdx === undefined) return "";
+
+    const x1 = lifelineX[fromIdx];
+    const x2 = lifelineX[toIdx];
+
+    const isReturn = m.kind === "return";
+    const isAsync = m.kind === "async";
+    const isSelf = fromIdx === toIdx || m.kind === "self";
+
+    const dashAttr = isReturn ? 'stroke-dasharray="6,5"' : "";
+    const stroke = PALETTE.border;
+
+    // Handle activations
+    if (!isReturn) {
+      if (isSelf) {
+        // self-activation (push)
+        activate(toIdx, y);
+      } else {
+        activate(toIdx, y);
+      }
+    } else {
+      // return: pop activation on caller side (from)
+      deactivate(fromIdx, y);
+    }
+
+    const parts = [];
+    if (isSelf) {
+      // Self-message: arrow loops to right of lifeline
+      const cx = x1;
+      const loopW = 60;
+      const dx = ACT_W / 2;
+      parts.push(`<path d="M ${cx + dx} ${y} L ${cx + dx + loopW} ${y} L ${cx + dx + loopW} ${y + 22} L ${cx + dx + 4} ${y + 22}"
+        fill="none" stroke="${stroke}" stroke-width="1.3" ${dashAttr}/>`);
+      // arrowhead
+      const tipPoint = { x: cx + dx + 4, y: y + 22 };
+      const dir = { x: -1, y: 0 };
+      parts.push(renderDecorator(tipPoint, dir, "association", "end"));
+      parts.push(`<text x="${cx + dx + 8}" y="${y - 6}" font-family="${SANS_FONT}" font-size="12" fill="${PALETTE.textPrimary}">${escapeXml(m.label)}</text>`);
+    } else {
+      const goingRight = x2 > x1;
+      const startX = goingRight ? x1 + ACT_W/2 : x1 - ACT_W/2;
+      const endX = goingRight ? x2 - ACT_W/2 : x2 + ACT_W/2;
+      parts.push(`<line x1="${startX}" y1="${y}" x2="${endX}" y2="${y}" stroke="${stroke}" stroke-width="1.3" ${dashAttr}/>`);
+      const tipPoint = { x: endX, y: y };
+      const dir = { x: goingRight ? 1 : -1, y: 0 };
+      parts.push(renderDecorator(tipPoint, dir, "association", "end"));
+      // Label centered above line
+      const midX = (startX + endX) / 2;
+      parts.push(`<text x="${midX}" y="${y - 8}" text-anchor="middle" font-family="${SANS_FONT}" font-size="12.5" fill="${PALETTE.textPrimary}"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">${i + 1}: ${escapeXml(m.label)}</text>`);
+    }
+    if (m.note) {
+      // UML note (folded corner) placed below the message line so it does not collide with the label
+      const noteText = m.note;
+      const charW = 6.6;
+      const noteW = Math.max(180, Math.min(540, noteText.length * charW + 28));
+      const noteH = 30;
+      let noteX;
+      if (isSelf) {
+        // place to the right of the self loop
+        noteX = x1 + ACT_W / 2 + 70;
+      } else {
+        noteX = Math.min(x1, x2) + 20;
+      }
+      const noteY = y + 16;     // safely below the message line (label sits at y-8)
+      const fold = 10;
+      // path with folded top-right corner
+      const path = `M ${noteX} ${noteY}
+                    L ${noteX + noteW - fold} ${noteY}
+                    L ${noteX + noteW} ${noteY + fold}
+                    L ${noteX + noteW} ${noteY + noteH}
+                    L ${noteX} ${noteY + noteH} Z`;
+      const foldPath = `M ${noteX + noteW - fold} ${noteY}
+                        L ${noteX + noteW - fold} ${noteY + fold}
+                        L ${noteX + noteW} ${noteY + fold}`;
+      parts.push(`<g>
+        <path d="${path}" fill="#faf6e8" stroke="${PALETTE.border}" stroke-width="1"/>
+        <path d="${foldPath}" fill="none" stroke="${PALETTE.border}" stroke-width="1"/>
+        <text x="${noteX + 8}" y="${noteY + 20}" font-family="${FONT}" font-style="italic" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(noteText)}</text>
+      </g>`);
+    }
+    return parts.join("\n");
+  }).join("\n");
+
+  // Close any remaining activations at bottom
+  for (let i = 0; i < activations.length; i++) {
+    while (activations[i].length > 0) {
+      const start = activations[i].pop();
+      const cx = lifelineX[i];
+      actRects.push(`<rect x="${cx - ACT_W/2}" y="${start}" width="${ACT_W}" height="${lifelineBottom - start}" fill="${PALETTE.background}" stroke="${PALETTE.border}" stroke-width="1.2"/>`);
+    }
+  }
+
+  const totalHeight = Math.max(H, lifelineBottom + 60);
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${totalHeight}" width="${W}" height="${totalHeight}">
+  <rect width="${W}" height="${totalHeight}" fill="${PALETTE.paper}"/>
+  ${titleBlock}
+  ${lifelines}
+  ${actRects.join("\n")}
+  ${headers}
+  ${msgSvg}
+</svg>`;
 }

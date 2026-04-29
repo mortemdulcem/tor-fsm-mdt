@@ -546,3 +546,105 @@ export const soru2 = {
     { from: "FaturaGonder", fromSide: "left", fromOffset: 0.5, to: "Fatura", toSide: "right", toOffset: 0.7, type: "dependency", label: "<<uses>>", routing: "orthogonal" },
   ],
 };
+
+// ---------------------------------------------------------------------------
+// SEQUENCE DIAGRAMS
+// ---------------------------------------------------------------------------
+
+export const sekans_soru1_sensor = {
+  width: 1900,
+  height: 1100,
+  title: "Sekans 1 — Hareket Sensoru Tetiklendiginde",
+  subtitle: "Observer + Mediator zinciri: Sensor -> Motor -> EvSistemi & KullaniciBildirimAlici",
+  actors: [
+    { id: "ks",    label: "h : HareketSensoru", kind: "object" },
+    { id: "motor", label: "m : AkilliEvIzlemeMotoru", kind: "mediator" },
+    { id: "isi",   label: "i : IsitmaSistemi",   kind: "object" },
+    { id: "ayd",   label: "a : AydinlatmaSistemi", kind: "object" },
+    { id: "mob",   label: "u : MobilUygulama",  kind: "boundary" },
+  ],
+  messages: [
+    { from: "ks",    to: "ks",    label: "olcumGonder()", kind: "self", note: "Yerel polling/donanim olayi" },
+    { from: "ks",    to: "motor", label: "bildirimAl(olay : SensorOlayi)", kind: "sync" },
+    { from: "motor", to: "motor", label: "ilgiliSistemleriBul(olay)", kind: "self" },
+    { from: "motor", to: "ayd",   label: "komutCalistir(\"hareketAlgilandi\")", kind: "sync" },
+    { from: "ayd",   to: "motor", label: "(donus)", kind: "return" },
+    { from: "motor", to: "isi",   label: "komutCalistir(\"hareketAlgilandi\")", kind: "sync" },
+    { from: "isi",   to: "motor", label: "(donus)", kind: "return" },
+    { from: "motor", to: "motor", label: "durumOzetiYayinla()", kind: "self" },
+    { from: "motor", to: "mob",   label: "bildirimGoster(olay)", kind: "async" },
+    { from: "motor", to: "mob",   label: "durumYansit(durumOzeti)", kind: "async" },
+    { from: "motor", to: "ks",    label: "(akis tamam)", kind: "return" },
+  ],
+};
+
+export const sekans_soru1_mod = {
+  width: 1900,
+  height: 1050,
+  title: "Sekans 2 — Kullanici Mod Degisikligi",
+  subtitle: "State + Mediator: tek bir mod degistirimi tum bagli sistemleri ve istemcileri eslestirir",
+  actors: [
+    { id: "k",   label: "k : Kullanici", kind: "actor" },
+    { id: "mob", label: "u : MobilUygulama", kind: "boundary" },
+    { id: "m",   label: "m : AkilliEvIzlemeMotoru", kind: "mediator" },
+    { id: "ayd", label: "a : AydinlatmaSistemi", kind: "object" },
+    { id: "isi", label: "i : IsitmaSistemi", kind: "object" },
+    { id: "tm",  label: "t : TasarrufluMod", kind: "object" },
+  ],
+  messages: [
+    { from: "k",   to: "mob", label: "modDegistir(TASARRUFLU)", kind: "sync" },
+    { from: "mob", to: "m",   label: "tumModlariAyarla(TASARRUFLU)", kind: "sync" },
+    { from: "m",   to: "tm",  label: "<<create>>", kind: "create", note: "Yeni TasarrufluMod nesnesi olusturulur (State)" },
+    { from: "m",   to: "ayd", label: "modAyarla(t)", kind: "sync" },
+    { from: "ayd", to: "tm",  label: "uygula(this)", kind: "sync" },
+    { from: "tm",  to: "ayd", label: "asgariAydinlatmaUygula()", kind: "sync" },
+    { from: "ayd", to: "m",   label: "(donus)", kind: "return" },
+    { from: "m",   to: "isi", label: "modAyarla(t)", kind: "sync" },
+    { from: "isi", to: "tm",  label: "uygula(this)", kind: "sync" },
+    { from: "tm",  to: "isi", label: "sicaklikAyarla(18)", kind: "sync" },
+    { from: "isi", to: "m",   label: "(donus)", kind: "return" },
+    { from: "m",   to: "m",   label: "durumOzetiYayinla()", kind: "self" },
+    { from: "m",   to: "mob", label: "durumYansit(ozet)", kind: "async" },
+    { from: "mob", to: "k",   label: "ekran guncelle", kind: "return" },
+  ],
+};
+
+export const sekans_soru2 = {
+  width: 1900,
+  height: 1300,
+  title: "Sekans 3 — Siparis Yasam Dongusu",
+  subtitle: "CoR (kontroller) + Strategy (odeme) + Command (sirali isleme adimlari)",
+  actors: [
+    { id: "musteri", label: ": Musteri", kind: "actor" },
+    { id: "yon",     label: "y : SiparisYoneticisi", kind: "service" },
+    { id: "k1",      label: "sk : SahtecilikKontrolu", kind: "object" },
+    { id: "k2",      label: "lk : LimitKontrolu", kind: "object" },
+    { id: "k3",      label: "bk : BakiyeKontrolu", kind: "object" },
+    { id: "siparis", label: "s : Siparis", kind: "object" },
+    { id: "odeme",   label: ": OdemeYontemi", kind: "object" },
+    { id: "isleyici",label: "i : SiparisIsleyici", kind: "object" },
+  ],
+  messages: [
+    { from: "musteri", to: "yon",   label: "siparisAl(s)", kind: "sync" },
+    { from: "yon",    to: "yon",    label: "kontrolleriCalistir(s)", kind: "self" },
+    { from: "yon",    to: "k1",     label: "kontrolEt(s)", kind: "sync" },
+    { from: "k1",     to: "k1",     label: "kontroluUygula(s)", kind: "self", note: "Sahtecilik degerlendirmesi" },
+    { from: "k1",     to: "k2",     label: "kontrolEt(s)", kind: "sync" },
+    { from: "k2",     to: "k2",     label: "kontroluUygula(s)", kind: "self", note: "Tutar limit kontrolu" },
+    { from: "k2",     to: "k3",     label: "kontrolEt(s)", kind: "sync" },
+    { from: "k3",     to: "k3",     label: "kontroluUygula(s)", kind: "self", note: "Musteri bakiye kontrolu" },
+    { from: "k3",     to: "k2",     label: "true", kind: "return" },
+    { from: "k2",     to: "k1",     label: "true", kind: "return" },
+    { from: "k1",     to: "yon",    label: "true", kind: "return" },
+    { from: "yon",    to: "siparis", label: "odemeAl()", kind: "sync", note: "Strategy: siparis kendi yontemini tasir" },
+    { from: "siparis", to: "odeme", label: "odemeYap(tutar)", kind: "sync" },
+    { from: "odeme",  to: "siparis", label: "true", kind: "return" },
+    { from: "siparis", to: "yon",   label: "true", kind: "return" },
+    { from: "yon",    to: "isleyici", label: "tumKomutlariCalistir(s)", kind: "sync" },
+    { from: "isleyici", to: "isleyici", label: "FaturaDuzenle.calistir(s)", kind: "self" },
+    { from: "isleyici", to: "isleyici", label: "FaturaGonder.calistir(s)", kind: "self" },
+    { from: "isleyici", to: "isleyici", label: "AlacaklaraKaydet.calistir(s)", kind: "self" },
+    { from: "isleyici", to: "yon",   label: "(donus)", kind: "return" },
+    { from: "yon",    to: "musteri", label: "siparis onaylandi", kind: "return" },
+  ],
+};
