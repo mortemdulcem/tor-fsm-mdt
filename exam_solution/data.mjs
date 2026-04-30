@@ -10,8 +10,8 @@
 export const soru1 = {
   width: 1900,
   height: 1700,
-  title: "Soru 1 — Akilli Ev Yonetim Sistemi",
-  subtitle: "State + Mediator + Observer Oruntuleri",
+  title: "Soru 1 — Akıllı Ev Yönetim Sistemi",
+  subtitle: "State + Mediator + Observer Örüntüleri",
   classes: [
     // ---- Kullanici katmani (ust) ----
     {
@@ -305,8 +305,8 @@ export const soru1 = {
 export const soru2 = {
   width: 1900,
   height: 1620,
-  title: "Soru 2 — SimpleCar E-Satis Sistemi",
-  subtitle: "Strategy + Chain of Responsibility + Command Oruntuleri",
+  title: "Soru 2 — SimpleCar E-Satış Sistemi",
+  subtitle: "Strategy + Chain of Responsibility + Command Örüntüleri",
   classes: [
     // ---- Domain (ust orta) ----
     {
@@ -554,7 +554,7 @@ export const soru2 = {
 export const sekans_soru1_sensor = {
   width: 1900,
   height: 1100,
-  title: "Sekans 1 — Hareket Sensoru Tetiklendiginde",
+  title: "Sekans 1 — Hareket Sensörü Tetiklendiğinde",
   subtitle: "Observer + Mediator zinciri: Sensor -> Motor -> EvSistemi & KullaniciBildirimAlici",
   actors: [
     { id: "ks",    label: "h : HareketSensoru", kind: "object" },
@@ -564,7 +564,7 @@ export const sekans_soru1_sensor = {
     { id: "mob",   label: "u : MobilUygulama",  kind: "boundary" },
   ],
   messages: [
-    { from: "ks",    to: "ks",    label: "olcumGonder()", kind: "self", note: "Yerel polling/donanim olayi" },
+    { from: "ks",    to: "ks",    label: "olcumGonder()", kind: "self", note: "Yerel polling/donanım olayı" },
     { from: "ks",    to: "motor", label: "bildirimAl(olay : SensorOlayi)", kind: "sync" },
     { from: "motor", to: "motor", label: "ilgiliSistemleriBul(olay)", kind: "self" },
     { from: "motor", to: "ayd",   label: "komutCalistir(\"hareketAlgilandi\")", kind: "sync" },
@@ -581,8 +581,8 @@ export const sekans_soru1_sensor = {
 export const sekans_soru1_mod = {
   width: 1900,
   height: 1050,
-  title: "Sekans 2 — Kullanici Mod Degisikligi",
-  subtitle: "State + Mediator: tek bir mod degistirimi tum bagli sistemleri ve istemcileri eslestirir",
+  title: "Sekans 2 — Kullanıcı Mod Değişikliği",
+  subtitle: "State + Mediator: tek bir mod değiştirimi tüm bağlı sistemleri ve istemcileri eşleştirir",
   actors: [
     { id: "k",   label: "k : Kullanici", kind: "actor" },
     { id: "mob", label: "u : MobilUygulama", kind: "boundary" },
@@ -594,7 +594,7 @@ export const sekans_soru1_mod = {
   messages: [
     { from: "k",   to: "mob", label: "modDegistir(TASARRUFLU)", kind: "sync" },
     { from: "mob", to: "m",   label: "tumModlariAyarla(TASARRUFLU)", kind: "sync" },
-    { from: "m",   to: "tm",  label: "<<create>>", kind: "create", note: "Yeni TasarrufluMod nesnesi olusturulur (State)" },
+    { from: "m",   to: "tm",  label: "<<create>>", kind: "create", note: "Yeni TasarrufluMod nesnesi oluşturulur (State)" },
     { from: "m",   to: "ayd", label: "modAyarla(t)", kind: "sync" },
     { from: "ayd", to: "tm",  label: "uygula(this)", kind: "sync" },
     { from: "tm",  to: "ayd", label: "asgariAydinlatmaUygula()", kind: "sync" },
@@ -612,8 +612,8 @@ export const sekans_soru1_mod = {
 export const sekans_soru2 = {
   width: 1900,
   height: 1300,
-  title: "Sekans 3 — Siparis Yasam Dongusu",
-  subtitle: "CoR (kontroller) + Strategy (odeme) + Command (sirali isleme adimlari)",
+  title: "Sekans 3 — Sipariş Yaşam Döngüsü",
+  subtitle: "CoR (kontroller) + Strategy (ödeme) + Command (sıralı işleme adımları)",
   actors: [
     { id: "musteri", label: ": Musteri", kind: "actor" },
     { id: "yon",     label: "y : SiparisYoneticisi", kind: "service" },
@@ -628,15 +628,15 @@ export const sekans_soru2 = {
     { from: "musteri", to: "yon",   label: "siparisAl(s)", kind: "sync" },
     { from: "yon",    to: "yon",    label: "kontrolleriCalistir(s)", kind: "self" },
     { from: "yon",    to: "k1",     label: "kontrolEt(s)", kind: "sync" },
-    { from: "k1",     to: "k1",     label: "kontroluUygula(s)", kind: "self", note: "Sahtecilik degerlendirmesi" },
+    { from: "k1",     to: "k1",     label: "kontroluUygula(s)", kind: "self", note: "Sahtecilik değerlendirmesi" },
     { from: "k1",     to: "k2",     label: "kontrolEt(s)", kind: "sync" },
-    { from: "k2",     to: "k2",     label: "kontroluUygula(s)", kind: "self", note: "Tutar limit kontrolu" },
+    { from: "k2",     to: "k2",     label: "kontroluUygula(s)", kind: "self", note: "Tutar limit kontrolü" },
     { from: "k2",     to: "k3",     label: "kontrolEt(s)", kind: "sync" },
-    { from: "k3",     to: "k3",     label: "kontroluUygula(s)", kind: "self", note: "Musteri bakiye kontrolu" },
+    { from: "k3",     to: "k3",     label: "kontroluUygula(s)", kind: "self", note: "Müşteri bakiye kontrolü" },
     { from: "k3",     to: "k2",     label: "true", kind: "return" },
     { from: "k2",     to: "k1",     label: "true", kind: "return" },
     { from: "k1",     to: "yon",    label: "true", kind: "return" },
-    { from: "yon",    to: "siparis", label: "odemeAl()", kind: "sync", note: "Strategy: siparis kendi yontemini tasir" },
+    { from: "yon",    to: "siparis", label: "odemeAl()", kind: "sync", note: "Strategy: sipariş kendi yöntemini taşır" },
     { from: "siparis", to: "odeme", label: "odemeYap(tutar)", kind: "sync" },
     { from: "odeme",  to: "siparis", label: "true", kind: "return" },
     { from: "siparis", to: "yon",   label: "true", kind: "return" },

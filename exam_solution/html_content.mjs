@@ -6,7 +6,7 @@ export function buildHtml({ diagram1Path, diagram2Path, sekans1aPath, sekans1bPa
 <html lang="tr">
 <head>
 <meta charset="utf-8"/>
-<title>Ara Sinav Cevap Belgesi</title>
+<title>Ara Sınav Cevap Belgesi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -19,15 +19,15 @@ ${css()}
 <!-- ====================== COVER ====================== -->
 <section class="cover">
   <div class="cover-frame">
-    <div class="cover-mark">Bilisim Enstitusu &middot; Yuksek Lisans</div>
+    <div class="cover-mark">Bilişim Enstitüsü &middot; Yüksek Lisans</div>
 
-    <h1 class="cover-title">Nesneye Yonelik<br/>Yazilim Gelistirme</h1>
-    <p class="cover-subtitle">Ara Sinav &middot; Cevap Belgesi</p>
+    <h1 class="cover-title">Nesneye Yönelik<br/>Yazılım Geliştirme</h1>
+    <p class="cover-subtitle">Ara Sınav &middot; Cevap Belgesi</p>
 
     <div class="cover-rule"></div>
 
     <table class="cover-meta">
-      <tr><td>Donem</td><td>2025-2026 Bahar</td></tr>
+      <tr><td>Dönem</td><td>2025-2026 Bahar</td></tr>
       <tr><td>Teslim Tarihi</td><td>30 Nisan 2026</td></tr>
       <tr><td>Toplam Puan</td><td>100 (Soru 1: 50 + Soru 2: 50)</td></tr>
       <tr><td>Format</td><td>PDF, A4, tek dosya</td></tr>
@@ -36,19 +36,19 @@ ${css()}
     <div class="cover-rule"></div>
 
     <p class="cover-abstract">
-      <span class="dropcap">B</span>u belge, sinavda istenen iki senaryo icin nesneye yonelik tasarim cozumlerini
-      sunar. Her soru icin (i) senaryo cozumlemesi, (ii) tasarim oruntusu secimleri ile <em>red edilmis
-      alternatiflerin gerekceleri</em>, (iii) UML 2.x sinif diyagrami, (iv) bir veya iki sira (sequence)
-      diyagrami, (v) onemli metotlarin sozde-kodlari ve (vi) tipik calisma akislari yer almaktadir.
-      Diyagramlar, baglilik (coupling) ve uyum (cohesion) olcutleri ile <em>okunaklilik</em> dengesi
-      gozetilerek elle dizayn edilmis; otomatik olarak yerlestirilmemistir.
+      <span class="dropcap">B</span>u belge, sınavda istenen iki senaryo için nesneye yönelik tasarım çözümlerini
+      sunar. Her soru için (i) senaryo çözümlemesi, (ii) tasarım örüntüsü seçimleri ile <em>reddedilmiş
+      alternatiflerin gerekçeleri</em>, (iii) UML 2.x sınıf diyagramı, (iv) bir veya iki sıra (sequence)
+      diyagramı, (v) önemli metotların sözde-kodları ve (vi) tipik çalışma akışları yer almaktadır.
+      Diyagramlar, bağlılık (coupling) ve uyum (cohesion) ölçütleri ile <em>okunaklılık</em> dengesi
+      gözetilerek elle dizayn edilmiş; otomatik olarak yerleştirilmemiştir.
     </p>
 
     <div class="cover-toc">
-      <div class="toc-title">Icindekiler</div>
+      <div class="toc-title">İçindekiler</div>
       <ol>
-        <li><span>Soru 1 &middot; Akilli Ev Yonetim Sistemi</span><span class="dots"></span><span>State + Mediator + Observer</span></li>
-        <li><span>Soru 2 &middot; SimpleCar E-Satis Sistemi</span><span class="dots"></span><span>Strategy + CoR + Command</span></li>
+        <li><span>Soru 1 &middot; Akıllı Ev Yönetim Sistemi</span><span class="dots"></span><span>State + Mediator + Observer</span></li>
+        <li><span>Soru 2 &middot; SimpleCar E-Satış Sistemi</span><span class="dots"></span><span>Strategy + CoR + Command</span></li>
       </ol>
     </div>
   </div>
@@ -58,61 +58,61 @@ ${css()}
 <section class="page question-page">
   <header class="q-header">
     <span class="q-tag">Soru 1 &middot; 50 Puan</span>
-    <h1>Akilli Ev Yonetim Sistemi</h1>
-    <p class="q-sub">State, Mediator ve Observer Oruntulerinin Birlikte Kullanimi</p>
+    <h1>Akıllı Ev Yönetim Sistemi</h1>
+    <p class="q-sub">State, Mediator ve Observer Örüntülerinin Birlikte Kullanımı</p>
   </header>
 
-  <h2>1.1 Senaryonun Cozumlenmesi</h2>
+  <h2>1.1 Senaryonun Çözümlenmesi</h2>
   <p>
-  Senaryo, dort tip bilesen tanimlar: iki <em>aktif sistem</em> (aydinlatma, isitma), iki <em>pasif olcum
-  kaynagi</em> (kapi sensoru, hareket sensoru) ve bir <em>orta kontrol noktasi</em> (akilli ev izleme motoru).
-  Bilesenler arasindaki etkilesimleri dort temel olguya indirgeyebiliriz:
+  Senaryo, dört tip bileşen tanımlar: iki <em>aktif sistem</em> (aydınlatma, ısıtma), iki <em>pasif ölçüm
+  kaynağı</em> (kapı sensörü, hareket sensörü) ve bir <em>orta kontrol noktası</em> (akıllı ev izleme motoru).
+  Bileşenler arasındaki etkileşimleri dört temel olguya indirgeyebiliriz:
   </p>
   <ol class="num-list">
-    <li><b>Davranissal cogulluk.</b> Aydinlatma ve isitma sistemleri, ic durumlarina &mdash; yani aktif <em>moda</em>
-      &mdash; gore <em>farkli davranir</em>. Tasarruflu modda isitma 18&deg;C, aydinlatma asgari seviye hedefler;
-      guvenli modda ise sirasiyla 40&deg;C panel sicakligi ve maksimum aydinlatma uygulanir. Bu davranissal
-      cogullugu <code>if/switch</code> ile cozmek, her yeni mod eklendiginde mevcut sinifi degistirmeyi gerektirir.
-      Polimorfizm uzerinden tasinmasi <em>acik-kapali</em> prensibinin (OCP) dogal sonucudur.</li>
-    <li><b>Kosullu senkronizasyon.</b> Iki sistemin modu <em>baglantilidir</em>: bir sistemde tasarruflu mod
-      secilirse digeri de zorunlu olarak gecer. Bu kural sistemler arasinda <em>dogrudan</em> uygulanirsa, her
-      sistem digerini referans alir; <em>n &times; (n-1)</em> baglantisi ortaya cikar. Senaryoda iki sistem var,
-      ancak ileride yeni bir sistem (orn. sulama) eklendiginde dogrudan referans yapisi kirilgan hale gelir.</li>
-    <li><b>Olay yayini, alici farkindaligi olmadan.</b> Sensorler, olcumlerini iletmeli; ama <em>kime</em>
-      ilettiklerini <em>bilmek zorunda olmamali</em>. Sensorun motora dogrudan referansi olmasi, sensoru izleme
-      altyapisina baglar &mdash; sensoru baska bir baglamda (orn. test, ayri bir konsol) kullanmayi imkansizlastirir.</li>
-    <li><b>Cogul bildirim hedefi.</b> Bir kullanicinin <em>birden fazla</em> istemcisi olabilir (mobil ve web).
-      Motor, "kullaniciya bildirim gonder" eylemini somut bir istemci tipine baglarsa, yeni bir kanal
-      (e-posta, SMS, sesli asistan) eklendiginde motor degisir. Burada da <em>yayinci-abone</em> ayrismasi
-      kacinilmazdir.</li>
+    <li><b>Davranışsal çoğulluk.</b> Aydınlatma ve ısıtma sistemleri, iç durumlarına &mdash; yani aktif <em>moda</em>
+      &mdash; göre <em>farklı davranır</em>. Tasarruflu modda ısıtma 18&deg;C, aydınlatma asgari seviye hedefler;
+      güvenli modda ise sırasıyla 40&deg;C panel sıcaklığı ve maksimum aydınlatma uygulanır. Bu davranışsal
+      çoğulluğu <code>if/switch</code> ile çözmek, her yeni mod eklendiğinde mevcut sınıfı değiştirmeyi gerektirir.
+      Polimorfizm üzerinden taşınması <em>açık-kapalı</em> prensibinin (OCP) doğal sonucudur.</li>
+    <li><b>Koşullu senkronizasyon.</b> İki sistemin modu <em>bağlantılıdır</em>: bir sistemde tasarruflu mod
+      seçilirse diğeri de zorunlu olarak geçer. Bu kural sistemler arasında <em>doğrudan</em> uygulanırsa, her
+      sistem diğerini referans alır; <em>n &times; (n-1)</em> bağlantısı ortaya çıkar. Senaryoda iki sistem var,
+      ancak ileride yeni bir sistem (örn. sulama) eklendiğinde doğrudan referans yapısı kırılgan hale gelir.</li>
+    <li><b>Olay yayını, alıcı farkındalığı olmadan.</b> Sensörler, ölçümlerini iletmeli; ama <em>kime</em>
+      ilettiklerini <em>bilmek zorunda olmamalı</em>. Sensörün motora doğrudan referansı olması, sensörü izleme
+      altyapısına bağlar &mdash; sensörü başka bir bağlamda (örn. test, ayrı bir konsol) kullanmayı imkânsızlaştırır.</li>
+    <li><b>Çoğul bildirim hedefi.</b> Bir kullanıcının <em>birden fazla</em> istemcisi olabilir (mobil ve web).
+      Motor, "kullanıcıya bildirim gönder" eylemini somut bir istemci tipine bağlarsa, yeni bir kanal
+      (e-posta, SMS, sesli asistan) eklendiğinde motor değişir. Burada da <em>yayıncı-abone</em> ayrışması
+      kaçınılmazdır.</li>
   </ol>
 
-  <h2>1.2 Oruntu Secimleri ve Gerekceleri</h2>
-  <p>Yukaridaki dort olgu, GoF kataloundaki uc <em>davranissal</em> oruntu ile noktasal olarak eslesir:</p>
+  <h2>1.2 Örüntü Seçimleri ve Gerekçeleri</h2>
+  <p>Yukarıdaki dört olgu, GoF kataloğundaki üç <em>davranışsal</em> örüntü ile noktasal olarak eşleşir:</p>
   <table class="design-table">
-    <thead><tr><th>Oruntu</th><th>Uygulanan Yer</th><th>Cozdugu Olgu</th></tr></thead>
+    <thead><tr><th>Örüntü</th><th>Uygulanan Yer</th><th>Çözdüğü Olgu</th></tr></thead>
     <tbody>
       <tr>
         <td><b>State</b><br/><span class="ref">GoF, s.305</span></td>
-        <td><code>CalismaModu</code> arayuzu; <code>GuvenliMod</code> ve <code>TasarrufluMod</code>; <code>EvSistemi</code>
-            &laquo;baglam&raquo; rolunde, <code>aktifMod</code> alanini tutar.</td>
-        <td>(1) Davranissal cogulluk: <code>komutCalistir</code> cagirildiginda davranis aktif moda gore polimorfik
-            secilir. Yeni bir mod eklemek <code>EvSistemi</code>'ni degistirmez.</td>
+        <td><code>CalismaModu</code> arayüzü; <code>GuvenliMod</code> ve <code>TasarrufluMod</code>; <code>EvSistemi</code>
+            &laquo;bağlam&raquo; rolünde, <code>aktifMod</code> alanını tutar.</td>
+        <td>(1) Davranışsal çoğulluk: <code>komutCalistir</code> çağırıldığında davranış aktif moda göre polimorfik
+            seçilir. Yeni bir mod eklemek <code>EvSistemi</code>'ni değiştirmez.</td>
       </tr>
       <tr>
         <td><b>Mediator</b><br/><span class="ref">GoF, s.273</span></td>
-        <td><code>AkilliEvIzlemeMotoru</code>; tum <code>EvSistemi</code> ve <code>Sensor</code> nesnelerini tanir,
-            sistemleri birbirine baglamadan koordine eder.</td>
-        <td>(2) Kosullu senkronizasyon: "tum sistemler ayni moda gecsin" gibi cok-yonlu kurallar arabulucuda
-            <em>tek bir noktada</em> uygulanir; sistemler arasi referans gerekmez.</td>
+        <td><code>AkilliEvIzlemeMotoru</code>; tüm <code>EvSistemi</code> ve <code>Sensor</code> nesnelerini tanır,
+            sistemleri birbirine bağlamadan koordine eder.</td>
+        <td>(2) Koşullu senkronizasyon: "tüm sistemler aynı moda geçsin" gibi çok-yönlü kurallar arabulucuda
+            <em>tek bir noktada</em> uygulanır; sistemler arası referans gerekmez.</td>
       </tr>
       <tr>
         <td><b>Observer</b><br/><span class="ref">GoF, s.293</span></td>
-        <td>(a) <code>Sensor</code> &#x2194; <code>SensorGozlemcisi</code> arayuzu (motor abonedir).<br/>
-            (b) <code>AkilliEvIzlemeMotoru</code> &#x2194; <code>KullaniciBildirimAlici</code> arayuzu
+        <td>(a) <code>Sensor</code> &#x2194; <code>SensorGozlemcisi</code> arayüzü (motor abonedir).<br/>
+            (b) <code>AkilliEvIzlemeMotoru</code> &#x2194; <code>KullaniciBildirimAlici</code> arayüzü
                 (mobil/web abonedir).</td>
-        <td>(3) Olay yayini ve (4) cogul bildirim hedefi: hem sensor hem motor, abone tipinden bagimsiz olarak
-            yayin yapar. Yeni kanal/abone eklemek mevcut yayinciyi degistirmez.</td>
+        <td>(3) Olay yayını ve (4) çoğul bildirim hedefi: hem sensör hem motor, abone tipinden bağımsız olarak
+            yayın yapar. Yeni kanal/abone eklemek mevcut yayıncıyı değiştirmez.</td>
       </tr>
     </tbody>
   </table>
@@ -123,155 +123,155 @@ ${css()}
     <tbody>
       <tr>
         <td><b>Singleton</b> &mdash; <code>AkilliEvIzlemeMotoru</code>'nu tekil yapmak.</td>
-        <td>Senaryo "bir akilli ev"den bahsediyor; ancak <em>test edilebilirlik</em> ve <em>gelecek cok-evli</em>
-          (apartman, site) senaryosu icin tekillik bagimliligi maliyetli. Tekillik bir <em>uretim/yaratim</em>
-          karari; mevcut tasarim <em>davranissal</em> sorunlari cozer.</td>
+        <td>Senaryo "bir akıllı ev"den bahsediyor; ancak <em>test edilebilirlik</em> ve <em>gelecek çok-evli</em>
+          (apartman, site) senaryosu için tekillik bağımlılığı maliyetli. Tekillik bir <em>üretim/yaratım</em>
+          kararı; mevcut tasarım <em>davranışsal</em> sorunları çözer.</td>
       </tr>
       <tr>
-        <td><b>Strategy</b> &mdash; modlari <code>Calisma Stratejisi</code> olarak tasimak.</td>
-        <td>Strategy, davranisi <em>disaridan</em> secilen bir algoritma olarak modeller; biz icine ait <em>durumu</em>
-          modelliyoruz. Ozellikle "iki sistemin modu birlikte degisir" kurali, sistemden ayri bir strateji nesnesini
-          gerektirmez. State daha dogru kavramsal eslesmedir.</td>
+        <td><b>Strategy</b> &mdash; modları <code>CalismaStratejisi</code> olarak taşımak.</td>
+        <td>Strategy, davranışı <em>dışarıdan</em> seçilen bir algoritma olarak modeller; biz içine ait <em>durumu</em>
+          modelliyoruz. Özellikle "iki sistemin modu birlikte değişir" kuralı, sistemden ayrı bir strateji nesnesini
+          gerektirmez. State daha doğru kavramsal eşleşmedir.</td>
       </tr>
       <tr>
-        <td><b>Pub/Sub mesaj kuyrugu</b> &mdash; sensor olaylari icin.</td>
-        <td>Senaryo bunu istemez; ek altyapi maliyeti getirir. Observer, <em>ayni surec icinde</em> ihtiyac
-          duyulan ayrismayi sade bicimde saglar.</td>
+        <td><b>Pub/Sub mesaj kuyruğu</b> &mdash; sensör olayları için.</td>
+        <td>Senaryo bunu istemez; ek altyapı maliyeti getirir. Observer, <em>aynı süreç içinde</em> ihtiyaç
+          duyulan ayrışmayı sade biçimde sağlar.</td>
       </tr>
       <tr>
-        <td><b>Visitor</b> &mdash; mod degisikliginde sistemleri dolasmak icin.</td>
-        <td>Visitor, <em>sabit nesne hiyerarsisi uzerinde degisken islemler</em> icin uygundur. Burada islem (mod
-          degistirme) sabit, hiyerarsi (sistemler) genisleyebilir; tam ters yon. Mediator + State daha uygun.</td>
+        <td><b>Visitor</b> &mdash; mod değişikliğinde sistemleri dolaşmak için.</td>
+        <td>Visitor, <em>sabit nesne hiyerarşisi üzerinde değişken işlemler</em> için uygundur. Burada işlem (mod
+          değiştirme) sabit, hiyerarşi (sistemler) genişleyebilir; tam ters yön. Mediator + State daha uygun.</td>
       </tr>
     </tbody>
   </table>
 
   <div class="callout">
-    <b>Mimari kanaat.</b> &nbsp; State davranisi, Mediator koordinasyonu, Observer ise bilgi yayinini bagimsiz
-    eksenler olarak ayirir. Uc oruntu birbirinin <em>kaldiraci</em>: birini cikartmak diger ikisinin yukunu
-    artirir ve kodun acilan/kapanan dengesini bozar.
+    <b>Mimari kanaat.</b> &nbsp; State davranışı, Mediator koordinasyonu, Observer ise bilgi yayınını bağımsız
+    eksenler olarak ayırır. Üç örüntü birbirinin <em>kaldıracı</em>: birini çıkartmak diğer ikisinin yükünü
+    artırır ve kodun açılan/kapanan dengesini bozar.
   </div>
 
   
 
-  <h2>1.4 Sinif Diyagrami</h2>
+  <h2>1.4 Sınıf Diyagramı</h2>
   <figure class="diagram-figure">
-    <img src="${diagram1Path}" alt="Soru 1 sinif diyagrami"/>
-    <figcaption>Sekil 1.1 &middot; Akilli Ev Yonetim Sistemi &mdash; UML 2.x sinif diyagrami.
-      Sol katman: kullanici ve goruntuleme; orta katman: arabulucu motor ve gozlemci arayuzleri; alt katman:
-      sistem ve sensor hiyerarsileri.</figcaption>
+    <img src="${diagram1Path}" alt="Soru 1 sınıf diyagramı"/>
+    <figcaption>Şekil 1.1 &middot; Akıllı Ev Yönetim Sistemi &mdash; UML 2.x sınıf diyagramı.
+      Sol katman: kullanıcı ve görüntüleme; orta katman: arabulucu motor ve gözlemci arayüzleri; alt katman:
+      sistem ve sensör hiyerarşileri.</figcaption>
   </figure>
 
   
 
-  <h2>1.5 Sinif Aciklamalari</h2>
+  <h2>1.5 Sınıf Açıklamaları</h2>
   <table class="class-table">
-    <thead><tr><th>Sinif / Arayuz</th><th>Stereotip</th><th>Sorumluluk &amp; Roller</th></tr></thead>
+    <thead><tr><th>Sınıf / Arayüz</th><th>Stereotip</th><th>Sorumluluk &amp; Roller</th></tr></thead>
     <tbody>
       <tr><td><code>Kullanici</code></td><td>&laquo;entity&raquo;</td>
-          <td>Ev sahibinin kimligi; bir veya birden fazla bildirim aliciya (mobil/web) sahip olabilir.</td></tr>
+          <td>Ev sahibinin kimliği; bir veya birden fazla bildirim alıcıya (mobil/web) sahip olabilir.</td></tr>
       <tr><td><code>KullaniciBildirimAlici</code></td><td>&laquo;interface&raquo;</td>
-          <td>Observer arayuzu (kanal-bagimsiz). <code>bildirimGoster(olay)</code> ve <code>durumYansit(ozet)</code>.</td></tr>
+          <td>Observer arayüzü (kanal-bağımsız). <code>bildirimGoster(olay)</code> ve <code>durumYansit(ozet)</code>.</td></tr>
       <tr><td><code>MobilUygulama</code> &middot; <code>WebUygulamasi</code></td><td>&laquo;concrete&raquo;</td>
-          <td>Concrete observer; kanal-ozel goruntuleme yapar. Kullanici komutlarini motora iletir.</td></tr>
+          <td>Somut gözlemci; kanal-özel görüntüleme yapar. Kullanıcı komutlarını motora iletir.</td></tr>
       <tr><td><code>DurumOzeti</code></td><td>&laquo;value object&raquo;</td>
-          <td>Anlik durum fotografi; degismez (immutable). Motor uretir, alicilar tuketir.</td></tr>
+          <td>Anlık durum fotoğrafı; değişmez (immutable). Motor üretir, alıcılar tüketir.</td></tr>
       <tr><td><code>AkilliEvIzlemeMotoru</code></td><td>&laquo;mediator&raquo; + &laquo;observer&raquo;</td>
-          <td>Tum sistem ve sensorleri tanir. Sensor olaylarinda gozlemci, kullanici icin yayinci. Mod
-            senkronizasyonu, komut yonlendirme ve durum yayini.</td></tr>
+          <td>Tüm sistem ve sensörleri tanır. Sensör olaylarında gözlemci, kullanıcı için yayıncı. Mod
+            senkronizasyonu, komut yönlendirme ve durum yayını.</td></tr>
       <tr><td><code>EvSistemi</code></td><td>&laquo;abstract&raquo;</td>
-          <td>State icin <em>baglam</em>; <code>aktifMod</code> alani uzerinden davranisini polimorfik secer.
-            <code>komutCalistir</code> alt siniflara birakilir.</td></tr>
+          <td>State için <em>bağlam</em>; <code>aktifMod</code> alanı üzerinden davranışını polimorfik seçer.
+            <code>komutCalistir</code> alt sınıflara bırakılır.</td></tr>
       <tr><td><code>AydinlatmaSistemi</code> &middot; <code>IsitmaSistemi</code></td><td>&laquo;concrete&raquo;</td>
-          <td>Cihaz-ozel davranisi (asgari/maksimum aydinlatma; hedef sicaklik) uygular.</td></tr>
+          <td>Cihaz-özel davranışı (asgari/maksimum aydınlatma; hedef sıcaklık) uygular.</td></tr>
       <tr><td><code>CalismaModu</code></td><td>&laquo;interface&raquo;</td>
-          <td>State arayuzu; <code>uygula(sistem)</code> ile baglami yapilandirir.</td></tr>
+          <td>State arayüzü; <code>uygula(sistem)</code> ile bağlamı yapılandırır.</td></tr>
       <tr><td><code>GuvenliMod</code> &middot; <code>TasarrufluMod</code></td><td>&laquo;concrete&raquo;</td>
-          <td>Iki politik davranis: maksimum kapasite ile asgari/hedef ayar.</td></tr>
+          <td>İki politik davranış: maksimum kapasite ile asgari/hedef ayar.</td></tr>
       <tr><td><code>ModTipi</code></td><td>&laquo;enumeration&raquo;</td>
-          <td>Kullanici arayuzunden gelen mod tercihi icin tip-guvenli sabitler.</td></tr>
+          <td>Kullanıcı arayüzünden gelen mod tercihi için tip-güvenli sabitler.</td></tr>
       <tr><td><code>Sensor</code></td><td>&laquo;abstract&raquo;</td>
-          <td>Subject rolu: <code>attach</code>/<code>detach</code> ve <code>bildir</code> ortak metotlari.</td></tr>
+          <td>Özne (subject) rolü: <code>attach</code>/<code>detach</code> ve <code>bildir</code> ortak metotları.</td></tr>
       <tr><td><code>KapiSensoru</code> &middot; <code>HareketSensoru</code></td><td>&laquo;concrete&raquo;</td>
-          <td>Donanima ozgu olcum metotlari (<code>olcumGonder</code>); olay tetiklerler.</td></tr>
+          <td>Donanıma özgü ölçüm metotları (<code>olcumGonder</code>); olay tetiklerler.</td></tr>
       <tr><td><code>SensorGozlemcisi</code></td><td>&laquo;interface&raquo;</td>
-          <td>Sensor olaylarini alacak nesneler icin Observer arayuzu (motor uygular).</td></tr>
+          <td>Sensör olaylarını alacak nesneler için Observer arayüzü (motor uygular).</td></tr>
       <tr><td><code>SensorOlayi</code></td><td>&laquo;value object&raquo;</td>
-          <td>Tip, kaynak sensor, veri ve zaman tasiyan degismez olay nesnesi.</td></tr>
+          <td>Tip, kaynak sensör, veri ve zaman taşıyan değişmez olay nesnesi.</td></tr>
       <tr><td><code>SensorTipi</code></td><td>&laquo;enumeration&raquo;</td>
-          <td>KAPI / HAREKET; mantik kontrolu ve kayit icin.</td></tr>
+          <td>KAPI / HAREKET; mantık kontrolü ve kayıt için.</td></tr>
     </tbody>
   </table>
 
-  <h2>1.6 Iliski Tipleri (UML Notasyonu)</h2>
+  <h2>1.6 İlişki Tipleri (UML Notasyonu)</h2>
   <ul class="bullet-list">
-    <li><em>Olusum (composition).</em> <code>AkilliEvIzlemeMotoru &#x25C6;&mdash; EvSistemi (1..*)</code> ve
-        <code>AkilliEvIzlemeMotoru &#x25C6;&mdash; Sensor (1..*)</code>: motor olmadan sistem/sensor anlamli
-        degildir &mdash; yasam dongulerini motor sahiplenir.</li>
-    <li><em>Birikim (aggregation).</em> <code>AkilliEvIzlemeMotoru &#x25C7;&mdash; KullaniciBildirimAlici (0..*)</code>:
-        bildirim alicilari motorun parcasi degildir, dis dunyaya aittir; motor onlari yalnizca tutar.</li>
-    <li><em>Birikim (state).</em> <code>EvSistemi &#x25C7;&mdash; CalismaModu</code> (aktif mod): mod
-        nesnesi sistemin yasam dongusunden bagimsiz olusturulup atanir.</li>
-    <li><em>Gerceklestirme (realization).</em> <code>MobilUygulama / WebUygulamasi &mdash;..&#x25B7; KullaniciBildirimAlici</code>;
+    <li><em>Composition.</em> <code>AkilliEvIzlemeMotoru &#x25C6;&mdash; EvSistemi (1..*)</code> ve
+        <code>AkilliEvIzlemeMotoru &#x25C6;&mdash; Sensor (1..*)</code>: motor olmadan sistem/sensör anlamlı
+        değildir &mdash; yaşam döngülerini motor sahiplenir.</li>
+    <li><em>Aggregation.</em> <code>AkilliEvIzlemeMotoru &#x25C7;&mdash; KullaniciBildirimAlici (0..*)</code>:
+        bildirim alıcıları motorun parçası değildir, dış dünyaya aittir; motor onları yalnızca tutar.</li>
+    <li><em>Aggregation.</em> <code>EvSistemi &#x25C7;&mdash; CalismaModu</code> (aktif mod): mod
+        nesnesi sistemin yaşam döngüsünden bağımsız oluşturulup atanır.</li>
+    <li><em>Realization.</em> <code>MobilUygulama / WebUygulamasi &mdash;..&#x25B7; KullaniciBildirimAlici</code>;
         <code>GuvenliMod / TasarrufluMod &mdash;..&#x25B7; CalismaModu</code>;
         <code>AkilliEvIzlemeMotoru &mdash;..&#x25B7; SensorGozlemcisi</code>.</li>
-    <li><em>Kalitim (inheritance).</em> Sensor ve EvSistemi hiyerarsileri.</li>
-    <li><em>Bagimlilik (dependency).</em> <code>AkilliEvIzlemeMotoru &mdash;..&gt; DurumOzeti</code>
-        (&laquo;creates&raquo;): motor durum ozetini olusturup yayinlar; alicilar bunu yalnizca tuketir.</li>
+    <li><em>Inheritance.</em> Sensor ve EvSistemi hiyerarşileri.</li>
+    <li><em>Dependency.</em> <code>AkilliEvIzlemeMotoru &mdash;..&gt; DurumOzeti</code>
+        (&laquo;creates&raquo;): motor durum özetini oluşturup yayınlar; alıcılar bunu yalnızca tüketir.</li>
   </ul>
 
   
 
-  <h2>1.7 Sira Diyagramlari (Calisma Akislari)</h2>
+  <h2>1.7 Sıra Diyagramları (Çalışma Akışları)</h2>
   <figure class="diagram-figure">
-    <img src="${sekans1aPath}" alt="Sekans 1 - sensor olayi"/>
-    <figcaption>Sekil 1.2 &middot; Hareket sensoru tetiklendiginde olay akisi.
-      Sensor olayi gozlemci uzerinden motora iletilir; motor ilgili sistemleri
-      uyarir, sonra DurumOzeti ile tum bildirim alicilarini eslestirir.</figcaption>
+    <img src="${sekans1aPath}" alt="Sekans 1 - sensör olayı"/>
+    <figcaption>Şekil 1.2 &middot; Hareket sensörü tetiklendiğinde olay akışı.
+      Sensör olayı gözlemci üzerinden motora iletilir; motor ilgili sistemleri
+      uyarır, sonra DurumOzeti ile tüm bildirim alıcılarını eşleştirir.</figcaption>
   </figure>
 
   <figure class="diagram-figure">
-    <img src="${sekans1bPath}" alt="Sekans 2 - mod degisikligi"/>
-    <figcaption>Sekil 1.3 &middot; Kullanicinin tasarruflu mod talebi.
-      Tek bir <code>tumModlariAyarla</code> cagrisi, mediator araciligi ile tum sistemleri ve istemcileri
-      tutarli bicimde gunceller; sistemler birbirini referans almaz.</figcaption>
+    <img src="${sekans1bPath}" alt="Sekans 2 - mod değişikliği"/>
+    <figcaption>Şekil 1.3 &middot; Kullanıcının tasarruflu mod talebi.
+      Tek bir <code>tumModlariAyarla</code> çağrısı, mediator aracılığıyla tüm sistemleri ve istemcileri
+      tutarlı biçimde günceller; sistemler birbirini referans almaz.</figcaption>
   </figure>
 
   
 
-  <h2>1.8 Onemli Metotlarin Sozde-Kodu</h2>
+  <h2>1.8 Önemli Metotların Sözde-Kodu</h2>
 
-  <pre class="code">// MEDIATOR — tum sistemleri tek noktadan moda gecir
+  <pre class="code">// MEDIATOR — tüm sistemleri tek noktadan moda geçir
 class AkilliEvIzlemeMotoru implements SensorGozlemcisi {
     void tumModlariAyarla(ModTipi tip) {
         CalismaModu yeniMod = (tip == ModTipi.TASARRUFLU)
                               ? new TasarrufluMod()
                               : new GuvenliMod();
-        for (EvSistemi s : sistemler) {        // baglantili sistemler
-            s.modAyarla(yeniMod);              // ayni nesne paylasilir
+        for (EvSistemi s : sistemler) {        // bağlantılı sistemler
+            s.modAyarla(yeniMod);              // aynı nesne paylaşılır
         }
         aktifModTipi = tip;
         durumOzetiYayinla();                   // observer'lara bildir
     }
 
-    // OBSERVER — sensorden olay
+    // OBSERVER — sensörden olay
     void bildirimAl(SensorOlayi olay) {
         for (EvSistemi s : ilgiliSistemleriBul(olay))
             s.komutCalistir(olay.tip == SensorTipi.HAREKET
                             ? "hareketAlgilandi" : "kapiAcildi");
         for (KullaniciBildirimAlici a : bildirimAlicilari)
-            a.bildirimGoster(olay);            // kanal-bagimsiz yayin
+            a.bildirimGoster(olay);            // kanal-bağımsız yayın
         durumOzetiYayinla();
     }
 
     private void durumOzetiYayinla() {
-        DurumOzeti ozet = new DurumOzeti(/* anlik durum */);
+        DurumOzeti ozet = new DurumOzeti(/* anlık durum */);
         for (KullaniciBildirimAlici a : bildirimAlicilari)
             a.durumYansit(ozet);
     }
 }</pre>
 
-  <pre class="code">// STATE — davranisi mod uzerinden polimorfik tasi
+  <pre class="code">// STATE — davranışı mod üzerinden polimorfik taşı
 abstract class EvSistemi {
     protected CalismaModu aktifMod;
     void modAyarla(CalismaModu m) { this.aktifMod = m; m.uygula(this); }
@@ -279,10 +279,10 @@ abstract class EvSistemi {
 }
 
 class IsitmaSistemi extends EvSistemi {
-    void sicaklikAyarla(int derece) { /* donanim cagrisi */ }
+    void sicaklikAyarla(int derece) { /* donanım çağrısı */ }
     void komutCalistir(String komut) {
-        // mod kararinin tum yuku CalismaModu.uygula icinde toplanmistir;
-        // burada yalnizca komutu donanima yansitiriz
+        // mod kararının tüm yükü CalismaModu.uygula içinde toplanmıştır;
+        // burada yalnızca komutu donanıma yansıtırız
     }
 }
 
@@ -294,16 +294,16 @@ class TasarrufluMod implements CalismaModu {
     ModTipi tipi() { return ModTipi.TASARRUFLU; }
 }</pre>
 
-  <h2>1.9 Tasarimin Niteliksel Avantajlari</h2>
+  <h2>1.9 Tasarımın Niteliksel Avantajları</h2>
   <ul class="bullet-list">
-    <li><b>Acik-Kapali (OCP).</b> Yeni mod (UykuModu), yeni sensor (Pencere), yeni bildirim kanali (E-posta);
-        her durumda <em>yalnizca yeni bir sinif</em> eklenir, mevcut kod degismez.</li>
-    <li><b>Tek Sorumluluk (SRP).</b> Mod davranisi <code>CalismaModu</code> hiyerarsisinde; senkronizasyon
-        politikasi <code>AkilliEvIzlemeMotoru</code>'nda; olay tasimasi <code>Sensor</code> +
-        <code>SensorGozlemcisi</code> ikilisinde tutulmustur.</li>
-    <li><b>Dusuk Baglilik.</b> Sistemler birbirini, sensorler de motoru somut bir tip olarak bilmez.</li>
-    <li><b>Test Edilebilirlik.</b> Stub gozlemci ve sahte modlar ile motor birim test seviyesinde dogrulanabilir.</li>
-    <li><b>Liskov Uyumu.</b> Yeni mod, yeni sistem ve yeni sensor turleri ust sozlesmenin (<em>contract</em>)
+    <li><b>Açık-Kapalı (OCP).</b> Yeni mod (UykuModu), yeni sensör (Pencere), yeni bildirim kanalı (E-posta);
+        her durumda <em>yalnızca yeni bir sınıf</em> eklenir, mevcut kod değişmez.</li>
+    <li><b>Tek Sorumluluk (SRP).</b> Mod davranışı <code>CalismaModu</code> hiyerarşisinde; senkronizasyon
+        politikası <code>AkilliEvIzlemeMotoru</code>'nda; olay taşıması <code>Sensor</code> +
+        <code>SensorGozlemcisi</code> ikilisinde tutulmuştur.</li>
+    <li><b>Düşük Bağlılık.</b> Sistemler birbirini, sensörler de motoru somut bir tip olarak bilmez.</li>
+    <li><b>Test Edilebilirlik.</b> Stub gözlemci ve sahte modlar ile motor birim test seviyesinde doğrulanabilir.</li>
+    <li><b>Liskov Uyumu.</b> Yeni mod, yeni sistem ve yeni sensör türleri üst sözleşmenin (<em>contract</em>)
         ihlali olmadan eklenir.</li>
   </ul>
 </section>
@@ -312,54 +312,54 @@ class TasarrufluMod implements CalismaModu {
 <section class="page question-page">
   <header class="q-header">
     <span class="q-tag">Soru 2 &middot; 50 Puan</span>
-    <h1>SimpleCar E-Satis Sistemi</h1>
-    <p class="q-sub">Strategy, Chain of Responsibility ve Command Oruntulerinin Birlikte Kullanimi</p>
+    <h1>SimpleCar E-Satış Sistemi</h1>
+    <p class="q-sub">Strategy, Chain of Responsibility ve Command Örüntülerinin Birlikte Kullanımı</p>
   </header>
 
-  <h2>2.1 Senaryonun Cozumlenmesi</h2>
+  <h2>2.1 Senaryonun Çözümlenmesi</h2>
   <p>
-  SimpleCar firmasi yalnizca e-satis yapan bir araba ureticisidir. Domeni dort bilesene ayrilabilir:
+  SimpleCar firması yalnızca e-satış yapan bir araba üreticisidir. Domeni dört bileşene ayrılabilir:
   </p>
   <ol class="num-list">
-    <li><b>Algoritma ailesi (odeme).</b> Odeme tek bir <em>davranistir</em>, ancak <em>banka havalesi</em>,
-      <em>paypal</em>, <em>soguk cuzdan</em> gibi farkli yollarla yapilir; senaryo ayrica bu listenin <em>siklikla
-      genisleyip daralacagini</em> ozellikle vurgular. Calisma zamaninda secilebilen, bagimsiz olarak
-      degistirilebilen bir <em>algoritma ailesi</em> gerekir.</li>
-    <li><b>Asamali ve genisleyebilir kontrol.</b> Her siparis <em>sahtecilik</em>, <em>limit</em> ve <em>bakiye</em>
-      kontrollerine tabidir. Birinin olumsuzlugu siparisi iptal eder. Senaryo bu kontrollerin de zamanla
-      <em>artirilabilecegini</em> belirtir. Bu, bir <em>filtre zinciri</em>: her halka kararini verir, basariliysa
-      siradakine devreder; basarisizsa zinciri keser.</li>
-    <li><b>Sirali isleme adimlari.</b> Tum kontroller basariliysa siparis sirasiyla <em>fatura duzenleme</em>,
-      <em>fatura gonderme</em> ve <em>alacaklara kaydetme</em> adimlariyla islenir. Adimlar ileride degisebilir;
-      her biri test edilebilir bagimsiz bir is birimini temsil eder.</li>
-    <li><b>Yonetim ve yasam dongusu.</b> Bir orchestrator (use-case) bilesen, siparisi <em>alir</em>,
-      <em>dogrular</em> ve <em>isler</em>. Domain (Siparis) ile servis sorumluluklari ayrik tutulmalidir.</li>
+    <li><b>Algoritma ailesi (ödeme).</b> Ödeme tek bir <em>davranıştır</em>, ancak <em>banka havalesi</em>,
+      <em>paypal</em>, <em>soğuk cüzdan</em> gibi farklı yollarla yapılır; senaryo ayrıca bu listenin <em>sıklıkla
+      genişleyip daralacağını</em> özellikle vurgular. Çalışma zamanında seçilebilen, bağımsız olarak
+      değiştirilebilen bir <em>algoritma ailesi</em> gerekir.</li>
+    <li><b>Aşamalı ve genişleyebilir kontrol.</b> Her sipariş <em>sahtecilik</em>, <em>limit</em> ve <em>bakiye</em>
+      kontrollerine tabidir. Birinin olumsuzluğu siparişi iptal eder. Senaryo bu kontrollerin de zamanla
+      <em>artırılabileceğini</em> belirtir. Bu, bir <em>filtre zinciri</em>: her halka kararını verir, başarılıysa
+      sıradakine devreder; başarısızsa zinciri keser.</li>
+    <li><b>Sıralı işleme adımları.</b> Tüm kontroller başarılıysa sipariş sırasıyla <em>fatura düzenleme</em>,
+      <em>fatura gönderme</em> ve <em>alacaklara kaydetme</em> adımlarıyla işlenir. Adımlar ileride değişebilir;
+      her biri test edilebilir bağımsız bir iş birimini temsil eder.</li>
+    <li><b>Yönetim ve yaşam döngüsü.</b> Bir orchestrator (use-case) bileşen, siparişi <em>alır</em>,
+      <em>doğrular</em> ve <em>işler</em>. Domain (Siparis) ile servis sorumlulukları ayrık tutulmalıdır.</li>
   </ol>
 
-  <h2>2.2 Oruntu Secimleri ve Gerekceleri</h2>
+  <h2>2.2 Örüntü Seçimleri ve Gerekçeleri</h2>
   <table class="design-table">
-    <thead><tr><th>Oruntu</th><th>Uygulanan Yer</th><th>Cozdugu Olgu</th></tr></thead>
+    <thead><tr><th>Örüntü</th><th>Uygulanan Yer</th><th>Çözdüğü Olgu</th></tr></thead>
     <tbody>
       <tr>
         <td><b>Strategy</b><br/><span class="ref">GoF, s.315</span></td>
-        <td><code>OdemeYontemi</code> arayuzu; <code>BankaHavalesi</code>, <code>Paypal</code>,
-            <code>SogukCuzdan</code>; siparisle <em>1-1</em> birikim.</td>
-        <td>(1) Algoritma ailesi: odeme ailesi siparisten bagimsiz olarak yer degistirebilir; yeni yontem eklemek
-            mevcut kodu degistirmez.</td>
+        <td><code>OdemeYontemi</code> arayüzü; <code>BankaHavalesi</code>, <code>Paypal</code>,
+            <code>SogukCuzdan</code>; siparişle <em>1-1</em> birikim.</td>
+        <td>(1) Algoritma ailesi: ödeme ailesi siparişten bağımsız olarak yer değiştirebilir; yeni yöntem eklemek
+            mevcut kodu değiştirmez.</td>
       </tr>
       <tr>
         <td><b>Chain of Responsibility</b><br/><span class="ref">GoF, s.223</span></td>
-        <td><code>SiparisKontrolu</code> soyut sinifi; <code>Sahtecilik</code>, <code>Limit</code>,
-            <code>Bakiye</code> halkalari; <code>setSonraki</code> ile kuruluyor.</td>
-        <td>(2) Asamali kontrol: halka basariliysa siradakine devreder, basarisizsa zincir kesilir;
-            yeni kontrol eklemek tek satir konfigurasyondur.</td>
+        <td><code>SiparisKontrolu</code> soyut sınıfı; <code>Sahtecilik</code>, <code>Limit</code>,
+            <code>Bakiye</code> halkaları; <code>setSonraki</code> ile kuruluyor.</td>
+        <td>(2) Aşamalı kontrol: halka başarılıysa sıradakine devreder, başarısızsa zincir kesilir;
+            yeni kontrol eklemek tek satır konfigürasyondur.</td>
       </tr>
       <tr>
         <td><b>Command + Macro Command</b><br/><span class="ref">GoF, s.233</span></td>
-        <td><code>Komut</code> arayuzu; <code>FaturaDuzenle</code>, <code>FaturaGonder</code>,
-            <code>AlacaklaraKaydet</code>; <code>SiparisIsleyici</code> sirayla calistirir.</td>
-        <td>(3) Sirali isleme adimlari: her adim kapsullenmis; sira degistirme, ek adim, geri-alma (undo) gibi
-            ihtiyaclar icin esnek altyapi.</td>
+        <td><code>Komut</code> arayüzü; <code>FaturaDuzenle</code>, <code>FaturaGonder</code>,
+            <code>AlacaklaraKaydet</code>; <code>SiparisIsleyici</code> sırayla çalıştırır.</td>
+        <td>(3) Sıralı işleme adımları: her adım kapsüllenmiş; sıra değiştirme, ek adım, geri-alma (undo) gibi
+            ihtiyaçlar için esnek altyapı.</td>
       </tr>
     </tbody>
   </table>
@@ -369,121 +369,121 @@ class TasarrufluMod implements CalismaModu {
     <thead><tr><th>Alternatif</th><th>Neden Tercih Edilmedi?</th></tr></thead>
     <tbody>
       <tr>
-        <td><b>Template Method</b> &mdash; siparis isleme akisini soyut sinifta sablon olarak kurmak.</td>
-        <td>Sablon, <em>sira sabit</em> ise iyidir; ancak senaryo "adim sayisi degisebilir" implikasyonunu tasir
-          (yeni adimlar). Komut listesi, calisma zamaninda yeniden duzenlenebilir; sablon ise siniflarin
-          yeniden yazilmasini gerektirir.</td>
+        <td><b>Template Method</b> &mdash; sipariş işleme akışını soyut sınıfta şablon olarak kurmak.</td>
+        <td>Şablon, <em>sıra sabit</em> ise iyidir; ancak senaryo "adım sayısı değişebilir" implikasyonunu taşır
+          (yeni adımlar). Komut listesi, çalışma zamanında yeniden düzenlenebilir; şablon ise sınıfların
+          yeniden yazılmasını gerektirir.</td>
       </tr>
       <tr>
-        <td><b>Decorator</b> &mdash; kontrolleri sarmalayici olarak eklemek.</td>
-        <td>Decorator, ana arayuze yeni davranis ekler; ancak burada kontroller <em>kararsal</em>: false donerse
-          akisi durdurur. Bu, "ekleme" degil "eleme" semantigi; CoR daha dogru.</td>
+        <td><b>Decorator</b> &mdash; kontrolleri sarmalayıcı olarak eklemek.</td>
+        <td>Decorator, ana arayüze yeni davranış ekler; ancak burada kontroller <em>kararsal</em>: false dönerse
+          akışı durdurur. Bu, "ekleme" değil "eleme" semantiği; CoR daha doğru.</td>
       </tr>
       <tr>
-        <td><b>Observer</b> &mdash; siparis durumu degistikce abonelere haber vermek.</td>
-        <td>Faydali olabilirdi; ancak senaryo "bilgilendirme" istemiyor, <em>islem akisini</em> tarif ediyor.
-          Cozumumuz islem-yonludur; Observer ihtiyaca gore daha sonra eklenebilir, mimariyi engellemez.</td>
+        <td><b>Observer</b> &mdash; sipariş durumu değiştikçe abonelere haber vermek.</td>
+        <td>Faydalı olabilirdi; ancak senaryo "bilgilendirme" istemiyor, <em>işlem akışını</em> tarif ediyor.
+          Çözümümüz işlem-yönlüdür; Observer ihtiyaca göre daha sonra eklenebilir, mimariyi engellemez.</td>
       </tr>
       <tr>
-        <td><b>State</b> &mdash; siparis durumu icin.</td>
-        <td><code>SiparisDurumu</code> bir enum yeterli; siparisin davranisi durumla degismiyor (yalnizca
-          basit gozlemlenebilir alanlar). State asiri muhendislik olur.</td>
+        <td><b>State</b> &mdash; sipariş durumu için.</td>
+        <td><code>SiparisDurumu</code> bir enum yeterli; siparişin davranışı durumla değişmiyor (yalnızca
+          basit gözlemlenebilir alanlar). State aşırı mühendislik olur.</td>
       </tr>
     </tbody>
   </table>
 
   <div class="callout">
-    <b>Mimari kanaat.</b> Strategy "ne ile odensin", CoR "kabul edilebilir mi", Command "kabul sonrasi ne yapilsin"
-    sorularini birbirinden bagimsiz cevaplar. Senaryonun her uc <em>degisme ekseni</em> &mdash; odeme yontemleri,
-    kontrol kurallari, isleme adimlari &mdash; ayri bir oruntu ile soyutlanmistir; biri buyurken digerleri sabit kalir.
+    <b>Mimari kanaat.</b> Strategy "ne ile ödensin", CoR "kabul edilebilir mi", Command "kabul sonrası ne yapılsın"
+    sorularını birbirinden bağımsız cevaplar. Senaryonun her üç <em>değişme ekseni</em> &mdash; ödeme yöntemleri,
+    kontrol kuralları, işleme adımları &mdash; ayrı bir örüntü ile soyutlanmıştır; biri büyürken diğerleri sabit kalır.
   </div>
 
   
 
-  <h2>2.4 Sinif Diyagrami</h2>
+  <h2>2.4 Sınıf Diyagramı</h2>
   <figure class="diagram-figure">
-    <img src="${diagram2Path}" alt="Soru 2 sinif diyagrami"/>
-    <figcaption>Sekil 2.1 &middot; SimpleCar E-Satis &mdash; UML 2.x sinif diyagrami.
-      Sol kanat: CoR (kontroller); orta: orchestrator; sag ust: Strategy (odeme yontemleri);
-      sag alt: Command (sirali isleme adimlari).</figcaption>
+    <img src="${diagram2Path}" alt="Soru 2 sınıf diyagramı"/>
+    <figcaption>Şekil 2.1 &middot; SimpleCar E-Satış &mdash; UML 2.x sınıf diyagramı.
+      Sol kanat: CoR (kontroller); orta: orchestrator; sağ üst: Strategy (ödeme yöntemleri);
+      sağ alt: Command (sıralı işleme adımları).</figcaption>
   </figure>
 
   
 
-  <h2>2.5 Sinif Aciklamalari</h2>
+  <h2>2.5 Sınıf Açıklamaları</h2>
   <table class="class-table">
-    <thead><tr><th>Sinif / Arayuz</th><th>Stereotip</th><th>Sorumluluk &amp; Roller</th></tr></thead>
+    <thead><tr><th>Sınıf / Arayüz</th><th>Stereotip</th><th>Sorumluluk &amp; Roller</th></tr></thead>
     <tbody>
       <tr><td><code>Musteri</code></td><td>&laquo;entity&raquo;</td>
-          <td>Siparisi veren kisi; <code>hesapBakiyesi</code> bakiye kontrolunde kullanilir.</td></tr>
+          <td>Siparişi veren kişi; <code>hesapBakiyesi</code> bakiye kontrolünde kullanılır.</td></tr>
       <tr><td><code>Siparis</code></td><td>&laquo;entity&raquo;</td>
-          <td>Aggregate root; tutar, miktar, secilen <code>OdemeYontemi</code>, durum bilgilerini tasir.</td></tr>
+          <td>Aggregate root; tutar, miktar, seçilen <code>OdemeYontemi</code>, durum bilgilerini taşır.</td></tr>
       <tr><td><code>SiparisDurumu</code></td><td>&laquo;enumeration&raquo;</td>
-          <td>Yasam dongusu sabitleri: ALINDI / KONTROL_EDILIYOR / ONAYLANDI / IPTAL_EDILDI / ISLENDI.</td></tr>
+          <td>Yaşam döngüsü sabitleri: ALINDI / KONTROL_EDILIYOR / ONAYLANDI / IPTAL_EDILDI / ISLENDI.</td></tr>
       <tr><td><code>OdemeYontemi</code></td><td>&laquo;interface&raquo;</td>
-          <td>Strategy sozlesmesi; <code>odemeYap(tutar)</code> imzasi.</td></tr>
+          <td>Strategy sözleşmesi; <code>odemeYap(tutar)</code> imzası.</td></tr>
       <tr><td><code>BankaHavalesi</code> &middot; <code>Paypal</code> &middot; <code>SogukCuzdan</code></td>
           <td>&laquo;concrete&raquo;</td>
-          <td>Mevcut odeme stratejileri; her birinin kanal-ozel alanlari (IBAN, e-posta, cuzdan adresi) vardir.</td></tr>
+          <td>Mevcut ödeme stratejileri; her birinin kanal-özel alanları (IBAN, e-posta, cüzdan adresi) vardır.</td></tr>
       <tr><td><code>SiparisKontrolu</code></td><td>&laquo;abstract&raquo;</td>
-          <td>CoR taban sinifi; <code>kontrolEt</code> sablon metodu zincirleme isini tasir,
-            <code>kontroluUygula</code> alt siniflara birakilir.</td></tr>
+          <td>CoR taban sınıfı; <code>kontrolEt</code> şablon metodu zincirleme işini taşır,
+            <code>kontroluUygula</code> alt sınıflara bırakılır.</td></tr>
       <tr><td><code>SahtecilikKontrolu</code> &middot; <code>LimitKontrolu</code> &middot; <code>BakiyeKontrolu</code></td>
           <td>&laquo;concrete&raquo;</td>
-          <td>Tek bir kurali uygulayan halkalar; bagimsiz birim test yapilabilir.</td></tr>
+          <td>Tek bir kuralı uygulayan halkalar; bağımsız birim test yapılabilir.</td></tr>
       <tr><td><code>Komut</code></td><td>&laquo;interface&raquo;</td>
-          <td>Command sozlesmesi; <code>calistir(siparis)</code>.</td></tr>
+          <td>Command sözleşmesi; <code>calistir(siparis)</code>.</td></tr>
       <tr><td><code>FaturaDuzenle</code> &middot; <code>FaturaGonder</code> &middot; <code>AlacaklaraKaydet</code></td>
           <td>&laquo;concrete&raquo;</td>
-          <td>Senaryoda istenen sirali uc isleme adimi; her biri kendi yan etkisinden sorumlu.</td></tr>
+          <td>Senaryoda istenen sıralı üç işleme adımı; her biri kendi yan etkisinden sorumlu.</td></tr>
       <tr><td><code>SiparisIsleyici</code></td><td>&laquo;macro command&raquo;</td>
-          <td>Sirali komut listesi; <code>komutEkle</code> ile genisletilebilir.</td></tr>
+          <td>Sıralı komut listesi; <code>komutEkle</code> ile genişletilebilir.</td></tr>
       <tr><td><code>SiparisYoneticisi</code></td><td>&laquo;service&raquo;</td>
-          <td>Use-case orchestratoru; kontrol zincirini ve isleyiciyi koordine eder. <em>Acik:</em>
-            burada Facade kalitsal bir izi vardir &mdash; cagirana tek bir <code>siparisAl(s)</code> arayuzu
+          <td>Use-case orchestratoru; kontrol zincirini ve işleyiciyi koordine eder. <em>Açık:</em>
+            burada Facade kalıtsal bir izi vardır &mdash; çağırana tek bir <code>siparisAl(s)</code> arayüzü
             sunulur.</td></tr>
       <tr><td><code>Fatura</code></td><td>&laquo;entity&raquo;</td>
-          <td>Fatura komutlari arasinda paylasilan veri; siparis ile <em>1-1</em> iliskili.</td></tr>
+          <td>Fatura komutları arasında paylaşılan veri; sipariş ile <em>1-1</em> ilişkili.</td></tr>
     </tbody>
   </table>
 
-  <h2>2.6 Iliski Tipleri (UML Notasyonu)</h2>
+  <h2>2.6 İlişki Tipleri (UML Notasyonu)</h2>
   <ul class="bullet-list">
-    <li><em>Birikim (aggregation).</em> <code>Siparis &#x25C7;&mdash; OdemeYontemi (1..1)</code>: odeme yontemi
-        siparise atanir, fakat onun parcasi degildir.</li>
-    <li><em>Birikim.</em> <code>SiparisIsleyici &#x25C7;&mdash; Komut (1..*, sirali)</code>: komut listesi
-        isleyiciden bagimsiz olarak da var olabilir.</li>
-    <li><em>Olusum (composition).</em> <code>SiparisYoneticisi &#x25C6;&mdash; SiparisIsleyici</code>: yonetici,
-        isleyiciyi kendisi olusturur ve sahiplenir.</li>
-    <li><em>Refleksif iliski.</em> <code>SiparisKontrolu &mdash; sonraki: 0..1</code>: zincirleme
-        bagintisi, halkanin kendisine.</li>
-    <li><em>Gerceklestirme (realization).</em> <code>BankaHavalesi/Paypal/SogukCuzdan &mdash;..&#x25B7; OdemeYontemi</code>;
+    <li><em>Aggregation.</em> <code>Siparis &#x25C7;&mdash; OdemeYontemi (1..1)</code>: ödeme yöntemi
+        siparişe atanır, fakat onun parçası değildir.</li>
+    <li><em>Aggregation.</em> <code>SiparisIsleyici &#x25C7;&mdash; Komut (1..*, sıralı)</code>: komut listesi
+        işleyiciden bağımsız olarak da var olabilir.</li>
+    <li><em>Composition.</em> <code>SiparisYoneticisi &#x25C6;&mdash; SiparisIsleyici</code>: yönetici,
+        işleyiciyi kendisi oluşturur ve sahiplenir.</li>
+    <li><em>Self-association.</em> <code>SiparisKontrolu &mdash; sonraki: 0..1</code>: zincirleme
+        bağıntısı, halkanın kendisine.</li>
+    <li><em>Realization.</em> <code>BankaHavalesi/Paypal/SogukCuzdan &mdash;..&#x25B7; OdemeYontemi</code>;
         <code>FaturaDuzenle/FaturaGonder/AlacaklaraKaydet &mdash;..&#x25B7; Komut</code>.</li>
-    <li><em>Kalitim.</em> Uc kontrol halkasi <code>SiparisKontrolu</code>'ndan turer.</li>
-    <li><em>Bagimlilik.</em> <code>SiparisYoneticisi &mdash;..&gt; Siparis</code> (&laquo;invokes&raquo;);
+    <li><em>Inheritance.</em> Üç kontrol halkası <code>SiparisKontrolu</code>'ndan türer.</li>
+    <li><em>Dependency.</em> <code>SiparisYoneticisi &mdash;..&gt; Siparis</code> (&laquo;invokes&raquo;);
         <code>FaturaDuzenle &mdash;..&gt; Fatura</code> (&laquo;creates&raquo;).</li>
   </ul>
 
   
 
-  <h2>2.7 Sira Diyagrami (Siparis Yasam Dongusu)</h2>
+  <h2>2.7 Sıra Diyagramı (Sipariş Yaşam Döngüsü)</h2>
   <figure class="diagram-figure">
-    <img src="${sekans2Path}" alt="Sekans 3 - siparis yasam dongusu"/>
-    <figcaption>Sekil 2.2 &middot; Bir siparisin alinmasindan ISLENDI durumuna gecisine kadar tum etkilesim akisi.
-      Kontroller CoR boyunca devredilir; isleme adimlari Macro Command tarafindan sirayla calistirilir.</figcaption>
+    <img src="${sekans2Path}" alt="Sekans 3 - sipariş yaşam döngüsü"/>
+    <figcaption>Şekil 2.2 &middot; Bir siparişin alınmasından ISLENDI durumuna geçişine kadar tüm etkileşim akışı.
+      Kontroller CoR boyunca devredilir; işleme adımları Macro Command tarafından sırayla çalıştırılır.</figcaption>
   </figure>
 
   
 
-  <h2>2.8 Onemli Metotlarin Sozde-Kodu</h2>
+  <h2>2.8 Önemli Metotların Sözde-Kodu</h2>
 
-  <pre class="code">// CHAIN OF RESPONSIBILITY — taban sinif
+  <pre class="code">// CHAIN OF RESPONSIBILITY — taban sınıf
 abstract class SiparisKontrolu {
     protected SiparisKontrolu sonraki;
     SiparisKontrolu setSonraki(SiparisKontrolu k) { this.sonraki = k; return k; }
 
     final boolean kontrolEt(Siparis s) {       // template method
-        if (!kontroluUygula(s)) return false;  // basarisizsa zincir kesilir
+        if (!kontroluUygula(s)) return false;  // başarısızsa zincir kesilir
         return sonraki == null ? true
                                : sonraki.kontrolEt(s);
     }
@@ -496,7 +496,7 @@ class BakiyeKontrolu extends SiparisKontrolu {
     }
 }</pre>
 
-  <pre class="code">// MACRO COMMAND — sirali komut listesi
+  <pre class="code">// MACRO COMMAND — sıralı komut listesi
 class SiparisIsleyici {
     private final List&lt;Komut&gt; komutlar = new ArrayList&lt;&gt;();
     void komutEkle(Komut k) { komutlar.add(k); }
@@ -516,14 +516,14 @@ class SiparisYoneticisi {
             s.iptalEt();                      // durum = IPTAL_EDILDI
             return;
         }
-        if (!s.odemeAl()) { s.iptalEt(); return; }   // strategy uzerinden
+        if (!s.odemeAl()) { s.iptalEt(); return; }   // strategy üzerinden
         s.durum = SiparisDurumu.ONAYLANDI;
-        isleyici.tumKomutlariCalistir(s);     // fatura duzenle/gonder/alacak
+        isleyici.tumKomutlariCalistir(s);     // fatura düzenle/gönder/alacak
         s.tamamlandiOlarakIsaretle();         // durum = ISLENDI
     }
 }</pre>
 
-  <pre class="code">// STRATEGY — siparisten secilen yontem cagirilir
+  <pre class="code">// STRATEGY — siparişten seçilen yöntem çağırılır
 class Siparis {
     private OdemeYontemi odemeYontemi;
     boolean odemeAl() { return odemeYontemi.odemeYap(this.tutar); }
@@ -531,38 +531,38 @@ class Siparis {
 
 class Paypal implements OdemeYontemi {
     private final String hesapEpostasi;
-    public boolean odemeYap(double tutar) { /* ag cagrisi */ return true; }
+    public boolean odemeYap(double tutar) { /* ağ çağrısı */ return true; }
     public String adi() { return "Paypal"; }
 }</pre>
 
-  <h2>2.9 Genisletilebilirlik Senaryolari</h2>
+  <h2>2.9 Genişletilebilirlik Senaryoları</h2>
   <table class="design-table">
-    <thead><tr><th>Yeni Gereksinim</th><th>Mevcut Tasarimda Yapilacak Tek Sey</th></tr></thead>
+    <thead><tr><th>Yeni Gereksinim</th><th>Mevcut Tasarımda Yapılacak Tek Şey</th></tr></thead>
     <tbody>
-      <tr><td>Kripto kart yontemi eklemek</td>
-          <td><code>OdemeYontemi</code>'ni uygulayan yeni bir sinif yazmak. Mevcut hicbir kod degismez.</td></tr>
-      <tr><td>KYC kontrolu eklemek</td>
-          <td><code>SiparisKontrolu</code>'ndan turetilen yeni bir halka yazip zincire <code>setSonraki</code> ile takmak.</td></tr>
-      <tr><td>Kargo etiketi olusturma adimi eklemek</td>
-          <td><code>Komut</code>'u uygulayan yeni bir sinifi <code>SiparisIsleyici.komutEkle</code> ile dahil etmek.</td></tr>
-      <tr><td>Bazi adimlari paralel calistirma</td>
-          <td><code>SiparisIsleyici</code>'yi <code>ParalelSiparisIsleyici</code> olarak alternatiflestirmek
+      <tr><td>Kripto kart yöntemi eklemek</td>
+          <td><code>OdemeYontemi</code>'ni uygulayan yeni bir sınıf yazmak. Mevcut hiçbir kod değişmez.</td></tr>
+      <tr><td>KYC kontrolü eklemek</td>
+          <td><code>SiparisKontrolu</code>'ndan türetilen yeni bir halka yazıp zincire <code>setSonraki</code> ile takmak.</td></tr>
+      <tr><td>Kargo etiketi oluşturma adımı eklemek</td>
+          <td><code>Komut</code>'u uygulayan yeni bir sınıfı <code>SiparisIsleyici.komutEkle</code> ile dahil etmek.</td></tr>
+      <tr><td>Bazı adımları paralel çalıştırma</td>
+          <td><code>SiparisIsleyici</code>'yi <code>ParalelSiparisIsleyici</code> olarak alternatifleştirmek
               (Liskov uyumlu).</td></tr>
-      <tr><td>Tum kontrolleri tek seferde calistirip <em>tum</em> hatalari toplama</td>
-          <td>Yeni bir <code>HepsiniDogrulayanSiparisKontrolu</code> kompozit halkasi yazmak; mevcut halkalar
-              degismeden kullanilir.</td></tr>
+      <tr><td>Tüm kontrolleri tek seferde çalıştırıp <em>tüm</em> hataları toplama</td>
+          <td>Yeni bir <code>HepsiniDogrulayanSiparisKontrolu</code> kompozit halkası yazmak; mevcut halkalar
+              değişmeden kullanılır.</td></tr>
     </tbody>
   </table>
 
-  <h2>2.10 Sonuc</h2>
+  <h2>2.10 Sonuç</h2>
   <p>
-  Onerilen tasarim; siparisin <em>alinmasi, dogrulanmasi ve islenmesi</em> ic akislarini birbirinden ayri,
-  oruntu-tabanli kapsullere yerlestirir. Senaryonun en sik degisecegi belirtilen iki ekseni &mdash; <em>odeme
-  yontemleri</em> ve <em>kontrol kurallari</em> &mdash; mevcut kodu degistirmeden buyur. Sirali isleme,
-  gozlemlenebilir, sira/komut listesi degistirebilir ve test edilebilir bir komut akisi ile gerceklestirilir.
-  Boylece, hem sinav kurallarinda istenen <em>oruntu adi acikca belirtilmis</em> ve <em>iliski tip ile
-  isaretlemeleri dogru kullanilmis</em>; hem de senaryodaki nitelikler ve metotlar siniflar icinde
-  konumlandirilmistir.
+  Önerilen tasarım; siparişin <em>alınması, doğrulanması ve işlenmesi</em> iç akışlarını birbirinden ayrı,
+  örüntü-tabanlı kapsüllere yerleştirir. Senaryonun en sık değişeceği belirtilen iki ekseni &mdash; <em>ödeme
+  yöntemleri</em> ve <em>kontrol kuralları</em> &mdash; mevcut kodu değiştirmeden büyür. Sıralı işleme,
+  gözlemlenebilir, sıra/komut listesi değiştirilebilir ve test edilebilir bir komut akışı ile gerçekleştirilir.
+  Böylece, hem sınav kurallarında istenen <em>örüntü adı açıkça belirtilmiş</em> ve <em>ilişki tipi ile
+  işaretlemeleri doğru kullanılmış</em>; hem de senaryodaki nitelikler ve metotlar sınıflar içinde
+  konumlandırılmıştır.
   </p>
 </section>
 

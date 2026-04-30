@@ -355,7 +355,7 @@ function renderLegend(W, y) {
   const parts = [];
   parts.push(`<g>`);
   parts.push(`<line x1="60" y1="${y}" x2="${W - 60}" y2="${y}" stroke="${PALETTE.rule}" stroke-width="0.8"/>`);
-  parts.push(`<text x="60" y="${y + 22}" font-family="${FONT}" font-size="13" font-style="italic" fill="${PALETTE.textMuted}">Notasyon Aciklamasi</text>`);
+  parts.push(`<text x="60" y="${y + 22}" font-family="${FONT}" font-size="13" font-style="italic" fill="${PALETTE.textMuted}">Notasyon Açıklaması</text>`);
 
   items.forEach((it, i) => {
     const ix = startX + i * itemW;

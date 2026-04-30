@@ -86,11 +86,11 @@ async function main() {
     margin: { top: "20mm", bottom: "20mm", left: "18mm", right: "18mm" },
     displayHeaderFooter: true,
     headerTemplate: `<div style="font-family:'EB Garamond',Georgia,serif;font-size:9px;color:#7a7060;width:100%;padding:0 18mm;display:flex;justify-content:space-between;font-style:italic;">
-      <span>Nesneye Yonelik Yazilim Gelistirme &middot; Ara Sinav Cevabi</span>
+      <span>Nesneye Yönelik Yazılım Geliştirme &middot; Ara Sınav Cevabı</span>
       <span class="title"></span>
     </div>`,
     footerTemplate: `<div style="font-family:'EB Garamond',Georgia,serif;font-size:9px;color:#7a7060;width:100%;padding:0 18mm;display:flex;justify-content:space-between;font-style:italic;">
-      <span>Bilisim Enstitusu &middot; 2025-2026 Bahar</span>
+      <span>Bilişim Enstitüsü &middot; 2025-2026 Bahar</span>
       <span><span class="pageNumber"></span> / <span class="totalPages"></span></span>
     </div>`,
   });
