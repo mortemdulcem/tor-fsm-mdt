@@ -578,7 +578,7 @@ export const soru2 = {
     // Command realizations
     { from: "FaturaDuzenle", fromSide: "top", to: "Komut", toSide: "bottom", toOffset: 0.2, type: "realization", routing: "orthogonal" },
     { from: "FaturaGonder", fromSide: "top", to: "Komut", toSide: "bottom", toOffset: 0.7, type: "realization", routing: "orthogonal" },
-    { from: "AlacaklaraKaydet", fromSide: "top", fromOffset: 0.7, to: "Komut", toSide: "bottom", toOffset: 0.85, type: "realization", routing: "orthogonal" },
+    { from: "AlacaklaraKaydet", fromSide: "top", fromOffset: 0.78, to: "Komut", toSide: "bottom", toOffset: 0.89, type: "realization", routing: "orthogonal" },
     // Fatura usage
     { from: "FaturaDuzenle", fromSide: "left", fromOffset: 0.5, to: "Fatura", toSide: "right", toOffset: 0.5, type: "dependency", label: "<<creates>>" },
   ],
