@@ -11,13 +11,13 @@
     <line x1="60" y1="80" x2="1840" y2="80" stroke="#1a1a1a" stroke-width="0.8"/>
   
   <g class="rel-association">
-<path d="M 400 262.9 L 340 263" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+<path d="M 400 270.6 L 340 263" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="358,254 340,263 358,272" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
-<text x="390" y="278.9" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..*</text>
+<text x="390" y="286.6" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..*</text>
 <text x="350" y="279" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <g>
-      <text x="370" y="254.95" text-anchor="middle"
+      <text x="370" y="258.8" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         alici
@@ -25,20 +25,20 @@
     </g>
 </g>
 <g class="rel-association">
-<path d="M 688 454 L 688 482 L 950 482 L 950 412 L 950 440" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+<path d="M 688 476 L 688 504 L 950 504 L 950 412 L 950 440" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="941,422 950,440 959,422" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
-<text x="698" y="472" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">*</text>
+<text x="698" y="494" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">*</text>
 <text x="960" y="430" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 </g>
 <g class="rel-aggregation">
-<path d="M 760 248.2 L 1140 225" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+<path d="M 760 254.8 L 1140 225" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="760,248.2 770,239.2 780,248.2 770,257.2" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
-<text x="770" y="264.2" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<polygon points="760,254.8 770,245.8 780,254.8 770,263.8" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
+<text x="770" y="270.8" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <text x="1130" y="241" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <g>
-      <text x="950" y="228.6" text-anchor="middle"
+      <text x="950" y="231.9" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         odemeYontemi
@@ -89,11 +89,11 @@
     </g>
 </g>
 <g class="rel-dependency">
-<path d="M 729 660 L 729 632 L 580 632 L 580 482 L 580 454" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+<path d="M 729 660 L 729 632 L 580 632 L 580 504 L 580 476" fill="none" stroke="#1a1a1a" stroke-width="1.2"
     stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="589,472 580,454 571,472" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="589,494 580,476 571,494" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <g>
-      <text x="654.5" y="549" text-anchor="middle"
+      <text x="654.5" y="560" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         isler
@@ -139,7 +139,7 @@
       <text x="1330" y="853" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
-        komutlar (sirali)
+        komutlar {ordered}
       </text>
     </g>
 </g>
@@ -196,7 +196,7 @@
 <text x="72" y="350" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ bakiyeyiGetir() : double</text>
 </g>
 <g class="cls-Siparis">
-<rect x="400" y="160" width="360" height="294"
+<rect x="400" y="160" width="360" height="316"
         fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="400" y="160" width="360" height="56"
         fill="#ececec" stroke="none"/>
@@ -218,11 +218,12 @@
 <text x="412" y="308" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- tutar : double</text>
 <text x="412" y="330" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- odemeYontemi : OdemeYontemi</text>
 <text x="412" y="352" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- durum : SiparisDurumu</text>
-<line x1="400" y1="368" x2="760" y2="368"
+<text x="412" y="374" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">/ toplamTutar : double</text>
+<line x1="400" y1="390" x2="760" y2="390"
     stroke="#1a1a1a" stroke-width="0.8"/>
-<text x="412" y="394" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ iptalEt() : void</text>
-<text x="412" y="416" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ tamamlandiOlarakIsaretle() : void</text>
-<text x="412" y="438" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ odemeAl() : boolean</text>
+<text x="412" y="416" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ iptalEt() : void</text>
+<text x="412" y="438" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ tamamlandiOlarakIsaretle() : void</text>
+<text x="412" y="460" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ odemeAl() : boolean</text>
 </g>
 <g class="cls-SiparisDurumu">
 <rect x="820" y="440" width="260" height="196"

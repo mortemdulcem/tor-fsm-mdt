@@ -356,6 +356,7 @@ export const soru2 = {
         "- tutar : double",
         "- odemeYontemi : OdemeYontemi",
         "- durum : SiparisDurumu",
+        "/ toplamTutar : double",
       ],
       methods: [
         "+ iptalEt() : void",
@@ -574,7 +575,7 @@ export const soru2 = {
     { from: "LimitKontrolu", fromSide: "top", to: "SiparisKontrolu", toSide: "bottom", toOffset: 0.5, type: "inheritance", routing: "orthogonal" },
     { from: "BakiyeKontrolu", fromSide: "top", to: "SiparisKontrolu", toSide: "bottom", toOffset: 0.8, type: "inheritance", routing: "orthogonal" },
     // Command aggregation
-    { from: "SiparisIsleyici", fromSide: "bottom", fromOffset: 0.5, to: "Komut", toSide: "top", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1..*", label: "komutlar (sirali)", routing: "orthogonal" },
+    { from: "SiparisIsleyici", fromSide: "bottom", fromOffset: 0.5, to: "Komut", toSide: "top", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1..*", label: "komutlar {ordered}", routing: "orthogonal" },
     // Command realizations
     { from: "FaturaDuzenle", fromSide: "top", to: "Komut", toSide: "bottom", toOffset: 0.2, type: "realization", routing: "orthogonal" },
     { from: "FaturaGonder", fromSide: "top", to: "Komut", toSide: "bottom", toOffset: 0.7, type: "realization", routing: "orthogonal" },
