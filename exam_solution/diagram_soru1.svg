@@ -577,50 +577,50 @@
     stroke="#1a1a1a" stroke-width="0.8"/>
 </g>
   <g>
-<line x1="1380" y1="404" x2="1120" y2="699"
+<line x1="1380" y1="416" x2="1120" y2="699"
       stroke="#1a1a1a" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
 <path d="M 1380 320
                 L 1748 320
                 L 1760 332
-                L 1760 404
-                L 1380 404 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
+                L 1760 416
+                L 1380 416 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
 <path d="M 1748 320
                     L 1748 332
                     L 1760 332" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-<text x="1390" y="343"
+<text x="1390" y="349"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Mediator + Observer:</text>
-<text x="1390" y="358"
+<text x="1390" y="364"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Motor merkezi yönlendiricidir; sensörler</text>
-<text x="1390" y="373"
+<text x="1390" y="379"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">ve sistemler birbirini doğrudan tanımaz.</text>
-<text x="1390" y="388"
+<text x="1390" y="394"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Tüm olay akışı motor üzerinden geçer.</text>
 </g>
 <g>
-<line x1="1620" y1="954" x2="1530" y2="1020"
+<line x1="1620" y1="966" x2="1530" y2="1020"
       stroke="#1a1a1a" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
 <path d="M 1620 870
                 L 1928 870
                 L 1940 882
-                L 1940 954
-                L 1620 954 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
+                L 1940 966
+                L 1620 966 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
 <path d="M 1928 870
                     L 1928 882
                     L 1940 882" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-<text x="1630" y="893"
+<text x="1630" y="899"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">State örüntüsü:</text>
-<text x="1630" y="908"
+<text x="1630" y="914"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">EvSistemi yalnızca CalismaModu sözleşmesini</text>
-<text x="1630" y="923"
+<text x="1630" y="929"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">tanır; davranış mod nesnesinde tutulur,</text>
-<text x="1630" y="938"
+<text x="1630" y="944"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">farklı modlar koşulsuz değiştirilebilir.</text>
 </g>
@@ -630,21 +630,21 @@
 <path d="M 1380 570
                 L 1688 570
                 L 1700 582
-                L 1700 654
-                L 1380 654 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
+                L 1700 666
+                L 1380 666 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
 <path d="M 1688 570
                     L 1688 582
                     L 1700 582" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-<text x="1390" y="593"
+<text x="1390" y="599"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Yeni bir bildirim kanalı eklemek için</text>
-<text x="1390" y="608"
+<text x="1390" y="614"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">KullaniciBildirimAlici'yi gerçekleştiren</text>
-<text x="1390" y="623"
+<text x="1390" y="629"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">yeni bir sınıf yazmak yeterlidir.</text>
-<text x="1390" y="638"
+<text x="1390" y="644"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">— Açık/Kapalı İlkesi.</text>
 </g>

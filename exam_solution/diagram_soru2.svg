@@ -561,29 +561,29 @@
     stroke="#1a1a1a" stroke-width="0.8"/>
 </g>
   <g>
-<line x1="440" y1="749.5" x2="420" y2="763"
+<line x1="440" y1="755.5" x2="420" y2="763"
       stroke="#1a1a1a" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
 <path d="M 440 700
                 L 638 700
                 L 650 712
-                L 650 799
-                L 440 799 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
+                L 650 811
+                L 440 811 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
 <path d="M 638 700
                     L 638 712
                     L 650 712" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-<text x="450" y="723"
+<text x="450" y="729"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Şablon Yöntem:</text>
-<text x="450" y="738"
+<text x="450" y="744"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">kontrolEt(s) sabit kalır;</text>
-<text x="450" y="753"
+<text x="450" y="759"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">alt sınıf yalnızca</text>
-<text x="450" y="768"
+<text x="450" y="774"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">kontroluUygula(s) yi yazar.</text>
-<text x="450" y="783"
+<text x="450" y="789"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Halka düşerse zincir kirilir.</text>
 </g>
@@ -593,21 +593,21 @@
 <path d="M 1530 860
                 L 1878 860
                 L 1890 872
-                L 1890 944
-                L 1530 944 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
+                L 1890 956
+                L 1530 956 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
 <path d="M 1878 860
                     L 1878 872
                     L 1890 872" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-<text x="1540" y="883"
+<text x="1540" y="889"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Macro Command:</text>
-<text x="1540" y="898"
+<text x="1540" y="904"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">SiparisIsleyici, Komut listesini</text>
-<text x="1540" y="913"
+<text x="1540" y="919"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">sırayla çalıştırır. Geri alınabilirlik</text>
-<text x="1540" y="928"
+<text x="1540" y="934"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">için + undo() : void eklenebilir.</text>
 </g>
@@ -617,18 +617,18 @@
 <path d="M 1500 640
                 L 1868 640
                 L 1880 652
-                L 1880 709
-                L 1500 709 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
+                L 1880 721
+                L 1500 721 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
 <path d="M 1868 640
                     L 1868 652
                     L 1880 652" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-<text x="1510" y="663"
+<text x="1510" y="669"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Strategy: Sipariş kendi ödeme yöntemini taşır.</text>
-<text x="1510" y="678"
+<text x="1510" y="684"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Yönetici hangi sınıf olduğunu bilmez;</text>
-<text x="1510" y="693"
+<text x="1510" y="699"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">yalnızca odemeYap(tutar) sözleşmesini çağırır.</text>
 </g>

@@ -347,7 +347,7 @@ function renderClassNote(note, classMap, contentOffsetY) {
   const lines = note.text.split("\n");
   const lineH = 15;
   const padX = 10;
-  const padY = 12;
+  const padY = 18;
   const fold = 12;
   const charW = 6.6;
   const maxLineW = Math.max(...lines.map(l => l.length * charW));
