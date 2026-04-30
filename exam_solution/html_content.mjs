@@ -459,7 +459,10 @@ ${css()}
     <li><em>Inheritance.</em> Üç kontrol halkası <code>SiparisKontrolu</code>'ndan türer.</li>
     <li><em>Dependency.</em> <code>SiparisYoneticisi &mdash;..&gt; Siparis</code> (etiket: <em>isler</em>);
         <code>FaturaDuzenle &mdash;..&gt; Fatura</code> (&laquo;creates&raquo;);
-        <code>Siparis &mdash;..&gt; SiparisDurumKaydi</code> (&laquo;creates&raquo;).</li>
+        <code>Siparis &mdash;..&gt; SiparisDurumKaydi</code> (&laquo;creates&raquo;);
+        <code>Siparis &mdash;..&gt; SiparisDurumu</code> ve
+        <code>SiparisDurumKaydi &mdash;..&gt; SiparisDurumu</code> (&laquo;uses&raquo; &mdash; her iki sınıf da
+        <code>durum</code> alanını bu enumerasyondan tipler).</li>
   </ul>
 
   

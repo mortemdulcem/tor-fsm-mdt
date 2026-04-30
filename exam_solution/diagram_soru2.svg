@@ -25,13 +25,13 @@
     </g>
 </g>
 <g class="rel-aggregation">
-<path d="M 760 268 L 1140 225" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+<path d="M 731.2 160 L 731.2 132 L 1188 132 L 1188 132 L 1188 160" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="760,268 770,259 780,268 770,277" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
-<text x="770" y="284" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
-<text x="1130" y="241" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<polygon points="731.2,160 722.2,150 731.2,140 740.2,150" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
+<text x="741.2" y="150" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<text x="1198" y="150" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <g>
-      <text x="950" y="238.5" text-anchor="middle"
+      <text x="959.6" y="124" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         odemeYontemi
@@ -164,14 +164,38 @@
     </g>
 </g>
 <g class="rel-dependency">
-<path d="M 760 394 L 820 247" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+<path d="M 760 340 L 820 247" fill="none" stroke="#1a1a1a" stroke-width="1.2"
     stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="802,256 820,247 802,238" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <g>
-      <text x="790" y="312.5" text-anchor="middle"
+      <text x="790" y="285.5" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         &lt;&lt;creates&gt;&gt;
+      </text>
+    </g>
+</g>
+<g class="rel-dependency">
+<path d="M 760 502 L 788 502 L 788 538 L 792 538 L 820 538" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="802,547 820,538 802,529" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
+<g>
+      <text x="790" y="512" text-anchor="middle"
+        font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
+        &lt;&lt;uses&gt;&gt;
+      </text>
+    </g>
+</g>
+<g class="rel-dependency">
+<path d="M 948 334 L 950 440" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="941,422 950,440 959,422" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
+<g>
+      <text x="949" y="379" text-anchor="middle"
+        font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
+        paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
+        &lt;&lt;uses&gt;&gt;
       </text>
     </g>
 </g>

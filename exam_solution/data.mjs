@@ -577,8 +577,8 @@ export const soru2 = {
   relationships: [
     // Domain
     { from: "Siparis", fromSide: "left", fromOffset: 0.35, to: "Musteri", toSide: "right", toOffset: 0.5, type: "association", mFrom: "0..*", mTo: "1", label: "alici" },
-    // Strategy
-    { from: "Siparis", fromSide: "right", fromOffset: 0.3, to: "OdemeYontemi", toSide: "left", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1", label: "odemeYontemi" },
+    // Strategy: Siparis -<>- OdemeYontemi, ust uzerinden dolastirilir (SiparisDurumKaydi'nin uzerinden gecmesin)
+    { from: "Siparis", fromSide: "top", fromOffset: 0.92, to: "OdemeYontemi", toSide: "top", toOffset: 0.15, type: "aggregation", mFrom: "1", mTo: "1", label: "odemeYontemi", routing: "orthogonal" },
     { from: "BankaHavalesi", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.2, type: "realization", routing: "orthogonal" },
     { from: "Paypal", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.5, type: "realization", routing: "orthogonal" },
     { from: "SogukCuzdan", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.8, type: "realization", routing: "orthogonal" },
@@ -601,7 +601,10 @@ export const soru2 = {
     // Fatura usage
     { from: "FaturaDuzenle", fromSide: "left", fromOffset: 0.5, to: "Fatura", toSide: "right", toOffset: 0.5, type: "dependency", label: "<<creates>>" },
     // Memento: Siparis creates SiparisDurumKaydi (caretaker SiparisIsleyici tutar)
-    { from: "Siparis", fromSide: "right", fromOffset: 0.65, to: "SiparisDurumKaydi", toSide: "left", toOffset: 0.5, type: "dependency", label: "<<creates>>" },
+    { from: "Siparis", fromSide: "right", fromOffset: 0.5, to: "SiparisDurumKaydi", toSide: "left", toOffset: 0.5, type: "dependency", label: "<<creates>>" },
+    // Enum kullanim: durum tipi olarak SiparisDurumu'na bagimlilik
+    { from: "Siparis", fromSide: "right", fromOffset: 0.95, to: "SiparisDurumu", toSide: "left", toOffset: 0.5, type: "dependency", label: "<<uses>>", routing: "orthogonal" },
+    { from: "SiparisDurumKaydi", fromSide: "bottom", fromOffset: 0.4, to: "SiparisDurumu", toSide: "top", toOffset: 0.5, type: "dependency", label: "<<uses>>" },
   ],
   notes: [
     {
