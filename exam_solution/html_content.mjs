@@ -415,8 +415,8 @@ ${css()}
   <ul class="bullet-list">
     <li><em>Aggregation.</em> <code>Siparis &#x25C7;&mdash; OdemeYontemi (1..1)</code>: ödeme yöntemi
         siparişe atanır, fakat onun parçası değildir.</li>
-    <li><em>Aggregation.</em> <code>SiparisIsleyici &#x25C7;&mdash; Komut (1..*, sıralı)</code>: komut listesi
-        işleyiciden bağımsız olarak da var olabilir.</li>
+    <li><em>Aggregation.</em> <code>SiparisIsleyici &#x25C7;&mdash; Komut (1..*, {ordered})</code>: komut listesi
+        işleyiciden bağımsız olarak da var olabilir; UML kısıtı <code>{ordered}</code> sıralı koleksiyonu belirtir.</li>
     <li><em>Composition.</em> <code>SiparisYoneticisi &#x25C6;&mdash; SiparisIsleyici</code>: yönetici,
         işleyiciyi kendisi oluşturur ve sahiplenir.</li>
     <li><em>Self-association.</em> <code>SiparisKontrolu &mdash; sonraki: 0..1</code>: zincirleme
@@ -424,7 +424,7 @@ ${css()}
     <li><em>Realization.</em> <code>BankaHavalesi/Paypal/SogukCuzdan &mdash;..&#x25B7; OdemeYontemi</code>;
         <code>FaturaDuzenle/FaturaGonder/AlacaklaraKaydet &mdash;..&#x25B7; Komut</code>.</li>
     <li><em>Inheritance.</em> Üç kontrol halkası <code>SiparisKontrolu</code>'ndan türer.</li>
-    <li><em>Dependency.</em> <code>SiparisYoneticisi &mdash;..&gt; Siparis</code> (&laquo;invokes&raquo;);
+    <li><em>Dependency.</em> <code>SiparisYoneticisi &mdash;..&gt; Siparis</code> (etiket: <em>isler</em>);
         <code>FaturaDuzenle &mdash;..&gt; Fatura</code> (&laquo;creates&raquo;).</li>
   </ul>
 
