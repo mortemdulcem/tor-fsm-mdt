@@ -235,15 +235,17 @@ ${css()}
 
   
 
+  <div style="break-inside:avoid;">
   <h2>1.7 Sıra Diyagramları (Çalışma Akışları)</h2>
-  <figure class="diagram-figure">
+  <figure class="diagram-figure seq-fig">
     <img src="${sekans1aPath}" alt="Sekans 1 - sensör olayı"/>
     <figcaption>Şekil 1.2 &middot; Hareket sensörü tetiklendiğinde olay akışı.
       Sensör olayı gözlemci üzerinden motora iletilir; motor ilgili sistemleri
       uyarır, sonra DurumOzeti ile tüm bildirim alıcılarını eşleştirir.</figcaption>
   </figure>
+  </div>
 
-  <figure class="diagram-figure">
+  <figure class="diagram-figure seq-fig">
     <img src="${sekans1bPath}" alt="Sekans 2 - mod değişikliği"/>
     <figcaption>Şekil 1.3 &middot; Kullanıcının tasarruflu mod talebi.
       Tek bir <code>tumModlariAyarla</code> çağrısı, mediator aracılığıyla tüm sistemleri ve istemcileri
@@ -428,12 +430,14 @@ ${css()}
 
   
 
+  <div style="break-inside:avoid;">
   <h2>2.7 Sıra Diyagramı (Sipariş Yaşam Döngüsü)</h2>
-  <figure class="diagram-figure">
+  <figure class="diagram-figure seq-fig">
     <img src="${sekans2Path}" alt="Sekans 3 - sipariş yaşam döngüsü"/>
     <figcaption>Şekil 2.2 &middot; Bir siparişin alınmasından ISLENDI durumuna geçişine kadar tüm etkileşim akışı.
       Kontroller CoR boyunca devredilir; işleme adımları Macro Command tarafından sırayla çalıştırılır.</figcaption>
   </figure>
+  </div>
 
   
 
@@ -773,6 +777,13 @@ pre.code {
   width: 100%;
   height: auto;
   border: 0.6px solid #1a1a1a;
+}
+.seq-fig {
+  break-inside: avoid;
+}
+.seq-fig img {
+  max-height: 78mm;
+  object-fit: contain;
 }
 .diagram-figure figcaption {
   margin-top: 6pt;
