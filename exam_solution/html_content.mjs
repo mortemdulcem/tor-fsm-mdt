@@ -48,7 +48,7 @@ ${css()}
       <span class="dropcap">B</span>u belge, sınavda istenen iki senaryo için nesneye yönelik tasarım çözümlerini
       sunar. Her soru için (i) senaryo çözümlemesi, (ii) tasarım örüntüsü seçimleri ile <em>reddedilmiş
       alternatiflerin gerekçeleri</em>, (iii) UML 2.x sınıf diyagramı, (iv) bir veya iki sıra (sequence)
-      diyagramı, (v) önemli metotların sözde-kodları ve (vi) tipik çalışma akışları yer almaktadır.
+      diyagramı ve (v) tipik çalışma akışları yer almaktadır.
       Diyagramlar, bağlılık (coupling) ve uyum (cohesion) ölçütleri ile <em>okunaklılık</em> dengesi
       gözetilerek elle dizayn edilmiş; otomatik olarak yerleştirilmemiştir.
     </p>
@@ -248,62 +248,7 @@ ${css()}
 
   
 
-  <h2>1.8 Önemli Metotların Sözde-Kodu</h2>
-
-  <pre class="code">// MEDIATOR — tüm sistemleri tek noktadan moda geçir
-class AkilliEvIzlemeMotoru implements SensorGozlemcisi {
-    void tumModlariAyarla(ModTipi tip) {
-        CalismaModu yeniMod = (tip == ModTipi.TASARRUFLU)
-                              ? new TasarrufluMod()
-                              : new GuvenliMod();
-        for (EvSistemi s : sistemler) {        // bağlantılı sistemler
-            s.modAyarla(yeniMod);              // aynı nesne paylaşılır
-        }
-        aktifModTipi = tip;
-        durumOzetiYayinla();                   // observer'lara bildir
-    }
-
-    // OBSERVER — sensörden olay
-    void bildirimAl(SensorOlayi olay) {
-        for (EvSistemi s : ilgiliSistemleriBul(olay))
-            s.komutCalistir(olay.tip == SensorTipi.HAREKET
-                            ? "hareketAlgilandi" : "kapiAcildi");
-        for (KullaniciBildirimAlici a : bildirimAlicilari)
-            a.bildirimGoster(olay);            // kanal-bağımsız yayın
-        durumOzetiYayinla();
-    }
-
-    private void durumOzetiYayinla() {
-        DurumOzeti ozet = new DurumOzeti(/* anlık durum */);
-        for (KullaniciBildirimAlici a : bildirimAlicilari)
-            a.durumYansit(ozet);
-    }
-}</pre>
-
-  <pre class="code">// STATE — davranışı mod üzerinden polimorfik taşı
-abstract class EvSistemi {
-    protected CalismaModu aktifMod;
-    void modAyarla(CalismaModu m) { this.aktifMod = m; m.uygula(this); }
-    abstract void komutCalistir(String komut);
-}
-
-class IsitmaSistemi extends EvSistemi {
-    void sicaklikAyarla(int derece) { /* donanım çağrısı */ }
-    void komutCalistir(String komut) {
-        // mod kararının tüm yükü CalismaModu.uygula içinde toplanmıştır;
-        // burada yalnızca komutu donanıma yansıtırız
-    }
-}
-
-class TasarrufluMod implements CalismaModu {
-    void uygula(EvSistemi s) {
-        if (s instanceof IsitmaSistemi)     ((IsitmaSistemi) s).sicaklikAyarla(18);
-        if (s instanceof AydinlatmaSistemi) ((AydinlatmaSistemi) s).asgariAydinlatmaUygula();
-    }
-    ModTipi tipi() { return ModTipi.TASARRUFLU; }
-}</pre>
-
-  <h2>1.9 Tasarımın Niteliksel Avantajları</h2>
+  <h2>1.8 Tasarımın Niteliksel Avantajları</h2>
   <ul class="bullet-list">
     <li><b>Açık-Kapalı (OCP).</b> Yeni mod (UykuModu), yeni sensör (Pencere), yeni bildirim kanalı (E-posta);
         her durumda <em>yalnızca yeni bir sınıf</em> eklenir, mevcut kod değişmez.</li>
@@ -484,67 +429,7 @@ class TasarrufluMod implements CalismaModu {
 
   
 
-  <h2>2.8 Önemli Metotların Sözde-Kodu</h2>
-
-  <pre class="code">// CHAIN OF RESPONSIBILITY — taban sınıf
-abstract class SiparisKontrolu {
-    protected SiparisKontrolu sonraki;
-    SiparisKontrolu setSonraki(SiparisKontrolu k) { this.sonraki = k; return k; }
-
-    final boolean kontrolEt(Siparis s) {       // template method
-        if (!kontroluUygula(s)) return false;  // başarısızsa zincir kesilir
-        return sonraki == null ? true
-                               : sonraki.kontrolEt(s);
-    }
-    protected abstract boolean kontroluUygula(Siparis s);
-}
-
-class BakiyeKontrolu extends SiparisKontrolu {
-    protected boolean kontroluUygula(Siparis s) {
-        return s.musteri.bakiyeyiGetir() >= s.tutar;
-    }
-}</pre>
-
-  <pre class="code">// MACRO COMMAND — sıralı komut listesi
-class SiparisIsleyici {
-    private final List&lt;Komut&gt; komutlar = new ArrayList&lt;&gt;();
-    void komutEkle(Komut k) { komutlar.add(k); }
-    void tumKomutlariCalistir(Siparis s) {
-        for (Komut k : komutlar) k.calistir(s);
-    }
-}
-
-// USE-CASE ORCHESTRATOR
-class SiparisYoneticisi {
-    private final SiparisKontrolu kontrolZinciri;
-    private final SiparisIsleyici isleyici;
-
-    void siparisAl(Siparis s) {
-        s.durum = SiparisDurumu.KONTROL_EDILIYOR;
-        if (!kontrolZinciri.kontrolEt(s)) {
-            s.iptalEt();                      // durum = IPTAL_EDILDI
-            return;
-        }
-        if (!s.odemeAl()) { s.iptalEt(); return; }   // strategy üzerinden
-        s.durum = SiparisDurumu.ONAYLANDI;
-        isleyici.tumKomutlariCalistir(s);     // fatura düzenle/gönder/alacak
-        s.tamamlandiOlarakIsaretle();         // durum = ISLENDI
-    }
-}</pre>
-
-  <pre class="code">// STRATEGY — siparişten seçilen yöntem çağırılır
-class Siparis {
-    private OdemeYontemi odemeYontemi;
-    boolean odemeAl() { return odemeYontemi.odemeYap(this.tutar); }
-}
-
-class Paypal implements OdemeYontemi {
-    private final String hesapEpostasi;
-    public boolean odemeYap(double tutar) { /* ağ çağrısı */ return true; }
-    public String adi() { return "Paypal"; }
-}</pre>
-
-  <h2>2.9 Genişletilebilirlik Senaryoları</h2>
+  <h2>2.8 Genişletilebilirlik Senaryoları</h2>
   <table class="design-table">
     <thead><tr><th>Yeni Gereksinim</th><th>Mevcut Tasarımda Yapılacak Tek Şey</th></tr></thead>
     <tbody>
@@ -563,7 +448,7 @@ class Paypal implements OdemeYontemi {
     </tbody>
   </table>
 
-  <h2>2.10 Sonuç</h2>
+  <h2>2.9 Sonuç</h2>
   <p>
   Önerilen tasarım; siparişin <em>alınması, doğrulanması ve işlenmesi</em> iç akışlarını birbirinden ayrı,
   örüntü-tabanlı kapsüllere yerleştirir. Senaryonun en sık değişeceği belirtilen iki ekseni &mdash; <em>ödeme
