@@ -544,7 +544,7 @@ export const soru2 = {
       id: "Fatura",
       kind: "entity",
       name: "Fatura",
-      x: 880, y: 1060, w: 260,
+      x: 720, y: 1060, w: 260,
       attributes: [
         "- faturaNo : String",
         "- tutar : double",

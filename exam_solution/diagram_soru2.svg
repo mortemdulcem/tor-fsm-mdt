@@ -159,11 +159,11 @@
 <polygon points="1418,1030 1428,1048 1408,1048" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 </g>
 <g class="rel-dependency">
-<path d="M 1180 1225 L 1140 1247" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+<path d="M 1180 1225 L 980 1247" fill="none" stroke="#1a1a1a" stroke-width="1.2"
     stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="1158,1238 1140,1247 1158,1256" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="998,1238 980,1247 998,1256" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <g>
-      <text x="1160" y="1228" text-anchor="middle"
+      <text x="1080" y="1228" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         &lt;&lt;creates&gt;&gt;
@@ -537,27 +537,27 @@
 <text x="1192" y="1494" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ aciklama() : String</text>
 </g>
 <g class="cls-Fatura">
-<rect x="880" y="1160" width="260" height="174"
+<rect x="720" y="1160" width="260" height="174"
         fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
-<rect x="880" y="1160" width="260" height="56"
+<rect x="720" y="1160" width="260" height="56"
         fill="#ececec" stroke="none"/>
-<line x1="880" y1="1216" x2="1140" y2="1216"
+<line x1="720" y1="1216" x2="980" y2="1216"
         stroke="#1a1a1a" stroke-width="1.1"/>
-<text x="1010" y="1181" text-anchor="middle"
+<text x="850" y="1181" text-anchor="middle"
       font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">
       &lt;&lt;entity&gt;&gt;
     </text>
-<text x="1010" y="1204" text-anchor="middle"
+<text x="850" y="1204" text-anchor="middle"
     font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     Fatura
   </text>
-<text x="892" y="1242" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- faturaNo : String</text>
-<text x="892" y="1264" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- tutar : double</text>
-<text x="892" y="1286" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- musteri : Musteri</text>
-<text x="892" y="1308" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- siparis : Siparis</text>
-<line x1="880" y1="1324" x2="1140" y2="1324"
+<text x="732" y="1242" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- faturaNo : String</text>
+<text x="732" y="1264" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- tutar : double</text>
+<text x="732" y="1286" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- musteri : Musteri</text>
+<text x="732" y="1308" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- siparis : Siparis</text>
+<line x1="720" y1="1324" x2="980" y2="1324"
     stroke="#1a1a1a" stroke-width="0.8"/>
 </g>
   <g>
