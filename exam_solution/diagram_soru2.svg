@@ -25,20 +25,20 @@
     </g>
 </g>
 <g class="rel-association">
-<path d="M 760 248.2 L 820 274" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 760 409.9 L 820 508.4" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="802,285 820,274 802,263" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
-<text x="782" y="244.2" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">*</text>
-<text x="798" y="286" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<polyline points="802,519.4 820,508.4 802,497.4" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="782" y="405.9" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">*</text>
+<text x="798" y="520.4" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 </g>
 <g class="rel-aggregation">
-<path d="M 760 365.79999999999995 L 1140 241" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 760 248.2 L 1140 241" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="760,365.79999999999995 772,354.79999999999995 784,365.79999999999995 772,376.79999999999995" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
-<text x="782" y="361.79999999999995" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<polygon points="760,248.2 772,237.2 784,248.2 772,259.2" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<text x="782" y="244.2" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <text x="1118" y="253" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <g>
-      <text x="950" y="299.4" text-anchor="middle"
+      <text x="950" y="240.6" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         odemeYontemi
@@ -89,11 +89,11 @@
     </g>
 </g>
 <g class="rel-dependency">
-<path d="M 890 660 L 890 632 L 580 632 L 580 482 L 580 454" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 729 660 L 729 632 L 580 632 L 580 482 L 580 454" fill="none" stroke="#1a1a1a" stroke-width="1.6"
     stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
 <polyline points="591,472 580,454 569,472" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <g>
-      <text x="735" y="553" text-anchor="middle"
+      <text x="654.5" y="553" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         isler
@@ -237,28 +237,28 @@
 <text x="412" y="438" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ odemeAl() : boolean</text>
 </g>
 <g class="cls-SiparisDurumu">
-<rect x="820" y="160" width="260" height="228"
+<rect x="820" y="440" width="260" height="228"
         fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
-<rect x="820" y="160" width="260" height="56"
+<rect x="820" y="440" width="260" height="56"
         fill="#ececec" stroke="none"/>
-<line x1="820" y1="216" x2="1080" y2="216"
+<line x1="820" y1="496" x2="1080" y2="496"
         stroke="#1a1a1a" stroke-width="1.3"/>
-<text x="950" y="181" text-anchor="middle"
+<text x="950" y="461" text-anchor="middle"
       font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="13" fill="#3a3a3a">
       &lt;&lt;enumeration&gt;&gt;
     </text>
-<text x="950" y="204" text-anchor="middle"
+<text x="950" y="484" text-anchor="middle"
     font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
     
     fill="#0c0c0c">
     SiparisDurumu
   </text>
-<text x="832" y="242" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">ALINDI</text>
-<text x="832" y="264" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">KONTROL_EDILIYOR</text>
-<text x="832" y="286" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">ONAYLANDI</text>
-<text x="832" y="308" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">IPTAL_EDILDI</text>
-<text x="832" y="330" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">ISLENDI</text>
-<line x1="820" y1="346" x2="1080" y2="346"
+<text x="832" y="522" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">ALINDI</text>
+<text x="832" y="544" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">KONTROL_EDILIYOR</text>
+<text x="832" y="566" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">ONAYLANDI</text>
+<text x="832" y="588" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">IPTAL_EDILDI</text>
+<text x="832" y="610" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">ISLENDI</text>
+<line x1="820" y1="626" x2="1080" y2="626"
     stroke="#1a1a1a" stroke-width="1"/>
 </g>
 <g class="cls-OdemeYontemi">

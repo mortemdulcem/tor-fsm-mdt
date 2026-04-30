@@ -346,7 +346,7 @@ export const soru2 = {
       id: "SiparisDurumu",
       kind: "enum",
       name: "SiparisDurumu",
-      x: 820, y: 60, w: 260,
+      x: 820, y: 340, w: 260,
       attributes: [
         "ALINDI",
         "KONTROL_EDILIYOR",
@@ -518,16 +518,16 @@ export const soru2 = {
   relationships: [
     // Domain
     { from: "Siparis", fromSide: "left", to: "Musteri", toSide: "right", type: "association", mFrom: "0..*", mTo: "1", label: "alici" },
-    { from: "Siparis", fromSide: "right", fromOffset: 0.3, to: "SiparisDurumu", toSide: "left", toOffset: 0.5, type: "association", mFrom: "*", mTo: "1" },
+    { from: "Siparis", fromSide: "right", fromOffset: 0.85, to: "SiparisDurumu", toSide: "left", toOffset: 0.3, type: "association", mFrom: "*", mTo: "1" },
     // Strategy
-    { from: "Siparis", fromSide: "right", fromOffset: 0.7, to: "OdemeYontemi", toSide: "left", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1", label: "odemeYontemi" },
+    { from: "Siparis", fromSide: "right", fromOffset: 0.3, to: "OdemeYontemi", toSide: "left", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1", label: "odemeYontemi" },
     { from: "BankaHavalesi", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.2, type: "realization", routing: "orthogonal" },
     { from: "Paypal", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.5, type: "realization", routing: "orthogonal" },
     { from: "SogukCuzdan", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.8, type: "realization", routing: "orthogonal" },
     // Orchestrator
     { from: "SiparisYoneticisi", fromSide: "left", fromOffset: 0.5, to: "SiparisKontrolu", toSide: "right", toOffset: 0.5, type: "association", mFrom: "1", mTo: "1", label: "kontrolZinciri" },
     { from: "SiparisYoneticisi", fromSide: "right", fromOffset: 0.5, to: "SiparisIsleyici", toSide: "left", toOffset: 0.5, type: "composition", mFrom: "1", mTo: "1", label: "isleyici" },
-    { from: "SiparisYoneticisi", fromSide: "top", fromOffset: 0.5, to: "Siparis", toSide: "bottom", toOffset: 0.5, type: "dependency", label: "isler", routing: "orthogonal" },
+    { from: "SiparisYoneticisi", fromSide: "top", fromOffset: 0.15, to: "Siparis", toSide: "bottom", toOffset: 0.5, type: "dependency", label: "isler", routing: "orthogonal" },
     // CoR self link
     { from: "SiparisKontrolu", fromSide: "top", fromOffset: 0.85, to: "SiparisKontrolu", toSide: "right", toOffset: 0.15, type: "association", mFrom: "0..1", mTo: "0..1", label: "sonraki", routing: "selfLoop" },
     // CoR inheritance
