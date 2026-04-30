@@ -265,11 +265,11 @@ function renderRelationship(rel, classMap) {
 
   if (rel.mFrom) {
     const off = labelOffset(p.start, p.startDir);
-    parts.push(`<text x="${off.x}" y="${off.y}" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(rel.mFrom)}</text>`);
+    parts.push(`<text x="${off.x}" y="${off.y}" text-anchor="middle" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(rel.mFrom)}</text>`);
   }
   if (rel.mTo) {
     const off = labelOffset(p.end, p.endDir, true);
-    parts.push(`<text x="${off.x}" y="${off.y}" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(rel.mTo)}</text>`);
+    parts.push(`<text x="${off.x}" y="${off.y}" text-anchor="middle" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(rel.mTo)}</text>`);
   }
 
   if (rel.label) {
@@ -291,13 +291,20 @@ function labelOffset(pt, dir, end = false) {
   const len = Math.hypot(dir.x, dir.y) || 1;
   const ux = dir.x / len;
   const uy = dir.y / len;
+  // perpendicular (left of dir vector)
   const px = -uy;
   const py =  ux;
-  const distAlong = -22;
-  const distSide = 8;
+  // Move along the line, away from the box edge (dir points into the box, so negative pushes outward).
+  const distAlong = -28;
+  // Always place label on the SAME visual side of the line for both endpoints.
+  // start has dir pointing into the from-box; end has dir pointing into the to-box (opposite direction).
+  // To keep label on the same screen side, flip the perpendicular sign for the end.
+  const sideSign = end ? -1 : 1;
+  const distSide = 11 * sideSign;
   return {
     x: pt.x + ux * distAlong + px * distSide,
     y: pt.y + uy * distAlong + py * distSide + 4,
+    anchor: "middle",
   };
 }
 
