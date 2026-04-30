@@ -326,7 +326,7 @@ export const soru2 = {
   width: 1900,
   height: 1620,
   title: "Soru 2 — SimpleCar E-Satış Sistemi",
-  subtitle: "Strategy + Chain of Responsibility + Command Örüntüleri",
+  subtitle: "Strategy + Chain of Responsibility + Command + Memento Örüntüleri",
   classes: [
     // ---- Domain (ust orta) ----
     {
@@ -362,7 +362,23 @@ export const soru2 = {
         "+ iptalEt() : void",
         "+ tamamlandiOlarakIsaretle() : void",
         "+ odemeAl() : boolean",
+        "+ durumKaydiOlustur() : SiparisDurumKaydi",
+        "+ kayittanGeriYukle(k : SiparisDurumKaydi) : void",
       ],
+    },
+    {
+      id: "SiparisDurumKaydi",
+      kind: "value",
+      name: "SiparisDurumKaydi",
+      x: 820, y: 60, w: 320,
+      stereotype: "<<memento>>",
+      attributes: [
+        "- durum : SiparisDurumu",
+        "- tutarKopya : double",
+        "- yanEtkiIzleri : List<String>",
+        "- zaman : LocalDateTime",
+      ],
+      methods: [],
     },
     {
       id: "SiparisDurumu",
@@ -496,10 +512,11 @@ export const soru2 = {
       id: "Komut",
       kind: "interface",
       name: "Komut",
-      x: 1180, y: 800, w: 280,
+      x: 1180, y: 800, w: 320,
       attributes: [],
       methods: [
         "+ calistir(s : Siparis) : void",
+        "+ geriAl(s : Siparis, oncekiKayit : SiparisDurumKaydi) : void",
         "+ aciklama() : String",
       ],
     },
@@ -508,38 +525,40 @@ export const soru2 = {
       kind: "service",
       name: "SiparisIsleyici",
       x: 1180, y: 560, w: 320,
-      stereotype: "<<macro command>>",
+      stereotype: "<<macro command>> <<caretaker>>",
       attributes: [
         "- komutlar : List<Komut>",
+        "- kayitlar : Stack<SiparisDurumKaydi>",
       ],
       methods: [
         "+ komutEkle(k : Komut) : void",
         "+ tumKomutlariCalistir(s : Siparis) : void",
+        "- hataDurumundaGeriAl(s : Siparis) : void",
       ],
     },
     {
       id: "FaturaDuzenle",
       kind: "concrete",
       name: "FaturaDuzenle",
-      x: 1180, y: 1060, w: 240,
+      x: 1180, y: 1060, w: 260,
       attributes: [],
-      methods: ["+ calistir(s) : void", "+ aciklama() : String"],
+      methods: ["+ calistir(s) : void", "+ geriAl(s, k) : void", "+ aciklama() : String"],
     },
     {
       id: "FaturaGonder",
       kind: "concrete",
       name: "FaturaGonder",
-      x: 1450, y: 1060, w: 240,
+      x: 1470, y: 1060, w: 260,
       attributes: [],
-      methods: ["+ calistir(s) : void", "+ aciklama() : String"],
+      methods: ["+ calistir(s) : void", "+ geriAl(s, k) : void", "+ aciklama() : String"],
     },
     {
       id: "AlacaklaraKaydet",
       kind: "concrete",
       name: "AlacaklaraKaydet",
-      x: 1180, y: 1280, w: 320,
+      x: 1180, y: 1300, w: 320,
       attributes: [],
-      methods: ["+ calistir(s) : void", "+ aciklama() : String"],
+      methods: ["+ calistir(s) : void", "+ geriAl(s, k) : void", "+ aciklama() : String"],
     },
     {
       id: "Fatura",
@@ -581,6 +600,8 @@ export const soru2 = {
     { from: "AlacaklaraKaydet", fromSide: "top", fromOffset: 0.78, to: "Komut", toSide: "bottom", toOffset: 0.89, type: "realization", routing: "orthogonal" },
     // Fatura usage
     { from: "FaturaDuzenle", fromSide: "left", fromOffset: 0.5, to: "Fatura", toSide: "right", toOffset: 0.5, type: "dependency", label: "<<creates>>" },
+    // Memento: Siparis creates SiparisDurumKaydi (caretaker SiparisIsleyici tutar)
+    { from: "Siparis", fromSide: "right", fromOffset: 0.65, to: "SiparisDurumKaydi", toSide: "left", toOffset: 0.5, type: "dependency", label: "<<creates>>" },
   ],
   notes: [
     {
@@ -591,9 +612,9 @@ export const soru2 = {
       attachSide: "top",
     },
     {
-      // Komut / Macro Command aciklamasi
-      text: "Macro Command:\nSiparisIsleyici, Komut listesini\nsırayla çalıştırır. Geri alınabilirlik\niçin + undo() : void eklenebilir.",
-      x: 1530, y: 760, w: 360,
+      // Macro Command + Memento (Saga benzeri telafi)
+      text: "Macro Command + Memento:\nSiparisIsleyici (caretaker) her komut\nöncesi durumKaydiOlustur() çağırır,\nkaydı yığına atar. n. komut hata verirse\nn-1..1 sırasıyla geriAl(s, k) çalışır:\nbu, Saga benzeri yerel telafi sağlar\n(GoF Command, s.237 — Memento iliştirme).",
+      x: 1530, y: 530, w: 380,
       attachTo: "SiparisIsleyici",
       attachSide: "right",
     },

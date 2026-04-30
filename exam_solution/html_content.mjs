@@ -57,7 +57,7 @@ ${css()}
       <div class="toc-title">İçindekiler</div>
       <ol>
         <li><span>Soru 1 &middot; Akıllı Ev Yönetim Sistemi</span><span class="dots"></span><span>State + Mediator + Observer</span></li>
-        <li><span>Soru 2 &middot; SimpleCar E-Satış Sistemi</span><span class="dots"></span><span>Strategy + CoR + Command</span></li>
+        <li><span>Soru 2 &middot; SimpleCar E-Satış Sistemi</span><span class="dots"></span><span>Strategy + CoR + Command + Memento</span></li>
       </ol>
     </div>
   </div>
@@ -273,7 +273,7 @@ ${css()}
   <header class="q-header">
     <span class="q-tag">Soru 2 &middot; 50 Puan</span>
     <h1>SimpleCar E-Satış Sistemi</h1>
-    <p class="q-sub">Strategy, Chain of Responsibility ve Command Örüntülerinin Birlikte Kullanımı</p>
+    <p class="q-sub">Strategy, Chain of Responsibility, Command ve Memento Örüntülerinin Birlikte Kullanımı</p>
   </header>
 
   <h2>2.1 Senaryonun Çözümlenmesi</h2>
@@ -321,8 +321,21 @@ ${css()}
         <td>(3) Sıralı işleme adımları: her adım kapsüllenmiş; sıra değiştirme, ek adım, geri-alma (undo) gibi
             ihtiyaçlar için esnek altyapı.</td>
       </tr>
+      <tr>
+        <td><b>Memento</b><br/><span class="ref">GoF, s.283</span></td>
+        <td><code>SiparisDurumKaydi</code> &laquo;memento&raquo;; <code>Siparis</code> &laquo;originator&raquo;;
+            <code>SiparisIsleyici</code> &laquo;caretaker&raquo; (kayıt yığını).</td>
+        <td>(3') Sıralı işleme ortasında oluşan hatalarda <em>yerel telafi</em>: yapılan adımlar ters sırayla
+            <code>geriAl(s, k)</code> ile çevrilir; siparişin iç alanları <em>Komut</em>'a açılmaz, kapsülleme
+            korunur.</td>
+      </tr>
     </tbody>
   </table>
+  <p class="ref-note">
+    <em>Tasarım notu.</em> GoF, Command bölümü s.237'de "<em>A command can use a memento to maintain the state required to reverse its effect</em>"
+    der. Burada bu kalıp, makro komutun <em>caretaker</em> rolünü üstlenmesiyle Saga'nın yerel (in-process) bir
+    sürümüne dönüştürülmüştür: dağıtık koordinasyon olmadan, tek transaksiyon sınırı içinde tutarlılık.
+  </p>
 
   <h2>2.3 Reddedilen Alternatifler</h2>
   <table class="design-table">
@@ -384,6 +397,11 @@ ${css()}
           <td>Aggregate root; tutar, miktar, seçilen <code>OdemeYontemi</code>, durum bilgilerini taşır.</td></tr>
       <tr><td><code>SiparisDurumu</code></td><td>&laquo;enumeration&raquo;</td>
           <td>Yaşam döngüsü sabitleri: ALINDI / KONTROL_EDILIYOR / ONAYLANDI / IPTAL_EDILDI / ISLENDI.</td></tr>
+      <tr><td><code>SiparisDurumKaydi</code></td><td>&laquo;memento&raquo;</td>
+          <td>Siparişin belirli bir andaki <em>kapsüllenmiş</em> kopyası: durum, tutar, yan etki izleri ve zaman
+              damgası. Sadece <code>Siparis</code> oluşturup okur; <code>SiparisIsleyici</code> kayıt yığınında
+              tutar (caretaker). Komutlar bu nesneye <em>opak</em> bakar &mdash; <em>narrow interface</em>
+              ilkesi.</td></tr>
       <tr><td><code>OdemeYontemi</code></td><td>&laquo;interface&raquo;</td>
           <td>Strategy sözleşmesi; <code>odemeYap(tutar)</code> imzası.</td></tr>
       <tr><td><code>BankaHavalesi</code> &middot; <code>Paypal</code> &middot; <code>SogukCuzdan</code></td>
@@ -425,7 +443,8 @@ ${css()}
         <code>FaturaDuzenle/FaturaGonder/AlacaklaraKaydet &mdash;..&#x25B7; Komut</code>.</li>
     <li><em>Inheritance.</em> Üç kontrol halkası <code>SiparisKontrolu</code>'ndan türer.</li>
     <li><em>Dependency.</em> <code>SiparisYoneticisi &mdash;..&gt; Siparis</code> (etiket: <em>isler</em>);
-        <code>FaturaDuzenle &mdash;..&gt; Fatura</code> (&laquo;creates&raquo;).</li>
+        <code>FaturaDuzenle &mdash;..&gt; Fatura</code> (&laquo;creates&raquo;);
+        <code>Siparis &mdash;..&gt; SiparisDurumKaydi</code> (&laquo;creates&raquo;).</li>
   </ul>
 
   
@@ -457,6 +476,10 @@ ${css()}
       <tr><td>Tüm kontrolleri tek seferde çalıştırıp <em>tüm</em> hataları toplama</td>
           <td>Yeni bir <code>HepsiniDogrulayanSiparisKontrolu</code> kompozit halkası yazmak; mevcut halkalar
               değişmeden kullanılır.</td></tr>
+      <tr><td>Sipariş işleme adımlarının ortasında bir adımın hata vermesi</td>
+          <td><b>Yok.</b> Tasarım, <code>SiparisDurumKaydi</code> (&laquo;memento&raquo;) + <code>SiparisIsleyici</code>
+              caretaker yığını ile bu durumu zaten karşılar: yapılan adımlar ters sırayla <code>geriAl(s, k)</code>
+              ile çevrilir, sipariş tutarlı bir önceki ana döner.</td></tr>
     </tbody>
   </table>
 
@@ -544,6 +567,11 @@ ol li, ul li { margin-bottom: 6px; }
 
 .ref {
   font-size: 9pt; font-style: italic; color: #5a5a5a;
+}
+.ref-note {
+  font-size: 10pt; line-height: 1.5; color: #3a3a3a;
+  background: #fbf6ec; border-left: 2px solid #b8a878;
+  padding: 8pt 12pt; margin: 8pt 0 14pt;
 }
 
 .page-break { page-break-after: always; height: 0; }
