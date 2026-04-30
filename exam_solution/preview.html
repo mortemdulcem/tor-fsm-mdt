@@ -735,9 +735,9 @@ pre.code {
           <td>&laquo;concrete&raquo;</td>
           <td>Tek bir kuralı uygulayan halkalar; bağımsız birim test yapılabilir.</td></tr>
       <tr><td><code>Komut</code></td><td>&laquo;interface&raquo;</td>
-          <td>Command sözleşmesi; ileri yön <code>calistir(siparis)</code>, geri yön
-              <code>geriAl(siparis, oncekiKayit)</code>. Geri-alma için her komut bir Memento alır;
-              GoF Command, s.237 (<em>Implementation</em>, madde 6) bu birleşimi açıkça önerir.</td></tr>
+          <td>Command sözleşmesi; ileri yön <code>calistir(s)</code>, geri yön
+              <code>geriAl(s, k)</code> &mdash; <em>k</em>, ilgili adımdan önce alınmış Memento'dur.
+              Bu birleşim, GoF Command, s.237 (<em>Implementation</em>, madde 6) tarafından önerilir.</td></tr>
       <tr><td><code>FaturaDuzenle</code> &middot; <code>FaturaGonder</code> &middot; <code>AlacaklaraKaydet</code></td>
           <td>&laquo;concrete&raquo;</td>
           <td>Senaryoda istenen sıralı üç işleme adımı; her biri kendi yan etkisinden sorumlu. Her komut,

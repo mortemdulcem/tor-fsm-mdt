@@ -516,7 +516,7 @@ export const soru2 = {
       attributes: [],
       methods: [
         "+ calistir(s : Siparis) : void",
-        "+ geriAl(s : Siparis, oncekiKayit : SiparisDurumKaydi) : void",
+        "+ geriAl(s : Siparis, k : SiparisDurumKaydi) : void",
         "+ aciklama() : String",
       ],
     },

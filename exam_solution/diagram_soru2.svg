@@ -513,7 +513,7 @@
 <line x1="1180" y1="966" x2="1500" y2="966"
     stroke="#1a1a1a" stroke-width="0.8"/>
 <text x="1192" y="992" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ calistir(s : Siparis) : void</text>
-<text x="1192" y="1014" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ geriAl(s : Siparis, oncekiKayit : SiparisDurumKaydi) : void</text>
+<text x="1192" y="1014" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ geriAl(s : Siparis, k : SiparisDurumKaydi) : void</text>
 <text x="1192" y="1036" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ aciklama() : String</text>
 </g>
 <g class="cls-SiparisIsleyici">
