@@ -18,7 +18,7 @@ export const soru1 = {
       id: "Kullanici",
       kind: "entity",
       name: "Kullanici",
-      x: 60, y: 60, w: 240,
+      x: 60, y: 120, w: 240,
       attributes: [
         "- id : int",
         "- adSoyad : String",
@@ -32,7 +32,7 @@ export const soru1 = {
       id: "KullaniciBildirimAlici",
       kind: "interface",
       name: "KullaniciBildirimAlici",
-      x: 420, y: 60, w: 340,
+      x: 420, y: 120, w: 340,
       attributes: [],
       methods: [
         "+ bildirimGoster(olay : SensorOlayi) : void",
@@ -43,7 +43,7 @@ export const soru1 = {
       id: "MobilUygulama",
       kind: "concrete",
       name: "MobilUygulama",
-      x: 800, y: 60, w: 240,
+      x: 800, y: 120, w: 240,
       attributes: ["- cihazId : String"],
       methods: [
         "+ bildirimGoster(olay) : void",
@@ -54,7 +54,7 @@ export const soru1 = {
       id: "WebUygulamasi",
       kind: "concrete",
       name: "WebUygulamasi",
-      x: 1100, y: 60, w: 240,
+      x: 1100, y: 120, w: 240,
       attributes: ["- oturumKimligi : String"],
       methods: [
         "+ bildirimGoster(olay) : void",
@@ -65,7 +65,7 @@ export const soru1 = {
       id: "DurumOzeti",
       kind: "value",
       name: "DurumOzeti",
-      x: 1400, y: 60, w: 240,
+      x: 1400, y: 120, w: 240,
       attributes: [
         "- sistemDurumlari : Map",
         "- sensorOkumalari : Map",
@@ -296,7 +296,7 @@ export const soru1 = {
     {
       // Mediator + Observer
       text: "Mediator + Observer:\nMotor merkezi yönlendiricidir; sensörler\nve sistemler birbirini doğrudan tanımaz.\nTüm olay akışı motor üzerinden geçer.",
-      x: 1380, y: 220, w: 380,
+      x: 1140, y: 430, w: 380,
       attachTo: "AkilliEvIzlemeMotoru",
       attachSide: "right",
     },
@@ -309,10 +309,10 @@ export const soru1 = {
     },
     {
       // Open-Closed pattern note for KullaniciBildirimAlici
-      text: "Yeni bir bildirim kanalı eklemek için\nKullaniciBildirimAlici'yi gerçekleştiren\nyeni bir sınıf yazmak yeterlidir.\n— Açık/Kapalı İlkesi.",
-      x: 1380, y: 470, w: 320,
+      text: "Açık/Kapalı İlkesi:\nYeni bildirim kanalı eklemek için\nKullaniciBildirimAlici'yi gerçekleştiren\nyeni bir sınıf yazmak yeterlidir.",
+      x: 420, y: 0, w: 340,
       attachTo: "KullaniciBildirimAlici",
-      attachSide: "right",
+      attachSide: "top",
     },
   ],
 };
