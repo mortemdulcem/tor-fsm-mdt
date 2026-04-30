@@ -600,7 +600,7 @@ export const soru2 = {
     {
       // Strategy aciklamasi
       text: "Strategy: Sipariş kendi ödeme yöntemini taşır.\nYönetici hangi sınıf olduğunu bilmez;\nyalnızca odemeYap(tutar) sözleşmesini çağırır.",
-      x: 1500, y: 540, w: 380,
+      x: 1500, y: 60, w: 380,
       attachTo: "OdemeYontemi",
       attachSide: "right",
     },
