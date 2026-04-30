@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import puppeteer from "puppeteer-core";
 
-import { soru1, soru2, sekans_soru1_sensor, sekans_soru1_mod, sekans_soru2 } from "./data.mjs";
+import { soru1, soru2, soru2_bolge, sekans_soru1_sensor, sekans_soru1_mod, sekans_soru2 } from "./data.mjs";
 import { renderDiagram, renderSequenceDiagram } from "./render_svg.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -26,12 +26,14 @@ async function main() {
   console.log("[1/5] SVG diyagramlar olusturuluyor (sinif + sekans)...");
   const svgClass1 = renderDiagram(soru1);
   const svgClass2 = renderDiagram(soru2);
+  const svgClass2bolge = renderDiagram(soru2_bolge);
   const svgSeq1a = renderSequenceDiagram(sekans_soru1_sensor);
   const svgSeq1b = renderSequenceDiagram(sekans_soru1_mod);
   const svgSeq2  = renderSequenceDiagram(sekans_soru2);
 
   await fs.writeFile(path.join(__dirname, "diagram_soru1.svg"), svgClass1, "utf8");
   await fs.writeFile(path.join(__dirname, "diagram_soru2.svg"), svgClass2, "utf8");
+  await fs.writeFile(path.join(__dirname, "diagram_soru2_bolge.svg"), svgClass2bolge, "utf8");
   await fs.writeFile(path.join(__dirname, "sekans_soru1a.svg"), svgSeq1a, "utf8");
   await fs.writeFile(path.join(__dirname, "sekans_soru1b.svg"), svgSeq1b, "utf8");
   await fs.writeFile(path.join(__dirname, "sekans_soru2.svg"),  svgSeq2,  "utf8");
@@ -41,6 +43,8 @@ async function main() {
   console.log("    -> sinif diyagrami 1");
   await svgToPng(svgClass2, path.join(__dirname, "diagram_soru2.png"));
   console.log("    -> sinif diyagrami 2");
+  await svgToPng(svgClass2bolge, path.join(__dirname, "diagram_soru2_bolge.png"));
+  console.log("    -> sinif diyagrami 2 (bolge)");
   await svgToPng(svgSeq1a, path.join(__dirname, "sekans_soru1a.png"));
   console.log("    -> sekans 1a");
   await svgToPng(svgSeq1b, path.join(__dirname, "sekans_soru1b.png"));
@@ -53,6 +57,7 @@ async function main() {
   const html = buildHtml({
     diagram1Path: "file://" + path.join(__dirname, "diagram_soru1.png"),
     diagram2Path: "file://" + path.join(__dirname, "diagram_soru2.png"),
+    diagram2BolgePath: "file://" + path.join(__dirname, "diagram_soru2_bolge.png"),
     sekans1aPath: "file://" + path.join(__dirname, "sekans_soru1a.png"),
     sekans1bPath: "file://" + path.join(__dirname, "sekans_soru1b.png"),
     sekans2Path:  "file://" + path.join(__dirname, "sekans_soru2.png"),

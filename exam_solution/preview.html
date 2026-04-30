@@ -372,7 +372,7 @@ pre.code {
       <div class="toc-title">İçindekiler</div>
       <ol>
         <li><span>Soru 1 &middot; Akıllı Ev Yönetim Sistemi</span><span class="dots"></span><span>State + Mediator + Observer</span></li>
-        <li><span>Soru 2 &middot; SimpleCar E-Satış Sistemi</span><span class="dots"></span><span>Strategy + CoR + Command + Memento</span></li>
+        <li><span>Soru 2 &middot; SimpleCar E-Satış Sistemi</span><span class="dots"></span><span>Strategy + CoR + Command + Memento (+ Abstract Factory)</span></li>
       </ol>
     </div>
   </div>
@@ -588,12 +588,12 @@ pre.code {
   <header class="q-header">
     <span class="q-tag">Soru 2 &middot; 50 Puan</span>
     <h1>SimpleCar E-Satış Sistemi</h1>
-    <p class="q-sub">Strategy, Chain of Responsibility, Command ve Memento Örüntülerinin Birlikte Kullanımı</p>
+    <p class="q-sub">Strategy, Chain of Responsibility, Command ve Memento Örüntülerinin Birlikte Kullanımı &mdash; Coğrafi Genişleme için Abstract Factory</p>
   </header>
 
   <h2>2.1 Senaryonun Çözümlenmesi</h2>
   <p>
-  SimpleCar firması yalnızca e-satış yapan bir araba üreticisidir. Domeni beş bileşene ayrılabilir:
+  SimpleCar firması yalnızca e-satış yapan bir araba üreticisidir. Domeni altı bileşene ayrılabilir:
   </p>
   <ol class="num-list">
     <li><b>Algoritma ailesi (ödeme).</b> Ödeme tek bir <em>davranıştır</em>, ancak <em>banka havalesi</em>,
@@ -613,6 +613,12 @@ pre.code {
       edilebilmelidir.</li>
     <li><b>Yönetim ve yaşam döngüsü.</b> Bir orchestrator (use-case) bileşen, siparişi <em>alır</em>,
       <em>doğrular</em> ve <em>işler</em>. Domain (Siparis) ile servis sorumlulukları ayrık tutulmalıdır.</li>
+    <li><b>Coğrafi genişleme imkânı.</b> Soruda &mdash; <em>"başka ülkelere dağıtım yapabilirsiniz"</em>
+      bilgisi verilir. Yani sistem, ülkeye bağlı olarak <em>kabul edilen ödeme yöntemlerini</em>, <em>uygulanan
+      kontrol kurallarını</em> (KVKK / GDPR, yaptırım listeleri, ihracat lisansı), <em>ek işleme adımlarını</em>
+      (gümrük beyannamesi, e-fatura biçimi) ve <em>para birimini</em> ülkeye göre değiştirebilmelidir. Bu, tek
+      bir ekstra eksendir; çekirdek tasarım bunu &laquo;Abstract Factory&raquo; ile ayrı bir katmana iter
+      (bkz. 2.10).</li>
   </ol>
 
   <h2>2.2 Örüntü Seçimleri ve Gerekçeleri</h2>
@@ -646,6 +652,15 @@ pre.code {
             <code>SiparisIsleyici</code> &laquo;caretaker&raquo; (kayıt yığını).</td>
         <td>(4) Kısmi başarısızlıkta tutarlılık: yapılan adımlar ters sırayla <code>geriAl(s, k)</code> ile
             çevrilir; siparişin iç alanları <em>Komut</em>'a açılmaz, kapsülleme korunur.</td>
+      </tr>
+      <tr>
+        <td><b>Abstract Factory</b><br/><span class="ref">GoF, s.87</span></td>
+        <td><code>BolgeKonfigurasyonu</code> &laquo;abstract factory&raquo;; <code>TrKonfigurasyonu</code>,
+            <code>DeKonfigurasyonu</code> somut fabrikalar; ülkeye-uygun ödeme/kontrol/komut takımını
+            <code>SiparisYoneticisi</code>'ne sağlar (bkz. Şekil 2.3).</td>
+        <td>(5) Coğrafi genişleme: ülke başına farklı paket gerekiyor; <em>aileler birlikte değişir</em>
+            (yeni ülkenin ödeme + kontrol + komutları tutarlı bir küme oluşturmalıdır). Tek-noktadan
+            kuruluş, çekirdek sınıflara dokunmadan n ülkeye ölçeklenir.</td>
       </tr>
     </tbody>
   </table>
@@ -818,16 +833,81 @@ pre.code {
     </tbody>
   </table>
 
-  <h2>2.9 Sonuç</h2>
+  <h2>2.10 Coğrafi Genişleme (Multi-Region Dağıtım)</h2>
+  <p>
+  Soruda &mdash; <em>"başka ülkelere dağıtım yapabilirsiniz"</em> imkânı verildiğinden, mevcut tasarımın bu
+  eksende ne kadar değişeceğini gösteriyorum. Cevap kısa: <b>çekirdek sınıf diyagramı değişmez;</b> üzerine
+  iki küçük katman eklenir.
+  </p>
+  <ol class="num-list">
+    <li><b>Money (Para) value object.</b> <code>Siparis.tutar : double</code> artık yetmez; tutar bir miktar
+        ile bir <em>para birimi</em>nden oluşur. Bu, bir tip değişikliğidir, mimari değişiklik değildir.
+        Aritmetik kuralları <code>Para</code> içinde toplanır; karşılaştırma/dönüşüm tek bir yerden geçer.</li>
+    <li><b>BolgeKonfigurasyonu &laquo;abstract factory&raquo;.</b> Ülkeye göre değişen üçlüyü &mdash;
+        kabul edilen <em>ödeme yöntemleri</em>, çalıştırılacak <em>kontrol zinciri</em>, sırasıyla yürütülecek
+        <em>komut listesi</em> &mdash; tek bir noktadan kuran fabrika. Her ülke için somut bir konfigürasyon
+        sınıfı yazılır (<code>TrKonfigurasyonu</code>, <code>DeKonfigurasyonu</code> vb.).
+        <code>SiparisYoneticisi</code> doğrudan bu fabrikadan istediği paketi alır; mevcut Strategy/CoR/Command
+        sınıflarını ne tanır ne değiştirir.</li>
+  </ol>
+  <p>
+  Aşağıdaki ek diyagram bu iki katmanı, <em>asıl diyagramı kalabalıklaştırmamak için ayrı</em> gösterir.
+  </p>
+  <figure class="diagram-figure">
+    <img src="file:///home/runner/workspace/exam_solution/diagram_soru2_bolge.png" alt="Soru 2 ek diyagram - cografi genisleme"/>
+    <figcaption>Şekil 2.3 &middot; Coğrafi genişleme katmanı. <code>BolgeKonfigurasyonu</code>, mevcut
+      arayüzlerden (<code>OdemeYontemi</code>, <code>SiparisKontrolu</code>, <code>Komut</code>)
+      <em>doğru takımı</em> kurar. Mevcut sınıf diyagramı (Şekil 2.1) hiç değişmez.</figcaption>
+  </figure>
+
+  <h3>2.10.1 Etkilenen ve Etkilenmeyen Kısımlar</h3>
+  <table class="design-table">
+    <thead><tr><th>Kısım</th><th>Etki</th></tr></thead>
+    <tbody>
+      <tr><td>Strategy ailesi (<code>OdemeYontemi</code> + somut sınıflar)</td>
+          <td><b>Değişmez.</b> Yeni ülkeye yeni ödeme gelirse Strategy ailesine yeni bir sınıf eklenir.</td></tr>
+      <tr><td>CoR halkaları (<code>SiparisKontrolu</code> + somut halkalar)</td>
+          <td><b>Değişmez.</b> Ülkeye-özgü halkalar (KVKK/GDPR onayı, yaptırım listesi, ihracat lisansı) yeni
+              somut halkalar olarak eklenir.</td></tr>
+      <tr><td>Command + Macro Command + Memento</td>
+          <td><b>Değişmez.</b> Ülkeye-özgü adımlar (gümrük beyannamesi, e-fatura UBL üretimi, döviz dönüşümü)
+              yeni <code>Komut</code> uygulamaları olarak eklenir; <code>geriAl</code> mantığı her komutun
+              kendi sorumluluğundadır.</td></tr>
+      <tr><td><code>Siparis</code></td>
+          <td><b>İki alan değişir/eklenir:</b> <code>tutar : double &rarr; tutar : Para</code> ve
+              <code>ulke : Ulke</code>. İmzaların geri kalanı korunur.</td></tr>
+      <tr><td><code>SiparisYoneticisi</code></td>
+          <td><b>Bir alan eklenir:</b> <code>konf : BolgeKonfigurasyonu</code>; ilk açılışta hangi ülke için
+              çalışıldığına göre fabrikadan paketi alır.</td></tr>
+      <tr><td>Lojistik / sevkiyat (kargo, depo, taşıyıcı, gümrük takibi)</td>
+          <td><b>Yeni bağlam (bounded context).</b> Bu, e-satış agregasının içine sıkıştırılmaz; mesaj/event
+              ile haberleşen ayrı bir alt-sistem olur. Mevcut tasarımı bozmaz, <em>yanına</em> gelir.</td></tr>
+      <tr><td>Yerelleştirme (dil, fatura biçimi, tarih/sayı)</td>
+          <td>Tek bir <code>FaturaBicimleyici</code> Strategy'si; <code>FaturaDuzenle</code> komutuna enjekte
+              edilir. Yeni sınıf değil, mevcut komutun parametreleşmesi.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.10.2 Tek Cümlelik Karar</h3>
+  <p>
+  Mevcut çekirdek tasarımın tüm değişen eksenleri (<em>ödeme</em>, <em>kontrol</em>, <em>işleme adımı</em>)
+  zaten arayüz/soyut sınıf seviyesinde soyutlanmış olduğundan, ülke bazında dağıtım <em>yeni varyant
+  eklemek</em> meselesidir; bunları toplayan tek-noktalı bir <em>Abstract Factory</em> ile sistem,
+  çekirdeği yeniden yazmadan <b>n adet ülkeye</b> ölçeklenir. Asıl yeni iş, lojistik bağlamı ve <code>Para</code>
+  tipidir; bu da mevcut sınıflara dokunmadan yapılır.
+  </p>
+
+  <h2>2.11 Sonuç</h2>
   <p>
   Önerilen tasarım; siparişin <em>alınması, doğrulanması ve işlenmesi</em> iç akışlarını birbirinden ayrı,
   örüntü-tabanlı kapsüllere yerleştirir. Senaryonun en sık değişeceği belirtilen iki ekseni &mdash; <em>ödeme
   yöntemleri</em> ve <em>kontrol kuralları</em> &mdash; mevcut kodu değiştirmeden büyür. Sıralı işleme;
   gözlemlenebilir, sıra/komut listesi değiştirilebilir ve test edilebilir bir komut akışı ile gerçekleştirilir;
   ardışık yan etkilerin ortasında oluşacak hatalar Memento + caretaker yığını üzerinden
-  <em>tutarlı bir önceki ana</em> geri sarılır. Böylece hem sınav kurallarında istenen <em>örüntü adı
-  açıkça belirtilmiş</em> ve <em>ilişki tipi ile işaretlemeleri doğru kullanılmış</em>; hem de senaryodaki
-  nitelikler ve metotlar sınıflar içinde konumlandırılmıştır.
+  <em>tutarlı bir önceki ana</em> geri sarılır. Aynı çekirdek, ülke bazlı dağıtıma da bir <em>Abstract
+  Factory</em> katmanı ile genişler; çekirdek sınıflar değişmeden farklı ülke paketleri kurulur. Böylece hem
+  sınav kurallarında istenen <em>örüntü adı açıkça belirtilmiş</em> ve <em>ilişki tipi ile işaretlemeleri
+  doğru kullanılmış</em>; hem de senaryodaki nitelikler ve metotlar sınıflar içinde konumlandırılmıştır.
   </p>
 </section>
 

@@ -632,6 +632,123 @@ export const soru2 = {
 };
 
 // ---------------------------------------------------------------------------
+// SORU 2 EK — Cografi Genisleme (Multi-Region)
+// Mevcut tasarima ek olarak ulkelere gore paket kuran Abstract Factory + Para
+// ---------------------------------------------------------------------------
+
+export const soru2_bolge = {
+  width: 1700,
+  height: 720,
+  title: "Soru 2 (Ek) — Coğrafi Genişleme",
+  subtitle: "Abstract Factory + Money Value Object: ülke başına farklı paket, mevcut sınıflar değişmez",
+  classes: [
+    {
+      id: "Para",
+      kind: "concrete",
+      name: "Para",
+      stereotype: "<<value object>>",
+      x: 60, y: 60, w: 240,
+      attributes: [
+        "- miktar : double",
+        "- birim : ParaBirimi",
+      ],
+      methods: [
+        "+ topla(p : Para) : Para",
+        "+ cevir(hedef : ParaBirimi) : Para",
+      ],
+    },
+    {
+      id: "ParaBirimi",
+      kind: "enum",
+      name: "ParaBirimi",
+      x: 60, y: 360, w: 240,
+      attributes: ["TRY", "EUR", "USD", "GBP", "..."],
+      methods: [],
+    },
+    {
+      id: "SiparisRef",
+      kind: "entity",
+      name: "Siparis",
+      x: 360, y: 60, w: 280,
+      attributes: [
+        "- tutar : Para     (degisti)",
+        "- ulke : Ulke      (yeni)",
+        "...",
+      ],
+      methods: [],
+    },
+    {
+      id: "BolgeKonfigurasyonu",
+      kind: "interface",
+      name: "BolgeKonfigurasyonu",
+      stereotype: "<<abstract factory>>",
+      x: 700, y: 60, w: 420,
+      attributes: [],
+      methods: [
+        "+ desteklenenOdemeler() : List<OdemeYontemi>",
+        "+ kontrolZinciri() : SiparisKontrolu",
+        "+ islemeKomutlari() : List<Komut>",
+        "+ paraBirimi() : ParaBirimi",
+      ],
+    },
+    {
+      id: "SiparisYoneticisiRef",
+      kind: "service",
+      name: "SiparisYoneticisi",
+      x: 1180, y: 60, w: 320,
+      stereotype: "<<service>>",
+      attributes: ["- konf : BolgeKonfigurasyonu"],
+      methods: ["+ siparisAl(s : Siparis) : void"],
+    },
+    {
+      id: "TrKonfigurasyonu",
+      kind: "concrete",
+      name: "TrKonfigurasyonu",
+      x: 460, y: 440, w: 320,
+      attributes: [],
+      methods: [
+        "+ desteklenenOdemeler()  : {Havale, Paypal}",
+        "+ kontrolZinciri()       : Sahtecilik->Limit->Bakiye->KvkkOnay",
+        "+ islemeKomutlari()      : EFatura->Gonder->AlacakKayit",
+        "+ paraBirimi()           : TRY",
+      ],
+    },
+    {
+      id: "DeKonfigurasyonu",
+      kind: "concrete",
+      name: "DeKonfigurasyonu",
+      x: 880, y: 440, w: 360,
+      attributes: [],
+      methods: [
+        "+ desteklenenOdemeler()  : {SEPA, Paypal, SogukCuzdan}",
+        "+ kontrolZinciri()       : Sahtecilik->Limit->Bakiye->GdprOnay->Yaptirim",
+        "+ islemeKomutlari()      : Fatura->Gumruk->Gonder->AlacakKayit",
+        "+ paraBirimi()           : EUR",
+      ],
+    },
+  ],
+  relationships: [
+    // Para-ParaBirimi
+    { from: "Para", fromSide: "bottom", fromOffset: 0.5, to: "ParaBirimi", toSide: "top", toOffset: 0.5, type: "dependency", label: "<<uses>>" },
+    // Siparis tutar : Para
+    { from: "SiparisRef", fromSide: "left", fromOffset: 0.5, to: "Para", toSide: "right", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1", label: "tutar" },
+    // SiparisYoneticisi -> BolgeKonfigurasyonu
+    { from: "SiparisYoneticisiRef", fromSide: "left", fromOffset: 0.5, to: "BolgeKonfigurasyonu", toSide: "right", toOffset: 0.5, type: "dependency", label: "<<uses>>" },
+    // Realizations
+    { from: "TrKonfigurasyonu", fromSide: "top", fromOffset: 0.5, to: "BolgeKonfigurasyonu", toSide: "bottom", toOffset: 0.35, type: "realization", routing: "orthogonal" },
+    { from: "DeKonfigurasyonu", fromSide: "top", fromOffset: 0.5, to: "BolgeKonfigurasyonu", toSide: "bottom", toOffset: 0.7, type: "realization", routing: "orthogonal" },
+  ],
+  notes: [
+    {
+      text: "Mevcut sinif diyagrami DEGISMEZ:\nOdemeYontemi, SiparisKontrolu, Komut\nzaten birer arayuz/soyut sinif.\nAbstract Factory yalnizca bunlardan\n'dogru takimi' kurar -> SiparisYoneticisi'ne\nverir. Mevcut Strategy/CoR/Command/Memento\nsiniflarinda tek satir bile degismez.",
+      x: 1280, y: 380, w: 380,
+      attachTo: "DeKonfigurasyonu",
+      attachSide: "right",
+    },
+  ],
+};
+
+// ---------------------------------------------------------------------------
 // SEQUENCE DIAGRAMS
 // ---------------------------------------------------------------------------
 
