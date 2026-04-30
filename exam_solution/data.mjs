@@ -558,7 +558,6 @@ export const soru2 = {
   relationships: [
     // Domain
     { from: "Siparis", fromSide: "left", fromOffset: 0.35, to: "Musteri", toSide: "right", toOffset: 0.5, type: "association", mFrom: "0..*", mTo: "1", label: "alici" },
-    { from: "Siparis", fromSide: "bottom", fromOffset: 0.8, to: "SiparisDurumu", toSide: "top", toOffset: 0.5, type: "association", mFrom: "*", mTo: "1", routing: "orthogonal" },
     // Strategy
     { from: "Siparis", fromSide: "right", fromOffset: 0.3, to: "OdemeYontemi", toSide: "left", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1", label: "odemeYontemi" },
     { from: "BankaHavalesi", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.2, type: "realization", routing: "orthogonal" },

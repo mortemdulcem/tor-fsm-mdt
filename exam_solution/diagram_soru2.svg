@@ -24,13 +24,6 @@
       </text>
     </g>
 </g>
-<g class="rel-association">
-<path d="M 688 476 L 688 504 L 950 504 L 950 412 L 950 440" fill="none" stroke="#1a1a1a" stroke-width="1.2"
-     stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="941,422 950,440 959,422" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
-<text x="698" y="494" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">*</text>
-<text x="960" y="430" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
-</g>
 <g class="rel-aggregation">
 <path d="M 760 254.8 L 1140 225" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
