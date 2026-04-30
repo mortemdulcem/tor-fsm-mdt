@@ -13,6 +13,7 @@ const PALETTE = {
   background: "#ffffff",
   paper:      "#fbfaf6",     // very subtle off-white "paper" tone
   rule:       "#1a1a1a",
+  noteBg:     "#fdf6dc",     // post-it / hand-written note tint
 };
 
 const FONT       = "'EB Garamond','Georgia','Cambria',serif";
@@ -321,6 +322,11 @@ export function renderDiagram(diagram) {
   const classSvg = diagram.classes.map(renderClass).join("\n");
   const relSvg = diagram.relationships.map(r => renderRelationship(r, classMap)).join("\n");
 
+  // UML notes (folded-corner) with optional dashed attachment line to a class
+  const notes = diagram.notes || [];
+  notes.forEach(n => { n._yShifted = n.y + contentOffsetY; });
+  const noteSvg = notes.map(n => renderClassNote(n, classMap, contentOffsetY)).join("\n");
+
   diagram.classes.forEach(c => { c.y -= contentOffsetY; });
 
   const totalHeight = H + 100 + 80;
@@ -332,8 +338,60 @@ export function renderDiagram(diagram) {
   ${titleBlock}
   ${relSvg}
   ${classSvg}
+  ${noteSvg}
   ${legend}
 </svg>`;
+}
+
+function renderClassNote(note, classMap, contentOffsetY) {
+  const lines = note.text.split("\n");
+  const lineH = 15;
+  const padX = 10;
+  const padY = 12;
+  const fold = 12;
+  const charW = 6.6;
+  const maxLineW = Math.max(...lines.map(l => l.length * charW));
+  const w = note.w || Math.max(180, maxLineW + padX * 2 + fold);
+  const h = note.h || (padY * 2 + lines.length * lineH);
+  const x = note.x;
+  const y = note.y + contentOffsetY;
+
+  const path = `M ${x} ${y}
+                L ${x + w - fold} ${y}
+                L ${x + w} ${y + fold}
+                L ${x + w} ${y + h}
+                L ${x} ${y + h} Z`;
+  const foldPath = `M ${x + w - fold} ${y}
+                    L ${x + w - fold} ${y + fold}
+                    L ${x + w} ${y + fold}`;
+  const parts = [];
+  parts.push(`<g>`);
+  // Optional attachment line to a class
+  if (note.attachTo && classMap.has(note.attachTo)) {
+    const c = classMap.get(note.attachTo);
+    const cy = c.y;
+    const side = note.attachSide || "auto";
+    let cx, cy2;
+    if (side === "top")    { cx = c.x + c.w / 2;       cy2 = cy; }
+    else if (side === "bottom") { cx = c.x + c.w / 2;  cy2 = cy + classBoxHeight(c); }
+    else if (side === "left")   { cx = c.x;            cy2 = cy + classBoxHeight(c) / 2; }
+    else if (side === "right")  { cx = c.x + c.w;      cy2 = cy + classBoxHeight(c) / 2; }
+    else { cx = c.x + c.w / 2; cy2 = cy + classBoxHeight(c) / 2; }
+    // Anchor on note edge closest to the class
+    const anchorX = (cx < x) ? x : (cx > x + w) ? x + w : x + w / 2;
+    const anchorY = (cy2 < y) ? y : (cy2 > y + h) ? y + h : y + h / 2;
+    parts.push(`<line x1="${anchorX}" y1="${anchorY}" x2="${cx}" y2="${cy2}"
+      stroke="${PALETTE.border}" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>`);
+  }
+  parts.push(`<path d="${path}" fill="${PALETTE.noteBg || "#fdf6e3"}" stroke="${PALETTE.border}" stroke-width="1"/>`);
+  parts.push(`<path d="${foldPath}" fill="none" stroke="${PALETTE.border}" stroke-width="1"/>`);
+  lines.forEach((line, i) => {
+    parts.push(`<text x="${x + padX}" y="${y + padY + (i + 1) * lineH - 4}"
+      font-family="${SANS_FONT}" font-style="italic" font-size="11.5"
+      fill="${PALETTE.textPrimary}">${escapeXml(line)}</text>`);
+  });
+  parts.push(`</g>`);
+  return parts.join("\n");
 }
 
 function renderLegend(W, y) {

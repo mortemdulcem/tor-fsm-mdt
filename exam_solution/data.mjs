@@ -292,6 +292,29 @@ export const soru1 = {
     { from: "GuvenliMod", fromSide: "bottom", fromOffset: 0.5, to: "ModTipi", toSide: "top", toOffset: 0.3, type: "dependency", routing: "orthogonal" },
     { from: "TasarrufluMod", fromSide: "bottom", fromOffset: 0.5, to: "ModTipi", toSide: "top", toOffset: 0.7, type: "dependency", routing: "orthogonal" },
   ],
+  notes: [
+    {
+      // Mediator + Observer
+      text: "Mediator + Observer:\nMotor merkezi yönlendiricidir; sensörler\nve sistemler birbirini doğrudan tanımaz.\nTüm olay akışı motor üzerinden geçer.",
+      x: 1380, y: 220, w: 380,
+      attachTo: "AkilliEvIzlemeMotoru",
+      attachSide: "right",
+    },
+    {
+      // State pattern note
+      text: "State örüntüsü:\nEvSistemi yalnızca CalismaModu sözleşmesini\ntanır; davranış mod nesnesinde tutulur,\nfarklı modlar koşulsuz değiştirilebilir.",
+      x: 1620, y: 770, w: 320,
+      attachTo: "CalismaModu",
+      attachSide: "top",
+    },
+    {
+      // Open-Closed pattern note for KullaniciBildirimAlici
+      text: "Yeni bir bildirim kanalı eklemek için\nKullaniciBildirimAlici'yi gerçekleştiren\nyeni bir sınıf yazmak yeterlidir.\n— Açık/Kapalı İlkesi.",
+      x: 1380, y: 470, w: 320,
+      attachTo: "KullaniciBildirimAlici",
+      attachSide: "right",
+    },
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -422,31 +445,49 @@ export const soru2 = {
         "+ setSonraki(k : SiparisKontrolu) : SiparisKontrolu",
         "+ kontrolEt(s : Siparis) : boolean",
         "# kontroluUygula(s : Siparis) : boolean  {abstract}",
+        "# sonrakiniCagir(s : Siparis) : boolean",
       ],
     },
     {
       id: "SahtecilikKontrolu",
       kind: "concrete",
       name: "SahtecilikKontrolu",
-      x: 60, y: 800, w: 240,
-      attributes: ["- risksKurali : RiskKurali"],
-      methods: ["# kontroluUygula(s) : boolean"],
+      x: 60, y: 820, w: 260,
+      attributes: [
+        "- riskEsigi : double = 0.7",
+        "- karaListe : Set<String>",
+      ],
+      methods: [
+        "# kontroluUygula(s) : boolean",
+        "- riskSkoru(s) : double",
+      ],
     },
     {
       id: "LimitKontrolu",
       kind: "concrete",
       name: "LimitKontrolu",
-      x: 320, y: 800, w: 240,
-      attributes: ["- ustLimit : double"],
-      methods: ["# kontroluUygula(s) : boolean"],
+      x: 340, y: 820, w: 260,
+      attributes: [
+        "- gunlukLimit : double = 50000",
+        "- islemLimiti : double = 10000",
+      ],
+      methods: [
+        "# kontroluUygula(s) : boolean",
+        "- gunlukToplam(m : Musteri) : double",
+      ],
     },
     {
       id: "BakiyeKontrolu",
       kind: "concrete",
       name: "BakiyeKontrolu",
-      x: 580, y: 800, w: 240,
-      attributes: [],
-      methods: ["# kontroluUygula(s) : boolean"],
+      x: 620, y: 820, w: 260,
+      attributes: [
+        "- kilit : Lock",
+      ],
+      methods: [
+        "# kontroluUygula(s) : boolean",
+        "- bakiyeyiRezerveEt(s) : void",
+      ],
     },
 
     // ---- Command: Siparis isleme (alt orta-sag) ----
@@ -541,6 +582,29 @@ export const soru2 = {
     // Fatura usage
     { from: "FaturaDuzenle", fromSide: "left", fromOffset: 0.5, to: "Fatura", toSide: "right", toOffset: 0.5, type: "dependency", label: "<<creates>>" },
     { from: "FaturaGonder", fromSide: "left", fromOffset: 0.5, to: "Fatura", toSide: "right", toOffset: 0.7, type: "dependency", label: "<<uses>>", routing: "orthogonal" },
+  ],
+  notes: [
+    {
+      // CoR / Template Method aciklamasi
+      text: "Şablon Yöntem (Template Method):\nkontrolEt(s) = kontroluUygula(s)\n             && (sonraki == null || sonraki.kontrolEt(s))\n— halka basarisiz olursa zincir kirilir.",
+      x: 360, y: 1090, w: 460,
+      attachTo: "SiparisKontrolu",
+      attachSide: "bottom",
+    },
+    {
+      // Komut / Macro Command aciklamasi
+      text: "Macro Command:\nSiparisIsleyici, Komut listesini sırayla çalıştırır.\nGeri alınabilirlik için + undo() : void eklenebilir.",
+      x: 880, y: 1280, w: 280,
+      attachTo: "SiparisIsleyici",
+      attachSide: "bottom",
+    },
+    {
+      // Strategy aciklamasi
+      text: "Strategy: Sipariş kendi ödeme yöntemini taşır.\nYönetici hangi sınıf olduğunu bilmez;\nyalnızca odemeYap(tutar) sözleşmesini çağırır.",
+      x: 1500, y: 540, w: 380,
+      attachTo: "OdemeYontemi",
+      attachSide: "right",
+    },
   ],
 };
 
