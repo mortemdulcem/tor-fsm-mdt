@@ -215,15 +215,15 @@ function renderDecorator(point, dir, type, role) {
   }
 
   if (role === "end" && (type === "association" || type === "dependency")) {
-    const baseLen = 14;
-    const baseHalf = 7;
+    const baseLen = 18;
+    const baseHalf = 9;
     const baseX = tipX - ux * baseLen;
     const baseY = tipY - uy * baseLen;
     const p1x = baseX + px * baseHalf;
     const p1y = baseY + py * baseHalf;
     const p2x = baseX - px * baseHalf;
     const p2y = baseY - py * baseHalf;
-    return `<polyline points="${p1x},${p1y} ${tipX},${tipY} ${p2x},${p2y}" fill="none" stroke="${PALETTE.border}" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>`;
+    return `<polyline points="${p1x},${p1y} ${tipX},${tipY} ${p2x},${p2y}" fill="none" stroke="${PALETTE.border}" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>`;
   }
 
   if (role === "start" && (type === "aggregation" || type === "composition")) {

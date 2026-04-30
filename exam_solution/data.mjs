@@ -32,11 +32,11 @@ export const soru1 = {
       id: "KullaniciBildirimAlici",
       kind: "interface",
       name: "KullaniciBildirimAlici",
-      x: 420, y: 60, w: 320,
+      x: 420, y: 60, w: 340,
       attributes: [],
       methods: [
         "+ bildirimGoster(olay : SensorOlayi) : void",
-        "+ durumYansit(durumOzeti : DurumOzeti) : void",
+        "+ durumYansit(ozet : DurumOzeti) : void",
       ],
     },
     {
@@ -442,9 +442,9 @@ export const soru2 = {
         "# sonraki : SiparisKontrolu",
       ],
       methods: [
-        "+ setSonraki(k : SiparisKontrolu) : SiparisKontrolu",
+        "+ setSonraki(k : SiparisKontrolu) : void",
         "+ kontrolEt(s : Siparis) : boolean",
-        "# kontroluUygula(s : Siparis) : boolean  {abstract}",
+        "# kontroluUygula(s) : boolean {abstract}",
         "# sonrakiniCagir(s : Siparis) : boolean",
       ],
     },
@@ -473,7 +473,7 @@ export const soru2 = {
       ],
       methods: [
         "# kontroluUygula(s) : boolean",
-        "- gunlukToplam(m : Musteri) : double",
+        "- gunlukToplam(m) : double",
       ],
     },
     {
@@ -581,22 +581,21 @@ export const soru2 = {
     { from: "AlacaklaraKaydet", fromSide: "top", fromOffset: 0.7, to: "Komut", toSide: "bottom", toOffset: 0.85, type: "realization", routing: "orthogonal" },
     // Fatura usage
     { from: "FaturaDuzenle", fromSide: "left", fromOffset: 0.5, to: "Fatura", toSide: "right", toOffset: 0.5, type: "dependency", label: "<<creates>>" },
-    { from: "FaturaGonder", fromSide: "left", fromOffset: 0.5, to: "Fatura", toSide: "right", toOffset: 0.7, type: "dependency", label: "<<uses>>", routing: "orthogonal" },
   ],
   notes: [
     {
       // CoR / Template Method aciklamasi
-      text: "Şablon Yöntem (Template Method):\nkontrolEt(s) = kontroluUygula(s)\n             && (sonraki == null || sonraki.kontrolEt(s))\n— halka basarisiz olursa zincir kirilir.",
-      x: 360, y: 1090, w: 460,
+      text: "Şablon Yöntem:\nkontrolEt(s) sabit kalır;\nalt sınıf yalnızca\nkontroluUygula(s) yi yazar.\nHalka düşerse zincir kirilir.",
+      x: 440, y: 600, w: 210,
       attachTo: "SiparisKontrolu",
-      attachSide: "bottom",
+      attachSide: "right",
     },
     {
       // Komut / Macro Command aciklamasi
-      text: "Macro Command:\nSiparisIsleyici, Komut listesini sırayla çalıştırır.\nGeri alınabilirlik için + undo() : void eklenebilir.",
-      x: 880, y: 1280, w: 280,
+      text: "Macro Command:\nSiparisIsleyici, Komut listesini\nsırayla çalıştırır. Geri alınabilirlik\niçin + undo() : void eklenebilir.",
+      x: 1530, y: 760, w: 360,
       attachTo: "SiparisIsleyici",
-      attachSide: "bottom",
+      attachSide: "right",
     },
     {
       // Strategy aciklamasi

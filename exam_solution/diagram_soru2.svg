@@ -13,7 +13,7 @@
   <g class="rel-association">
 <path d="M 400 262.9 L 340 263" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="354,256 340,263 354,270" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="358,254 340,263 358,272" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="390" y="278.9" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..*</text>
 <text x="350" y="279" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <g>
@@ -27,7 +27,7 @@
 <g class="rel-association">
 <path d="M 688 454 L 688 482 L 950 482 L 950 412 L 950 440" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="943,426 950,440 957,426" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="941,422 950,440 959,422" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="698" y="472" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">*</text>
 <text x="960" y="430" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 </g>
@@ -63,7 +63,7 @@
 <g class="rel-association">
 <path d="M 660 752.7 L 420 763" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="434,756 420,763 434,770" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="438,754 420,763 438,772" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="650" y="768.7" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <text x="430" y="779" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..1</text>
 <g>
@@ -91,7 +91,7 @@
 <g class="rel-dependency">
 <path d="M 729 660 L 729 632 L 580 632 L 580 482 L 580 454" fill="none" stroke="#1a1a1a" stroke-width="1.2"
     stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="587,468 580,454 573,468" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="589,472 580,454 571,472" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <g>
       <text x="654.5" y="549" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
@@ -103,7 +103,7 @@
 <g class="rel-association">
 <path d="M 366 660 L 366 624 L 456 624 L 456 690.9 L 420 690.9" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="434,683.9 420,690.9 434,697.9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="438,681.9 420,690.9 438,699.9" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="376" y="650" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..1</text>
 <text x="430" y="706.9" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..1</text>
 <g>
@@ -161,24 +161,12 @@
 <g class="rel-dependency">
 <path d="M 1180 1225 L 1140 1247" fill="none" stroke="#1a1a1a" stroke-width="1.2"
     stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="1154,1240 1140,1247 1154,1254" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1158,1238 1140,1247 1158,1256" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <g>
       <text x="1160" y="1228" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         &lt;&lt;creates&gt;&gt;
-      </text>
-    </g>
-</g>
-<g class="rel-dependency">
-<path d="M 1450 1225 L 1422 1225 L 1422 1281.8 L 1168 1281.8 L 1140 1281.8" fill="none" stroke="#1a1a1a" stroke-width="1.2"
-    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="1154,1274.8 1140,1281.8 1154,1288.8" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
-<g>
-      <text x="1295" y="1245.4" text-anchor="middle"
-        font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
-        paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
-        &lt;&lt;uses&gt;&gt;
       </text>
     </g>
 </g>
@@ -385,9 +373,9 @@
 <text x="72" y="742" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c"># sonraki : SiparisKontrolu</text>
 <line x1="60" y1="758" x2="420" y2="758"
     stroke="#1a1a1a" stroke-width="0.8"/>
-<text x="72" y="784" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ setSonraki(k : SiparisKontrolu) : SiparisKontrolu</text>
+<text x="72" y="784" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ setSonraki(k : SiparisKontrolu) : void</text>
 <text x="72" y="806" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ kontrolEt(s : Siparis) : boolean</text>
-<text x="72" y="828" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12" font-style="italic" fill="#0c0c0c"># kontroluUygula(s : Siparis) : boolean  {abstract}</text>
+<text x="72" y="828" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12" font-style="italic" fill="#0c0c0c"># kontroluUygula(s) : boolean {abstract}</text>
 <text x="72" y="850" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c"># sonrakiniCagir(s : Siparis) : boolean</text>
 </g>
 <g class="cls-SahtecilikKontrolu">
@@ -428,7 +416,7 @@
 <line x1="340" y1="1040" x2="600" y2="1040"
     stroke="#1a1a1a" stroke-width="0.8"/>
 <text x="352" y="1066" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c"># kontroluUygula(s) : boolean</text>
-<text x="352" y="1088" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">- gunlukToplam(m : Musteri) : double</text>
+<text x="352" y="1088" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">- gunlukToplam(m) : double</text>
 </g>
 <g class="cls-BakiyeKontrolu">
 <rect x="620" y="920" width="260" height="162"
@@ -573,49 +561,55 @@
     stroke="#1a1a1a" stroke-width="0.8"/>
 </g>
   <g>
-<line x1="360" y1="1190" x2="240" y2="866"
+<line x1="440" y1="749.5" x2="420" y2="763"
       stroke="#1a1a1a" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
-<path d="M 360 1190
-                L 808 1190
-                L 820 1202
-                L 820 1274
-                L 360 1274 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
-<path d="M 808 1190
-                    L 808 1202
-                    L 820 1202" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-<text x="370" y="1213"
+<path d="M 440 700
+                L 638 700
+                L 650 712
+                L 650 799
+                L 440 799 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
+<path d="M 638 700
+                    L 638 712
+                    L 650 712" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+<text x="450" y="723"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
-      fill="#0c0c0c">Şablon Yöntem (Template Method):</text>
-<text x="370" y="1228"
+      fill="#0c0c0c">Şablon Yöntem:</text>
+<text x="450" y="738"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
-      fill="#0c0c0c">kontrolEt(s) = kontroluUygula(s)</text>
-<text x="370" y="1243"
+      fill="#0c0c0c">kontrolEt(s) sabit kalır;</text>
+<text x="450" y="753"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
-      fill="#0c0c0c">             &amp;&amp; (sonraki == null || sonraki.kontrolEt(s))</text>
-<text x="370" y="1258"
+      fill="#0c0c0c">alt sınıf yalnızca</text>
+<text x="450" y="768"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
-      fill="#0c0c0c">— halka basarisiz olursa zincir kirilir.</text>
+      fill="#0c0c0c">kontroluUygula(s) yi yazar.</text>
+<text x="450" y="783"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
+      fill="#0c0c0c">Halka düşerse zincir kirilir.</text>
 </g>
 <g>
-<line x1="1160" y1="1380" x2="1340" y2="822"
+<line x1="1530" y1="860" x2="1500" y2="741"
       stroke="#1a1a1a" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
-<path d="M 880 1380
-                L 1148 1380
-                L 1160 1392
-                L 1160 1449
-                L 880 1449 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
-<path d="M 1148 1380
-                    L 1148 1392
-                    L 1160 1392" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-<text x="890" y="1403"
+<path d="M 1530 860
+                L 1878 860
+                L 1890 872
+                L 1890 944
+                L 1530 944 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
+<path d="M 1878 860
+                    L 1878 872
+                    L 1890 872" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+<text x="1540" y="883"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Macro Command:</text>
-<text x="890" y="1418"
+<text x="1540" y="898"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
-      fill="#0c0c0c">SiparisIsleyici, Komut listesini sırayla çalıştırır.</text>
-<text x="890" y="1433"
+      fill="#0c0c0c">SiparisIsleyici, Komut listesini</text>
+<text x="1540" y="913"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
-      fill="#0c0c0c">Geri alınabilirlik için + undo() : void eklenebilir.</text>
+      fill="#0c0c0c">sırayla çalıştırır. Geri alınabilirlik</text>
+<text x="1540" y="928"
+      font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
+      fill="#0c0c0c">için + undo() : void eklenebilir.</text>
 </g>
 <g>
 <line x1="1500" y1="640" x2="1460" y2="225"
@@ -654,10 +648,10 @@
 <polygon points="954,1750 964,1741 974,1750 964,1759" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 <text x="1016" y="1754" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Olusum (composition)</text>
 <line x1="1250.6666666666667" y1="1750" x2="1302.6666666666667" y2="1750" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1288.6666666666667,1757 1302.6666666666667,1750 1288.6666666666667,1743" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1284.6666666666667,1759 1302.6666666666667,1750 1284.6666666666667,1741" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1312.6666666666667" y="1754" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Iliski (association)</text>
 <line x1="1547.3333333333335" y1="1750" x2="1599.3333333333335" y2="1750" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="1585.3333333333335,1757 1599.3333333333335,1750 1585.3333333333335,1743" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1581.3333333333335,1759 1599.3333333333335,1750 1581.3333333333335,1741" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1609.3333333333335" y="1754" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Bagimlilik (dependency)</text>
 </g>
 </svg>
