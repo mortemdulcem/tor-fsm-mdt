@@ -163,8 +163,6 @@ ${css()}
 
   
 
-  <h2>1.4 Sınıf Diyagramı</h2>
-  <p style="font-style:italic;color:#555;">Diyagram okunabilirliği için bir sonraki sayfa yatay (<em>landscape</em>) basılmıştır.</p>
 </section>
 <section class="diagram-page-landscape">
   <h2>1.4 Sınıf Diyagramı</h2>
@@ -360,8 +358,6 @@ ${css()}
 
   
 
-  <h2>2.4 Sınıf Diyagramı</h2>
-  <p style="font-style:italic;color:#555;">Diyagram okunabilirliği için bir sonraki sayfa yatay (<em>landscape</em>) basılmıştır.</p>
 </section>
 <section class="diagram-page-landscape">
   <h2>2.4 Sınıf Diyagramı</h2>
@@ -484,20 +480,24 @@ function css() {
 
 .diagram-page-landscape {
   page: landscape-diagram;
-  page-break-before: always;
-  page-break-after: always;
+  break-before: page;
+  break-after: page;
+  break-inside: avoid;
 }
 .diagram-page-landscape .diagram-figure {
   margin: 0;
+  break-inside: avoid;
 }
 .diagram-page-landscape .diagram-figure img {
   width: 100%;
-  max-height: 168mm;
+  max-height: 160mm;
   object-fit: contain;
   height: auto;
 }
 .diagram-page-landscape h2 {
   margin-top: 0;
+  margin-bottom: 4pt;
+  break-after: avoid;
 }
 
 * { box-sizing: border-box; }
