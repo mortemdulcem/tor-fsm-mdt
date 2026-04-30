@@ -85,7 +85,8 @@ async function main() {
     printBackground: true,
     margin: { top: "20mm", bottom: "20mm", left: "18mm", right: "18mm" },
     displayHeaderFooter: true,
-    headerTemplate: `<div style="font-family:'EB Garamond',Georgia,serif;font-size:9px;color:#7a7060;width:100%;padding:0 18mm;display:flex;justify-content:flex-end;font-style:italic;">
+    headerTemplate: `<div style="font-family:'EB Garamond',Georgia,serif;font-size:9px;color:#7a7060;width:100%;padding:0 18mm;display:flex;justify-content:space-between;font-style:italic;">
+      <span>Nesneye Yönelik Yazılım Geliştirme</span>
       <span class="title"></span>
     </div>`,
     footerTemplate: `<div style="font-family:'EB Garamond',Georgia,serif;font-size:9px;color:#7a7060;width:100%;padding:0 18mm;display:flex;justify-content:space-between;font-style:italic;">
