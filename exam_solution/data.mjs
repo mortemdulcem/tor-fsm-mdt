@@ -399,7 +399,7 @@ export const soru2 = {
       id: "SiparisYoneticisi",
       kind: "service",
       name: "SiparisYoneticisi",
-      x: 660, y: 460, w: 460,
+      x: 660, y: 560, w: 460,
       attributes: [
         "- kontrolZinciri : SiparisKontrolu",
         "- isleyici : SiparisIsleyici",
@@ -416,7 +416,7 @@ export const soru2 = {
       id: "SiparisKontrolu",
       kind: "abstract",
       name: "SiparisKontrolu",
-      x: 60, y: 460, w: 360,
+      x: 60, y: 560, w: 360,
       attributes: [
         "# sonraki : SiparisKontrolu",
       ],
@@ -467,7 +467,7 @@ export const soru2 = {
       id: "SiparisIsleyici",
       kind: "service",
       name: "SiparisIsleyici",
-      x: 1180, y: 460, w: 320,
+      x: 1180, y: 560, w: 320,
       stereotype: "<<macro command>>",
       attributes: [
         "- komutlar : List<Komut>",
