@@ -264,12 +264,12 @@ function renderRelationship(rel, classMap) {
   }
 
   if (rel.mFrom) {
-    const off = labelOffset(p.start, p.startDir);
-    parts.push(`<text x="${off.x}" y="${off.y}" text-anchor="middle" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(rel.mFrom)}</text>`);
+    const off = labelOffset(p.start, rel.fromSide);
+    parts.push(`<text x="${off.x}" y="${off.y}" text-anchor="${off.anchor}" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(rel.mFrom)}</text>`);
   }
   if (rel.mTo) {
-    const off = labelOffset(p.end, p.endDir, true);
-    parts.push(`<text x="${off.x}" y="${off.y}" text-anchor="middle" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(rel.mTo)}</text>`);
+    const off = labelOffset(p.end, rel.toSide);
+    parts.push(`<text x="${off.x}" y="${off.y}" text-anchor="${off.anchor}" font-family="${SANS_FONT}" font-size="11.5" fill="${PALETTE.textPrimary}">${escapeXml(rel.mTo)}</text>`);
   }
 
   if (rel.label) {
@@ -287,25 +287,18 @@ function renderRelationship(rel, classMap) {
   return parts.join("\n");
 }
 
-function labelOffset(pt, dir, end = false) {
-  const len = Math.hypot(dir.x, dir.y) || 1;
-  const ux = dir.x / len;
-  const uy = dir.y / len;
-  // perpendicular (left of dir vector)
-  const px = -uy;
-  const py =  ux;
-  // Move along the line, away from the box edge (dir points into the box, so negative pushes outward).
-  const distAlong = -28;
-  // Always place label on the SAME visual side of the line for both endpoints.
-  // start has dir pointing into the from-box; end has dir pointing into the to-box (opposite direction).
-  // To keep label on the same screen side, flip the perpendicular sign for the end.
-  const sideSign = end ? -1 : 1;
-  const distSide = 11 * sideSign;
-  return {
-    x: pt.x + ux * distAlong + px * distSide,
-    y: pt.y + uy * distAlong + py * distSide + 4,
-    anchor: "middle",
-  };
+function labelOffset(pt, side) {
+  // Place a multiplicity/role label JUST OUTSIDE the box edge, so it never
+  // overlaps the class rectangle regardless of the line angle.
+  // pt = the point where the relationship line touches the box.
+  // side = which side of the box ("left" | "right" | "top" | "bottom").
+  switch (side) {
+    case "left":   return { x: pt.x - 8,  y: pt.y - 6,  anchor: "end" };
+    case "right":  return { x: pt.x + 8,  y: pt.y - 6,  anchor: "start" };
+    case "top":    return { x: pt.x + 8,  y: pt.y - 6,  anchor: "start" };
+    case "bottom": return { x: pt.x + 8,  y: pt.y + 14, anchor: "start" };
+    default:       return { x: pt.x,      y: pt.y,      anchor: "middle" };
+  }
 }
 
 // ---------------------------------------------------------------------------
