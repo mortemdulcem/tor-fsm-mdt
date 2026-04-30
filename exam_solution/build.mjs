@@ -81,9 +81,8 @@ async function main() {
   const pdfPath = path.join(__dirname, "Arasinav_Cevap.pdf");
   await page.pdf({
     path: pdfPath,
-    format: "A4",
     printBackground: true,
-    margin: { top: "20mm", bottom: "20mm", left: "18mm", right: "18mm" },
+    preferCSSPageSize: true,
     displayHeaderFooter: true,
     headerTemplate: `<div style="font-family:'EB Garamond',Georgia,serif;font-size:9px;color:#7a7060;width:100%;padding:0 18mm;display:flex;justify-content:space-between;font-style:italic;">
       <span>Nesneye Yönelik Yazılım Geliştirme</span>

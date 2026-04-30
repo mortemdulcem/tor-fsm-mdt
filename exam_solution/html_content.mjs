@@ -164,12 +164,18 @@ ${css()}
   
 
   <h2>1.4 Sınıf Diyagramı</h2>
+  <p style="font-style:italic;color:#555;">Diyagram okunabilirliği için bir sonraki sayfa yatay (<em>landscape</em>) basılmıştır.</p>
+</section>
+<section class="diagram-page-landscape">
+  <h2>1.4 Sınıf Diyagramı</h2>
   <figure class="diagram-figure">
     <img src="${diagram1Path}" alt="Soru 1 sınıf diyagramı"/>
     <figcaption>Şekil 1.1 &middot; Akıllı Ev Yönetim Sistemi &mdash; UML 2.x sınıf diyagramı.
       Sol katman: kullanıcı ve görüntüleme; orta katman: arabulucu motor ve gözlemci arayüzleri; alt katman:
       sistem ve sensör hiyerarşileri.</figcaption>
   </figure>
+</section>
+<section class="page question-page">
 
   
 
@@ -355,12 +361,18 @@ ${css()}
   
 
   <h2>2.4 Sınıf Diyagramı</h2>
+  <p style="font-style:italic;color:#555;">Diyagram okunabilirliği için bir sonraki sayfa yatay (<em>landscape</em>) basılmıştır.</p>
+</section>
+<section class="diagram-page-landscape">
+  <h2>2.4 Sınıf Diyagramı</h2>
   <figure class="diagram-figure">
     <img src="${diagram2Path}" alt="Soru 2 sınıf diyagramı"/>
     <figcaption>Şekil 2.1 &middot; SimpleCar E-Satış &mdash; UML 2.x sınıf diyagramı.
       Sol kanat: CoR (kontroller); orta: orchestrator; sağ üst: Strategy (ödeme yöntemleri);
       sağ alt: Command (sıralı işleme adımları).</figcaption>
   </figure>
+</section>
+<section class="page question-page">
 
   
 
@@ -467,7 +479,26 @@ ${css()}
 
 function css() {
   return `
-@page { size: A4; margin: 20mm 18mm; }
+@page { size: A4 portrait; margin: 20mm 18mm; }
+@page landscape-diagram { size: A4 landscape; margin: 14mm 16mm; }
+
+.diagram-page-landscape {
+  page: landscape-diagram;
+  page-break-before: always;
+  page-break-after: always;
+}
+.diagram-page-landscape .diagram-figure {
+  margin: 0;
+}
+.diagram-page-landscape .diagram-figure img {
+  width: 100%;
+  max-height: 168mm;
+  object-fit: contain;
+  height: auto;
+}
+.diagram-page-landscape h2 {
+  margin-top: 0;
+}
 
 * { box-sizing: border-box; }
 
