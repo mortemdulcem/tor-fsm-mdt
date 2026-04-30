@@ -19,7 +19,10 @@ ${css()}
 <!-- ====================== COVER ====================== -->
 <section class="cover">
   <div class="cover-frame">
-    <div class="cover-mark">Hacettepe Üniversitesi &middot; Yazılım Mühendisliği Yüksek Lisansı</div>
+    <div class="cover-mark">
+      <span class="cover-mark-line">Hacettepe Üniversitesi</span>
+      <span class="cover-mark-line">Yazılım Mühendisliği Yüksek Lisansı</span>
+    </div>
 
     <h1 class="cover-title">Nesneye Yönelik<br/>Yazılım Geliştirme</h1>
     <p class="cover-subtitle">Ara Sınav &middot; Cevap Belgesi</p>
@@ -645,27 +648,35 @@ ol li, ul li { margin-bottom: 6px; }
     radial-gradient(circle at 4% 96%, rgba(0,0,0,0.04), transparent 28%);
 }
 .cover-mark {
+  text-align: center;
+  margin-top: 6mm;
+}
+.cover-mark-line {
+  display: block;
   font-size: 9.5pt;
   letter-spacing: 0.32em;
   color: #5a5a5a;
   font-weight: 600;
   text-transform: uppercase;
-  font-variant-caps: small-caps;
+  margin: 1.2mm 0;
 }
 .cover-title {
+  text-align: center;
   font-size: 38pt;
   font-weight: 700;
-  margin-top: 8mm;
+  margin-top: 10mm;
   line-height: 1.02;
   color: #0c0c0c;
   letter-spacing: -0.015em;
 }
 .cover-subtitle {
-  font-size: 17pt;
+  text-align: center !important;
+  font-size: 16pt;
   font-style: italic;
   font-weight: 500;
-  margin: 4mm 0 0;
+  margin: 5mm 0 0;
   color: #2b2b2b;
+  hyphens: none;
 }
 .cover-rule {
   border-top: 1px solid #1a1a1a;
@@ -675,6 +686,7 @@ ol li, ul li { margin-bottom: 6px; }
   text-align: center;
   margin: 4mm 0 0;
 }
+.cover-author p { text-align: center !important; hyphens: none; }
 .cover-author-name {
   font-family: 'EB Garamond', Georgia, serif;
   font-size: 15pt;
@@ -692,6 +704,7 @@ ol li, ul li { margin-bottom: 6px; }
 }
 .cover-meta {
   width: 110mm;
+  margin: 0 auto;
   border-collapse: collapse;
   font-size: 11pt;
 }
