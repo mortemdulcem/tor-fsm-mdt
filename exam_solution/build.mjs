@@ -90,7 +90,7 @@ async function main() {
       <span class="title"></span>
     </div>`,
     footerTemplate: `<div style="font-family:'EB Garamond',Georgia,serif;font-size:9px;color:#7a7060;width:100%;padding:0 18mm;display:flex;justify-content:space-between;font-style:italic;">
-      <span>Bilişim Enstitüsü &middot; 2025-2026 Bahar</span>
+      <span>Hacettepe Üniversitesi &middot; Yazılım Mühendisliği Yüksek Lisansı</span>
       <span><span class="pageNumber"></span> / <span class="totalPages"></span></span>
     </div>`,
   });
