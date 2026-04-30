@@ -64,29 +64,24 @@ function renderClass(c) {
   const parts = [];
   parts.push(`<g class="cls-${escapeXml(c.id)}">`);
 
-  // Outer rectangle
   parts.push(`<rect x="${c.x}" y="${c.y}" width="${c.w}" height="${h}"
-        fill="${PALETTE.background}" stroke="${PALETTE.border}" stroke-width="1.3"/>`);
+        fill="${PALETTE.background}" stroke="${PALETTE.border}" stroke-width="1.1"/>`);
 
-  // Header band (subtle gray)
   parts.push(`<rect x="${c.x}" y="${c.y}" width="${c.w}" height="${HEADER_HEIGHT}"
         fill="${headerFill}" stroke="none"/>`);
 
-  // Header bottom rule
   parts.push(`<line x1="${c.x}" y1="${c.y + HEADER_HEIGHT}" x2="${c.x + c.w}" y2="${c.y + HEADER_HEIGHT}"
-        stroke="${PALETTE.border}" stroke-width="1.3"/>`);
+        stroke="${PALETTE.border}" stroke-width="1.1"/>`);
 
-  // Stereotype
   if (stereotype) {
     parts.push(`<text x="${c.x + c.w / 2}" y="${c.y + 21}" text-anchor="middle"
-      font-family="${FONT}" font-style="italic" font-size="13" fill="${PALETTE.textMuted}">
+      font-family="${FONT}" font-style="italic" font-size="12.5" fill="${PALETTE.textMuted}">
       ${escapeXml(stereotype)}
     </text>`);
   }
 
-  // Class name
   parts.push(`<text x="${c.x + c.w / 2}" y="${c.y + 44}" text-anchor="middle"
-    font-family="${FONT}" font-weight="700" font-size="17"
+    font-family="${FONT}" font-weight="700" font-size="16"
     ${italicName ? 'font-style="italic"' : ""}
     fill="${PALETTE.textPrimary}">
     ${escapeXml(c.name)}
@@ -102,14 +97,13 @@ function renderClass(c) {
 
   // Section divider
   parts.push(`<line x1="${c.x}" y1="${methodsTopY}" x2="${c.x + c.w}" y2="${methodsTopY}"
-    stroke="${PALETTE.border}" stroke-width="1"/>`);
+    stroke="${PALETTE.border}" stroke-width="0.8"/>`);
 
-  // Methods section
   for (let i = 0; i < c.methods.length; i++) {
     const text = c.methods[i];
     const lineY = methodsTopY + SECTION_PAD + ROW_HEIGHT * i + 16;
     const italic = /\{abstract\}/.test(text) ? 'font-style="italic"' : "";
-    parts.push(`<text x="${c.x + 12}" y="${lineY}" font-family="${MONO_FONT}" font-size="12.5" ${italic} fill="${PALETTE.textPrimary}">${escapeXml(text)}</text>`);
+    parts.push(`<text x="${c.x + 12}" y="${lineY}" font-family="${MONO_FONT}" font-size="12" ${italic} fill="${PALETTE.textPrimary}">${escapeXml(text)}</text>`);
   }
 
   parts.push(`</g>`);
@@ -202,32 +196,32 @@ function renderDecorator(point, dir, type, role) {
   const tipY = point.y;
 
   if (role === "end" && (type === "inheritance" || type === "realization")) {
-    const baseLen = 20;
-    const baseHalf = 13;
+    const baseLen = 18;
+    const baseHalf = 10;
     const baseX = tipX - ux * baseLen;
     const baseY = tipY - uy * baseLen;
     const p1x = baseX + px * baseHalf;
     const p1y = baseY + py * baseHalf;
     const p2x = baseX - px * baseHalf;
     const p2y = baseY - py * baseHalf;
-    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${p2x},${p2y}" fill="#ffffff" stroke="${PALETTE.border}" stroke-width="1.8" stroke-linejoin="miter"/>`;
+    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${p2x},${p2y}" fill="#ffffff" stroke="${PALETTE.border}" stroke-width="1.5" stroke-linejoin="miter"/>`;
   }
 
   if (role === "end" && (type === "association" || type === "dependency")) {
-    const baseLen = 18;
-    const baseHalf = 11;
+    const baseLen = 14;
+    const baseHalf = 7;
     const baseX = tipX - ux * baseLen;
     const baseY = tipY - uy * baseLen;
     const p1x = baseX + px * baseHalf;
     const p1y = baseY + py * baseHalf;
     const p2x = baseX - px * baseHalf;
     const p2y = baseY - py * baseHalf;
-    return `<polyline points="${p1x},${p1y} ${tipX},${tipY} ${p2x},${p2y}" fill="none" stroke="${PALETTE.border}" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>`;
+    return `<polyline points="${p1x},${p1y} ${tipX},${tipY} ${p2x},${p2y}" fill="none" stroke="${PALETTE.border}" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>`;
   }
 
   if (role === "start" && (type === "aggregation" || type === "composition")) {
-    const baseLen = 24;
-    const baseHalf = 11;
+    const baseLen = 20;
+    const baseHalf = 9;
     const fill = type === "composition" ? PALETTE.border : "#ffffff";
     const baseX = tipX - ux * baseLen;
     const baseY = tipY - uy * baseLen;
@@ -237,7 +231,7 @@ function renderDecorator(point, dir, type, role) {
     const p1y = midY + py * baseHalf;
     const p2x = midX - px * baseHalf;
     const p2y = midY - py * baseHalf;
-    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${baseX},${baseY} ${p2x},${p2y}" fill="${fill}" stroke="${PALETTE.border}" stroke-width="1.8" stroke-linejoin="miter"/>`;
+    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${baseX},${baseY} ${p2x},${p2y}" fill="${fill}" stroke="${PALETTE.border}" stroke-width="1.5" stroke-linejoin="miter"/>`;
   }
 
   return "";
@@ -253,8 +247,8 @@ function renderRelationship(rel, classMap) {
 
   const parts = [];
   parts.push(`<g class="rel-${rel.type}">`);
-  parts.push(`<path d="${p.d}" fill="none" stroke="${PALETTE.border}" stroke-width="1.6"
-    ${isDashed ? 'stroke-dasharray="7,5"' : ""} stroke-linejoin="round" stroke-linecap="round"/>`);
+  parts.push(`<path d="${p.d}" fill="none" stroke="${PALETTE.border}" stroke-width="1.2"
+    ${isDashed ? 'stroke-dasharray="8,5"' : ""} stroke-linejoin="round" stroke-linecap="round"/>`);
 
   if (rel.type === "aggregation" || rel.type === "composition") {
     parts.push(renderDecorator(p.start, p.startDir, rel.type, "start"));
@@ -275,7 +269,7 @@ function renderRelationship(rel, classMap) {
   if (rel.label) {
     const m = p.midpoint;
     parts.push(`<g>
-      <text x="${m.x}" y="${m.y - 4}" text-anchor="middle"
+      <text x="${m.x}" y="${m.y - 8}" text-anchor="middle"
         font-family="${FONT}" font-size="13" font-style="italic" fill="${PALETTE.textPrimary}"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         ${escapeXml(rel.label)}
@@ -288,15 +282,11 @@ function renderRelationship(rel, classMap) {
 }
 
 function labelOffset(pt, side) {
-  // Place a multiplicity/role label JUST OUTSIDE the box edge, so it never
-  // overlaps the class rectangle regardless of the line angle.
-  // pt = the point where the relationship line touches the box.
-  // side = which side of the box ("left" | "right" | "top" | "bottom").
   switch (side) {
-    case "left":   return { x: pt.x - 8,  y: pt.y - 6,  anchor: "end" };
-    case "right":  return { x: pt.x + 8,  y: pt.y - 6,  anchor: "start" };
-    case "top":    return { x: pt.x + 8,  y: pt.y - 6,  anchor: "start" };
-    case "bottom": return { x: pt.x + 8,  y: pt.y + 14, anchor: "start" };
+    case "left":   return { x: pt.x - 10, y: pt.y + 16, anchor: "end" };
+    case "right":  return { x: pt.x + 10, y: pt.y + 16, anchor: "start" };
+    case "top":    return { x: pt.x + 10, y: pt.y - 10,  anchor: "start" };
+    case "bottom": return { x: pt.x + 10, y: pt.y + 18, anchor: "start" };
     default:       return { x: pt.x,      y: pt.y,      anchor: "middle" };
   }
 }

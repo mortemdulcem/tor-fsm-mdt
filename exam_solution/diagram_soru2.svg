@@ -11,13 +11,13 @@
     <line x1="60" y1="80" x2="1840" y2="80" stroke="#1a1a1a" stroke-width="0.8"/>
   
   <g class="rel-association">
-<path d="M 400 307 L 340 263" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 400 307 L 340 263" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="358,252 340,263 358,274" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
-<text x="392" y="301" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..*</text>
-<text x="348" y="257" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<polyline points="354,256 340,263 354,270" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="390" y="323" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..*</text>
+<text x="350" y="279" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <g>
-      <text x="370" y="281" text-anchor="middle"
+      <text x="370" y="277" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         alici
@@ -25,20 +25,20 @@
     </g>
 </g>
 <g class="rel-association">
-<path d="M 760 409.9 L 820 508.4" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 688 454 L 688 482 L 950 482 L 950 412 L 950 440" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="802,519.4 820,508.4 802,497.4" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
-<text x="768" y="403.9" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">*</text>
-<text x="812" y="502.4" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<polyline points="943,426 950,440 957,426" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="698" y="472" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">*</text>
+<text x="960" y="430" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 </g>
 <g class="rel-aggregation">
-<path d="M 760 248.2 L 1140 241" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 760 248.2 L 1140 241" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="760,248.2 772,237.2 784,248.2 772,259.2" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
-<text x="768" y="242.2" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
-<text x="1132" y="235" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<polygon points="760,248.2 770,239.2 780,248.2 770,257.2" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
+<text x="770" y="264.2" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<text x="1130" y="257" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <g>
-      <text x="950" y="240.6" text-anchor="middle"
+      <text x="950" y="236.6" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         odemeYontemi
@@ -46,28 +46,28 @@
     </g>
 </g>
 <g class="rel-realization">
-<path d="M 1260 420 L 1260 392 L 1204 392 L 1204 350 L 1204 322" fill="none" stroke="#1a1a1a" stroke-width="1.6"
-    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1204,322 1217,342 1191,342" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<path d="M 1260 420 L 1260 392 L 1204 392 L 1204 350 L 1204 322" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1204,322 1214,340 1194,340" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 </g>
 <g class="rel-realization">
-<path d="M 1520 420 L 1520 392 L 1300 392 L 1300 350 L 1300 322" fill="none" stroke="#1a1a1a" stroke-width="1.6"
-    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1300,322 1313,342 1287,342" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<path d="M 1520 420 L 1520 392 L 1300 392 L 1300 350 L 1300 322" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1300,322 1310,340 1290,340" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 </g>
 <g class="rel-realization">
-<path d="M 1770 420 L 1770 392 L 1396 392 L 1396 350 L 1396 322" fill="none" stroke="#1a1a1a" stroke-width="1.6"
-    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1396,322 1409,342 1383,342" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<path d="M 1770 420 L 1770 392 L 1396 392 L 1396 350 L 1396 322" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1396,322 1406,340 1386,340" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 </g>
 <g class="rel-association">
-<path d="M 660 763 L 420 752" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 660 763 L 420 752" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="438,741 420,752 438,763" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
-<text x="652" y="757" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
-<text x="428" y="746" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<polyline points="434,745 420,752 434,759" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="650" y="779" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<text x="430" y="768" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <g>
-      <text x="540" y="753.5" text-anchor="middle"
+      <text x="540" y="749.5" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         kontrolZinciri
@@ -75,13 +75,13 @@
     </g>
 </g>
 <g class="rel-composition">
-<path d="M 1120 763 L 1180 741" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 1120 763 L 1180 741" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1120,763 1132,752 1144,763 1132,774" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
-<text x="1128" y="757" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
-<text x="1172" y="735" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<polygon points="1120,763 1130,754 1140,763 1130,772" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
+<text x="1130" y="779" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<text x="1170" y="757" text-anchor="end" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <g>
-      <text x="1150" y="748" text-anchor="middle"
+      <text x="1150" y="744" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         isleyici
@@ -89,11 +89,11 @@
     </g>
 </g>
 <g class="rel-dependency">
-<path d="M 729 660 L 729 632 L 580 632 L 580 482 L 580 454" fill="none" stroke="#1a1a1a" stroke-width="1.6"
-    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="591,472 580,454 569,472" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<path d="M 729 660 L 729 632 L 580 632 L 580 482 L 580 454" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="587,468 580,454 573,468" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <g>
-      <text x="654.5" y="553" text-anchor="middle"
+      <text x="654.5" y="549" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         isler
@@ -101,13 +101,13 @@
     </g>
 </g>
 <g class="rel-association">
-<path d="M 366 660 L 366 624 L 456 624 L 456 687.6 L 420 687.6" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 366 660 L 366 624 L 456 624 L 456 687.6 L 420 687.6" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="438,676.6 420,687.6 438,698.6" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
-<text x="374" y="654" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..1</text>
-<text x="428" y="681.6" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..1</text>
+<polyline points="434,680.6 420,687.6 434,694.6" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<text x="376" y="650" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..1</text>
+<text x="430" y="703.6" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..1</text>
 <g>
-      <text x="456" y="612" text-anchor="middle"
+      <text x="456" y="608" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         sonraki
@@ -115,28 +115,28 @@
     </g>
 </g>
 <g class="rel-inheritance">
-<path d="M 180 900 L 180 872 L 132 872 L 132 872 L 132 844" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 180 900 L 180 872 L 132 872 L 132 872 L 132 844" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="132,844 145,864 119,864" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<polygon points="132,844 142,862 122,862" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 </g>
 <g class="rel-inheritance">
-<path d="M 440 900 L 440 872 L 240 872 L 240 872 L 240 844" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 440 900 L 440 872 L 240 872 L 240 872 L 240 844" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="240,844 253,864 227,864" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<polygon points="240,844 250,862 230,862" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 </g>
 <g class="rel-inheritance">
-<path d="M 700 900 L 700 872 L 348 872 L 348 872 L 348 844" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 700 900 L 700 872 L 348 872 L 348 872 L 348 844" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="348,844 361,864 335,864" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<polygon points="348,844 358,862 338,862" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 </g>
 <g class="rel-aggregation">
-<path d="M 1340 822 L 1340 850 L 1320 850 L 1320 872 L 1320 900" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+<path d="M 1340 822 L 1340 850 L 1320 850 L 1320 872 L 1320 900" fill="none" stroke="#1a1a1a" stroke-width="1.2"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1340,822 1351,834 1340,846 1329,834" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
-<text x="1348" y="836" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
-<text x="1328" y="894" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1..*</text>
+<polygon points="1340,822 1349,832 1340,842 1331,832" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
+<text x="1350" y="840" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
+<text x="1330" y="890" text-anchor="start" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1..*</text>
 <g>
-      <text x="1330" y="857" text-anchor="middle"
+      <text x="1330" y="853" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         komutlar (sirali)
@@ -144,26 +144,26 @@
     </g>
 </g>
 <g class="rel-realization">
-<path d="M 1300 1160 L 1300 1132 L 1236 1132 L 1236 1090 L 1236 1062" fill="none" stroke="#1a1a1a" stroke-width="1.6"
-    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1236,1062 1249,1082 1223,1082" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<path d="M 1300 1160 L 1300 1132 L 1236 1132 L 1236 1090 L 1236 1062" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1236,1062 1246,1080 1226,1080" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 </g>
 <g class="rel-realization">
-<path d="M 1570 1160 L 1570 1132 L 1376 1132 L 1376 1090 L 1376 1062" fill="none" stroke="#1a1a1a" stroke-width="1.6"
-    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1376,1062 1389,1082 1363,1082" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<path d="M 1570 1160 L 1570 1132 L 1376 1132 L 1376 1090 L 1376 1062" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1376,1062 1386,1080 1366,1080" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 </g>
 <g class="rel-realization">
-<path d="M 1404 1380 L 1404 1352 L 1418 1352 L 1418 1090 L 1418 1062" fill="none" stroke="#1a1a1a" stroke-width="1.6"
-    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1418,1062 1431,1082 1405,1082" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<path d="M 1404 1380 L 1404 1352 L 1418 1352 L 1418 1090 L 1418 1062" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1418,1062 1428,1080 1408,1080" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 </g>
 <g class="rel-dependency">
-<path d="M 1180 1241 L 1140 1263" fill="none" stroke="#1a1a1a" stroke-width="1.6"
-    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="1158,1252 1140,1263 1158,1274" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<path d="M 1180 1241 L 1140 1263" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1154,1256 1140,1263 1154,1270" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <g>
-      <text x="1160" y="1248" text-anchor="middle"
+      <text x="1160" y="1244" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         &lt;&lt;creates&gt;&gt;
@@ -171,11 +171,11 @@
     </g>
 </g>
 <g class="rel-dependency">
-<path d="M 1450 1241 L 1422 1241 L 1422 1304.2 L 1168 1304.2 L 1140 1304.2" fill="none" stroke="#1a1a1a" stroke-width="1.6"
-    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="1158,1293.2 1140,1304.2 1158,1315.2" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<path d="M 1450 1241 L 1422 1241 L 1422 1304.2 L 1168 1304.2 L 1140 1304.2" fill="none" stroke="#1a1a1a" stroke-width="1.2"
+    stroke-dasharray="8,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1154,1297.2 1140,1304.2 1154,1311.2" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <g>
-      <text x="1295" y="1268.6" text-anchor="middle"
+      <text x="1295" y="1264.6" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round">
         &lt;&lt;uses&gt;&gt;
@@ -184,17 +184,17 @@
 </g>
   <g class="cls-Musteri">
 <rect x="60" y="160" width="280" height="206"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="60" y="160" width="280" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="60" y1="216" x2="340" y2="216"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="200" y="181" text-anchor="middle"
-      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="13" fill="#3a3a3a">
+      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">
       &lt;&lt;entity&gt;&gt;
     </text>
 <text x="200" y="204" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     Musteri
@@ -204,22 +204,22 @@
 <text x="72" y="286" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- eposta : String</text>
 <text x="72" y="308" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- hesapBakiyesi : double</text>
 <line x1="60" y1="324" x2="340" y2="324"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="72" y="350" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ bakiyeyiGetir() : double</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="72" y="350" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ bakiyeyiGetir() : double</text>
 </g>
 <g class="cls-Siparis">
 <rect x="400" y="160" width="360" height="294"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="400" y="160" width="360" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="400" y1="216" x2="760" y2="216"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="580" y="181" text-anchor="middle"
-      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="13" fill="#3a3a3a">
+      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">
       &lt;&lt;entity&gt;&gt;
     </text>
 <text x="580" y="204" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     Siparis
@@ -231,24 +231,24 @@
 <text x="412" y="330" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- odemeYontemi : OdemeYontemi</text>
 <text x="412" y="352" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- durum : SiparisDurumu</text>
 <line x1="400" y1="368" x2="760" y2="368"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="412" y="394" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ iptalEt() : void</text>
-<text x="412" y="416" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ tamamlandiOlarakIsaretle() : void</text>
-<text x="412" y="438" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ odemeAl() : boolean</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="412" y="394" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ iptalEt() : void</text>
+<text x="412" y="416" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ tamamlandiOlarakIsaretle() : void</text>
+<text x="412" y="438" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ odemeAl() : boolean</text>
 </g>
 <g class="cls-SiparisDurumu">
 <rect x="820" y="440" width="260" height="228"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="820" y="440" width="260" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="820" y1="496" x2="1080" y2="496"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="950" y="461" text-anchor="middle"
-      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="13" fill="#3a3a3a">
+      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">
       &lt;&lt;enumeration&gt;&gt;
     </text>
 <text x="950" y="484" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     SiparisDurumu
@@ -259,100 +259,100 @@
 <text x="832" y="588" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">IPTAL_EDILDI</text>
 <text x="832" y="610" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">ISLENDI</text>
 <line x1="820" y1="626" x2="1080" y2="626"
-    stroke="#1a1a1a" stroke-width="1"/>
+    stroke="#1a1a1a" stroke-width="0.8"/>
 </g>
 <g class="cls-OdemeYontemi">
 <rect x="1140" y="160" width="320" height="162"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="1140" y="160" width="320" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="1140" y1="216" x2="1460" y2="216"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="1300" y="181" text-anchor="middle"
-      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="13" fill="#3a3a3a">
+      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">
       &lt;&lt;interface&gt;&gt;
     </text>
 <text x="1300" y="204" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     font-style="italic"
     fill="#0c0c0c">
     OdemeYontemi
   </text>
 <line x1="1140" y1="258" x2="1460" y2="258"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="1152" y="284" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ odemeYap(tutar : double) : boolean</text>
-<text x="1152" y="306" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ adi() : String</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="1152" y="284" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ odemeYap(tutar : double) : boolean</text>
+<text x="1152" y="306" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ adi() : String</text>
 </g>
 <g class="cls-BankaHavalesi">
 <rect x="1140" y="420" width="240" height="162"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="1140" y="420" width="240" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="1140" y1="476" x2="1380" y2="476"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="1260" y="464" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     BankaHavalesi
   </text>
 <text x="1152" y="502" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- ibanNumarasi : String</text>
 <line x1="1140" y1="518" x2="1380" y2="518"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="1152" y="544" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ odemeYap(tutar) : boolean</text>
-<text x="1152" y="566" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ adi() : String</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="1152" y="544" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ odemeYap(tutar) : boolean</text>
+<text x="1152" y="566" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ adi() : String</text>
 </g>
 <g class="cls-Paypal">
 <rect x="1410" y="420" width="220" height="162"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="1410" y="420" width="220" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="1410" y1="476" x2="1630" y2="476"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="1520" y="464" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     Paypal
   </text>
 <text x="1422" y="502" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- hesapEpostasi : String</text>
 <line x1="1410" y1="518" x2="1630" y2="518"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="1422" y="544" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ odemeYap(tutar) : boolean</text>
-<text x="1422" y="566" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ adi() : String</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="1422" y="544" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ odemeYap(tutar) : boolean</text>
+<text x="1422" y="566" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ adi() : String</text>
 </g>
 <g class="cls-SogukCuzdan">
 <rect x="1660" y="420" width="220" height="162"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="1660" y="420" width="220" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="1660" y1="476" x2="1880" y2="476"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="1770" y="464" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     SogukCuzdan
   </text>
 <text x="1672" y="502" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- cuzdanAdresi : String</text>
 <line x1="1660" y1="518" x2="1880" y2="518"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="1672" y="544" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ odemeYap(tutar) : boolean</text>
-<text x="1672" y="566" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ adi() : String</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="1672" y="544" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ odemeYap(tutar) : boolean</text>
+<text x="1672" y="566" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ adi() : String</text>
 </g>
 <g class="cls-SiparisYoneticisi">
 <rect x="660" y="660" width="460" height="206"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="660" y="660" width="460" height="56"
         fill="#dcdcdc" stroke="none"/>
 <line x1="660" y1="716" x2="1120" y2="716"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="890" y="681" text-anchor="middle"
-      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="13" fill="#3a3a3a">
+      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">
       &lt;&lt;service&gt;&gt;
     </text>
 <text x="890" y="704" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     SiparisYoneticisi
@@ -360,200 +360,200 @@
 <text x="672" y="742" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- kontrolZinciri : SiparisKontrolu</text>
 <text x="672" y="764" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- isleyici : SiparisIsleyici</text>
 <line x1="660" y1="780" x2="1120" y2="780"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="672" y="806" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ siparisAl(s : Siparis) : void</text>
-<text x="672" y="828" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- kontrolleriCalistir(s : Siparis) : boolean</text>
-<text x="672" y="850" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- siparisiIsle(s : Siparis) : void</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="672" y="806" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ siparisAl(s : Siparis) : void</text>
+<text x="672" y="828" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">- kontrolleriCalistir(s : Siparis) : boolean</text>
+<text x="672" y="850" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">- siparisiIsle(s : Siparis) : void</text>
 </g>
 <g class="cls-SiparisKontrolu">
 <rect x="60" y="660" width="360" height="184"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="60" y="660" width="360" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="60" y1="716" x2="420" y2="716"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="240" y="681" text-anchor="middle"
-      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="13" fill="#3a3a3a">
+      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">
       &lt;&lt;abstract&gt;&gt;
     </text>
 <text x="240" y="704" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     font-style="italic"
     fill="#0c0c0c">
     SiparisKontrolu
   </text>
 <text x="72" y="742" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c"># sonraki : SiparisKontrolu</text>
 <line x1="60" y1="758" x2="420" y2="758"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="72" y="784" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ setSonraki(k : SiparisKontrolu) : SiparisKontrolu</text>
-<text x="72" y="806" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ kontrolEt(s : Siparis) : boolean</text>
-<text x="72" y="828" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5" font-style="italic" fill="#0c0c0c"># kontroluUygula(s : Siparis) : boolean  {abstract}</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="72" y="784" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ setSonraki(k : SiparisKontrolu) : SiparisKontrolu</text>
+<text x="72" y="806" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ kontrolEt(s : Siparis) : boolean</text>
+<text x="72" y="828" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12" font-style="italic" fill="#0c0c0c"># kontroluUygula(s : Siparis) : boolean  {abstract}</text>
 </g>
 <g class="cls-SahtecilikKontrolu">
 <rect x="60" y="900" width="240" height="140"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="60" y="900" width="240" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="60" y1="956" x2="300" y2="956"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="180" y="944" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     SahtecilikKontrolu
   </text>
 <text x="72" y="982" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- risksKurali : RiskKurali</text>
 <line x1="60" y1="998" x2="300" y2="998"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="72" y="1024" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c"># kontroluUygula(s) : boolean</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="72" y="1024" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c"># kontroluUygula(s) : boolean</text>
 </g>
 <g class="cls-LimitKontrolu">
 <rect x="320" y="900" width="240" height="140"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="320" y="900" width="240" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="320" y1="956" x2="560" y2="956"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="440" y="944" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     LimitKontrolu
   </text>
 <text x="332" y="982" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- ustLimit : double</text>
 <line x1="320" y1="998" x2="560" y2="998"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="332" y="1024" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c"># kontroluUygula(s) : boolean</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="332" y="1024" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c"># kontroluUygula(s) : boolean</text>
 </g>
 <g class="cls-BakiyeKontrolu">
 <rect x="580" y="900" width="240" height="140"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="580" y="900" width="240" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="580" y1="956" x2="820" y2="956"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="700" y="944" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     BakiyeKontrolu
   </text>
 <line x1="580" y1="998" x2="820" y2="998"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="592" y="1024" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c"># kontroluUygula(s) : boolean</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="592" y="1024" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c"># kontroluUygula(s) : boolean</text>
 </g>
 <g class="cls-Komut">
 <rect x="1180" y="900" width="280" height="162"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="1180" y="900" width="280" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="1180" y1="956" x2="1460" y2="956"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="1320" y="921" text-anchor="middle"
-      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="13" fill="#3a3a3a">
+      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">
       &lt;&lt;interface&gt;&gt;
     </text>
 <text x="1320" y="944" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     font-style="italic"
     fill="#0c0c0c">
     Komut
   </text>
 <line x1="1180" y1="998" x2="1460" y2="998"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="1192" y="1024" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ calistir(s : Siparis) : void</text>
-<text x="1192" y="1046" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ aciklama() : String</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="1192" y="1024" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ calistir(s : Siparis) : void</text>
+<text x="1192" y="1046" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ aciklama() : String</text>
 </g>
 <g class="cls-SiparisIsleyici">
 <rect x="1180" y="660" width="320" height="162"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="1180" y="660" width="320" height="56"
         fill="#dcdcdc" stroke="none"/>
 <line x1="1180" y1="716" x2="1500" y2="716"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="1340" y="681" text-anchor="middle"
-      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="13" fill="#3a3a3a">
+      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">
       &lt;&lt;macro command&gt;&gt;
     </text>
 <text x="1340" y="704" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     SiparisIsleyici
   </text>
 <text x="1192" y="742" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- komutlar : List&lt;Komut&gt;</text>
 <line x1="1180" y1="758" x2="1500" y2="758"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="1192" y="784" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ komutEkle(k : Komut) : void</text>
-<text x="1192" y="806" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ tumKomutlariCalistir(s : Siparis) : void</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="1192" y="784" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ komutEkle(k : Komut) : void</text>
+<text x="1192" y="806" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ tumKomutlariCalistir(s : Siparis) : void</text>
 </g>
 <g class="cls-FaturaDuzenle">
 <rect x="1180" y="1160" width="240" height="162"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="1180" y="1160" width="240" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="1180" y1="1216" x2="1420" y2="1216"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="1300" y="1204" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     FaturaDuzenle
   </text>
 <line x1="1180" y1="1258" x2="1420" y2="1258"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="1192" y="1284" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ calistir(s) : void</text>
-<text x="1192" y="1306" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ aciklama() : String</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="1192" y="1284" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ calistir(s) : void</text>
+<text x="1192" y="1306" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ aciklama() : String</text>
 </g>
 <g class="cls-FaturaGonder">
 <rect x="1450" y="1160" width="240" height="162"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="1450" y="1160" width="240" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="1450" y1="1216" x2="1690" y2="1216"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="1570" y="1204" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     FaturaGonder
   </text>
 <line x1="1450" y1="1258" x2="1690" y2="1258"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="1462" y="1284" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ calistir(s) : void</text>
-<text x="1462" y="1306" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ aciklama() : String</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="1462" y="1284" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ calistir(s) : void</text>
+<text x="1462" y="1306" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ aciklama() : String</text>
 </g>
 <g class="cls-AlacaklaraKaydet">
 <rect x="1180" y="1380" width="320" height="162"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="1180" y="1380" width="320" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="1180" y1="1436" x2="1500" y2="1436"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="1340" y="1424" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     AlacaklaraKaydet
   </text>
 <line x1="1180" y1="1478" x2="1500" y2="1478"
-    stroke="#1a1a1a" stroke-width="1"/>
-<text x="1192" y="1504" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ calistir(s) : void</text>
-<text x="1192" y="1526" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">+ aciklama() : String</text>
+    stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="1192" y="1504" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ calistir(s) : void</text>
+<text x="1192" y="1526" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12"  fill="#0c0c0c">+ aciklama() : String</text>
 </g>
 <g class="cls-Fatura">
 <rect x="880" y="1160" width="260" height="206"
-        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.3"/>
+        fill="#ffffff" stroke="#1a1a1a" stroke-width="1.1"/>
 <rect x="880" y="1160" width="260" height="56"
         fill="#ececec" stroke="none"/>
 <line x1="880" y1="1216" x2="1140" y2="1216"
-        stroke="#1a1a1a" stroke-width="1.3"/>
+        stroke="#1a1a1a" stroke-width="1.1"/>
 <text x="1010" y="1181" text-anchor="middle"
-      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="13" fill="#3a3a3a">
+      font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="12.5" fill="#3a3a3a">
       &lt;&lt;entity&gt;&gt;
     </text>
 <text x="1010" y="1204" text-anchor="middle"
-    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="17"
+    font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="16"
     
     fill="#0c0c0c">
     Fatura
@@ -563,28 +563,28 @@
 <text x="892" y="1286" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- musteri : Musteri</text>
 <text x="892" y="1308" font-family="'JetBrains Mono','SFMono-Regular','Consolas',Menlo,monospace" font-size="12.5"  fill="#0c0c0c">- siparis : Siparis</text>
 <line x1="880" y1="1324" x2="1140" y2="1324"
-    stroke="#1a1a1a" stroke-width="1"/>
+    stroke="#1a1a1a" stroke-width="0.8"/>
 </g>
   <g>
 <line x1="60" y1="1700" x2="1840" y2="1700" stroke="#1a1a1a" stroke-width="0.8"/>
 <text x="60" y="1722" font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#3a3a3a">Notasyon Açıklaması</text>
 <line x1="64" y1="1750" x2="116" y2="1750" stroke="#1a1a1a" stroke-width="1.3" />
-<polygon points="116,1750 96,1763 96,1737" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<polygon points="116,1750 98,1760 98,1740" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 <text x="126" y="1754" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Kalitim (inheritance)</text>
 <line x1="360.6666666666667" y1="1750" x2="412.6666666666667" y2="1750" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polygon points="412.6666666666667,1750 392.6666666666667,1763 392.6666666666667,1737" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<polygon points="412.6666666666667,1750 394.6666666666667,1760 394.6666666666667,1740" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 <text x="422.6666666666667" y="1754" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Gerceklestirme (realization)</text>
 <line x1="657.3333333333334" y1="1750" x2="709.3333333333334" y2="1750" stroke="#1a1a1a" stroke-width="1.3" />
-<polygon points="657.3333333333334,1750 669.3333333333334,1739 681.3333333333334,1750 669.3333333333334,1761" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<polygon points="657.3333333333334,1750 667.3333333333334,1741 677.3333333333334,1750 667.3333333333334,1759" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 <text x="719.3333333333334" y="1754" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Birikim (aggregation)</text>
 <line x1="954" y1="1750" x2="1006" y2="1750" stroke="#1a1a1a" stroke-width="1.3" />
-<polygon points="954,1750 966,1739 978,1750 966,1761" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
+<polygon points="954,1750 964,1741 974,1750 964,1759" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter"/>
 <text x="1016" y="1754" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Olusum (composition)</text>
 <line x1="1250.6666666666667" y1="1750" x2="1302.6666666666667" y2="1750" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1284.6666666666667,1761 1302.6666666666667,1750 1284.6666666666667,1739" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1288.6666666666667,1757 1302.6666666666667,1750 1288.6666666666667,1743" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1312.6666666666667" y="1754" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Iliski (association)</text>
 <line x1="1547.3333333333335" y1="1750" x2="1599.3333333333335" y2="1750" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="1581.3333333333335,1761 1599.3333333333335,1750 1581.3333333333335,1739" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1585.3333333333335,1757 1599.3333333333335,1750 1585.3333333333335,1743" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1609.3333333333335" y="1754" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Bagimlilik (dependency)</text>
 </g>
 </svg>

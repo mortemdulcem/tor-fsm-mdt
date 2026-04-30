@@ -32,7 +32,7 @@ export const soru1 = {
       id: "KullaniciBildirimAlici",
       kind: "interface",
       name: "KullaniciBildirimAlici",
-      x: 360, y: 60, w: 320,
+      x: 420, y: 60, w: 320,
       attributes: [],
       methods: [
         "+ bildirimGoster(olay : SensorOlayi) : void",
@@ -43,7 +43,7 @@ export const soru1 = {
       id: "MobilUygulama",
       kind: "concrete",
       name: "MobilUygulama",
-      x: 730, y: 60, w: 240,
+      x: 800, y: 60, w: 240,
       attributes: ["- cihazId : String"],
       methods: [
         "+ bildirimGoster(olay) : void",
@@ -54,7 +54,7 @@ export const soru1 = {
       id: "WebUygulamasi",
       kind: "concrete",
       name: "WebUygulamasi",
-      x: 1020, y: 60, w: 240,
+      x: 1100, y: 60, w: 240,
       attributes: ["- oturumKimligi : String"],
       methods: [
         "+ bildirimGoster(olay) : void",
@@ -65,7 +65,7 @@ export const soru1 = {
       id: "DurumOzeti",
       kind: "value",
       name: "DurumOzeti",
-      x: 1320, y: 60, w: 240,
+      x: 1400, y: 60, w: 240,
       attributes: [
         "- sistemDurumlari : Map",
         "- sensorOkumalari : Map",
@@ -79,7 +79,7 @@ export const soru1 = {
       id: "AkilliEvIzlemeMotoru",
       kind: "mediator",
       name: "AkilliEvIzlemeMotoru",
-      x: 540, y: 430, w: 540,
+      x: 580, y: 430, w: 540,
       stereotype: "<<mediator>> <<observer>>",
       attributes: [
         "- sistemler : List<EvSistemi>",
@@ -260,8 +260,8 @@ export const soru1 = {
     // Kullanici, soyutlamaya (interface) bağımlı: bildirim alıcısı arayüzünü kullanır
     { from: "Kullanici", fromSide: "right", to: "KullaniciBildirimAlici", toSide: "left", type: "association", mFrom: "1", mTo: "1..*", label: "kullanir" },
     // Realizasyonlar (interface implementations)
-    { from: "MobilUygulama", fromSide: "top", fromOffset: 0.5, to: "KullaniciBildirimAlici", toSide: "top", toOffset: 0.55, type: "realization", routing: "orthogonal" },
-    { from: "WebUygulamasi", fromSide: "top", fromOffset: 0.5, to: "KullaniciBildirimAlici", toSide: "top", toOffset: 0.75, type: "realization", routing: "orthogonal" },
+    { from: "MobilUygulama", fromSide: "bottom", fromOffset: 0.3, to: "KullaniciBildirimAlici", toSide: "bottom", toOffset: 0.7, type: "realization", routing: "orthogonal" },
+    { from: "WebUygulamasi", fromSide: "bottom", fromOffset: 0.3, to: "KullaniciBildirimAlici", toSide: "bottom", toOffset: 0.9, type: "realization", routing: "orthogonal" },
     // Mediator → user notification
     { from: "AkilliEvIzlemeMotoru", fromSide: "top", fromOffset: 0.6, to: "KullaniciBildirimAlici", toSide: "bottom", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "0..*", label: "bildirimAlicilari", routing: "orthogonal" },
     // Mediator publishes DurumOzeti
@@ -291,8 +291,6 @@ export const soru1 = {
     // CalismaModu uses ModTipi
     { from: "GuvenliMod", fromSide: "bottom", fromOffset: 0.5, to: "ModTipi", toSide: "top", toOffset: 0.3, type: "dependency", routing: "orthogonal" },
     { from: "TasarrufluMod", fromSide: "bottom", fromOffset: 0.5, to: "ModTipi", toSide: "top", toOffset: 0.7, type: "dependency", routing: "orthogonal" },
-    // Kullanici has Mobile/Web composition
-    { from: "Kullanici", fromSide: "right", fromOffset: 0.7, to: "WebUygulamasi", toSide: "left", toOffset: 0.5, type: "association", mFrom: "1", mTo: "0..*", routing: "orthogonal" },
   ],
 };
 
@@ -518,7 +516,7 @@ export const soru2 = {
   relationships: [
     // Domain
     { from: "Siparis", fromSide: "left", to: "Musteri", toSide: "right", type: "association", mFrom: "0..*", mTo: "1", label: "alici" },
-    { from: "Siparis", fromSide: "right", fromOffset: 0.85, to: "SiparisDurumu", toSide: "left", toOffset: 0.3, type: "association", mFrom: "*", mTo: "1" },
+    { from: "Siparis", fromSide: "bottom", fromOffset: 0.8, to: "SiparisDurumu", toSide: "top", toOffset: 0.5, type: "association", mFrom: "*", mTo: "1", routing: "orthogonal" },
     // Strategy
     { from: "Siparis", fromSide: "right", fromOffset: 0.3, to: "OdemeYontemi", toSide: "left", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1", label: "odemeYontemi" },
     { from: "BankaHavalesi", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.2, type: "realization", routing: "orthogonal" },

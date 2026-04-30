@@ -70,15 +70,15 @@
             font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="14" fill="#0c0c0c">t : TasarrufluMod</text>
     
   <line x1="231" y1="210" x2="509" y2="210" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="491,221 509,210 491,199" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="495,217 509,210 495,203" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="370" y="202" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">1: modDegistir(TASARRUFLU)</text>
 <line x1="521" y1="260" x2="799" y2="260" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="781,271 799,260 781,249" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="785,267 799,260 785,253" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="660" y="252" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">2: tumModlariAyarla(TASARRUFLU)</text>
 <line x1="811" y1="310" x2="1669" y2="310" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1651,321 1669,310 1651,299" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1655,317 1669,310 1655,303" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1240" y="302" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">3: &lt;&lt;create&gt;&gt;</text>
 <g>
@@ -93,47 +93,47 @@
         <text x="833" y="346" font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="11.5" fill="#0c0c0c">Yeni TasarrufluMod nesnesi oluşturulur (State)</text>
       </g>
 <line x1="811" y1="404" x2="1089" y2="404" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1071,415 1089,404 1071,393" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1075,411 1089,404 1075,397" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="950" y="396" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">4: modAyarla(t)</text>
 <line x1="1101" y1="454" x2="1669" y2="454" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1651,465 1669,454 1651,443" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1655,461 1669,454 1655,447" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1385" y="446" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">5: uygula(this)</text>
 <line x1="1669" y1="504" x2="1101" y2="504" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1119,493 1101,504 1119,515" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1115,497 1101,504 1115,511" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1385" y="496" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">6: asgariAydinlatmaUygula()</text>
 <line x1="1089" y1="554" x2="811" y2="554" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="829,543 811,554 829,565" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="825,547 811,554 825,561" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="950" y="546" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">7: (donus)</text>
 <line x1="811" y1="604" x2="1379" y2="604" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1361,615 1379,604 1361,593" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1365,611 1379,604 1365,597" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1095" y="596" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">8: modAyarla(t)</text>
 <line x1="1391" y1="654" x2="1669" y2="654" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1651,665 1669,654 1651,643" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1655,661 1669,654 1655,647" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1530" y="646" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">9: uygula(this)</text>
 <line x1="1669" y1="704" x2="1391" y2="704" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1409,693 1391,704 1409,715" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1405,697 1391,704 1405,711" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1530" y="696" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">10: sicaklikAyarla(18)</text>
 <line x1="1379" y1="754" x2="811" y2="754" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="829,743 811,754 829,765" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="825,747 811,754 825,761" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1095" y="746" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">11: (donus)</text>
 <path d="M 811 804 L 871 804 L 871 826 L 815 826"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="833,815 815,826 833,837" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="829,819 815,826 829,833" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="819" y="798" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">durumOzetiYayinla()</text>
 <line x1="799" y1="872" x2="521" y2="872" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="539,861 521,872 539,883" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="535,865 521,872 535,879" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="660" y="864" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">13: durumYansit(ozet)</text>
 <line x1="509" y1="922" x2="231" y2="922" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="249,911 231,922 249,933" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="245,915 231,922 245,929" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="370" y="914" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">14: ekran guncelle</text>
 </svg>
