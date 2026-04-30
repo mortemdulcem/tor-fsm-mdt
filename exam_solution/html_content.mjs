@@ -278,7 +278,7 @@ ${css()}
 
   <h2>2.1 Senaryonun Çözümlenmesi</h2>
   <p>
-  SimpleCar firması yalnızca e-satış yapan bir araba üreticisidir. Domeni dört bileşene ayrılabilir:
+  SimpleCar firması yalnızca e-satış yapan bir araba üreticisidir. Domeni beş bileşene ayrılabilir:
   </p>
   <ol class="num-list">
     <li><b>Algoritma ailesi (ödeme).</b> Ödeme tek bir <em>davranıştır</em>, ancak <em>banka havalesi</em>,
@@ -292,6 +292,10 @@ ${css()}
     <li><b>Sıralı işleme adımları.</b> Tüm kontroller başarılıysa sipariş sırasıyla <em>fatura düzenleme</em>,
       <em>fatura gönderme</em> ve <em>alacaklara kaydetme</em> adımlarıyla işlenir. Adımlar ileride değişebilir;
       her biri test edilebilir bağımsız bir iş birimini temsil eder.</li>
+    <li><b>Kısmi başarısızlıkta tutarlılık.</b> Üç işleme adımı ardışık ve <em>yan etkili</em>dir
+      (fatura yaratılır, e-posta gider, defter kaydı atılır). Senaryo, n. adımın hata vermesi halinde sistemi
+      tutarsız bir ara durumda bırakmamayı zımnen gerektirir: yapılan adımlar ters yönde telafi
+      edilebilmelidir.</li>
     <li><b>Yönetim ve yaşam döngüsü.</b> Bir orchestrator (use-case) bileşen, siparişi <em>alır</em>,
       <em>doğrular</em> ve <em>işler</em>. Domain (Siparis) ile servis sorumlulukları ayrık tutulmalıdır.</li>
   </ol>
@@ -325,9 +329,8 @@ ${css()}
         <td><b>Memento</b><br/><span class="ref">GoF, s.283</span></td>
         <td><code>SiparisDurumKaydi</code> &laquo;memento&raquo;; <code>Siparis</code> &laquo;originator&raquo;;
             <code>SiparisIsleyici</code> &laquo;caretaker&raquo; (kayıt yığını).</td>
-        <td>(3') Sıralı işleme ortasında oluşan hatalarda <em>yerel telafi</em>: yapılan adımlar ters sırayla
-            <code>geriAl(s, k)</code> ile çevrilir; siparişin iç alanları <em>Komut</em>'a açılmaz, kapsülleme
-            korunur.</td>
+        <td>(4) Kısmi başarısızlıkta tutarlılık: yapılan adımlar ters sırayla <code>geriAl(s, k)</code> ile
+            çevrilir; siparişin iç alanları <em>Komut</em>'a açılmaz, kapsülleme korunur.</td>
       </tr>
     </tbody>
   </table>
@@ -393,8 +396,11 @@ ${css()}
     <tbody>
       <tr><td><code>Musteri</code></td><td>&laquo;entity&raquo;</td>
           <td>Siparişi veren kişi; <code>hesapBakiyesi</code> bakiye kontrolünde kullanılır.</td></tr>
-      <tr><td><code>Siparis</code></td><td>&laquo;entity&raquo;</td>
-          <td>Aggregate root; tutar, miktar, seçilen <code>OdemeYontemi</code>, durum bilgilerini taşır.</td></tr>
+      <tr><td><code>Siparis</code></td><td>&laquo;entity&raquo; / &laquo;originator&raquo;</td>
+          <td>Aggregate root; tutar, miktar, seçilen <code>OdemeYontemi</code>, durum bilgilerini taşır.
+              Memento rolünde de <em>originator</em>'dur: <code>durumKaydiOlustur()</code> ile kendi iç
+              durumunu kapsüllü bir <code>SiparisDurumKaydi</code> olarak dışa verir,
+              <code>kayittanGeriYukle(k)</code> ile geri okur.</td></tr>
       <tr><td><code>SiparisDurumu</code></td><td>&laquo;enumeration&raquo;</td>
           <td>Yaşam döngüsü sabitleri: ALINDI / KONTROL_EDILIYOR / ONAYLANDI / IPTAL_EDILDI / ISLENDI.</td></tr>
       <tr><td><code>SiparisDurumKaydi</code></td><td>&laquo;memento&raquo;</td>
@@ -414,12 +420,21 @@ ${css()}
           <td>&laquo;concrete&raquo;</td>
           <td>Tek bir kuralı uygulayan halkalar; bağımsız birim test yapılabilir.</td></tr>
       <tr><td><code>Komut</code></td><td>&laquo;interface&raquo;</td>
-          <td>Command sözleşmesi; <code>calistir(siparis)</code>.</td></tr>
+          <td>Command sözleşmesi; ileri yön <code>calistir(siparis)</code>, geri yön
+              <code>geriAl(siparis, oncekiKayit)</code>. Geri-alma için her komut bir Memento alır;
+              GoF Command, s.237 (<em>Implementation</em>, madde 6) bu birleşimi açıkça önerir.</td></tr>
       <tr><td><code>FaturaDuzenle</code> &middot; <code>FaturaGonder</code> &middot; <code>AlacaklaraKaydet</code></td>
           <td>&laquo;concrete&raquo;</td>
-          <td>Senaryoda istenen sıralı üç işleme adımı; her biri kendi yan etkisinden sorumlu.</td></tr>
-      <tr><td><code>SiparisIsleyici</code></td><td>&laquo;macro command&raquo;</td>
-          <td>Sıralı komut listesi; <code>komutEkle</code> ile genişletilebilir.</td></tr>
+          <td>Senaryoda istenen sıralı üç işleme adımı; her biri kendi yan etkisinden sorumlu. Her komut,
+              <code>geriAl</code>'da kendi yan etkisini ters yönde işler (faturayı sil, gönderimi iptal et,
+              alacak kaydını sil).</td></tr>
+      <tr><td><code>SiparisIsleyici</code></td><td>&laquo;macro command&raquo; / &laquo;caretaker&raquo;</td>
+          <td>Sıralı komut listesi; <code>komutEkle</code> ile genişletilebilir. Aynı zamanda Memento
+              <em>caretaker</em>'ıdır: her komut çağrısından önce
+              <code>durumKaydiOlustur()</code> sonucunu <code>kayitlar</code> yığınına iter; <em>n</em>.
+              komut hata verirse <code>hataDurumundaGeriAl(s)</code> içinde <em>n&minus;1..1</em>
+              sırasıyla <code>geriAl(s, k)</code> çağırır. Kayıtların içine asla <em>bakmaz</em> &mdash;
+              sadece taşır (narrow interface).</td></tr>
       <tr><td><code>SiparisYoneticisi</code></td><td>&laquo;service&raquo;</td>
           <td>Use-case orchestratoru; kontrol zincirini ve işleyiciyi koordine eder. <em>Açık:</em>
             burada Facade kalıtsal bir izi vardır &mdash; çağırana tek bir <code>siparisAl(s)</code> arayüzü
@@ -454,7 +469,9 @@ ${css()}
   <figure class="diagram-figure seq-fig">
     <img src="${sekans2Path}" alt="Sekans 3 - sipariş yaşam döngüsü"/>
     <figcaption>Şekil 2.2 &middot; Bir siparişin alınmasından ISLENDI durumuna geçişine kadar tüm etkileşim akışı.
-      Kontroller CoR boyunca devredilir; işleme adımları Macro Command tarafından sırayla çalıştırılır.</figcaption>
+      Kontroller CoR boyunca devredilir; işleme adımları Macro Command tarafından sırayla çalıştırılır. Hata
+      yolunda, caretaker rolündeki <code>SiparisIsleyici</code> önceden aldığı Memento'lar üzerinden
+      <code>geriAl</code> çağrılarını ters sırayla yürütür.</figcaption>
   </figure>
   </div>
 
@@ -487,11 +504,12 @@ ${css()}
   <p>
   Önerilen tasarım; siparişin <em>alınması, doğrulanması ve işlenmesi</em> iç akışlarını birbirinden ayrı,
   örüntü-tabanlı kapsüllere yerleştirir. Senaryonun en sık değişeceği belirtilen iki ekseni &mdash; <em>ödeme
-  yöntemleri</em> ve <em>kontrol kuralları</em> &mdash; mevcut kodu değiştirmeden büyür. Sıralı işleme,
-  gözlemlenebilir, sıra/komut listesi değiştirilebilir ve test edilebilir bir komut akışı ile gerçekleştirilir.
-  Böylece, hem sınav kurallarında istenen <em>örüntü adı açıkça belirtilmiş</em> ve <em>ilişki tipi ile
-  işaretlemeleri doğru kullanılmış</em>; hem de senaryodaki nitelikler ve metotlar sınıflar içinde
-  konumlandırılmıştır.
+  yöntemleri</em> ve <em>kontrol kuralları</em> &mdash; mevcut kodu değiştirmeden büyür. Sıralı işleme;
+  gözlemlenebilir, sıra/komut listesi değiştirilebilir ve test edilebilir bir komut akışı ile gerçekleştirilir;
+  ardışık yan etkilerin ortasında oluşacak hatalar Memento + caretaker yığını üzerinden
+  <em>tutarlı bir önceki ana</em> geri sarılır. Böylece hem sınav kurallarında istenen <em>örüntü adı
+  açıkça belirtilmiş</em> ve <em>ilişki tipi ile işaretlemeleri doğru kullanılmış</em>; hem de senaryodaki
+  nitelikler ve metotlar sınıflar içinde konumlandırılmıştır.
   </p>
 </section>
 
