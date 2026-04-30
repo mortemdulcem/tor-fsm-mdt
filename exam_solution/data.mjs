@@ -18,7 +18,7 @@ export const soru1 = {
       id: "Kullanici",
       kind: "entity",
       name: "Kullanici",
-      x: 60, y: 60, w: 280,
+      x: 60, y: 60, w: 240,
       attributes: [
         "- id : int",
         "- adSoyad : String",
@@ -515,7 +515,7 @@ export const soru2 = {
   ],
   relationships: [
     // Domain
-    { from: "Siparis", fromSide: "left", to: "Musteri", toSide: "right", type: "association", mFrom: "0..*", mTo: "1", label: "alici" },
+    { from: "Siparis", fromSide: "left", fromOffset: 0.35, to: "Musteri", toSide: "right", toOffset: 0.5, type: "association", mFrom: "0..*", mTo: "1", label: "alici" },
     { from: "Siparis", fromSide: "bottom", fromOffset: 0.8, to: "SiparisDurumu", toSide: "top", toOffset: 0.5, type: "association", mFrom: "*", mTo: "1", routing: "orthogonal" },
     // Strategy
     { from: "Siparis", fromSide: "right", fromOffset: 0.3, to: "OdemeYontemi", toSide: "left", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "1", label: "odemeYontemi" },
@@ -523,7 +523,7 @@ export const soru2 = {
     { from: "Paypal", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.5, type: "realization", routing: "orthogonal" },
     { from: "SogukCuzdan", fromSide: "top", to: "OdemeYontemi", toSide: "bottom", toOffset: 0.8, type: "realization", routing: "orthogonal" },
     // Orchestrator
-    { from: "SiparisYoneticisi", fromSide: "left", fromOffset: 0.5, to: "SiparisKontrolu", toSide: "right", toOffset: 0.5, type: "association", mFrom: "1", mTo: "1", label: "kontrolZinciri" },
+    { from: "SiparisYoneticisi", fromSide: "left", fromOffset: 0.45, to: "SiparisKontrolu", toSide: "right", toOffset: 0.5, type: "association", mFrom: "1", mTo: "0..1", label: "kontrolZinciri" },
     { from: "SiparisYoneticisi", fromSide: "right", fromOffset: 0.5, to: "SiparisIsleyici", toSide: "left", toOffset: 0.5, type: "composition", mFrom: "1", mTo: "1", label: "isleyici" },
     { from: "SiparisYoneticisi", fromSide: "top", fromOffset: 0.15, to: "Siparis", toSide: "bottom", toOffset: 0.5, type: "dependency", label: "isler", routing: "orthogonal" },
     // CoR self link

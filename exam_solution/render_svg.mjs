@@ -33,8 +33,12 @@ function escapeXml(s) {
 }
 
 function classBoxHeight(c) {
-  const attrsH = SECTION_PAD * 2 + Math.max(1, c.attributes.length) * ROW_HEIGHT;
-  const methodsH = SECTION_PAD * 2 + Math.max(1, c.methods.length) * ROW_HEIGHT;
+  const attrsH = c.attributes.length > 0
+    ? SECTION_PAD * 2 + c.attributes.length * ROW_HEIGHT
+    : SECTION_PAD;
+  const methodsH = c.methods.length > 0
+    ? SECTION_PAD * 2 + c.methods.length * ROW_HEIGHT
+    : SECTION_PAD;
   return HEADER_HEIGHT + attrsH + methodsH;
 }
 
@@ -58,7 +62,9 @@ function renderClass(c) {
   const headerFill = (c.kind === "service" || c.kind === "mediator") ? PALETTE.headerStrong : PALETTE.headerFill;
 
   const attrsTopY = c.y + HEADER_HEIGHT;
-  const attrsHeight = SECTION_PAD * 2 + Math.max(1, c.attributes.length) * ROW_HEIGHT;
+  const attrsHeight = c.attributes.length > 0
+    ? SECTION_PAD * 2 + c.attributes.length * ROW_HEIGHT
+    : SECTION_PAD;
   const methodsTopY = attrsTopY + attrsHeight;
 
   const parts = [];
@@ -383,6 +389,23 @@ function renderLegend(W, y) {
 //   ]
 // }
 
+function seqArrowhead(point, dir, filled) {
+  const ux = dir.x, uy = dir.y;
+  const px = -uy, py = ux;
+  const baseLen = 12;
+  const baseHalf = 6;
+  const bx = point.x - ux * baseLen;
+  const by = point.y - uy * baseLen;
+  const p1x = bx + px * baseHalf;
+  const p1y = by + py * baseHalf;
+  const p2x = bx - px * baseHalf;
+  const p2y = by - py * baseHalf;
+  if (filled) {
+    return `<polygon points="${point.x},${point.y} ${p1x},${p1y} ${p2x},${p2y}" fill="${PALETTE.border}" stroke="${PALETTE.border}" stroke-width="1" stroke-linejoin="miter"/>`;
+  }
+  return `<polyline points="${p1x},${p1y} ${point.x},${point.y} ${p2x},${p2y}" fill="none" stroke="${PALETTE.border}" stroke-width="1.3" stroke-linejoin="miter" stroke-linecap="round"/>`;
+}
+
 export function renderSequenceDiagram(diagram) {
   const W = diagram.width;
   const H = diagram.height;
@@ -476,9 +499,10 @@ export function renderSequenceDiagram(diagram) {
 
     const isReturn = m.kind === "return";
     const isAsync = m.kind === "async";
+    const isCreate = m.kind === "create";
     const isSelf = fromIdx === toIdx || m.kind === "self";
 
-    const dashAttr = isReturn ? 'stroke-dasharray="6,5"' : "";
+    const dashAttr = (isReturn || isCreate) ? 'stroke-dasharray="6,5"' : "";
     const stroke = PALETTE.border;
 
     // Handle activations
@@ -495,17 +519,16 @@ export function renderSequenceDiagram(diagram) {
     }
 
     const parts = [];
+    const useFilled = !isReturn && !isAsync && !isCreate;
     if (isSelf) {
-      // Self-message: arrow loops to right of lifeline
       const cx = x1;
       const loopW = 60;
       const dx = ACT_W / 2;
       parts.push(`<path d="M ${cx + dx} ${y} L ${cx + dx + loopW} ${y} L ${cx + dx + loopW} ${y + 22} L ${cx + dx + 4} ${y + 22}"
         fill="none" stroke="${stroke}" stroke-width="1.3" ${dashAttr}/>`);
-      // arrowhead
       const tipPoint = { x: cx + dx + 4, y: y + 22 };
       const dir = { x: -1, y: 0 };
-      parts.push(renderDecorator(tipPoint, dir, "association", "end"));
+      parts.push(seqArrowhead(tipPoint, dir, useFilled));
       parts.push(`<text x="${cx + dx + 8}" y="${y - 6}" font-family="${SANS_FONT}" font-size="12" fill="${PALETTE.textPrimary}">${escapeXml(m.label)}</text>`);
     } else {
       const goingRight = x2 > x1;
@@ -514,8 +537,7 @@ export function renderSequenceDiagram(diagram) {
       parts.push(`<line x1="${startX}" y1="${y}" x2="${endX}" y2="${y}" stroke="${stroke}" stroke-width="1.3" ${dashAttr}/>`);
       const tipPoint = { x: endX, y: y };
       const dir = { x: goingRight ? 1 : -1, y: 0 };
-      parts.push(renderDecorator(tipPoint, dir, "association", "end"));
-      // Label centered above line
+      parts.push(seqArrowhead(tipPoint, dir, useFilled));
       const midX = (startX + endX) / 2;
       parts.push(`<text x="${midX}" y="${y - 8}" text-anchor="middle" font-family="${SANS_FONT}" font-size="12.5" fill="${PALETTE.textPrimary}"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">${i + 1}: ${escapeXml(m.label)}</text>`);

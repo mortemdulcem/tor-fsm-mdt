@@ -60,7 +60,7 @@
     
   <path d="M 260 210 L 320 210 L 320 232 L 264 232"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="278,225 264,232 278,239" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polygon points="264,232 276,226 276,238" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="miter"/>
 <text x="268" y="204" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">olcumGonder()</text>
 <g>
         <path d="M 330 226
@@ -74,43 +74,43 @@
         <text x="338" y="246" font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="11.5" fill="#0c0c0c">Yerel polling/donanım olayı</text>
       </g>
 <line x1="260" y1="322" x2="596" y2="322" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="582,329 596,322 582,315" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polygon points="596,322 584,328 584,316" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="miter"/>
 <text x="428" y="314" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">2: bildirimAl(olay : SensorOlayi)</text>
 <path d="M 608 372 L 668 372 L 668 394 L 612 394"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="626,387 612,394 626,401" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polygon points="612,394 624,388 624,400" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="miter"/>
 <text x="616" y="366" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">ilgiliSistemleriBul(olay)</text>
 <line x1="608" y1="440" x2="1292" y2="440" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1278,447 1292,440 1278,433" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polygon points="1292,440 1280,446 1280,434" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="miter"/>
 <text x="950" y="432" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">4: komutCalistir(&quot;hareketAlgilandi&quot;)</text>
 <line x1="1292" y1="490" x2="608" y2="490" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="622,483 608,490 622,497" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="620,484 608,490 620,496" fill="none" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="950" y="482" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">5: (donus)</text>
 <line x1="608" y1="540" x2="944" y2="540" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="930,547 944,540 930,533" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polygon points="944,540 932,546 932,534" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="miter"/>
 <text x="776" y="532" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">6: komutCalistir(&quot;hareketAlgilandi&quot;)</text>
 <line x1="944" y1="590" x2="608" y2="590" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="622,583 608,590 622,597" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="620,584 608,590 620,596" fill="none" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="776" y="582" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">7: (donus)</text>
 <path d="M 608 640 L 668 640 L 668 662 L 612 662"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="626,655 612,662 626,669" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polygon points="612,662 624,656 624,668" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1" stroke-linejoin="miter"/>
 <text x="616" y="634" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">durumOzetiYayinla()</text>
 <line x1="608" y1="708" x2="1640" y2="708" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1626,715 1640,708 1626,701" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1628,714 1640,708 1628,702" fill="none" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1124" y="700" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">9: bildirimGoster(olay)</text>
 <line x1="608" y1="758" x2="1640" y2="758" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1626,765 1640,758 1626,751" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1628,764 1640,758 1628,752" fill="none" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1124" y="750" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">10: durumYansit(durumOzeti)</text>
 <line x1="596" y1="808" x2="260" y2="808" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="274,801 260,808 274,815" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="272,802 260,808 272,814" fill="none" stroke="#1a1a1a" stroke-width="1.3" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="428" y="800" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">11: (akis tamam)</text>
 </svg>
