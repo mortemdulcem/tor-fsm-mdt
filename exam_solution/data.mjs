@@ -257,11 +257,11 @@ export const soru1 = {
     },
   ],
   relationships: [
-    // Kullanici uygulamalarini kullanir
-    { from: "Kullanici", fromSide: "right", to: "MobilUygulama", toSide: "left", type: "association", mFrom: "1", mTo: "1..*", label: "kullanir" },
+    // Kullanici, soyutlamaya (interface) bağımlı: bildirim alıcısı arayüzünü kullanır
+    { from: "Kullanici", fromSide: "right", to: "KullaniciBildirimAlici", toSide: "left", type: "association", mFrom: "1", mTo: "1..*", label: "kullanir" },
     // Realizasyonlar (interface implementations)
-    { from: "MobilUygulama", fromSide: "left", to: "KullaniciBildirimAlici", toSide: "right", type: "realization" },
-    { from: "WebUygulamasi", fromSide: "top", fromOffset: 0.5, to: "KullaniciBildirimAlici", toSide: "top", toOffset: 0.7, type: "realization", routing: "orthogonal" },
+    { from: "MobilUygulama", fromSide: "top", fromOffset: 0.5, to: "KullaniciBildirimAlici", toSide: "top", toOffset: 0.55, type: "realization", routing: "orthogonal" },
+    { from: "WebUygulamasi", fromSide: "top", fromOffset: 0.5, to: "KullaniciBildirimAlici", toSide: "top", toOffset: 0.75, type: "realization", routing: "orthogonal" },
     // Mediator → user notification
     { from: "AkilliEvIzlemeMotoru", fromSide: "top", fromOffset: 0.6, to: "KullaniciBildirimAlici", toSide: "bottom", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "0..*", label: "bildirimAlicilari", routing: "orthogonal" },
     // Mediator publishes DurumOzeti
