@@ -202,32 +202,32 @@ function renderDecorator(point, dir, type, role) {
   const tipY = point.y;
 
   if (role === "end" && (type === "inheritance" || type === "realization")) {
-    const baseLen = 16;
-    const baseHalf = 10;
+    const baseLen = 20;
+    const baseHalf = 13;
     const baseX = tipX - ux * baseLen;
     const baseY = tipY - uy * baseLen;
     const p1x = baseX + px * baseHalf;
     const p1y = baseY + py * baseHalf;
     const p2x = baseX - px * baseHalf;
     const p2y = baseY - py * baseHalf;
-    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${p2x},${p2y}" fill="#ffffff" stroke="${PALETTE.border}" stroke-width="1.4" stroke-linejoin="miter"/>`;
+    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${p2x},${p2y}" fill="#ffffff" stroke="${PALETTE.border}" stroke-width="1.8" stroke-linejoin="miter"/>`;
   }
 
   if (role === "end" && (type === "association" || type === "dependency")) {
-    const baseLen = 13;
-    const baseHalf = 7.5;
+    const baseLen = 18;
+    const baseHalf = 11;
     const baseX = tipX - ux * baseLen;
     const baseY = tipY - uy * baseLen;
     const p1x = baseX + px * baseHalf;
     const p1y = baseY + py * baseHalf;
     const p2x = baseX - px * baseHalf;
     const p2y = baseY - py * baseHalf;
-    return `<polyline points="${p1x},${p1y} ${tipX},${tipY} ${p2x},${p2y}" fill="none" stroke="${PALETTE.border}" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>`;
+    return `<polyline points="${p1x},${p1y} ${tipX},${tipY} ${p2x},${p2y}" fill="none" stroke="${PALETTE.border}" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>`;
   }
 
   if (role === "start" && (type === "aggregation" || type === "composition")) {
-    const baseLen = 20;
-    const baseHalf = 9;
+    const baseLen = 24;
+    const baseHalf = 11;
     const fill = type === "composition" ? PALETTE.border : "#ffffff";
     const baseX = tipX - ux * baseLen;
     const baseY = tipY - uy * baseLen;
@@ -237,7 +237,7 @@ function renderDecorator(point, dir, type, role) {
     const p1y = midY + py * baseHalf;
     const p2x = midX - px * baseHalf;
     const p2y = midY - py * baseHalf;
-    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${baseX},${baseY} ${p2x},${p2y}" fill="${fill}" stroke="${PALETTE.border}" stroke-width="1.4" stroke-linejoin="miter"/>`;
+    return `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${baseX},${baseY} ${p2x},${p2y}" fill="${fill}" stroke="${PALETTE.border}" stroke-width="1.8" stroke-linejoin="miter"/>`;
   }
 
   return "";
@@ -253,8 +253,8 @@ function renderRelationship(rel, classMap) {
 
   const parts = [];
   parts.push(`<g class="rel-${rel.type}">`);
-  parts.push(`<path d="${p.d}" fill="none" stroke="${PALETTE.border}" stroke-width="1.3"
-    ${isDashed ? 'stroke-dasharray="6,5"' : ""} stroke-linejoin="round" stroke-linecap="round"/>`);
+  parts.push(`<path d="${p.d}" fill="none" stroke="${PALETTE.border}" stroke-width="1.6"
+    ${isDashed ? 'stroke-dasharray="7,5"' : ""} stroke-linejoin="round" stroke-linecap="round"/>`);
 
   if (rel.type === "aggregation" || rel.type === "composition") {
     parts.push(renderDecorator(p.start, p.startDir, rel.type, "start"));

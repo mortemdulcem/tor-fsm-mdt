@@ -89,20 +89,20 @@
             font-family="'EB Garamond','Georgia','Cambria',serif" font-weight="700" font-size="14" fill="#0c0c0c">i : SiparisIsleyici</text>
     
   <line x1="194.75" y1="210" x2="400.25" y2="210" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="387.25,217.5 400.25,210 387.25,202.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="382.25,221 400.25,210 382.25,199" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="297.5" y="202" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">1: siparisAl(s)</text>
 <path d="M 412.25 260 L 472.25 260 L 472.25 282 L 416.25 282"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="429.25,274.5 416.25,282 429.25,289.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="434.25,271 416.25,282 434.25,293" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="420.25" y="254" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">kontrolleriCalistir(s)</text>
 <line x1="412.25" y1="328" x2="617.75" y2="328" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="604.75,335.5 617.75,328 604.75,320.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="599.75,339 617.75,328 599.75,317" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="515" y="320" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">3: kontrolEt(s)</text>
 <path d="M 629.75 378 L 689.75 378 L 689.75 400 L 633.75 400"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="646.75,392.5 633.75,400 646.75,407.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="651.75,389 633.75,400 651.75,411" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="637.75" y="372" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">kontroluUygula(s)</text>
 <g>
         <path d="M 699.75 394
@@ -116,12 +116,12 @@
         <text x="707.75" y="414" font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="11.5" fill="#0c0c0c">Sahtecilik değerlendirmesi</text>
       </g>
 <line x1="629.75" y1="490" x2="835.25" y2="490" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="822.25,497.5 835.25,490 822.25,482.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="817.25,501 835.25,490 817.25,479" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="732.5" y="482" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">5: kontrolEt(s)</text>
 <path d="M 847.25 540 L 907.25 540 L 907.25 562 L 851.25 562"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="864.25,554.5 851.25,562 864.25,569.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="869.25,551 851.25,562 869.25,573" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="855.25" y="534" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">kontroluUygula(s)</text>
 <g>
         <path d="M 917.25 556
@@ -135,12 +135,12 @@
         <text x="925.25" y="576" font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="11.5" fill="#0c0c0c">Tutar limit kontrolü</text>
       </g>
 <line x1="847.25" y1="652" x2="1052.75" y2="652" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1039.75,659.5 1052.75,652 1039.75,644.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1034.75,663 1052.75,652 1034.75,641" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="950" y="644" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">7: kontrolEt(s)</text>
 <path d="M 1064.75 702 L 1124.75 702 L 1124.75 724 L 1068.75 724"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1081.75,716.5 1068.75,724 1081.75,731.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1086.75,713 1068.75,724 1086.75,735" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1072.75" y="696" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">kontroluUygula(s)</text>
 <g>
         <path d="M 1134.75 718
@@ -154,19 +154,19 @@
         <text x="1142.75" y="738" font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="11.5" fill="#0c0c0c">Müşteri bakiye kontrolü</text>
       </g>
 <line x1="1052.75" y1="814" x2="847.25" y2="814" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="860.25,806.5 847.25,814 860.25,821.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="865.25,803 847.25,814 865.25,825" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="950" y="806" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">9: true</text>
 <line x1="835.25" y1="864" x2="629.75" y2="864" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="642.75,856.5 629.75,864 642.75,871.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="647.75,853 629.75,864 647.75,875" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="732.5" y="856" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">10: true</text>
 <line x1="617.75" y1="914" x2="412.25" y2="914" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="425.25,906.5 412.25,914 425.25,921.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="430.25,903 412.25,914 430.25,925" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="515" y="906" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">11: true</text>
 <line x1="412.25" y1="964" x2="1270.25" y2="964" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1257.25,971.5 1270.25,964 1257.25,956.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1252.25,975 1270.25,964 1252.25,953" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="841.25" y="956" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">12: odemeAl()</text>
 <g>
@@ -181,39 +181,39 @@
         <text x="434.25" y="1000" font-family="'EB Garamond','Georgia','Cambria',serif" font-style="italic" font-size="11.5" fill="#0c0c0c">Strategy: sipariş kendi yöntemini taşır</text>
       </g>
 <line x1="1282.25" y1="1058" x2="1487.75" y2="1058" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1474.75,1065.5 1487.75,1058 1474.75,1050.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1469.75,1069 1487.75,1058 1469.75,1047" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1385" y="1050" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">13: odemeYap(tutar)</text>
 <line x1="1487.75" y1="1108" x2="1282.25" y2="1108" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="1295.25,1100.5 1282.25,1108 1295.25,1115.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1300.25,1097 1282.25,1108 1300.25,1119" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1385" y="1100" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">14: true</text>
 <line x1="1270.25" y1="1158" x2="412.25" y2="1158" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="425.25,1150.5 412.25,1158 425.25,1165.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="430.25,1147 412.25,1158 430.25,1169" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="841.25" y="1150" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">15: true</text>
 <line x1="412.25" y1="1208" x2="1705.25" y2="1208" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1692.25,1215.5 1705.25,1208 1692.25,1200.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1687.25,1219 1705.25,1208 1687.25,1197" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1058.75" y="1200" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">16: tumKomutlariCalistir(s)</text>
 <path d="M 1717.25 1258 L 1777.25 1258 L 1777.25 1280 L 1721.25 1280"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1734.25,1272.5 1721.25,1280 1734.25,1287.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1739.25,1269 1721.25,1280 1739.25,1291" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1725.25" y="1252" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">FaturaDuzenle.calistir(s)</text>
 <path d="M 1717.25 1326 L 1777.25 1326 L 1777.25 1348 L 1721.25 1348"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1734.25,1340.5 1721.25,1348 1734.25,1355.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1739.25,1337 1721.25,1348 1739.25,1359" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1725.25" y="1320" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">FaturaGonder.calistir(s)</text>
 <path d="M 1717.25 1394 L 1777.25 1394 L 1777.25 1416 L 1721.25 1416"
         fill="none" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1734.25,1408.5 1721.25,1416 1734.25,1423.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1739.25,1405 1721.25,1416 1739.25,1427" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1725.25" y="1388" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12" fill="#0c0c0c">AlacaklaraKaydet.calistir(s)</text>
 <line x1="1705.25" y1="1462" x2="412.25" y2="1462" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="425.25,1454.5 412.25,1462 425.25,1469.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="430.25,1451 412.25,1462 430.25,1473" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1058.75" y="1454" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">20: (donus)</text>
 <line x1="400.25" y1="1512" x2="194.75" y2="1512" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="207.75,1504.5 194.75,1512 207.75,1519.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="212.75,1501 194.75,1512 212.75,1523" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="297.5" y="1504" text-anchor="middle" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="12.5" fill="#0c0c0c"
         paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">21: siparis onaylandi</text>
 </svg>

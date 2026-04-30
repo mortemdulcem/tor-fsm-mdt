@@ -11,9 +11,9 @@
     <line x1="60" y1="80" x2="1840" y2="80" stroke="#1a1a1a" stroke-width="0.8"/>
   
   <g class="rel-association">
-<path d="M 340 252 L 360 241" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 340 252 L 360 241" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="347,248.5 360,241 347,233.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="342,252 360,241 342,230" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="362" y="248" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <text x="338" y="253" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1..*</text>
 <g>
@@ -25,19 +25,19 @@
     </g>
 </g>
 <g class="rel-realization">
-<path d="M 850 160 L 850 132 L 536 132 L 536 132 L 536 160" fill="none" stroke="#1a1a1a" stroke-width="1.3"
-    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="536,160 526,144 546,144" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<path d="M 850 160 L 850 132 L 536 132 L 536 132 L 536 160" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="536,160 523,140 549,140" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 </g>
 <g class="rel-realization">
-<path d="M 1140 160 L 1140 132 L 600 132 L 600 132 L 600 160" fill="none" stroke="#1a1a1a" stroke-width="1.3"
-    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="600,160 590,144 610,144" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<path d="M 1140 160 L 1140 132 L 600 132 L 600 132 L 600 160" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="600,160 587,140 613,140" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 </g>
 <g class="rel-aggregation">
-<path d="M 864 530 L 864 502 L 520 502 L 520 350 L 520 322" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 864 530 L 864 502 L 520 502 L 520 350 L 520 322" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="864,530 855,520 864,510 873,520" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="864,530 853,518 864,506 875,518" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 <text x="856" y="512" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <text x="528" y="348" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..*</text>
 <g>
@@ -49,9 +49,9 @@
     </g>
 </g>
 <g class="rel-dependency">
-<path d="M 1026 530 L 1026 502 L 1440 502 L 1440 372 L 1440 344" fill="none" stroke="#1a1a1a" stroke-width="1.3"
-    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="1447.5,357 1440,344 1432.5,357" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<path d="M 1026 530 L 1026 502 L 1440 502 L 1440 372 L 1440 344" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1451,362 1440,344 1429,362" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <g>
       <text x="1233" y="433" text-anchor="middle"
         font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#0c0c0c"
@@ -61,14 +61,14 @@
     </g>
 </g>
 <g class="rel-realization">
-<path d="M 540 699 L 380 600" fill="none" stroke="#1a1a1a" stroke-width="1.3"
-    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="380,600 396,590 396,610" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<path d="M 540 699 L 380 600" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="380,600 400,587 400,613" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 </g>
 <g class="rel-aggregation">
-<path d="M 354 1020 L 354 992 L 220 992 L 220 698 L 220 670" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 354 1020 L 354 992 L 220 992 L 220 698 L 220 670" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="354,1020 345,1010 354,1000 363,1010" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="354,1020 343,1008 354,996 365,1008" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 <text x="346" y="1002" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <text x="228" y="696" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..*</text>
 <g>
@@ -80,9 +80,9 @@
     </g>
 </g>
 <g class="rel-composition">
-<path d="M 621 868 L 621 896 L 482 896 L 482 992 L 482 1020" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 621 868 L 621 896 L 482 896 L 482 992 L 482 1020" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="621,868 630,878 621,888 612,878" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="621,868 632,880 621,892 610,880" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 <text x="629" y="894" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <text x="474" y="1002" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1..*</text>
 <g>
@@ -94,9 +94,9 @@
     </g>
 </g>
 <g class="rel-composition">
-<path d="M 864 868 L 864 896 L 804 896 L 804 992 L 804 1020" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 864 868 L 864 896 L 804 896 L 804 992 L 804 1020" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="864,868 873,878 864,888 855,878" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="864,868 875,880 864,892 853,880" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 <text x="872" y="894" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <text x="796" y="1002" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1..*</text>
 <g>
@@ -108,29 +108,29 @@
     </g>
 </g>
 <g class="rel-inheritance">
-<path d="M 190 1340 L 190 1312 L 386 1312 L 386 1298 L 386 1270" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 190 1340 L 190 1312 L 386 1312 L 386 1298 L 386 1270" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="386,1270 396,1286 376,1286" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="386,1270 399,1290 373,1290" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 </g>
 <g class="rel-inheritance">
-<path d="M 480 1340 L 480 1312 L 514 1312 L 514 1298 L 514 1270" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 480 1340 L 480 1312 L 514 1312 L 514 1298 L 514 1270" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="514,1270 524,1286 504,1286" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="514,1270 527,1290 501,1290" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 </g>
 <g class="rel-inheritance">
-<path d="M 820 1340 L 820 1312 L 768 1312 L 768 1276 L 768 1248" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 820 1340 L 820 1312 L 768 1312 L 768 1276 L 768 1248" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="768,1248 778,1264 758,1264" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="768,1248 781,1268 755,1268" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 </g>
 <g class="rel-inheritance">
-<path d="M 1180 1340 L 1180 1312 L 912 1312 L 912 1276 L 912 1248" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 1180 1340 L 1180 1312 L 912 1312 L 912 1276 L 912 1248" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="912,1248 922,1264 902,1264" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="912,1248 925,1268 899,1268" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 </g>
 <g class="rel-aggregation">
-<path d="M 1020 1088.4 L 1380 1101" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 1020 1088.4 L 1380 1101" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1020,1088.4 1030,1079.4 1040,1088.4 1030,1097.4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="1020,1088.4 1032,1077.4 1044,1088.4 1032,1099.4" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 <text x="1042" y="1084.4" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <text x="1358" y="1113" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <g>
@@ -142,29 +142,29 @@
     </g>
 </g>
 <g class="rel-realization">
-<path d="M 1490 1270 L 1490 1242 L 1470 1242 L 1470 1210 L 1470 1182" fill="none" stroke="#1a1a1a" stroke-width="1.3"
-    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1470,1182 1480,1198 1460,1198" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<path d="M 1490 1270 L 1490 1242 L 1470 1242 L 1470 1210 L 1470 1182" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1470,1182 1483,1202 1457,1202" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 </g>
 <g class="rel-realization">
-<path d="M 1750 1270 L 1750 1242 L 1590 1242 L 1590 1210 L 1590 1182" fill="none" stroke="#1a1a1a" stroke-width="1.3"
-    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polygon points="1590,1182 1600,1198 1580,1198" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<path d="M 1750 1270 L 1750 1242 L 1590 1242 L 1590 1210 L 1590 1182" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="1590,1182 1603,1202 1577,1202" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 </g>
 <g class="rel-dependency">
-<path d="M 1490 1432 L 1490 1460 L 1446 1460 L 1446 1452 L 1446 1480" fill="none" stroke="#1a1a1a" stroke-width="1.3"
-    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="1438.5,1467 1446,1480 1453.5,1467" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<path d="M 1490 1432 L 1490 1460 L 1446 1460 L 1446 1452 L 1446 1480" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1435,1462 1446,1480 1457,1462" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 </g>
 <g class="rel-dependency">
-<path d="M 1750 1432 L 1750 1460 L 1534 1460 L 1534 1452 L 1534 1480" fill="none" stroke="#1a1a1a" stroke-width="1.3"
-    stroke-dasharray="6,5" stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="1526.5,1467 1534,1480 1541.5,1467" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<path d="M 1750 1432 L 1750 1460 L 1534 1460 L 1534 1452 L 1534 1480" fill="none" stroke="#1a1a1a" stroke-width="1.6"
+    stroke-dasharray="7,5" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1523,1462 1534,1480 1545,1462" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 </g>
 <g class="rel-association">
-<path d="M 340 288.79999999999995 L 368 288.79999999999995 L 368 241 L 992 241 L 1020 241" fill="none" stroke="#1a1a1a" stroke-width="1.3"
+<path d="M 340 288.79999999999995 L 368 288.79999999999995 L 368 241 L 992 241 L 1020 241" fill="none" stroke="#1a1a1a" stroke-width="1.6"
      stroke-linejoin="round" stroke-linecap="round"/>
-<polyline points="1007,248.5 1020,241 1007,233.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1002,252 1020,241 1002,230" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="362" y="284.79999999999995" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">1</text>
 <text x="998" y="253" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">0..*</text>
 </g>
@@ -587,22 +587,22 @@
 <line x1="60" y1="1780" x2="1840" y2="1780" stroke="#1a1a1a" stroke-width="0.8"/>
 <text x="60" y="1802" font-family="'EB Garamond','Georgia','Cambria',serif" font-size="13" font-style="italic" fill="#3a3a3a">Notasyon Açıklaması</text>
 <line x1="64" y1="1830" x2="116" y2="1830" stroke="#1a1a1a" stroke-width="1.3" />
-<polygon points="116,1830 100,1840 100,1820" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="116,1830 96,1843 96,1817" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 <text x="126" y="1834" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Kalitim (inheritance)</text>
 <line x1="360.6666666666667" y1="1830" x2="412.6666666666667" y2="1830" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polygon points="412.6666666666667,1830 396.6666666666667,1840 396.6666666666667,1820" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="412.6666666666667,1830 392.6666666666667,1843 392.6666666666667,1817" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 <text x="422.6666666666667" y="1834" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Gerceklestirme (realization)</text>
 <line x1="657.3333333333334" y1="1830" x2="709.3333333333334" y2="1830" stroke="#1a1a1a" stroke-width="1.3" />
-<polygon points="657.3333333333334,1830 667.3333333333334,1821 677.3333333333334,1830 667.3333333333334,1839" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="657.3333333333334,1830 669.3333333333334,1819 681.3333333333334,1830 669.3333333333334,1841" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 <text x="719.3333333333334" y="1834" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Birikim (aggregation)</text>
 <line x1="954" y1="1830" x2="1006" y2="1830" stroke="#1a1a1a" stroke-width="1.3" />
-<polygon points="954,1830 964,1821 974,1830 964,1839" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter"/>
+<polygon points="954,1830 966,1819 978,1830 966,1841" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.8" stroke-linejoin="miter"/>
 <text x="1016" y="1834" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Olusum (composition)</text>
 <line x1="1250.6666666666667" y1="1830" x2="1302.6666666666667" y2="1830" stroke="#1a1a1a" stroke-width="1.3" />
-<polyline points="1289.6666666666667,1837.5 1302.6666666666667,1830 1289.6666666666667,1822.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1284.6666666666667,1841 1302.6666666666667,1830 1284.6666666666667,1819" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1312.6666666666667" y="1834" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Iliski (association)</text>
 <line x1="1547.3333333333335" y1="1830" x2="1599.3333333333335" y2="1830" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="6,5"/>
-<polyline points="1586.3333333333335,1837.5 1599.3333333333335,1830 1586.3333333333335,1822.5" fill="none" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="miter" stroke-linecap="round"/>
+<polyline points="1581.3333333333335,1841 1599.3333333333335,1830 1581.3333333333335,1819" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linejoin="miter" stroke-linecap="round"/>
 <text x="1609.3333333333335" y="1834" font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-size="11.5" fill="#0c0c0c">Bagimlilik (dependency)</text>
 </g>
 </svg>
