@@ -585,10 +585,10 @@ export const soru2 = {
   notes: [
     {
       // CoR / Template Method aciklamasi
-      text: "Şablon Yöntem:\nkontrolEt(s) sabit kalır;\nalt sınıf yalnızca\nkontroluUygula(s) yi yazar.\nHalka düşerse zincir kirilir.",
-      x: 440, y: 600, w: 210,
+      text: "Şablon Yöntem:\nkontrolEt(s) sabit kalır;\nalt sınıf sadece\nkontroluUygula(s) yazar.\nHalka düşerse zincir kırılır.",
+      x: 60, y: 400, w: 360,
       attachTo: "SiparisKontrolu",
-      attachSide: "right",
+      attachSide: "top",
     },
     {
       // Komut / Macro Command aciklamasi

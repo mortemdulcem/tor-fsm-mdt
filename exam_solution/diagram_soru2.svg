@@ -561,31 +561,31 @@
     stroke="#1a1a1a" stroke-width="0.8"/>
 </g>
   <g>
-<line x1="440" y1="755.5" x2="420" y2="763"
+<line x1="240" y1="611" x2="240" y2="660"
       stroke="#1a1a1a" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
-<path d="M 440 700
-                L 638 700
-                L 650 712
-                L 650 811
-                L 440 811 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
-<path d="M 638 700
-                    L 638 712
-                    L 650 712" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-<text x="450" y="729"
+<path d="M 60 500
+                L 408 500
+                L 420 512
+                L 420 611
+                L 60 611 Z" fill="#fdf6dc" stroke="#1a1a1a" stroke-width="1"/>
+<path d="M 408 500
+                    L 408 512
+                    L 420 512" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+<text x="70" y="529"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">Şablon Yöntem:</text>
-<text x="450" y="744"
+<text x="70" y="544"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
       fill="#0c0c0c">kontrolEt(s) sabit kalır;</text>
-<text x="450" y="759"
+<text x="70" y="559"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
-      fill="#0c0c0c">alt sınıf yalnızca</text>
-<text x="450" y="774"
+      fill="#0c0c0c">alt sınıf sadece</text>
+<text x="70" y="574"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
-      fill="#0c0c0c">kontroluUygula(s) yi yazar.</text>
-<text x="450" y="789"
+      fill="#0c0c0c">kontroluUygula(s) yazar.</text>
+<text x="70" y="589"
       font-family="'Inter','Helvetica Neue','Segoe UI',Arial,sans-serif" font-style="italic" font-size="11.5"
-      fill="#0c0c0c">Halka düşerse zincir kirilir.</text>
+      fill="#0c0c0c">Halka düşerse zincir kırılır.</text>
 </g>
 <g>
 <line x1="1530" y1="860" x2="1500" y2="741"
