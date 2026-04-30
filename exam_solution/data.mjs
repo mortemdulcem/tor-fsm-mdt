@@ -180,7 +180,7 @@ export const soru1 = {
         "+ modAyarla(mod : CalismaModu) : void",
         "+ aktifModu() : CalismaModu",
         "+ durumGetir() : String",
-        "+ komutCalistir(komut : String) : void  {abstract}",
+        "+ komutCalistir(komut) : void  {abstract}",
       ],
     },
     {
