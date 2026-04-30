@@ -270,10 +270,9 @@ export const soru1 = {
     { from: "AkilliEvIzlemeMotoru", fromSide: "left", fromOffset: 0.5, to: "SensorGozlemcisi", toSide: "right", toOffset: 0.5, type: "realization" },
     // Sensor uses observer
     { from: "Sensor", fromSide: "top", fromOffset: 0.2, to: "SensorGozlemcisi", toSide: "bottom", toOffset: 0.5, type: "aggregation", mFrom: "1", mTo: "0..*", label: "gozlemciler", routing: "orthogonal" },
-    // Sensor creates SensorOlayi
-    { from: "Sensor", fromSide: "left", fromOffset: 0.5, to: "SensorOlayi", toSide: "right", toOffset: 0.7, type: "dependency", label: "<<creates>>" },
-    // SensorOlayi uses SensorTipi
-    { from: "SensorOlayi", fromSide: "bottom", fromOffset: 0.3, to: "SensorTipi", toSide: "top", toOffset: 0.5, type: "association", mFrom: "1", mTo: "1", routing: "orthogonal" },
+    // Not: Sensor.bildir(SensorOlayi) ve SensorOlayi.tip:SensorTipi
+    // bağlantıları sınıf nitelik/imzaları üzerinden zaten görünür;
+    // diyagramda ek ok çakışmasını önlemek için ayrıca çizilmemiştir.
     // Mediator owns Sensor (composition)
     { from: "AkilliEvIzlemeMotoru", fromSide: "bottom", fromOffset: 0.15, to: "Sensor", toSide: "top", toOffset: 0.6, type: "composition", mFrom: "1", mTo: "1..*", label: "sensorler", routing: "orthogonal" },
     // Mediator owns EvSistemi (composition)
