@@ -30,3 +30,9 @@ id = "gHkBDedIpClcy8aRWwmCs"
 uri = "file://experiments/trials.csv"
 type = "table"
 title = "Ham Deney Verisi (90 koşu)"
+
+[[outputs]]
+id = "dVcgP4IiSOBVn5A21t9zD"
+uri = "file://thesis/Tez_Taslagi.pdf"
+type = "pdf"
+title = "Tez Taslağı (Bölüm 1-6 + Kaynakça + Ek A/B)"
