@@ -18,3 +18,15 @@ id = "ertWEvrYOXkG6_Dvnny5O"
 uri = "file://proposal_revised/Literatur_Notlari.pdf"
 type = "pdf"
 title = "Literatür Notları (SLR — 20 Kaynak)"
+
+[[outputs]]
+id = "zF-FaQb4WTwtFDIt0bxDJ"
+uri = "file://experiments/Bolum_3_5_Rapor.pdf"
+type = "pdf"
+title = "Bölüm 3-5 Rapor (Yöntem + Deney + Bulgular)"
+
+[[outputs]]
+id = "gHkBDedIpClcy8aRWwmCs"
+uri = "file://experiments/trials.csv"
+type = "table"
+title = "Ham Deney Verisi (90 koşu)"

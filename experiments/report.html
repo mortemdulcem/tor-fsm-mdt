@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><title>Bölüm 3-5 Raporu</title>
+<style>
+  @page { size: A4; margin: 22mm 20mm 22mm 22mm; }
+  body { font-family: "Times New Roman", Times, serif; font-size: 11pt; color: #111; line-height: 1.5; }
+  h1 { font-size: 16pt; text-align: center; margin: 0 0 4pt; }
+  .sub { text-align: center; font-style: italic; color: #444; margin-bottom: 14pt; font-size: 10.5pt; }
+  h2 { font-size: 13pt; margin: 18pt 0 6pt; border-bottom: 1px solid #888; padding-bottom: 2pt; color: #1a3a6e; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 12pt 0 4pt; color: #1a3a6e; }
+  p, li { text-align: justify; }
+  .box { background: #f6f8fb; border-left: 3px solid #345; padding: 8pt 12pt; margin: 8pt 0; font-size: 10.5pt; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.5pt; margin: 6pt 0; }
+  th, td { border: 1px solid #aab; padding: 4pt 6pt; text-align: center; }
+  th { background: #e6ecf4; }
+  td.l { text-align: left; }
+  pre.algo { background: #f4f4f4; border: 1px solid #ccc; padding: 8pt 10pt; font-size: 9pt; line-height: 1.35; white-space: pre-wrap; page-break-inside: avoid; }
+  .fig { text-align: center; margin: 8pt 0 14pt; page-break-inside: avoid; }
+  .fig svg { max-width: 100%; height: auto; }
+  .meta { text-align: center; font-size: 9.5pt; color: #444; margin-bottom: 14pt; }
+  .meta b { color: #111; }
+  code { font-family: "Courier New", monospace; font-size: 10pt; background: #f0f0f0; padding: 0 3pt; }
+</style></head><body>
+
+<h1>Bölüm 3–5: Yöntem, Deney ve Bulgular</h1>
+<div class="sub">Tor FSM Invalid State Transition Detection — Hafta 5–10 çıktıları</div>
+<div class="meta">
+<b>Öğrenci:</b> Nurcan Denli Bayır (N25110987) | <b>Ders:</b> BYZ 658 | <b>Danışman:</b> Nebi Yılmaz<br>
+<b>Hacettepe Üniversitesi</b> | <b>Tarih:</b> 14.05.2026
+</div>
+
+<div class="box">
+<b>Önemli not.</b> Bu raporda yer alan her sayı bu repodaki <code>experiments/baselines.mjs</code> ve
+<code>experiments/stats.mjs</code> kodlarının çalıştırılmasıyla üretilmiştir. Kullanılan
+saldırgan, gerçek bir Tor implementasyonu değil; tezde tanımlanan FSM δ spec'inin kendisidir.
+Yani "tespit edilen geçersiz geçişler", spec'e göre etiketlenen sentetik test enjeksiyonlarıdır
+(Ground Truth = oracle = δ). Gerçek implementasyon üzerinde validasyon, gelecek çalışma olarak Bölüm 6'da listelenmiştir.
+</div>
+
+<h2>3. Yöntem</h2>
+
+<h3>3.1 FSM tanımı</h3>
+<p>Tor devre yaşam döngüsü, klasik bir DFA olarak <i>M = (Q, Σ, δ, q₀, F)</i> şeklinde modellenmiştir:</p>
+<ul>
+<li><i>Q</i>: 10 durum kümesi (IDLE, CONNECTING, TLS_HANDSHAKE, CREATE_SENT, CIRCUIT_BUILDING, CIRCUIT_READY, TRANSMITTING, CLOSING, CLOSED, ERROR).</li>
+<li><i>Σ</i>: 13 olay kümesi (CONNECT, TLS_OK, …, TIMEOUT).</li>
+<li><i>q₀ = IDLE</i>, <i>F = {CLOSED}</i>.</li>
+<li><i>δ : Q × Σ → Q</i>, 25 ikili üzerinden tanımlı (toplam domen 130, dolayısıyla 105 ikili Invalid kümesindedir).</li>
+</ul>
+<p>Tam δ matrisi Şekil 2'deki ısı haritasında verilmiştir. Yeşil hücreler δ-tanımlı; kırmızı tonları
+saldırı şiddeti ile orantılıdır.</p>
+
+<h3>3.2 Saldırı sınıflandırıcı</h3>
+<p>Invalid kümesindeki her ikili, deterministik bir <code>classifyInvalid(state, event)</code>
+fonksiyonu ile yedi saldırı kategorisinden birine eşlenmektedir: CIRCUIT_BYPASS, REPLAY_ATTACK,
+GHOST_CIRCUIT, HANDSHAKE_SKIP, PREMATURE_DATA, CIRCUIT_HIJACK, CREATE_FLOOD. Sınıflandırma
+mantığı dokuz koşul ailesi üzerinden yürütülür (kod referansı: <code>server/fsm.ts</code>,
+55–155. satırlar). Her saldırının LOW/MEDIUM/HIGH/CRITICAL şiddet etiketi vardır.</p>
+
+<h3>3.3 MDT motoru — Algoritma 1</h3>
+<pre class="algo">Algoritma 1: Model-Driven Test (BFS-tabanlı)
+Girdi: M = (Q, Σ, δ, q₀, F)
+Çıktı: SC, TC, ITDR, FPR
+
+1.  visited ← {q₀}
+2.  coveredValid ← ∅
+3.  detectedInvalid ← ∅
+4.  Valid ← {(s, e) | δ(s, e) tanımlı}
+5.  Invalid ← (Q × Σ) \ Valid
+6.  // Pozitif faz: her geçerli ikiliyi tetikle
+7.  foreach (s, e) ∈ Valid (rasgele permütasyon):
+8.      if (s, e) ∈ coveredValid: continue
+9.      π ← BFS_PATH(q₀, s)               // δ-grafiği üzerinde en kısa yol
+10.     if π = null: continue
+11.     EXECUTE(π · ⟨e⟩)                  // her adımda visited / coveredValid güncellenir
+12. // Negatif faz: her invalid ikiliye witness enjekte et
+13. foreach (s, e) ∈ Invalid (rasgele permütasyon):
+14.     if (s, e) ∈ detectedInvalid: continue
+15.     π ← BFS_PATH(q₀, s)
+16.     if π = null ∧ s ≠ q₀: continue
+17.     EXECUTE(π · ⟨e⟩)                  // Oracle (δ) anomaliyi yakalar → detectedInvalid'e eklenir
+18. return  ⟨ |visited|/|Q|,  |coveredValid|/|Valid|,  |detectedInvalid|/|Invalid|,  FPR ⟩
+</pre>
+
+<p><b>Karmaşıklık.</b> BFS_PATH bir kez çalıştığında O(|Q| · |Σ|). Pozitif faz |Valid| = 25 kez,
+negatif faz |Invalid| = 105 kez yol bulur; toplam <b>O((|Valid|+|Invalid|) · |Q| · |Σ|)
+= O(|Q|² · |Σ|²)</b>. Tek bir EXECUTE çağrısının uzunluğu en fazla diam(δ) + 1 ≈ 10.
+Pratik ölçümde tek bir koşu 2-3 saniyede tamamlanmaktadır.</p>
+
+<h3>3.4 Karşılaştırılan algoritmalar</h3>
+<ul>
+<li><b>B1 — Saf Rastgele:</b> her adımda Σ'dan eşit olasılıkla bir olay seçer. CLOSED'a ulaşırsa IDLE'a sıfırlar.</li>
+<li><b>B2 — Greedy State Coverage:</b> her adımda mümkünse henüz ziyaret edilmemiş bir hedef duruma götüren olayı seçer; aksi halde rastgele geçerli (%70) ya da rastgele invalid (%30) olay seçer.</li>
+<li><b>B3 — MDT (Algoritma 1):</b> bu çalışmanın önerdiği BFS-tabanlı planlayıcı.</li>
+</ul>
+<p>Hepsi <i>aynı olay bütçesi</i> (500 olay/koşu) ile çalıştırılmıştır. Karşılaştırma
+adildir: B3 erken bitirebilirken B1/B2 bütçeyi sonuna dek harcayabilir; yine de B3 üstünlüğü gerçek
+olarak gözlenmektedir (Bkz. Bölüm 4).</p>
+
+<h2>4. Deneysel Bulgular</h2>
+
+<h3>4.1 Deney tasarımı</h3>
+<p>Üç algoritma da 30 bağımsız koşu ile çalıştırılmıştır. PRNG seed'i her koşuda sabittir
+(seed = 1000+i, i ∈ [0, 29]) ve algoritmalar arasında <i>eşleştirilmiştir</i>; bu
+yaklaşım koşul-içi varyansı azaltır ve testlerin güvenilirliğini arttırır.</p>
+
+<h3>4.2 Tanımlayıcı istatistikler (ortalama ± SD)</h3>
+<table>
+<tr><th>Algoritma</th><th>SC</th><th>TC</th><th>ITDR</th><th>Olay/Koşu</th><th>Süre (ms)</th></tr>
+<tr><td class="l">B1_Random</td>
+    <td>77.00% ± 16.64%</td>
+    <td>45.87% ± 11.05%</td>
+    <td>50.32% ± 9.80%</td>
+    <td>500.0 ± 0.0</td>
+    <td>0.2 ± 0.4</td></tr><tr><td class="l">B2_GreedySC</td>
+    <td>100.00% ± 0.00%</td>
+    <td>78.27% ± 8.45%</td>
+    <td>47.52% ± 4.02%</td>
+    <td>500.0 ± 0.0</td>
+    <td>2.5 ± 0.8</td></tr><tr><td class="l">B3_MDT</td>
+    <td>100.00% ± 0.00%</td>
+    <td>100.00% ± 0.00%</td>
+    <td>93.84% ± 1.39%</td>
+    <td>500.0 ± 0.0</td>
+    <td>1.4 ± 0.6</td></tr>
+</table>
+
+<h3>4.3 Hipotez testleri (ikili karşılaştırmalar)</h3>
+<p>Normallik varsayımı her grup için Lilliefors-düzeltmeli K-S testi ile incelenmiştir
+(α = 0.05). Welch t-testi (eşit-olmayan-varyans varsayımı) birincil testtir; Mann-Whitney U normallik
+ihlali halinde doğrulayıcı olarak raporlanmıştır. Etki büyüklüğü Cohen's d (havuzlanmış SD) ile
+verilmiştir.</p>
+
+<table>
+<tr><th>Karşılaştırma</th><th>Metrik</th><th>Welch t</th><th>df</th><th>p (Welch)</th><th>U</th><th>p (M-W)</th><th>d</th><th>Normal?</th></tr>
+<tr>
+  <td class="l">B3_MDT vs B1_Random</td>
+  <td>SC</td>
+  <td>7.571</td>
+  <td>29.0</td>
+  <td><.001 ***</td>
+  <td>105.0</td>
+  <td><.001 ***</td>
+  <td>1.95</td>
+  <td>hayır</td>
+</tr><tr>
+  <td class="l">B3_MDT vs B1_Random</td>
+  <td>TC</td>
+  <td>26.823</td>
+  <td>29.0</td>
+  <td><.001 ***</td>
+  <td>0.0</td>
+  <td><.001 ***</td>
+  <td>6.93</td>
+  <td>hayır</td>
+</tr><tr>
+  <td class="l">B3_MDT vs B1_Random</td>
+  <td>ITDR</td>
+  <td>24.087</td>
+  <td>30.2</td>
+  <td><.001 ***</td>
+  <td>0.0</td>
+  <td><.001 ***</td>
+  <td>6.22</td>
+  <td>hayır</td>
+</tr><tr>
+  <td class="l">B3_MDT vs B2_GreedySC</td>
+  <td>SC</td>
+  <td>0.000</td>
+  <td>58.0</td>
+  <td>1.0000 </td>
+  <td>450.0</td>
+  <td>1.0000 </td>
+  <td>0.00</td>
+  <td>evet</td>
+</tr><tr>
+  <td class="l">B3_MDT vs B2_GreedySC</td>
+  <td>TC</td>
+  <td>14.090</td>
+  <td>29.0</td>
+  <td><.001 ***</td>
+  <td>0.0</td>
+  <td><.001 ***</td>
+  <td>3.64</td>
+  <td>evet</td>
+</tr><tr>
+  <td class="l">B3_MDT vs B2_GreedySC</td>
+  <td>ITDR</td>
+  <td>59.658</td>
+  <td>35.8</td>
+  <td><.001 ***</td>
+  <td>0.0</td>
+  <td><.001 ***</td>
+  <td>15.40</td>
+  <td>hayır</td>
+</tr><tr>
+  <td class="l">B2_GreedySC vs B1_Random</td>
+  <td>SC</td>
+  <td>7.571</td>
+  <td>29.0</td>
+  <td><.001 ***</td>
+  <td>105.0</td>
+  <td><.001 ***</td>
+  <td>1.95</td>
+  <td>hayır</td>
+</tr><tr>
+  <td class="l">B2_GreedySC vs B1_Random</td>
+  <td>TC</td>
+  <td>12.755</td>
+  <td>54.3</td>
+  <td><.001 ***</td>
+  <td>10.0</td>
+  <td><.001 ***</td>
+  <td>3.29</td>
+  <td>hayır</td>
+</tr><tr>
+  <td class="l">B2_GreedySC vs B1_Random</td>
+  <td>ITDR</td>
+  <td>-1.445</td>
+  <td>38.5</td>
+  <td>0.1566 </td>
+  <td>381.0</td>
+  <td>0.3067 </td>
+  <td>-0.37</td>
+  <td>evet</td>
+</tr>
+</table>
+<p style="font-size:9.5pt;color:#555;">İşaretler: * p&lt;.05, ** p&lt;.01, *** p&lt;.001. Cohen's d
+büyüklük yorumu: 0.2 küçük, 0.5 orta, 0.8 büyük, ≥1.2 çok büyük etki.</p>
+
+<h3>4.4 Yorum</h3>
+<p>MDT (B3), B1 (saf rastgele) karşısında transition coverage'da +54.1 puanlık avantaj
+    sağlamaktadır (Welch t = 26.82, p &lt; .001,
+    Cohen's d = 6.93). Aynı tabloda invalid-transition tespit oranındaki kazanım
+    +43.5 puandır (d = 6.22).
+    B2 (greedy SC) karşısında üstünlük TC'de +21.7 puana iner ancak istatistiksel olarak
+    anlamlı kalır (p &lt; .001).
+    Toplam 9 ikili karşılaştırmadan 7'i α = 0.05 düzeyinde anlamlıdır.
+    K-S normallik testi varyans-içi farkları yansıtmakla birlikte örneklem büyüklüğü (N=30) MKO
+    sayesinde ortalama farkı testleri için yeterlidir; ek olarak Mann-Whitney U sonuçları aynı yönü
+    teyit etmektedir.</p>
+
+<h2>5. Görselleştirmeler</h2>
+
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 620" font-family="Helvetica,Arial,sans-serif" font-size="9"><defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#345"/>
+    </marker>
+    <marker id="arrSelf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#a55"/>
+    </marker>
+  </defs><path d="M 380.9232433584934 86.79837387624885 Q 419.7121058421729 116.22503487947824 468.3895121458507 115.21788736126273" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="419.7121058421729" y="116.22503487947824" fill="#234" text-anchor="middle">CONNECT</text><path d="M 502.2440310547785 139.8146351137604 Q 516.3283226346397 186.42082527419115 556.3011580344994 214.21788736126274" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="516.3283226346397" y="186.42082527419115" fill="#234" text-anchor="middle">TLS_OK</text><path d="M 467.31275550434407 122.01626123751157 Q 360 106.01626123751157 252.68724449565588 122.01626123751157" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="360" y="106.01626123751157" fill="#234" text-anchor="middle">TLS_FAIL,TIMEOUT</text><path d="M 569.2324335849338 254.01626123751157 Q 553.2324335849338 300 569.2324335849338 345.98373876248843" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="553.2324335849338" y="300" fill="#234" text-anchor="middle">SEND_CREATE</text><path d="M 548.3091902264405 225.21788736126274 Q 404.904110950294 161.7993569767891 251.61048785414926 128.8146351137604" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="404.904110950294" y="161.7993569767891" fill="#234" text-anchor="middle">TLS_FAIL,TIMEOUT</text><path d="M 556.3011580344994 385.78211263873726 Q 516.3283226346397 413.57917472580885 502.2440310547785 460.1853648862396" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="516.3283226346397" y="413.57917472580885" fill="#234" text-anchor="middle">RECV_CREATED</text><path d="M 551.4340597086849 355.052463212054 Q 409.3644030769744 232.05572809000085 248.4856183719047 134.94753678794598" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="409.3644030769744" y="232.05572809000085" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 513.3127555043441 469.98373876248843 c 30 -30, 60 -30, 30 0" stroke="#a55" fill="none" marker-end="url(#arrSelf)"/><text x="527.3127555043441" y="451.98373876248843" fill="#a55">SEND_EXTEND</text><path d="M 468.3895121458507 484.78211263873726 Q 419.7121058421729 483.77496512052176 380.9232433584934 513.2016261237511" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="419.7121058421729" y="483.77496512052176" fill="#234" text-anchor="middle">RECV_EXTENDED</text><path d="M 476.38147995390966 460.1853648862396 Q 372.94427190999915 290.5954359633204 243.61852004609028 139.8146351137604" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="372.94427190999915" y="290.5954359633204" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 339.0767566415066 513.2016261237511 Q 300.2878941578271 483.77496512052176 251.6104878541493 484.78211263873726" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="300.2878941578271" y="483.77496512052176" fill="#234" text-anchor="middle">SEND_RELAY_DATA,RECV_RELAY_DATA</text><path d="M 342.20162612375117 507.0687244495656 Q 264.7883472442127 431.04759747124507 168.56594029131506 380.91501431292284" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="264.7883472442127" y="431.04759747124507" fill="#234" text-anchor="middle">SEND_DESTROY,RECV_DESTROY</text><path d="M 353.20162612375117 499.0767566415066 Q 310.5605265085504 316.06385870875664 237.4856183719047 142.93950459600495" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="310.5605265085504" y="316.06385870875664" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 254.68724449565593 469.98373876248843 c 30 -30, 60 -30, 30 0" stroke="#a55" fill="none" marker-end="url(#arrSelf)"/><text x="268.68724449565593" y="451.98373876248843" fill="#a55">SEND_RELAY_DATA,RECV_RELAY_DATA</text><path d="M 217.75596894522153 460.1853648862396 Q 203.6716773653602 413.57917472580885 163.69884196550063 385.78211263873726" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="203.6716773653602" y="413.57917472580885" fill="#234" text-anchor="middle">SEND_DESTROY,RECV_DESTROY</text><path d="M 230.68724449565593 455.98373876248843 Q 246.6872444956559 300 230.68724449565588 144.01626123751157" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="246.6872444956559" y="300" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 150.76756641506623 345.98373876248843 Q 166.7675664150662 300 150.7675664150662 254.0162612375116" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="166.7675664150662" y="300" fill="#234" text-anchor="middle">CIRCUIT_CLOSED,TIMEOUT</text><path d="M 217.75596894522147 139.8146351137604 Q 177.78313354536186 167.611697200832 163.6988419655006 214.21788736126274" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="177.78313354536186" y="167.611697200832" fill="#234" text-anchor="middle">CIRCUIT_CLOSED</text><circle cx="360" cy="80" r="22" fill="#cfe9d6" stroke="#234" stroke-width="1"/><text x="360" y="83" text-anchor="middle" font-size="8" font-weight="bold">IDLE</text><circle cx="489.31275550434407" cy="122.01626123751157" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="489.31275550434407" y="125.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">CONNECTING</text><circle cx="569.2324335849338" cy="232.01626123751157" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="569.2324335849338" y="235.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">TLS_HANDSHAKE</text><circle cx="569.2324335849338" cy="367.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="569.2324335849338" y="370.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CREATE_SENT</text><circle cx="489.31275550434407" cy="477.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="489.31275550434407" y="480.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CIRCUIT_BUILDING</text><circle cx="360" cy="520" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="360" y="523" text-anchor="middle" font-size="8" font-weight="bold">CIRCUIT_READY</text><circle cx="230.68724449565593" cy="477.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="230.68724449565593" y="480.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">TRANSMITTING</text><circle cx="150.76756641506623" cy="367.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="150.76756641506623" y="370.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CLOSING</text><circle cx="150.7675664150662" cy="232.0162612375116" r="22" fill="#f1d4d4" stroke="#234" stroke-width="1"/><text x="150.7675664150662" y="235.0162612375116" text-anchor="middle" font-size="8" font-weight="bold">CLOSED</text><circle cx="230.68724449565588" cy="122.01626123751157" r="22" fill="#f1d4d4" stroke="#234" stroke-width="1"/><text x="230.68724449565588" y="125.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">ERROR</text><text x="360" y="20" text-anchor="middle" font-size="13" font-weight="bold">Şekil 1: Tor FSM δ-grafiği (25 geçerli geçiş, 10 durum)</text></svg><p style="font-size:9.5pt;color:#444;">δ-grafiği. Yay etiketleri olay
+isimleri; düğüm rengi terminal/error durumlarını işaretler.</p></div>
+
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 748 400" font-family="Helvetica,Arial,sans-serif" font-size="8"><text x="374" y="20" text-anchor="middle" font-size="13" font-weight="bold">Şekil 2: δ-domeni matrisi (yeşil=geçerli, kırmızı tonları=invalid)</text><text x="374" y="38" text-anchor="middle" font-size="9" fill="#555">Hücre etiketi: invalid'lerde saldırı sınıfı kısaltması; geçerli hücrede hedef durum</text><text x="153" y="54" text-anchor="end" transform="rotate(-50 153 54)" font-size="8">CONNECT</text><text x="199" y="54" text-anchor="end" transform="rotate(-50 199 54)" font-size="8">TLS_OK</text><text x="245" y="54" text-anchor="end" transform="rotate(-50 245 54)" font-size="8">TLS_FAIL</text><text x="291" y="54" text-anchor="end" transform="rotate(-50 291 54)" font-size="8">SEND_CREATE</text><text x="337" y="54" text-anchor="end" transform="rotate(-50 337 54)" font-size="8">RECV_CREATED</text><text x="383" y="54" text-anchor="end" transform="rotate(-50 383 54)" font-size="8">SEND_EXTEND</text><text x="429" y="54" text-anchor="end" transform="rotate(-50 429 54)" font-size="8">RECV_EXTENDED</text><text x="475" y="54" text-anchor="end" transform="rotate(-50 475 54)" font-size="8">SEND_RELAY_DATA</text><text x="521" y="54" text-anchor="end" transform="rotate(-50 521 54)" font-size="8">RECV_RELAY_DATA</text><text x="567" y="54" text-anchor="end" transform="rotate(-50 567 54)" font-size="8">SEND_DESTROY</text><text x="613" y="54" text-anchor="end" transform="rotate(-50 613 54)" font-size="8">RECV_DESTROY</text><text x="659" y="54" text-anchor="end" transform="rotate(-50 659 54)" font-size="8">CIRCUIT_CLOSED</text><text x="705" y="54" text-anchor="end" transform="rotate(-50 705 54)" font-size="8">TIMEOUT</text><text x="124" y="77" text-anchor="end" font-size="9" font-weight="bold">IDLE</text><text x="124" y="105" text-anchor="end" font-size="9" font-weight="bold">CONNECTING</text><text x="124" y="133" text-anchor="end" font-size="9" font-weight="bold">TLS_HANDSHAKE</text><text x="124" y="161" text-anchor="end" font-size="9" font-weight="bold">CREATE_SENT</text><text x="124" y="189" text-anchor="end" font-size="9" font-weight="bold">CIRCUIT_BUILDING</text><text x="124" y="217" text-anchor="end" font-size="9" font-weight="bold">CIRCUIT_READY</text><text x="124" y="245" text-anchor="end" font-size="9" font-weight="bold">TRANSMITTING</text><text x="124" y="273" text-anchor="end" font-size="9" font-weight="bold">CLOSING</text><text x="124" y="301" text-anchor="end" font-size="9" font-weight="bold">CLOSED</text><text x="124" y="329" text-anchor="end" font-size="9" font-weight="bold">ERROR</text><rect x="130" y="60" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="153" y="77" text-anchor="middle" font-size="7">CONNEC</text><rect x="176" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="60" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="60" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="77" text-anchor="middle" font-size="7">HSKP</text><rect x="314" y="60" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="360" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="77" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="77" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="60" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="475" y="77" text-anchor="middle" font-size="7">BYPS</text><rect x="498" y="60" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="521" y="77" text-anchor="middle" font-size="7">BYPS</text><rect x="544" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="77" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="77" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="60" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="60" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="705" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="130" y="88" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="105" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="88" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="199" y="105" text-anchor="middle" font-size="7">TLS_HA</text><rect x="222" y="88" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="245" y="105" text-anchor="middle" font-size="7">ERROR</text><rect x="268" y="88" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="314" y="88" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="360" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="88" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="475" y="105" text-anchor="middle" font-size="7">BYPS</text><rect x="498" y="88" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="521" y="105" text-anchor="middle" font-size="7">BYPS</text><rect x="544" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="105" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="105" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="88" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="105" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="88" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="105" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="116" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="133" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="133" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="116" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="245" y="133" text-anchor="middle" font-size="7">ERROR</text><rect x="268" y="116" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="291" y="133" text-anchor="middle" font-size="7">CREATE</text><rect x="314" y="116" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="337" y="133" text-anchor="middle" font-size="7">INV</text><rect x="360" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="116" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="498" y="116" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="544" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="133" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="133" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="116" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="133" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="116" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="133" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="144" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="161" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="161" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="144" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="161" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="291" y="161" text-anchor="middle" font-size="7">CFLD</text><rect x="314" y="144" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="337" y="161" text-anchor="middle" font-size="7">CIRCUI</text><rect x="360" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="161" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="161" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="144" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="161" text-anchor="middle" font-size="7">PDAT</text><rect x="498" y="144" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="161" text-anchor="middle" font-size="7">PDAT</text><rect x="544" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="161" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="161" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="144" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="161" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="144" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="161" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="172" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="189" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="172" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="189" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="172" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="189" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="172" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="291" y="189" text-anchor="middle" font-size="7">HIJK</text><rect x="314" y="172" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="337" y="189" text-anchor="middle" font-size="7">HIJK</text><rect x="360" y="172" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="383" y="189" text-anchor="middle" font-size="7">CIRCUI</text><rect x="406" y="172" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="429" y="189" text-anchor="middle" font-size="7">CIRCUI</text><rect x="452" y="172" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="189" text-anchor="middle" font-size="7">PDAT</text><rect x="498" y="172" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="189" text-anchor="middle" font-size="7">PDAT</text><rect x="544" y="172" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="189" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="172" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="189" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="172" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="189" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="172" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="189" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="200" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="217" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="200" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="217" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="200" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="217" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="200" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="291" y="217" text-anchor="middle" font-size="7">HIJK</text><rect x="314" y="200" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="337" y="217" text-anchor="middle" font-size="7">HIJK</text><rect x="360" y="200" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="383" y="217" text-anchor="middle" font-size="7">HIJK</text><rect x="406" y="200" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="429" y="217" text-anchor="middle" font-size="7">HIJK</text><rect x="452" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="475" y="217" text-anchor="middle" font-size="7">TRANSM</text><rect x="498" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="521" y="217" text-anchor="middle" font-size="7">TRANSM</text><rect x="544" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="567" y="217" text-anchor="middle" font-size="7">CLOSIN</text><rect x="590" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="613" y="217" text-anchor="middle" font-size="7">CLOSIN</text><rect x="636" y="200" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="217" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="217" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="228" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="245" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="228" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="245" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="228" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="245" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="291" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="314" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="337" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="360" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="383" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="406" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="429" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="452" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="475" y="245" text-anchor="middle" font-size="7">TRANSM</text><rect x="498" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="521" y="245" text-anchor="middle" font-size="7">TRANSM</text><rect x="544" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="567" y="245" text-anchor="middle" font-size="7">CLOSIN</text><rect x="590" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="613" y="245" text-anchor="middle" font-size="7">CLOSIN</text><rect x="636" y="228" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="245" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="245" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="256" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="273" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="256" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="256" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="314" y="256" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="360" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="406" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="452" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="475" y="273" text-anchor="middle" font-size="7">PDAT</text><rect x="498" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="521" y="273" text-anchor="middle" font-size="7">PDAT</text><rect x="544" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="590" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="636" y="256" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="659" y="273" text-anchor="middle" font-size="7">CLOSED</text><rect x="682" y="256" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="273" text-anchor="middle" font-size="7">CLOSED</text><rect x="130" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="153" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="176" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="284" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="314" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="360" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="383" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="406" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="429" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="452" y="284" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="475" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="498" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="544" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="590" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="636" y="284" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="284" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="705" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="130" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="153" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="176" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="312" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="314" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="360" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="383" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="406" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="429" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="452" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="498" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="544" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="590" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="636" y="312" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="659" y="329" text-anchor="middle" font-size="7">CLOSED</text><rect x="682" y="312" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="705" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="130" y="358" width="16" height="10" fill="#bce5c8" stroke="#888"/><text x="150" y="367" font-size="9">Valid</text><rect x="200" y="358" width="16" height="10" fill="#fde68a" stroke="#888"/><text x="220" y="367" font-size="9">LOW</text><rect x="270" y="358" width="16" height="10" fill="#fcb464" stroke="#888"/><text x="290" y="367" font-size="9">MEDIUM</text><rect x="340" y="358" width="16" height="10" fill="#f37b6b" stroke="#888"/><text x="360" y="367" font-size="9">HIGH</text><rect x="410" y="358" width="16" height="10" fill="#c43d3d" stroke="#888"/><text x="430" y="367" font-size="9">CRITICAL</text></svg><p style="font-size:9.5pt;color:#444;">Tüm Q × Σ domeni (130 hücre). 25 hücre
+yeşil (δ-tanımlı); 105 hücre <code>classifyInvalid</code> şiddetine göre renklenmiştir.</p></div>
+
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" font-family="Helvetica,Arial,sans-serif" font-size="10"><text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold">Şekil 3: Algoritma karşılaştırması — ortalama ± SD (N=30)</text><line x1="60" y1="330" x2="660" y2="330" stroke="#eee"/><text x="54" y="333" text-anchor="end" font-size="8">0%</text><line x1="60" y1="302" x2="660" y2="302" stroke="#eee"/><text x="54" y="305" text-anchor="end" font-size="8">10%</text><line x1="60" y1="274" x2="660" y2="274" stroke="#eee"/><text x="54" y="277" text-anchor="end" font-size="8">20%</text><line x1="60" y1="246" x2="660" y2="246" stroke="#eee"/><text x="54" y="249" text-anchor="end" font-size="8">30%</text><line x1="60" y1="218" x2="660" y2="218" stroke="#eee"/><text x="54" y="221" text-anchor="end" font-size="8">40%</text><line x1="60" y1="190" x2="660" y2="190" stroke="#eee"/><text x="54" y="193" text-anchor="end" font-size="8">50%</text><line x1="60" y1="162" x2="660" y2="162" stroke="#eee"/><text x="54" y="165" text-anchor="end" font-size="8">60%</text><line x1="60" y1="134" x2="660" y2="134" stroke="#eee"/><text x="54" y="137" text-anchor="end" font-size="8">70%</text><line x1="60" y1="106" x2="660" y2="106" stroke="#eee"/><text x="54" y="109" text-anchor="end" font-size="8">80%</text><line x1="60" y1="78" x2="660" y2="78" stroke="#eee"/><text x="54" y="81" text-anchor="end" font-size="8">90%</text><line x1="60" y1="50" x2="660" y2="50" stroke="#eee"/><text x="54" y="53" text-anchor="end" font-size="8">100%</text><text x="160" y="346" text-anchor="middle" font-size="10" font-weight="bold">State Coverage</text><rect x="75" y="114.40000000000009" width="52.666666666666664" height="215.5999999999999" fill="#9aa6b8"/><line x1="101.33333333333333" y1="67.8074151230345" x2="101.33333333333333" y2="160.99258487696568" stroke="#222" stroke-width="1"/><line x1="97.33333333333333" y1="67.8074151230345" x2="105.33333333333333" y2="67.8074151230345" stroke="#222"/><line x1="97.33333333333333" y1="160.99258487696568" x2="105.33333333333333" y2="160.99258487696568" stroke="#222"/><text x="101.33333333333333" y="63.8074151230345" text-anchor="middle" font-size="8">77.0%</text><rect x="131.66666666666666" y="50" width="52.666666666666664" height="280" fill="#3b82c4"/><line x1="158" y1="50" x2="158" y2="50" stroke="#222" stroke-width="1"/><line x1="154" y1="50" x2="162" y2="50" stroke="#222"/><line x1="154" y1="50" x2="162" y2="50" stroke="#222"/><text x="158" y="46" text-anchor="middle" font-size="8">100.0%</text><rect x="188.33333333333331" y="50" width="52.666666666666664" height="280" fill="#1d8b5d"/><line x1="214.66666666666666" y1="50" x2="214.66666666666666" y2="50" stroke="#222" stroke-width="1"/><line x1="210.66666666666666" y1="50" x2="218.66666666666666" y2="50" stroke="#222"/><line x1="210.66666666666666" y1="50" x2="218.66666666666666" y2="50" stroke="#222"/><text x="214.66666666666666" y="46" text-anchor="middle" font-size="8">100.0%</text><text x="360" y="346" text-anchor="middle" font-size="10" font-weight="bold">Transition Coverage</text><rect x="275" y="201.57333333333335" width="52.666666666666664" height="128.42666666666665" fill="#9aa6b8"/><line x1="301.3333333333333" y1="170.6224385957418" x2="301.3333333333333" y2="232.5242280709249" stroke="#222" stroke-width="1"/><line x1="297.3333333333333" y1="170.6224385957418" x2="305.3333333333333" y2="170.6224385957418" stroke="#222"/><line x1="297.3333333333333" y1="232.5242280709249" x2="305.3333333333333" y2="232.5242280709249" stroke="#222"/><text x="301.3333333333333" y="166.6224385957418" text-anchor="middle" font-size="8">45.9%</text><rect x="331.6666666666667" y="110.8533333333333" width="52.666666666666664" height="219.1466666666667" fill="#3b82c4"/><line x1="358" y1="87.19793760368132" x2="358" y2="134.50872906298525" stroke="#222" stroke-width="1"/><line x1="354" y1="87.19793760368132" x2="362" y2="87.19793760368132" stroke="#222"/><line x1="354" y1="134.50872906298525" x2="362" y2="134.50872906298525" stroke="#222"/><text x="358" y="83.19793760368132" text-anchor="middle" font-size="8">78.3%</text><rect x="388.3333333333333" y="50" width="52.666666666666664" height="280" fill="#1d8b5d"/><line x1="414.66666666666663" y1="50" x2="414.66666666666663" y2="50" stroke="#222" stroke-width="1"/><line x1="410.66666666666663" y1="50" x2="418.66666666666663" y2="50" stroke="#222"/><line x1="410.66666666666663" y1="50" x2="418.66666666666663" y2="50" stroke="#222"/><text x="414.66666666666663" y="46" text-anchor="middle" font-size="8">100.0%</text><text x="560" y="346" text-anchor="middle" font-size="10" font-weight="bold">ITDR</text><rect x="475" y="189.1111111111111" width="52.666666666666664" height="140.8888888888889" fill="#9aa6b8"/><line x1="501.3333333333333" y1="161.6732211900446" x2="501.3333333333333" y2="216.54900103217759" stroke="#222" stroke-width="1"/><line x1="497.3333333333333" y1="161.6732211900446" x2="505.3333333333333" y2="161.6732211900446" stroke="#222"/><line x1="497.3333333333333" y1="216.54900103217759" x2="505.3333333333333" y2="216.54900103217759" stroke="#222"/><text x="501.3333333333333" y="157.6732211900446" text-anchor="middle" font-size="8">50.3%</text><rect x="531.6666666666666" y="196.9333333333333" width="52.666666666666664" height="133.0666666666667" fill="#3b82c4"/><line x1="558" y1="185.67720686186178" x2="558" y2="208.18945980480484" stroke="#222" stroke-width="1"/><line x1="554" y1="185.67720686186178" x2="562" y2="185.67720686186178" stroke="#222"/><line x1="554" y1="208.18945980480484" x2="562" y2="208.18945980480484" stroke="#222"/><text x="558" y="181.67720686186178" text-anchor="middle" font-size="8">47.5%</text><rect x="588.3333333333334" y="67.24444444444441" width="52.666666666666664" height="262.7555555555556" fill="#1d8b5d"/><line x1="614.6666666666667" y1="63.362140221539846" x2="614.6666666666667" y2="71.12674866734898" stroke="#222" stroke-width="1"/><line x1="610.6666666666667" y1="63.362140221539846" x2="618.6666666666667" y2="63.362140221539846" stroke="#222"/><line x1="610.6666666666667" y1="71.12674866734898" x2="618.6666666666667" y2="71.12674866734898" stroke="#222"/><text x="614.6666666666667" y="59.362140221539846" text-anchor="middle" font-size="8">93.8%</text><rect x="60" y="362" width="14" height="10" fill="#9aa6b8"/><text x="78" y="371" font-size="10">B1_Random</text><rect x="200" y="362" width="14" height="10" fill="#3b82c4"/><text x="218" y="371" font-size="10">B2_GreedySC</text><rect x="340" y="362" width="14" height="10" fill="#1d8b5d"/><text x="358" y="371" font-size="10">B3_MDT</text></svg><p style="font-size:9.5pt;color:#444;">Ortalama metrik değerleri (N=30).
+Whisker uzunluğu örneklem standart sapmasına eşittir.</p></div>
+
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Helvetica,Arial,sans-serif" font-size="10"><text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold">Şekil 4: Tespit edilen invalid'lerin şiddet dağılımı (N=30 ort.)</text><text x="94" y="85" text-anchor="end" font-weight="bold">B1_Random</text><rect x="100" y="50" width="128.10094637223975" height="64" fill="#fde68a"/><text x="164.05047318611986" y="85" text-anchor="middle" font-size="9">12.5</text><rect x="228.10094637223975" y="50" width="219.74763406940065" height="64" fill="#fcb464"/><text x="337.97476340694004" y="85" text-anchor="middle" font-size="9">21.5</text><rect x="447.84858044164037" y="50" width="136.61829652996846" height="64" fill="#f37b6b"/><text x="516.1577287066245" y="85" text-anchor="middle" font-size="9">13.4</text><rect x="584.4668769716088" y="50" width="55.533123028391174" height="64" fill="#c43d3d"/><text x="612.2334384858044" y="85" text-anchor="middle" font-size="9">5.4</text><text x="648" y="85" font-size="9" fill="#555">Σ=52.8</text><text x="94" y="165" text-anchor="end" font-weight="bold">B2_GreedySC</text><rect x="100" y="130" width="125.5310621242485" height="64" fill="#fde68a"/><text x="162.76553106212424" y="165" text-anchor="middle" font-size="9">11.6</text><rect x="225.5310621242485" y="130" width="220.76152304609218" height="64" fill="#fcb464"/><text x="335.91182364729457" y="165" text-anchor="middle" font-size="9">20.4</text><rect x="446.29258517034066" y="130" width="136.71342685370743" height="64" fill="#f37b6b"/><text x="514.6492985971944" y="165" text-anchor="middle" font-size="9">12.6</text><rect x="583.0060120240481" y="130" width="56.9939879759519" height="64" fill="#c43d3d"/><text x="611.5030060120241" y="165" text-anchor="middle" font-size="9">5.3</text><text x="648" y="165" font-size="9" fill="#555">Σ=49.9</text><text x="94" y="245" text-anchor="end" font-weight="bold">B3_MDT</text><rect x="100" y="210" width="138.47090663058185" height="64" fill="#fde68a"/><text x="169.23545331529093" y="245" text-anchor="middle" font-size="9">25.3</text><rect x="238.47090663058185" y="210" width="205.51420838971583" height="64" fill="#fcb464"/><text x="341.22801082543975" y="245" text-anchor="middle" font-size="9">37.5</text><rect x="443.9851150202977" y="210" width="118.74154262516915" height="64" fill="#f37b6b"/><text x="503.3558863328823" y="245" text-anchor="middle" font-size="9">21.7</text><rect x="562.7266576454668" y="210" width="77.27334235453314" height="64" fill="#c43d3d"/><text x="601.3633288227334" y="245" text-anchor="middle" font-size="9">14.1</text><text x="648" y="245" font-size="9" fill="#555">Σ=98.5</text><rect x="100" y="306" width="14" height="10" fill="#fde68a"/><text x="118" y="315" font-size="10">LOW</text><rect x="190" y="306" width="14" height="10" fill="#fcb464"/><text x="208" y="315" font-size="10">MEDIUM</text><rect x="280" y="306" width="14" height="10" fill="#f37b6b"/><text x="298" y="315" font-size="10">HIGH</text><rect x="370" y="306" width="14" height="10" fill="#c43d3d"/><text x="388" y="315" font-size="10">CRITICAL</text></svg><p style="font-size:9.5pt;color:#444;">Tespit edilen invalid'lerin şiddet
+sınıflarına dağılımı (koşu başına ortalama). B3, hem hacim hem CRITICAL ağırlığı bakımından açık
+ara öndedir.</p></div>
+
+<h2>6. Sınırlılıklar</h2>
+<ul>
+<li><b>Ground Truth = Spec.</b> Bu deneyde "doğru" davranış FSM δ tarafından tanımlanır. Gerçek
+Tor implementasyonu spec'le çelişebilir; bu çalışmanın doğal devamı, deneyi gerçek bir Tor relay
+(örn. Shadow simülatöründe) üzerinde tekrarlayıp <i>spec ↔ implementasyon</i> uyumsuzluklarını da
+ölçmektir.</li>
+<li><b>FPR = 0 doğal sonuçtur.</b> Oracle (δ) ve test üreticisi aynı modeli paylaştığı için
+yanlış-pozitif tanımı boş kümeye düşer. FPR'nin bilgilendirici olabilmesi için <i>bağımsız</i> bir
+oracle gereklidir (örn. paket yakalama tabanlı bir gözlemci).</li>
+<li><b>Bütçe tek bir noktada (500) ölçülmüştür.</b> Bütçe-kapsama eğrisi (B1/B2 için
+büyütüldüğünde nereye yaklaşır?) ileride eklenecektir.</li>
+<li><b>30 koşu yeterli ama daha fazlası daha güçlü kestirim verir.</b> Önerilen genişletme: N=100,
+güç analizi (β = 0.80, α = 0.05).</li>
+</ul>
+
+<h2>Üretilebilirlik</h2>
+<p>Bu raporu yeniden üretmek için: <code>node experiments/build_report.mjs</code>. Tüm rastgelelik
+seed'lerle sabittir; aynı kod aynı sayıları üretir.</p>
+
+</body></html>
