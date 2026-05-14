@@ -12,3 +12,9 @@ id = "HR8L-qxoGoCO8cMx5Qa02"
 uri = "file://proposal_revised/Proje_Onerisi_Revize.pdf"
 type = "pdf"
 title = "Proje Önerisi — Revize Sürüm"
+
+[[outputs]]
+id = "ertWEvrYOXkG6_Dvnny5O"
+uri = "file://proposal_revised/Literatur_Notlari.pdf"
+type = "pdf"
+title = "Literatür Notları (SLR — 20 Kaynak)"

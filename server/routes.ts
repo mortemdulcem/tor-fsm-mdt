@@ -4,105 +4,40 @@ import path from "path";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
+import {
+  STATES, EVENTS, VALID, validKeys, totalDomain, totalValid, totalInvalid,
+  classifyInvalid, type State, type Event, k,
+} from "./fsm";
 
-// --- Tor FSM Simulator ---
-const TorState = {
-  IDLE: 'IDLE',
-  CONNECTING: 'CONNECTING',
-  TLS_HANDSHAKE: 'TLS_HANDSHAKE',
-  CREATE_SENT: 'CREATE_SENT',
-  CIRCUIT_BUILDING: 'CIRCUIT_BUILDING',
-  CIRCUIT_READY: 'CIRCUIT_READY',
-  TRANSMITTING: 'TRANSMITTING',
-  CLOSING: 'CLOSING',
-  CLOSED: 'CLOSED',
-  ERROR: 'ERROR'
-};
-
-const TorEvent = {
-  CONNECT: 'CONNECT',
-  TLS_OK: 'TLS_OK',
-  TLS_FAIL: 'TLS_FAIL',
-  SEND_CREATE: 'SEND_CREATE',
-  RECV_CREATED: 'RECV_CREATED',
-  SEND_EXTEND: 'SEND_EXTEND',
-  RECV_EXTENDED: 'RECV_EXTENDED',
-  SEND_RELAY_DATA: 'SEND_RELAY_DATA',
-  RECV_RELAY_DATA: 'RECV_RELAY_DATA',
-  SEND_DESTROY: 'SEND_DESTROY',
-  RECV_DESTROY: 'RECV_DESTROY',
-  CIRCUIT_CLOSED: 'CIRCUIT_CLOSED',
-  TIMEOUT: 'TIMEOUT'
-};
-
-const VALID_TRANSITIONS: Record<string, string> = {
-  [`${TorState.IDLE}_${TorEvent.CONNECT}`]: TorState.CONNECTING,
-  [`${TorState.CONNECTING}_${TorEvent.TLS_OK}`]: TorState.TLS_HANDSHAKE,
-  [`${TorState.CONNECTING}_${TorEvent.TLS_FAIL}`]: TorState.ERROR,
-  [`${TorState.CONNECTING}_${TorEvent.TIMEOUT}`]: TorState.ERROR,
-  [`${TorState.TLS_HANDSHAKE}_${TorEvent.SEND_CREATE}`]: TorState.CREATE_SENT,
-  [`${TorState.CREATE_SENT}_${TorEvent.RECV_CREATED}`]: TorState.CIRCUIT_BUILDING,
-  [`${TorState.CREATE_SENT}_${TorEvent.TIMEOUT}`]: TorState.ERROR,
-  [`${TorState.CIRCUIT_BUILDING}_${TorEvent.RECV_EXTENDED}`]: TorState.CIRCUIT_READY,
-  [`${TorState.CIRCUIT_BUILDING}_${TorEvent.SEND_EXTEND}`]: TorState.CIRCUIT_BUILDING,
-  [`${TorState.CIRCUIT_READY}_${TorEvent.SEND_RELAY_DATA}`]: TorState.TRANSMITTING,
-  [`${TorState.CIRCUIT_READY}_${TorEvent.RECV_RELAY_DATA}`]: TorState.TRANSMITTING,
-  [`${TorState.TRANSMITTING}_${TorEvent.SEND_RELAY_DATA}`]: TorState.TRANSMITTING,
-  [`${TorState.TRANSMITTING}_${TorEvent.RECV_RELAY_DATA}`]: TorState.TRANSMITTING,
-  [`${TorState.TRANSMITTING}_${TorEvent.SEND_DESTROY}`]: TorState.CLOSING,
-  [`${TorState.TRANSMITTING}_${TorEvent.RECV_DESTROY}`]: TorState.CLOSING,
-  [`${TorState.CLOSING}_${TorEvent.CIRCUIT_CLOSED}`]: TorState.CLOSED,
-  [`${TorState.ERROR}_${TorEvent.CIRCUIT_CLOSED}`]: TorState.CLOSED,
-};
-
-const ATTACK_PATTERNS: Record<string, { type: string, severity: string, description: string }> = {
-  [`${TorState.IDLE}_${TorEvent.SEND_RELAY_DATA}`]: { type: "CIRCUIT_BYPASS", severity: "CRITICAL", description: "Bypassed circuit creation to send data" },
-  [`${TorState.CLOSED}_${TorEvent.SEND_RELAY_DATA}`]: { type: "REPLAY_ATTACK", severity: "CRITICAL", description: "Sending data on a closed circuit" },
-  [`${TorState.CLOSED}_${TorEvent.RECV_RELAY_DATA}`]: { type: "GHOST_CIRCUIT", severity: "HIGH", description: "Receiving data on a closed circuit" },
-  [`${TorState.TLS_HANDSHAKE}_${TorEvent.SEND_RELAY_DATA}`]: { type: "HANDSHAKE_SKIP", severity: "HIGH", description: "Skipping handshake to send data" },
-  [`${TorState.CIRCUIT_BUILDING}_${TorEvent.SEND_RELAY_DATA}`]: { type: "PREMATURE_DATA", severity: "HIGH", description: "Sending data before circuit is ready" },
-  [`${TorState.TRANSMITTING}_${TorEvent.SEND_CREATE}`]: { type: "CIRCUIT_HIJACK", severity: "CRITICAL", description: "Attempting to recreate an active circuit" },
-  [`${TorState.CREATE_SENT}_${TorEvent.SEND_CREATE}`]: { type: "CREATE_FLOOD", severity: "MEDIUM", description: "Sending multiple CREATE cells" },
-};
-
-async function runSimulation(testRunId: number, count: number) {
-  let currentState = TorState.IDLE;
-  let circuitId = `circ_${Math.floor(Math.random() * 10000)}`;
-
-  const events = Object.values(TorEvent);
+// --- Legacy random simulator (preserved for "Initialize Sandbox Run" button) ---
+async function runRandomSimulation(testRunId: number, count: number) {
+  let currentState: State = "IDLE";
+  const circuitId = `circ_${Math.floor(Math.random() * 10000)}`;
 
   for (let i = 0; i < count; i++) {
-    // 80% chance of picking a valid next event if possible, 20% chance of random event (to force invalid)
-    let nextEvent = events[Math.floor(Math.random() * events.length)];
-    
-    // Attempt to be somewhat realistic but occasionally fail
+    let nextEvent: Event = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+
+    // 70% bias toward a valid next event from current state
     if (Math.random() > 0.3) {
-       const validKeys = Object.keys(VALID_TRANSITIONS).filter(k => k.startsWith(currentState + '_'));
-       if (validKeys.length > 0) {
-           const chosenKey = validKeys[Math.floor(Math.random() * validKeys.length)];
-           nextEvent = chosenKey.split('_').slice(1).join('_'); // handle events with underscore
-       }
+      const candidates = EVENTS.filter((e) => VALID[k(currentState, e)] !== undefined);
+      if (candidates.length > 0) {
+        nextEvent = candidates[Math.floor(Math.random() * candidates.length)];
+      }
     }
 
-    const key = `${currentState}_${nextEvent}`;
-    const nextState = VALID_TRANSITIONS[key];
-    const isValid = !!nextState;
-    
+    const next = VALID[k(currentState, nextEvent)];
+    const isValid = !!next;
+
     await storage.createTransition({
       testRunId,
       fromState: currentState,
       event: nextEvent,
-      toState: isValid ? nextState : currentState,
-      isValid
+      toState: isValid ? next : currentState,
+      isValid,
     });
 
     if (!isValid) {
-      const attack = ATTACK_PATTERNS[key] || { 
-        type: "INVALID_TRANSITION", 
-        severity: "LOW", 
-        description: "An undefined transition was attempted." 
-      };
-
+      const attack = classifyInvalid(currentState, nextEvent);
       await storage.createViolation({
         testRunId,
         circuitId,
@@ -111,20 +46,173 @@ async function runSimulation(testRunId: number, count: number) {
         attemptedState: null,
         severity: attack.severity,
         attackType: attack.type,
-        description: attack.description
+        description: attack.description,
       });
     } else {
-      currentState = nextState;
+      currentState = next;
     }
   }
 }
 
-export async function registerRoutes(
-  httpServer: Server,
-  app: Express
-): Promise<Server> {
-  
-  app.get(api.testRuns.list.path, async (req, res) => {
+// --- Model-Driven Testing engine ---
+// BFS in the δ-graph to find the shortest event sequence from IDLE to a target state.
+function findPathTo(target: State): Event[] | null {
+  if (target === "IDLE") return [];
+  const queue: Array<{ state: State; path: Event[] }> = [{ state: "IDLE", path: [] }];
+  const seen = new Set<State>(["IDLE"]);
+  while (queue.length) {
+    const { state, path } = queue.shift()!;
+    for (const e of EVENTS) {
+      const next = VALID[k(state, e)];
+      if (!next || seen.has(next)) continue;
+      const newPath = [...path, e];
+      if (next === target) return newPath;
+      seen.add(next);
+      queue.push({ state: next, path: newPath });
+    }
+  }
+  return null;
+}
+
+type MdtMetrics = {
+  stateCoverage: number;
+  transitionCoverage: number;
+  itdr: number;
+  fpr: number;
+  visitedStates: number;
+  totalStates: number;
+  coveredValidPairs: number;
+  totalValidPairs: number;
+  detectedInvalidPairs: number;
+  totalInvalidPairs: number;
+  durationMs: number;
+};
+
+async function runMDT(testRunId: number): Promise<MdtMetrics> {
+  const start = Date.now();
+  const circuitId = `mdt_${start}`;
+
+  const visitedStates = new Set<State>();
+  const coveredValid = new Set<string>();
+  const detectedInvalid = new Set<string>();
+  let falsePositives = 0;
+
+  async function execute(events: Event[]) {
+    let s: State = "IDLE";
+    visitedStates.add(s);
+    for (const e of events) {
+      const key = k(s, e);
+      const next = VALID[key];
+      const isValid = !!next;
+
+      await storage.createTransition({
+        testRunId,
+        fromState: s,
+        event: e,
+        toState: isValid ? next : s,
+        isValid,
+      });
+
+      if (isValid) {
+        coveredValid.add(key);
+        s = next;
+        visitedStates.add(s);
+      } else {
+        detectedInvalid.add(key);
+        const attack = classifyInvalid(s, e);
+        await storage.createViolation({
+          testRunId,
+          circuitId,
+          fromState: s,
+          event: e,
+          attemptedState: null,
+          severity: attack.severity,
+          attackType: attack.type,
+          description: attack.description,
+        });
+      }
+    }
+  }
+
+  // PHASE 1 — POSITIVE: cover every valid (state, event) pair.
+  // For each valid pair, find a path to its source state, then trigger the event.
+  for (const vk of validKeys) {
+    if (coveredValid.has(vk)) continue;
+    const [src, evt] = vk.split("|") as [State, Event];
+    const path = findPathTo(src);
+    if (path === null) continue;
+    await execute([...path, evt]);
+  }
+
+  // PHASE 2 — NEGATIVE: inject every invalid (state, event) pair as a witness.
+  for (const s of STATES) {
+    for (const e of EVENTS) {
+      const key = k(s, e);
+      if (VALID[key] !== undefined) continue; // skip valid
+      if (detectedInvalid.has(key)) continue; // already triggered
+      const path = findPathTo(s);
+      if (path === null && s !== "IDLE") continue; // unreachable target
+      await execute([...(path ?? []), e]);
+    }
+  }
+
+  const durationMs = Date.now() - start;
+  return {
+    stateCoverage: visitedStates.size / STATES.length,
+    transitionCoverage: coveredValid.size / totalValid,
+    itdr: detectedInvalid.size / totalInvalid,
+    fpr: coveredValid.size === 0 ? 0 : falsePositives / coveredValid.size,
+    visitedStates: visitedStates.size,
+    totalStates: STATES.length,
+    coveredValidPairs: coveredValid.size,
+    totalValidPairs: totalValid,
+    detectedInvalidPairs: detectedInvalid.size,
+    totalInvalidPairs: totalInvalid,
+    durationMs,
+  };
+}
+
+// Compute metrics post-hoc from stored transitions+violations.
+async function computeMetricsForRun(testRunId: number): Promise<MdtMetrics> {
+  const trans = await storage.getTransitionsByTestRun(testRunId);
+  const viols = await storage.getViolationsByTestRun(testRunId);
+
+  const visitedStates = new Set<State>();
+  const coveredValid = new Set<string>();
+  const detectedInvalid = new Set<string>();
+  let falsePositives = 0;
+
+  for (const t of trans) {
+    visitedStates.add(t.fromState as State);
+    visitedStates.add(t.toState as State);
+    const key = k(t.fromState as State, t.event as Event);
+    const isValidInSpec = VALID[key] !== undefined;
+    if (t.isValid) {
+      if (isValidInSpec) coveredValid.add(key);
+      else falsePositives++; // marked valid but spec says invalid
+    } else {
+      if (isValidInSpec) falsePositives++; // marked invalid but spec says valid
+      else detectedInvalid.add(key);
+    }
+  }
+
+  return {
+    stateCoverage: visitedStates.size / STATES.length,
+    transitionCoverage: coveredValid.size / totalValid,
+    itdr: detectedInvalid.size / totalInvalid,
+    fpr: trans.length === 0 ? 0 : falsePositives / trans.length,
+    visitedStates: visitedStates.size,
+    totalStates: STATES.length,
+    coveredValidPairs: coveredValid.size,
+    totalValidPairs: totalValid,
+    detectedInvalidPairs: detectedInvalid.size,
+    totalInvalidPairs: totalInvalid,
+    durationMs: 0,
+  };
+}
+
+export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
+  app.get(api.testRuns.list.path, async (_req, res) => {
     const runs = await storage.getTestRuns();
     res.json(runs);
   });
@@ -135,67 +223,100 @@ export async function registerRoutes(
       const run = await storage.createTestRun(input);
       res.status(201).json(run);
     } catch (err) {
-      if (err instanceof z.ZodError) {
-        return res.status(400).json({ message: err.errors[0].message });
-      }
+      if (err instanceof z.ZodError) return res.status(400).json({ message: err.errors[0].message });
       res.status(500).json({ message: "Internal server error" });
     }
   });
 
   app.get(api.testRuns.get.path, async (req, res) => {
     const run = await storage.getTestRun(Number(req.params.id));
-    if (!run) {
-      return res.status(404).json({ message: 'Test run not found' });
-    }
+    if (!run) return res.status(404).json({ message: "Test run not found" });
     res.json(run);
   });
 
   app.get(api.transitions.list.path, async (req, res) => {
-    const transitions = await storage.getTransitionsByTestRun(Number(req.params.testRunId));
-    res.json(transitions);
+    res.json(await storage.getTransitionsByTestRun(Number(req.params.testRunId)));
   });
 
   app.get(api.violations.list.path, async (req, res) => {
-    const violations = await storage.getViolationsByTestRun(Number(req.params.testRunId));
-    res.json(violations);
+    res.json(await storage.getViolationsByTestRun(Number(req.params.testRunId)));
   });
 
-  app.get(api.violations.listAll.path, async (req, res) => {
-    const violations = await storage.getAllViolations();
-    res.json(violations);
+  app.get(api.violations.listAll.path, async (_req, res) => {
+    res.json(await storage.getAllViolations());
   });
 
   app.post(api.fsm.simulate.path, async (req, res) => {
     try {
       const input = api.fsm.simulate.input.parse(req.body);
-      
       const testRun = await storage.getTestRun(input.testRunId);
-      if (!testRun) {
-        return res.status(404).json({ message: "Test run not found" });
-      }
+      if (!testRun) return res.status(404).json({ message: "Test run not found" });
 
-      // Run simulation asynchronously
-      storage.updateTestRunStatus(input.testRunId, 'running').then(() => {
-        runSimulation(input.testRunId, input.count).then(() => {
-          storage.updateTestRunStatus(input.testRunId, 'completed');
-        }).catch((err) => {
-          console.error("Simulation failed:", err);
-          storage.updateTestRunStatus(input.testRunId, 'failed');
-        });
+      storage.updateTestRunStatus(input.testRunId, "running").then(() => {
+        runRandomSimulation(input.testRunId, input.count)
+          .then(() => storage.updateTestRunStatus(input.testRunId, "completed"))
+          .catch((e) => {
+            console.error("Random sim failed:", e);
+            storage.updateTestRunStatus(input.testRunId, "failed");
+          });
       });
-
       res.json({ message: "Simulation started" });
     } catch (err) {
-      if (err instanceof z.ZodError) {
-        return res.status(400).json({ message: err.errors[0].message });
-      }
+      if (err instanceof z.ZodError) return res.status(400).json({ message: err.errors[0].message });
       res.status(500).json({ message: "Internal server error" });
     }
   });
 
-  app.get('/api/download/proposal', (req, res) => {
-    const filePath = path.resolve('client/public/Proje_Onerisi_Plani.docx');
-    res.download(filePath, 'Proje_Onerisi_Plani.docx');
+  // FSM specification endpoint
+  app.get("/api/fsm/spec", async (_req, res) => {
+    res.json({
+      states: STATES,
+      events: EVENTS,
+      validTransitions: validKeys.map((vk) => {
+        const [from, event] = vk.split("|");
+        return { from, event, to: VALID[vk] };
+      }),
+      totalDomain,
+      totalValid,
+      totalInvalid,
+    });
+  });
+
+  // MDT run — synchronous (returns metrics)
+  app.post("/api/fsm/mdt", async (req, res) => {
+    try {
+      const input = z.object({ testRunId: z.number() }).parse(req.body);
+      const testRun = await storage.getTestRun(input.testRunId);
+      if (!testRun) return res.status(404).json({ message: "Test run not found" });
+
+      await storage.updateTestRunStatus(input.testRunId, "running");
+      try {
+        const metrics = await runMDT(input.testRunId);
+        await storage.updateTestRunStatus(input.testRunId, "completed");
+        res.json({ message: "MDT completed", metrics });
+      } catch (e) {
+        console.error("MDT failed:", e);
+        await storage.updateTestRunStatus(input.testRunId, "failed");
+        res.status(500).json({ message: "MDT execution failed" });
+      }
+    } catch (err) {
+      if (err instanceof z.ZodError) return res.status(400).json({ message: err.errors[0].message });
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Metrics for a given run
+  app.get("/api/test-runs/:id/metrics", async (req, res) => {
+    const id = Number(req.params.id);
+    const run = await storage.getTestRun(id);
+    if (!run) return res.status(404).json({ message: "Test run not found" });
+    const metrics = await computeMetricsForRun(id);
+    res.json(metrics);
+  });
+
+  app.get("/api/download/proposal", (_req, res) => {
+    const filePath = path.resolve("client/public/Proje_Onerisi_Plani.docx");
+    res.download(filePath, "Proje_Onerisi_Plani.docx");
   });
 
   return httpServer;

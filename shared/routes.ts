@@ -60,7 +60,65 @@ export const api = {
         200: z.object({ message: z.string() }),
         400: errorSchemas.validation,
       }
-    }
+    },
+    spec: {
+      method: 'GET' as const,
+      path: '/api/fsm/spec' as const,
+      responses: {
+        200: z.object({
+          states: z.array(z.string()),
+          events: z.array(z.string()),
+          validTransitions: z.array(z.object({ from: z.string(), event: z.string(), to: z.string() })),
+          totalDomain: z.number(),
+          totalValid: z.number(),
+          totalInvalid: z.number(),
+        }),
+      },
+    },
+    mdt: {
+      method: 'POST' as const,
+      path: '/api/fsm/mdt' as const,
+      input: z.object({ testRunId: z.number() }),
+      responses: {
+        200: z.object({
+          message: z.string(),
+          metrics: z.object({
+            stateCoverage: z.number(),
+            transitionCoverage: z.number(),
+            itdr: z.number(),
+            fpr: z.number(),
+            visitedStates: z.number(),
+            totalStates: z.number(),
+            coveredValidPairs: z.number(),
+            totalValidPairs: z.number(),
+            detectedInvalidPairs: z.number(),
+            totalInvalidPairs: z.number(),
+            durationMs: z.number(),
+          }),
+        }),
+        400: errorSchemas.validation,
+      },
+    },
+    metrics: {
+      method: 'GET' as const,
+      path: '/api/test-runs/:id/metrics' as const,
+      responses: {
+        200: z.object({
+          stateCoverage: z.number(),
+          transitionCoverage: z.number(),
+          itdr: z.number(),
+          fpr: z.number(),
+          visitedStates: z.number(),
+          totalStates: z.number(),
+          coveredValidPairs: z.number(),
+          totalValidPairs: z.number(),
+          detectedInvalidPairs: z.number(),
+          totalInvalidPairs: z.number(),
+          durationMs: z.number(),
+        }),
+        404: errorSchemas.notFound,
+      },
+    },
   }
 };
 
