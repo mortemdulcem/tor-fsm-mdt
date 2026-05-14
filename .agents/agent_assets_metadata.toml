@@ -6,3 +6,9 @@ id = "oAqWlowljLq9Y6GpLXSMg"
 uri = "file://exam_solution/Arasinav_Cevap.pdf"
 type = "pdf"
 title = "Arasinav_Cevap.pdf (16 sayfa)"
+
+[[outputs]]
+id = "HR8L-qxoGoCO8cMx5Qa02"
+uri = "file://proposal_revised/Proje_Onerisi_Revize.pdf"
+type = "pdf"
+title = "Proje Önerisi — Revize Sürüm"
