@@ -113,7 +113,8 @@ protocol state fuzzing, security testing, transition coverage.</p>
   <div class="lvl2"><span>2.4 Formal Yöntemler ve Protokol Doğrulama</span><span></span></div>
   <div class="lvl2"><span>2.5 Yazılım Testi Metodolojisi</span><span></span></div>
   <div class="lvl2"><span>2.6 Tor Simülasyon Altyapısı</span><span></span></div>
-  <div class="lvl2"><span>2.7 Literatür Boşluğu</span><span></span></div>
+  <div class="lvl2"><span>2.7 PRISMA Akış Diyagramı</span><span></span></div>
+  <div class="lvl2"><span>2.8 Literatür Boşluğu</span><span></span></div>
   <div class="lvl1"><span>3. Yöntem</span><span></span></div>
   <div class="lvl2"><span>3.1 FSM Formal Tanımı</span><span></span></div>
   <div class="lvl2"><span>3.2 Saldırı Sınıflandırıcı</span><span></span></div>
@@ -124,6 +125,10 @@ protocol state fuzzing, security testing, transition coverage.</p>
   <div class="lvl2"><span>4.2 Tanımlayıcı İstatistikler</span><span></span></div>
   <div class="lvl2"><span>4.3 Hipotez Testleri</span><span></span></div>
   <div class="lvl2"><span>4.4 Yorum</span><span></span></div>
+  <div class="lvl2"><span>4.5 Wilcoxon Signed-Rank Doğrulaması</span><span></span></div>
+  <div class="lvl2"><span>4.6 Detection Latency Ölçümü</span><span></span></div>
+  <div class="lvl2"><span>4.7 Bütçe-Kapsama Eğrisi</span><span></span></div>
+  <div class="lvl2"><span>4.8 Rule-Based Detector Karşılaştırması (B0)</span><span></span></div>
   <div class="lvl1"><span>5. Görselleştirme</span><span></span></div>
   <div class="lvl1"><span>6. Sonuç ve Gelecek Çalışmalar</span><span></span></div>
   <div class="lvl2"><span>6.1 Katkıların Yeniden Değerlendirilmesi</span><span></span></div>
@@ -264,7 +269,20 @@ tablosunun otorite kaynağıdır. Microsoft Research'ün veri-tabanlı FSM güve
 çalışması [20] state-level analizin endüstriyel uygulanabilirliğini gösterir, ancak
 Tor'a özel değildir.</p>
 
-<h3>2.7 Literatür Boşluğu</h3>
+<h3>2.7 PRISMA Akış Diyagramı</h3>
+<p>Bölüm 2.1'de tarif edilen SLR sürecinin PRISMA akışı Şekil 5'te sunulmuştur. Bu çalışmaya
+özgü iki dürüst not zorunludur: <b>(i)</b> canlı akademik veritabanı erişimi (Scopus, WoS,
+IEEE Xplore) bu ortamda mevcut değildir; bu nedenle "identified through database searching"
+hücresi sıfırdır ve tüm tanımlamalar açık-web kanalları (Google Scholar, arXiv, DOI
+çözümleme) üzerinden yapılmıştır. <b>(ii)</b> Açık-web sürecinde audit-edilebilir sorgu
+logu tutulmadığı için ara aşama sayıları (identified, screened, eligibility) <b>NA olarak
+raporlanır</b>; yalnızca son "included" sayısı (n=20) doğrulanabilir
+ve repodaki <code>Literatur_Notlari.pdf</code>'in atıf sayısı ile birebirdir. Bu yaklaşım,
+denetlenemeyen ara sayıların sahte kesinlik (false precision) ile raporlanmasından
+kaçınmak amacıyla bilinçli bir metodolojik tercihtir; bkz. Bölüm 6.2.</p>
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 540" font-family="Helvetica,Arial,sans-serif" font-size="10"><text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold">Şekil 5: PRISMA akış diyagramı (Kitchenham + Charters'a uyumlu)</text><rect x="30" y="50" width="280" height="60" fill="#dde7f4" stroke="#234" stroke-width="1" rx="4"/><text x="170" y="68" text-anchor="middle" font-size="10" font-weight="bold">IDENTIFICATION</text><text x="170" y="82" text-anchor="middle" font-size="9" font-weight="normal">Açık web (Scholar/arXiv/DOI): NA (kayıt tutulmadı)</text><text x="170" y="96" text-anchor="middle" font-size="9" font-weight="normal">Veritabanı (yapılamadı): n = 0</text><rect x="30" y="145" width="280" height="50" fill="#dde7f4" stroke="#234" stroke-width="1" rx="4"/><text x="170" y="163" text-anchor="middle" font-size="10" font-weight="bold">SCREENING — Duplikatlar çıkarıldı</text><text x="170" y="177" text-anchor="middle" font-size="9" font-weight="normal">NA (kayıt tutulmadı)</text><rect x="30" y="230" width="280" height="60" fill="#dde7f4" stroke="#234" stroke-width="1" rx="4"/><text x="170" y="248" text-anchor="middle" font-size="10" font-weight="bold">SCREENING — Başlık/Özet incelemesi</text><text x="170" y="262" text-anchor="middle" font-size="9" font-weight="normal">NA (kayıt tutulmadı)</text><text x="170" y="276" text-anchor="middle" font-size="9" font-weight="normal">Hariç: NA</text><rect x="30" y="325" width="280" height="60" fill="#dde7f4" stroke="#234" stroke-width="1" rx="4"/><text x="170" y="343" text-anchor="middle" font-size="10" font-weight="bold">ELIGIBILITY — Tam metin değerlendirme</text><text x="170" y="357" text-anchor="middle" font-size="9" font-weight="normal">NA (kayıt tutulmadı)</text><text x="170" y="371" text-anchor="middle" font-size="9" font-weight="normal">Hariç: NA</text><rect x="30" y="420" width="280" height="60" fill="#bce5c8" stroke="#234" stroke-width="1" rx="4"/><text x="170" y="438" text-anchor="middle" font-size="10" font-weight="bold">INCLUDED — Sentezde kullanılan</text><text x="170" y="452" text-anchor="middle" font-size="9" font-weight="normal">n = 20</text><text x="170" y="466" text-anchor="middle" font-size="9" font-weight="normal">(Literatur_Notlari.pdf ile doğrulanır)</text><line x1="170" y1="110" x2="170" y2="145" stroke="#234" stroke-width="1.4" marker-end="url(#prismaArr)"/><line x1="170" y1="195" x2="170" y2="230" stroke="#234" stroke-width="1.4" marker-end="url(#prismaArr)"/><line x1="170" y1="290" x2="170" y2="325" stroke="#234" stroke-width="1.4" marker-end="url(#prismaArr)"/><line x1="170" y1="385" x2="170" y2="420" stroke="#234" stroke-width="1.4" marker-end="url(#prismaArr)"/><rect x="360" y="325" width="330" height="155" fill="#fff4e0" stroke="#a86" stroke-width="1" rx="4"/><text x="370" y="341" font-size="10" font-weight="bold">Hariç tutma gerekçeleri (nitel)</text><text x="370" y="361" font-size="9">• Tor ile dolaylı ilgili çalışmalar</text><text x="370" y="375" font-size="9">• Sadece kriptografik primitif analizi (FSM ile ilgisiz)</text><text x="370" y="389" font-size="9">• Eski sürüm Tor (≤0.2.x), güncel spec ile uyumsuz</text><text x="370" y="403" font-size="9">• Tam metne açık erişim yok</text><text x="370" y="417" font-size="9">• Yetersiz metodolojik açıklama</text><line x1="310" y1="355" x2="360" y2="355" stroke="#a86" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#prismaArr)"/><defs><marker id="prismaArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#234"/></marker></defs><text x="360" y="510" text-anchor="middle" font-size="9" font-style="italic" fill="#555">Not: Açık-web sürecinde audit-edilebilir log tutulmadığı için ara sayılar NA olarak raporlanır; yalnızca son n=20 doğrulanabilir.</text></svg><div class="cap">Şekil 5. SLR sürecinin PRISMA akış diyagramı (ara sayılar NA).</div></div>
+
+<h3>2.8 Literatür Boşluğu</h3>
 <div class="box">
 20 kaynağın incelenmesi sonucunda <b>tez ölçeğinde dört somut boşluk</b> tespit edilmiştir:
 <ul>
@@ -482,6 +500,167 @@ Cohen's d büyüklük yorumu: 0.2 küçük, 0.5 orta, 0.8 büyük, ≥1.2 çok b
     sistematik negatif test üretimi açısından her iki temele kıyasla kanıtlanabilir bir üstünlük
     sergilemektedir.</p>
 
+<h3>4.5 Wilcoxon Signed-Rank Doğrulaması</h3>
+<p>Bölüm 4.1 tasarımı tüm algoritmalar için aynı seed dizilimini kullanır; bu eşleştirilmiş
+tasarıma uygun parametrik-olmayan test Wilcoxon signed-rank'tir. Welch t (Bölüm 4.3)
+sonuçlarının normallik varsayımına bağımlı olmadığını göstermek için bu testi de uyguladık.
+Tablo 3'teki her satır N=30 koşudan elde edilen eşleştirilmiş farklar üzerinden
+hesaplanmıştır; <i>n (≠0)</i> sütunu sıfır farklar (ties) çıkarıldıktan sonra kalan etkili
+örneklem büyüklüğüdür.</p>
+<table>
+<tr><th>Karşılaştırma</th><th>Metrik</th><th>W</th><th>z</th><th>p</th><th>n (≠0)</th></tr>
+<tr>
+  <td class="l">B3_MDT vs B1_Random</td><td>SC</td>
+  <td>0.0</td><td>-4.27</td>
+  <td>&lt;.001 ***</td>
+  <td>23</td>
+</tr><tr>
+  <td class="l">B3_MDT vs B1_Random</td><td>TC</td>
+  <td>0.0</td><td>-4.80</td>
+  <td>&lt;.001 ***</td>
+  <td>30</td>
+</tr><tr>
+  <td class="l">B3_MDT vs B1_Random</td><td>ITDR</td>
+  <td>0.0</td><td>-4.78</td>
+  <td>&lt;.001 ***</td>
+  <td>30</td>
+</tr><tr>
+  <td class="l">B3_MDT vs B2_GreedySC</td><td>SC</td>
+  <td>0.0</td><td>0.00</td>
+  <td>1.0000 </td>
+  <td>0</td>
+</tr><tr>
+  <td class="l">B3_MDT vs B2_GreedySC</td><td>TC</td>
+  <td>0.0</td><td>-4.80</td>
+  <td>&lt;.001 ***</td>
+  <td>30</td>
+</tr><tr>
+  <td class="l">B3_MDT vs B2_GreedySC</td><td>ITDR</td>
+  <td>0.0</td><td>-4.79</td>
+  <td>&lt;.001 ***</td>
+  <td>30</td>
+</tr><tr>
+  <td class="l">B2_GreedySC vs B1_Random</td><td>SC</td>
+  <td>0.0</td><td>-4.27</td>
+  <td>&lt;.001 ***</td>
+  <td>23</td>
+</tr><tr>
+  <td class="l">B2_GreedySC vs B1_Random</td><td>TC</td>
+  <td>1.0</td><td>-4.77</td>
+  <td>&lt;.001 ***</td>
+  <td>30</td>
+</tr><tr>
+  <td class="l">B2_GreedySC vs B1_Random</td><td>ITDR</td>
+  <td>153.5</td><td>-1.38</td>
+  <td>0.1662 </td>
+  <td>29</td>
+</tr>
+</table>
+<p><b>Yorum (sınırlandırılmış).</b> Tezin ana hipotezleri olan
+<i>B3_MDT &gt; B1_Random</i> ve <i>B3_MDT &gt; B2_GreedySC</i> karşılaştırmaları, hem TC
+hem ITDR boyutlarında p &lt; .001 ile anlamlıdır; bu, Welch sonucunu birebir doğrular.
+<b>SC boyutunda</b> üç algoritmanın B = 500 bütçesi altında ulaştığı ortalama değerler
+şöyledir: B1_Random 77.00%, B2_GreedySC
+100.00%, B3_MDT 100.00%. Buna göre
+<i>B3 vs B2</i> SC karşılaştırmasında her iki algoritma da %100'de doygundur (n≠0 = 0,
+p = 1.0); buna karşılık <i>B3 vs B1</i> ve <i>B2 vs B1</i> SC karşılaştırmaları
+hâlâ p &lt; .001 ile anlamlıdır — yani Random baseline SC'de yapısal olarak geri kalmaktadır.
+Son olarak <i>B2_GreedySC vs B1_Random</i> karşılaştırması ITDR'de istatistiksel olarak
+anlamlı değildir (p &gt; .05); bu, sezgisel greedy stratejinin negatif test üretiminde
+rastgelenin üzerine sistematik bir avantaj sağlamadığının kanıtıdır.</p>
+
+<h3>4.6 Detection Latency Ölçümü</h3>
+<p>Proposal'da tanımlanan ancak orijinal koşumda ölçülmeyen detection latency metriği,
+<b>nanosaniye çözünürlüklü</b> <code>process.hrtime.bigint()</code> ile <b>batch
+amortizasyon</b> tekniği kullanılarak ölçülmüştür: her ölçüm B = 100,000 step
+çağrısını sarar, toplam süre B'ye bölünür ve önceden kalibre edilmiş boş döngü
+overhead'i (2.52 ns/iter) çıkarılır.
+N = 30 batch tekrarı yapılır. Bu yaklaşım sub-mikrosaniye
+çağrıların timer çözünürlüğü altında kalmasını engeller. Üç temsili (state, event)
+hücresi probe edilmiştir.</p>
+<table>
+<tr><th>Probe</th><th>mean (ns)</th><th>SD (ns)</th>
+    <th>p50</th><th>p95</th><th>min</th><th>max</th></tr>
+<tr>
+  <td class="l">Geçerli geçiş (IDLE → CONNECTING)</td>
+  <td>73.6</td><td>13.2</td>
+  <td>68.2</td><td>112.6</td>
+  <td>62.1</td><td>112.8</td>
+</tr><tr>
+  <td class="l">Geçersiz CRITICAL (BYPASS)</td>
+  <td>164.7</td><td>17.4</td>
+  <td>162.5</td><td>193.3</td>
+  <td>145.3</td><td>238.9</td>
+</tr><tr>
+  <td class="l">Geçersiz LOW (GHOST)</td>
+  <td>142.9</td><td>18.8</td>
+  <td>135.3</td><td>196.0</td>
+  <td>125.2</td><td>197.9</td>
+</tr>
+</table>
+<p style="font-size:9.5pt;color:#555;"><b>Hedef karşılaştırması.</b> Proposal hedefi
+&lt; 50 ms = 50,000,000 ns idi. Ölçülen en yavaş probe
+(invalid_critical) max 239 ns'dir;
+bu hedeften <b>209335×
+daha hızlıdır</b>. Geçersiz tespitin geçerli adımdan ~2× daha pahalı olması
+beklenen bir sonuçtur (<code>classifyInvalid</code> ek bir koşul zinciri çalıştırır).
+<b>Limitler.</b> Bu ölçüm tek-thread, tek-makine, JIT-warm Node.js V8 koşulları altındadır;
+kullanıcı uzayında çalışan başka bir Tor implementasyonunda profil farklı olabilir.</p>
+
+<h3>4.7 Bütçe-Kapsama Eğrisi</h3>
+<p>Bölüm 4.2 tek bir bütçe noktası (B = 500) için algoritmaları karşılaştırır. Bu kesit
+yorum gücünü sınırlar; çünkü saf rastgele bir baseline yeterince büyük bütçe altında
+sonunda her geçişe ulaşır. Bu eleştiriye yanıt olarak bütçeyi bir ondalık derecede gezdirdik
+(B ∈ {50, 100, 200, 500, 1000, 2000, 5000}, her nokta 30 koşu). Şekil 6 sonuç eğrilerini
+verir; gölgeli bantlar ±1 SD'dir.</p>
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 410" font-family="Helvetica,Arial,sans-serif" font-size="10"><text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold">Şekil 6: Bütçe ↔ TC kapsama eğrisi (N=30 ortalama, gölge = SD)</text><line x1="60" y1="340" x2="660" y2="340" stroke="#eee"/><text x="54" y="343" text-anchor="end" font-size="8">0%</text><line x1="60" y1="312" x2="660" y2="312" stroke="#eee"/><text x="54" y="315" text-anchor="end" font-size="8">10%</text><line x1="60" y1="284" x2="660" y2="284" stroke="#eee"/><text x="54" y="287" text-anchor="end" font-size="8">20%</text><line x1="60" y1="256" x2="660" y2="256" stroke="#eee"/><text x="54" y="259" text-anchor="end" font-size="8">30%</text><line x1="60" y1="228" x2="660" y2="228" stroke="#eee"/><text x="54" y="231" text-anchor="end" font-size="8">40%</text><line x1="60" y1="200" x2="660" y2="200" stroke="#eee"/><text x="54" y="203" text-anchor="end" font-size="8">50%</text><line x1="60" y1="172" x2="660" y2="172" stroke="#eee"/><text x="54" y="175" text-anchor="end" font-size="8">60%</text><line x1="60" y1="144" x2="660" y2="144" stroke="#eee"/><text x="54" y="147" text-anchor="end" font-size="8">70%</text><line x1="60" y1="116" x2="660" y2="116" stroke="#eee"/><text x="54" y="119" text-anchor="end" font-size="8">80%</text><line x1="60" y1="88" x2="660" y2="88" stroke="#eee"/><text x="54" y="91" text-anchor="end" font-size="8">90%</text><line x1="60" y1="60" x2="660" y2="60" stroke="#eee"/><text x="54" y="63" text-anchor="end" font-size="8">100%</text><line x1="60" y1="340" x2="60" y2="344" stroke="#234"/><text x="60" y="356" text-anchor="middle" font-size="9">50</text><line x1="150.30899869919438" y1="340" x2="150.30899869919438" y2="344" stroke="#234"/><text x="150.30899869919438" y="356" text-anchor="middle" font-size="9">100</text><line x1="240.61799739838875" y1="340" x2="240.61799739838875" y2="344" stroke="#234"/><text x="240.61799739838875" y="356" text-anchor="middle" font-size="9">200</text><line x1="360" y1="340" x2="360" y2="344" stroke="#234"/><text x="360" y="356" text-anchor="middle" font-size="9">500</text><line x1="450.3089986991944" y1="340" x2="450.3089986991944" y2="344" stroke="#234"/><text x="450.3089986991944" y="356" text-anchor="middle" font-size="9">1000</text><line x1="540.6179973983888" y1="340" x2="540.6179973983888" y2="344" stroke="#234"/><text x="540.6179973983888" y="356" text-anchor="middle" font-size="9">2000</text><line x1="660" y1="340" x2="660" y2="344" stroke="#234"/><text x="660" y="356" text-anchor="middle" font-size="9">5000</text><text x="360" y="372" text-anchor="middle" font-size="10">Olay bütçesi (log ölçek)</text><path d="M 60 273.1668976393858 L 150.30899869919438 252.73297805935348 L 240.61799739838875 229.3521689456176 L 360 180.6224385957418 L 450.3089986991944 150.75060423425248 L 540.6179973983888 134.74711290452467 L 660 89.75955769241173 L 660 157.17377564092163 L 540.6179973983888 189.0928870954753 L 450.3089986991944 223.1160624324142 L 360 242.5242280709249 L 240.61799739838875 274.434497721049 L 150.30899869919438 295.85368860731313 L 60 311.25976902728087 Z" fill="#9aa6b8" opacity="0.18"/><polyline points="60,292.2133333333333 150.30899869919438,274.2933333333333 240.61799739838875,251.89333333333332 360,211.57333333333335 450.3089986991944,186.93333333333334 540.6179973983888,161.92 660,123.46666666666667" fill="none" stroke="#9aa6b8" stroke-width="2"/><circle cx="60" cy="292.2133333333333" r="3" fill="#9aa6b8"/><circle cx="150.30899869919438" cy="274.2933333333333" r="3" fill="#9aa6b8"/><circle cx="240.61799739838875" cy="251.89333333333332" r="3" fill="#9aa6b8"/><circle cx="360" cy="211.57333333333335" r="3" fill="#9aa6b8"/><circle cx="450.3089986991944" cy="186.93333333333334" r="3" fill="#9aa6b8"/><circle cx="540.6179973983888" cy="161.92" r="3" fill="#9aa6b8"/><circle cx="660" cy="123.46666666666667" r="3" fill="#9aa6b8"/><path d="M 60 183.4268185061652 L 150.30899869919438 157.60474374580642 L 240.61799739838875 122.5888222666689 L 360 97.19793760368131 L 450.3089986991944 78.50567474590446 L 540.6179973983888 60 L 660 60 L 660 69.62523126782139 L 540.6179973983888 91.40957679681472 L 450.3089986991944 119.14765858742865 L 360 144.50872906298525 L 240.61799739838875 172.87784439999774 L 150.30899869919438 202.07525625419362 L 60 216.5731814938347 Z" fill="#3b82c4" opacity="0.18"/><polyline points="60,199.99999999999997 150.30899869919438,179.84 240.61799739838875,147.73333333333332 360,120.8533333333333 450.3089986991944,98.82666666666657 540.6179973983888,75.67999999999984 660,62.613333333333344" fill="none" stroke="#3b82c4" stroke-width="2"/><circle cx="60" cy="199.99999999999997" r="3" fill="#3b82c4"/><circle cx="150.30899869919438" cy="179.84" r="3" fill="#3b82c4"/><circle cx="240.61799739838875" cy="147.73333333333332" r="3" fill="#3b82c4"/><circle cx="360" cy="120.8533333333333" r="3" fill="#3b82c4"/><circle cx="450.3089986991944" cy="98.82666666666657" r="3" fill="#3b82c4"/><circle cx="540.6179973983888" cy="75.67999999999984" r="3" fill="#3b82c4"/><circle cx="660" cy="62.613333333333344" r="3" fill="#3b82c4"/><path d="M 60 154.48071475815541 L 150.30899869919438 60 L 240.61799739838875 60 L 360 60 L 450.3089986991944 60 L 540.6179973983888 60 L 660 60 L 660 60 L 540.6179973983888 60 L 450.3089986991944 60 L 360 60 L 240.61799739838875 60 L 150.30899869919438 68.25821098286309 L 60 184.2926185751779 Z" fill="#1d8b5d" opacity="0.18"/><polyline points="60,169.38666666666666 150.30899869919438,62.613333333333344 240.61799739838875,60 360,60 450.3089986991944,60 540.6179973983888,60 660,60" fill="none" stroke="#1d8b5d" stroke-width="2"/><circle cx="60" cy="169.38666666666666" r="3" fill="#1d8b5d"/><circle cx="150.30899869919438" cy="62.613333333333344" r="3" fill="#1d8b5d"/><circle cx="240.61799739838875" cy="60" r="3" fill="#1d8b5d"/><circle cx="360" cy="60" r="3" fill="#1d8b5d"/><circle cx="450.3089986991944" cy="60" r="3" fill="#1d8b5d"/><circle cx="540.6179973983888" cy="60" r="3" fill="#1d8b5d"/><circle cx="660" cy="60" r="3" fill="#1d8b5d"/><line x1="60" y1="390" x2="86" y2="390" stroke="#9aa6b8" stroke-width="2"/><text x="92" y="393" font-size="10">B1_Random</text><line x1="200" y1="390" x2="226" y2="390" stroke="#3b82c4" stroke-width="2"/><text x="232" y="393" font-size="10">B2_GreedySC</text><line x1="340" y1="390" x2="366" y2="390" stroke="#1d8b5d" stroke-width="2"/><text x="372" y="393" font-size="10">B3_MDT</text></svg><div class="cap">Şekil 6a. Bütçe ↔ Transition Coverage eğrisi.</div></div>
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 410" font-family="Helvetica,Arial,sans-serif" font-size="10"><text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold">Şekil 6: Bütçe ↔ ITDR kapsama eğrisi (N=30 ortalama, gölge = SD)</text><line x1="60" y1="340" x2="660" y2="340" stroke="#eee"/><text x="54" y="343" text-anchor="end" font-size="8">0%</text><line x1="60" y1="312" x2="660" y2="312" stroke="#eee"/><text x="54" y="315" text-anchor="end" font-size="8">10%</text><line x1="60" y1="284" x2="660" y2="284" stroke="#eee"/><text x="54" y="287" text-anchor="end" font-size="8">20%</text><line x1="60" y1="256" x2="660" y2="256" stroke="#eee"/><text x="54" y="259" text-anchor="end" font-size="8">30%</text><line x1="60" y1="228" x2="660" y2="228" stroke="#eee"/><text x="54" y="231" text-anchor="end" font-size="8">40%</text><line x1="60" y1="200" x2="660" y2="200" stroke="#eee"/><text x="54" y="203" text-anchor="end" font-size="8">50%</text><line x1="60" y1="172" x2="660" y2="172" stroke="#eee"/><text x="54" y="175" text-anchor="end" font-size="8">60%</text><line x1="60" y1="144" x2="660" y2="144" stroke="#eee"/><text x="54" y="147" text-anchor="end" font-size="8">70%</text><line x1="60" y1="116" x2="660" y2="116" stroke="#eee"/><text x="54" y="119" text-anchor="end" font-size="8">80%</text><line x1="60" y1="88" x2="660" y2="88" stroke="#eee"/><text x="54" y="91" text-anchor="end" font-size="8">90%</text><line x1="60" y1="60" x2="660" y2="60" stroke="#eee"/><text x="54" y="63" text-anchor="end" font-size="8">100%</text><line x1="60" y1="340" x2="60" y2="344" stroke="#234"/><text x="60" y="356" text-anchor="middle" font-size="9">50</text><line x1="150.30899869919438" y1="340" x2="150.30899869919438" y2="344" stroke="#234"/><text x="150.30899869919438" y="356" text-anchor="middle" font-size="9">100</text><line x1="240.61799739838875" y1="340" x2="240.61799739838875" y2="344" stroke="#234"/><text x="240.61799739838875" y="356" text-anchor="middle" font-size="9">200</text><line x1="360" y1="340" x2="360" y2="344" stroke="#234"/><text x="360" y="356" text-anchor="middle" font-size="9">500</text><line x1="450.3089986991944" y1="340" x2="450.3089986991944" y2="344" stroke="#234"/><text x="450.3089986991944" y="356" text-anchor="middle" font-size="9">1000</text><line x1="540.6179973983888" y1="340" x2="540.6179973983888" y2="344" stroke="#234"/><text x="540.6179973983888" y="356" text-anchor="middle" font-size="9">2000</text><line x1="660" y1="340" x2="660" y2="344" stroke="#234"/><text x="660" y="356" text-anchor="middle" font-size="9">5000</text><text x="360" y="372" text-anchor="middle" font-size="10">Olay bütçesi (log ölçek)</text><path d="M 60 268.1407759327318 L 150.30899869919438 238.10645335530677 L 240.61799739838875 213.6868741070001 L 360 171.6732211900446 L 450.3089986991944 152.21641292203014 L 540.6179973983888 135.52368557985525 L 660 110.1249435233295 L 660 153.51950092111477 L 540.6179973983888 177.00964775347808 L 450.3089986991944 202.62803152241432 L 360 226.54900103217756 L 240.61799739838875 248.71312589299978 L 150.30899869919438 266.96021331135984 L 60 292.9258907339348 Z" fill="#9aa6b8" opacity="0.18"/><polyline points="60,280.5333333333333 150.30899869919438,252.5333333333333 240.61799739838875,231.19999999999996 360,199.1111111111111 450.3089986991944,177.42222222222222 540.6179973983888,156.26666666666665 660,131.82222222222214" fill="none" stroke="#9aa6b8" stroke-width="2"/><circle cx="60" cy="280.5333333333333" r="3" fill="#9aa6b8"/><circle cx="150.30899869919438" cy="252.5333333333333" r="3" fill="#9aa6b8"/><circle cx="240.61799739838875" cy="231.19999999999996" r="3" fill="#9aa6b8"/><circle cx="360" cy="199.1111111111111" r="3" fill="#9aa6b8"/><circle cx="450.3089986991944" cy="177.42222222222222" r="3" fill="#9aa6b8"/><circle cx="540.6179973983888" cy="156.26666666666665" r="3" fill="#9aa6b8"/><circle cx="660" cy="131.82222222222214" r="3" fill="#9aa6b8"/><path d="M 60 304.9766570506095 L 150.30899869919438 275.10542057788217 L 240.61799739838875 237.39969876987712 L 360 195.67720686186178 L 450.3089986991944 169.72375435047047 L 540.6179973983888 148.12695836958673 L 660 118.16888595574667 L 660 133.0311140442531 L 540.6179973983888 168.85081940819103 L 450.3089986991944 193.47624564952957 L 360 218.18945980480487 L 240.61799739838875 256.111412341234 L 150.30899869919438 292.5390238665622 L 60 316.89000961605717 Z" fill="#3b82c4" opacity="0.18"/><polyline points="60,310.93333333333334 150.30899869919438,283.8222222222222 240.61799739838875,246.75555555555553 360,206.9333333333333 450.3089986991944,181.60000000000002 540.6179973983888,158.48888888888888 660,125.59999999999988" fill="none" stroke="#3b82c4" stroke-width="2"/><circle cx="60" cy="310.93333333333334" r="3" fill="#3b82c4"/><circle cx="150.30899869919438" cy="283.8222222222222" r="3" fill="#3b82c4"/><circle cx="240.61799739838875" cy="246.75555555555553" r="3" fill="#3b82c4"/><circle cx="360" cy="206.9333333333333" r="3" fill="#3b82c4"/><circle cx="450.3089986991944" cy="181.60000000000002" r="3" fill="#3b82c4"/><circle cx="540.6179973983888" cy="158.48888888888888" r="3" fill="#3b82c4"/><circle cx="660" cy="125.59999999999988" r="3" fill="#3b82c4"/><path d="M 60 340 L 150.30899869919438 336.4799775723045 L 240.61799739838875 269.34938974638055 L 360 73.3621402215399 L 450.3089986991944 60 L 540.6179973983888 60 L 660 60 L 660 60 L 540.6179973983888 60 L 450.3089986991944 60 L 360 81.12674866734898 L 240.61799739838875 281.2283880313972 L 150.30899869919438 340 L 60 340 Z" fill="#1d8b5d" opacity="0.18"/><polyline points="60,340 150.30899869919438,338.6666666666667 240.61799739838875,275.2888888888889 360,77.24444444444441 450.3089986991944,60 540.6179973983888,60 660,60" fill="none" stroke="#1d8b5d" stroke-width="2"/><circle cx="60" cy="340" r="3" fill="#1d8b5d"/><circle cx="150.30899869919438" cy="338.6666666666667" r="3" fill="#1d8b5d"/><circle cx="240.61799739838875" cy="275.2888888888889" r="3" fill="#1d8b5d"/><circle cx="360" cy="77.24444444444441" r="3" fill="#1d8b5d"/><circle cx="450.3089986991944" cy="60" r="3" fill="#1d8b5d"/><circle cx="540.6179973983888" cy="60" r="3" fill="#1d8b5d"/><circle cx="660" cy="60" r="3" fill="#1d8b5d"/><line x1="60" y1="390" x2="86" y2="390" stroke="#9aa6b8" stroke-width="2"/><text x="92" y="393" font-size="10">B1_Random</text><line x1="200" y1="390" x2="226" y2="390" stroke="#3b82c4" stroke-width="2"/><text x="232" y="393" font-size="10">B2_GreedySC</text><line x1="340" y1="390" x2="366" y2="390" stroke="#1d8b5d" stroke-width="2"/><text x="372" y="393" font-size="10">B3_MDT</text></svg><div class="cap">Şekil 6b. Bütçe ↔ ITDR eğrisi.</div></div>
+<p>Eğriler iki temel bulguyu görselleştirir: <b>(i — yalnızca TC için)</b> B3_MDT zaten
+B = 200'de TC = 100.00% değerine
+ulaşır; B1_Random'ın B = 5000'deki TC değeri
+77.33%,
+B2_GreedySC'ninki 99.07%.
+Yani <b>TC boyutunda</b> MDT yapısal olarak <i>25× daha
+bütçe-verimlidir</i>. <b>(ii — ITDR farklı dinamik)</b> ITDR'de B3_MDT@B=200 yalnızca
+23.11%'tur; bu küçük bütçede
+B1/B2'nin büyük bütçedeki seviyesini geçmez. ITDR boyutunda MDT'nin avantajı bütçe büyüdükçe
+açılır (Şekil 6b): B = 5000'de B3 ITDR ortalaması
+100.00% iken B1/B2 sırasıyla
+74.35% /
+76.57% platosunda kalır.
+Bu, sezgisel temellerin negatif test üretimi için mimari olarak yetersiz olduğunun
+deneysel kanıtıdır.</p>
+
+<h3>4.8 Rule-Based Detector Karşılaştırması (B0)</h3>
+<p>Proposal'da B1 olarak listelenen "kural-tabanlı denetim" baseline'ı, <b>bütçesiz Q × Σ
+audit</b> koşullarında (yani tüm 130 hücrenin enumerate edildiği oracle modunda)
+spec-oracle'ın <i>105/105 = %100 completeness</i>'a ulaşması karşısında
+elle yazılmış imza kuralı kümesinin <i>completeness limiti</i>ni göstermek için
+gerçekleştirilmiştir. Not: bütçeli koşumda (Bölüm 4.2, B = 500) MDT'nin ITDR'si
+93.84%'tur — yani %100 completeness yalnızca bütçesiz audit
+modunda geçerli bir asimptot olup, bütçeli pratik koşumda hedef bütçenin büyüklüğüne göre
+yaklaşılır (bkz. Şekil 6b ITDR eğrisi). Yedi imza kuralı (her saldırı vektörü için bir tane;
+<code>experiments/b_extensions.mjs</code> 25–34. satırlar) tüm Q × Σ üzerinde
+çalıştırılmıştır.</p>
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Helvetica,Arial,sans-serif" font-size="10"><text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold">Şekil 7: Tespit completeness — kural-tabanlı (B0) vs. spec-oracle (MDT)</text><rect x="60" y="236" width="220" height="44" fill="#c97a3d"/><text x="170" y="230" text-anchor="middle" font-size="11" font-weight="bold">21/105 = 20.0%</text><text x="170" y="298" text-anchor="middle" font-size="10">B0 — Rule-based (7 imza)</text><rect x="380" y="60" width="220" height="220" fill="#1d8b5d"/><text x="490" y="54" text-anchor="middle" font-size="11" font-weight="bold">105/105 = 100.0%</text><text x="490" y="298" text-anchor="middle" font-size="10">MDT — Spec oracle (δ)</text><line x1="60" y1="280" x2="660" y2="280" stroke="#eee"/><text x="54" y="283" text-anchor="end" font-size="8">0%</text><line x1="60" y1="258" x2="660" y2="258" stroke="#eee"/><text x="54" y="261" text-anchor="end" font-size="8">10%</text><line x1="60" y1="236" x2="660" y2="236" stroke="#eee"/><text x="54" y="239" text-anchor="end" font-size="8">20%</text><line x1="60" y1="214" x2="660" y2="214" stroke="#eee"/><text x="54" y="217" text-anchor="end" font-size="8">30%</text><line x1="60" y1="192" x2="660" y2="192" stroke="#eee"/><text x="54" y="195" text-anchor="end" font-size="8">40%</text><line x1="60" y1="170" x2="660" y2="170" stroke="#eee"/><text x="54" y="173" text-anchor="end" font-size="8">50%</text><line x1="60" y1="148" x2="660" y2="148" stroke="#eee"/><text x="54" y="151" text-anchor="end" font-size="8">60%</text><line x1="60" y1="126" x2="660" y2="126" stroke="#eee"/><text x="54" y="129" text-anchor="end" font-size="8">70%</text><line x1="60" y1="104" x2="660" y2="104" stroke="#eee"/><text x="54" y="107" text-anchor="end" font-size="8">80%</text><line x1="60" y1="82" x2="660" y2="82" stroke="#eee"/><text x="54" y="85" text-anchor="end" font-size="8">90%</text><line x1="60" y1="60" x2="660" y2="60" stroke="#eee"/><text x="54" y="63" text-anchor="end" font-size="8">100%</text><text x="60" y="330" font-size="10" font-weight="bold">Kural tabanlının kaçırdığı (n=84) şiddet dağılımı:</text><text x="60" y="350" font-size="10">LOW: 27</text><text x="190" y="350" font-size="10">MEDIUM: 39</text><text x="320" y="350" font-size="10">HIGH: 16</text><text x="450" y="350" font-size="10">CRITICAL: 2</text></svg><div class="cap">Şekil 7. B0 (rule-based, 7 imza) vs MDT (spec-oracle) — completeness karşılaştırması.</div></div>
+<table style="width:60%;margin-left:auto;margin-right:auto;">
+<tr><th>Kural</th><th>Tetiklenme sayısı</th></tr>
+<tr><td class="l">R1_BYPASS</td><td>4</td></tr><tr><td class="l">R2_REPLAY</td><td>1</td></tr><tr><td class="l">R3_GHOST</td><td>1</td></tr><tr><td class="l">R4_HSKIP</td><td>2</td></tr><tr><td class="l">R5_PDATA</td><td>4</td></tr><tr><td class="l">R6_HIJACK</td><td>8</td></tr><tr><td class="l">R7_CFLOOD</td><td>1</td></tr>
+<tr><th>Toplam (deduplike)</th><th>21/105 = 20.0%</th></tr>
+</table>
+<p><b>Bulgu.</b> Kural tabanlı detector 20.0%
+completeness'ta sınırlanmaktadır (21/105).
+Kaçırdıklarının <b>2'i CRITICAL,
+16'i HIGH</b> şiddetindedir — yani en tehlikeli
+saldırı imzaları bile elle yazılmış kural setinden kaçabilmektedir. Bu bulgu, tezin G3
+literatür boşluğunun (her saldırı vektörü ↔ (state, event) çifti satır-satır eşlemesi)
+sayısal gerekçesidir: kategorik düzeyde kalmak 80%
+geçersiz ikiliyi gözden kaçırır.</p>
+<table style="width:60%;margin-left:auto;margin-right:auto;">
+<tr><th>Kaçırılan saldırı tipi</th><th>İkili sayısı</th></tr>
+<tr><td class="l">GHOST_CIRCUIT</td><td>37</td></tr><tr><td class="l">HANDSHAKE_SKIP</td><td>11</td></tr><tr><td class="l">REPLAY_ATTACK</td><td>24</td></tr><tr><td class="l">CREATE_FLOOD</td><td>7</td></tr><tr><td class="l">INVALID_TRANSITION</td><td>1</td></tr><tr><td class="l">CIRCUIT_HIJACK</td><td>2</td></tr><tr><td class="l">PREMATURE_DATA</td><td>2</td></tr>
+</table>
+
 <div class="pagebreak"></div>
 
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->
@@ -527,13 +706,14 @@ Cohen's d büyüklük yorumu: 0.2 küçük, 0.5 orta, 0.8 büyük, ≥1.2 çok b
   <li><b>FPR = 0 doğal sonuçtur.</b> Oracle (δ) ve test üreticisi aynı modeli paylaştığı
   için yanlış-pozitif tanımı boş kümeye düşer. FPR'nin bilgilendirici olması için
   <i>bağımsız</i> bir oracle gerekir (örn. paket yakalama tabanlı gözlemci).</li>
-  <li><b>Bütçe tek noktada (500 olay) ölçülmüştür.</b> Bütçe-kapsama eğrisi (B1/B2 için
-  bütçe büyütüldüğünde MDT performansına yaklaşma davranışı) raporun kapsamı dışındadır.</li>
   <li><b>N = 30 koşu</b> CLT için yeterli; ancak güç analizi (β = 0.80, α = 0.05) yapılmamıştır.
   Önerilen genişletme: N = 100.</li>
   <li><b>SLR canlı veritabanı erişimi yok.</b> Bu ortamda Scopus / WoS / IEEE Xplore canlı
-  sorgulanamadığı için tarama açık web kanalları ile sınırlıdır; bulunmayan kaynak olabileceği
-  açıkça kabul edilir.</li>
+  sorgulanamadığı için tarama açık web kanalları ile sınırlıdır (bkz. Şekil 5 PRISMA).
+  Bulunmayan kaynak olabileceği açıkça kabul edilir.</li>
+  <li><b>Latency tek-platform ölçümü.</b> Bölüm 4.6 ölçümü tek-thread, JIT-warm Node.js V8
+  koşulları altındadır; gerçek Tor C implementasyonunda profil farklı olabilir. Karşılaştırmalı
+  ölçüm için aynı δ-tablosunun C/Rust portu gereklidir.</li>
 </ul>
 
 <h3>6.3 Gelecek Çalışmalar</h3>

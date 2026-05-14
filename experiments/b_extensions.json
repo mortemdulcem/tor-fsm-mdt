@@ -1,0 +1,348 @@
+{
+  "ruleBased": {
+    "totalInvalid": 105,
+    "detectedByRules": 21,
+    "completeness": 0.2,
+    "missed": 84,
+    "perRule": {
+      "R1_BYPASS": 4,
+      "R2_REPLAY": 1,
+      "R3_GHOST": 1,
+      "R4_HSKIP": 2,
+      "R5_PDATA": 4,
+      "R6_HIJACK": 8,
+      "R7_CFLOOD": 1
+    },
+    "missedByType": {
+      "GHOST_CIRCUIT": 37,
+      "HANDSHAKE_SKIP": 11,
+      "REPLAY_ATTACK": 24,
+      "CREATE_FLOOD": 7,
+      "INVALID_TRANSITION": 1,
+      "CIRCUIT_HIJACK": 2,
+      "PREMATURE_DATA": 2
+    },
+    "missedBySeverity": {
+      "LOW": 27,
+      "MEDIUM": 39,
+      "HIGH": 16,
+      "CRITICAL": 2
+    }
+  },
+  "latencyData": {
+    "overheadNs": 2.5245799999999994,
+    "batchSize": 100000,
+    "repeats": 30,
+    "valid_step": {
+      "state": "IDLE",
+      "event": "CONNECT",
+      "mean_ns": 73.612523,
+      "sd_ns": 13.176611166044632,
+      "min_ns": 62.111320000000006,
+      "max_ns": 112.82831,
+      "p50_ns": 68.20872,
+      "p95_ns": 112.55611
+    },
+    "invalid_critical": {
+      "state": "IDLE",
+      "event": "SEND_RELAY_DATA",
+      "mean_ns": 164.71986933333338,
+      "sd_ns": 17.38445683168533,
+      "min_ns": 145.25321000000002,
+      "max_ns": 238.85171000000003,
+      "p50_ns": 162.54751000000002,
+      "p95_ns": 193.32241000000002
+    },
+    "invalid_low": {
+      "state": "ERROR",
+      "event": "TLS_FAIL",
+      "mean_ns": 142.89388,
+      "sd_ns": 18.84350113360041,
+      "min_ns": 125.24221,
+      "max_ns": 197.87321,
+      "p50_ns": 135.27381000000003,
+      "p95_ns": 196.01001000000002
+    }
+  },
+  "wilcoxon": [
+    {
+      "a": "B3_MDT",
+      "b": "B1_Random",
+      "metric": "sc",
+      "W": 0,
+      "z": -4.273039743336164,
+      "p": 0.00001929593119642803,
+      "n": 23,
+      "Wp": 276,
+      "Wn": 0
+    },
+    {
+      "a": "B3_MDT",
+      "b": "B1_Random",
+      "metric": "tc",
+      "W": 0,
+      "z": -4.79712956957384,
+      "p": 0.0000016116273147126492,
+      "n": 30,
+      "Wp": 465,
+      "Wn": 0
+    },
+    {
+      "a": "B3_MDT",
+      "b": "B1_Random",
+      "metric": "itdr",
+      "W": 0,
+      "z": -4.782518279281238,
+      "p": 0.0000017333210511338848,
+      "n": 30,
+      "Wp": 465,
+      "Wn": 0
+    },
+    {
+      "a": "B3_MDT",
+      "b": "B2_GreedySC",
+      "metric": "sc",
+      "W": 0,
+      "z": 0,
+      "p": 1,
+      "n": 0
+    },
+    {
+      "a": "B3_MDT",
+      "b": "B2_GreedySC",
+      "metric": "tc",
+      "W": 0,
+      "z": -4.798150996088039,
+      "p": 0.0000016034344865190064,
+      "n": 30,
+      "Wp": 465,
+      "Wn": 0
+    },
+    {
+      "a": "B3_MDT",
+      "b": "B2_GreedySC",
+      "metric": "itdr",
+      "W": 0,
+      "z": -4.785683288481898,
+      "p": 0.0000017062335491146996,
+      "n": 30,
+      "Wp": 465,
+      "Wn": 0
+    },
+    {
+      "a": "B2_GreedySC",
+      "b": "B1_Random",
+      "metric": "sc",
+      "W": 0,
+      "z": -4.273039743336164,
+      "p": 0.00001929593119642803,
+      "n": 23,
+      "Wp": 276,
+      "Wn": 0
+    },
+    {
+      "a": "B2_GreedySC",
+      "b": "B1_Random",
+      "metric": "tc",
+      "W": 1,
+      "z": -4.7663620159736775,
+      "p": 0.0000018781583532856416,
+      "n": 30,
+      "Wp": 464,
+      "Wn": 1
+    },
+    {
+      "a": "B2_GreedySC",
+      "b": "B1_Random",
+      "metric": "itdr",
+      "W": 153.5,
+      "z": -1.3843704200176563,
+      "p": 0.16624517659418014,
+      "n": 29,
+      "Wp": 153.5,
+      "Wn": 281.5
+    }
+  ],
+  "budgetCurve": {
+    "B1_Random": [
+      {
+        "budget": 50,
+        "tc_mean": 0.17066666666666672,
+        "tc_sd": 0.06802298462124115,
+        "itdr_mean": 0.21238095238095242,
+        "itdr_sd": 0.04425913357357679
+      },
+      {
+        "budget": 100,
+        "tc_mean": 0.23466666666666675,
+        "tc_sd": 0.07700126883564225,
+        "itdr_mean": 0.3123809523809525,
+        "itdr_sd": 0.0515245713500948
+      },
+      {
+        "budget": 200,
+        "tc_mean": 0.31466666666666676,
+        "tc_sd": 0.08050415852755609,
+        "itdr_mean": 0.38857142857142873,
+        "itdr_sd": 0.06254687818928512
+      },
+      {
+        "budget": 500,
+        "tc_mean": 0.4586666666666666,
+        "tc_sd": 0.11053890977711262,
+        "itdr_mean": 0.5031746031746033,
+        "itdr_sd": 0.09799246400380889
+      },
+      {
+        "budget": 1000,
+        "tc_mean": 0.5466666666666666,
+        "tc_sd": 0.12922403249671727,
+        "itdr_mean": 0.5806349206349206,
+        "itdr_sd": 0.09002074750068603
+      },
+      {
+        "budget": 2000,
+        "tc_mean": 0.636,
+        "tc_sd": 0.09704602534098324,
+        "itdr_mean": 0.6561904761904762,
+        "itdr_sd": 0.07408207531004078
+      },
+      {
+        "budget": 5000,
+        "tc_mean": 0.7733333333333333,
+        "tc_sd": 0.12038253205091051,
+        "itdr_mean": 0.7434920634920638,
+        "itdr_sd": 0.0774902810674737
+      }
+    ],
+    "B2_GreedySC": [
+      {
+        "budget": 50,
+        "tc_mean": 0.5000000000000001,
+        "tc_sd": 0.05918993390655266,
+        "itdr_mean": 0.10380952380952382,
+        "itdr_sd": 0.02127384386687087
+      },
+      {
+        "budget": 100,
+        "tc_mean": 0.572,
+        "tc_sd": 0.07941162947926284,
+        "itdr_mean": 0.2006349206349207,
+        "itdr_sd": 0.031131434444071484
+      },
+      {
+        "budget": 200,
+        "tc_mean": 0.6866666666666668,
+        "tc_sd": 0.08980182523808719,
+        "itdr_mean": 0.33301587301587304,
+        "itdr_sd": 0.03341377423456584
+      },
+      {
+        "budget": 500,
+        "tc_mean": 0.7826666666666668,
+        "tc_sd": 0.08448355617732846,
+        "itdr_mean": 0.4752380952380953,
+        "itdr_sd": 0.040200451683826945
+      },
+      {
+        "budget": 1000,
+        "tc_mean": 0.8613333333333337,
+        "tc_sd": 0.0725749711455789,
+        "itdr_mean": 0.5657142857142856,
+        "itdr_sd": 0.04241516303403409
+      },
+      {
+        "budget": 2000,
+        "tc_mean": 0.9440000000000005,
+        "tc_sd": 0.05617705998862451,
+        "itdr_mean": 0.6482539682539683,
+        "itdr_sd": 0.03700689471179342
+      },
+      {
+        "budget": 5000,
+        "tc_mean": 0.9906666666666667,
+        "tc_sd": 0.02504249262317171,
+        "itdr_mean": 0.7657142857142861,
+        "itdr_sd": 0.02653969301519004
+      }
+    ],
+    "B3_MDT": [
+      {
+        "budget": 50,
+        "tc_mean": 0.6093333333333334,
+        "tc_sd": 0.05323554253039736,
+        "itdr_mean": 0,
+        "itdr_sd": 0
+      },
+      {
+        "budget": 100,
+        "tc_mean": 0.9906666666666667,
+        "tc_sd": 0.02016027731974924,
+        "itdr_mean": 0.0047619047619047615,
+        "itdr_sd": 0.007809603908436201
+      },
+      {
+        "budget": 200,
+        "tc_mean": 1,
+        "tc_sd": 0,
+        "itdr_mean": 0.23111111111111116,
+        "itdr_sd": 0.02121249693752968
+      },
+      {
+        "budget": 500,
+        "tc_mean": 1,
+        "tc_sd": 0,
+        "itdr_mean": 0.9384126984126985,
+        "itdr_sd": 0.013865372224659155
+      },
+      {
+        "budget": 1000,
+        "tc_mean": 1,
+        "tc_sd": 0,
+        "itdr_mean": 1,
+        "itdr_sd": 0
+      },
+      {
+        "budget": 2000,
+        "tc_mean": 1,
+        "tc_sd": 0,
+        "itdr_mean": 1,
+        "itdr_sd": 0
+      },
+      {
+        "budget": 5000,
+        "tc_mean": 1,
+        "tc_sd": 0,
+        "itdr_mean": 1,
+        "itdr_sd": 0
+      }
+    ]
+  },
+  "prisma": {
+    "identified_db": 0,
+    "identified_other": null,
+    "duplicates_removed": null,
+    "screened": null,
+    "excluded_title_abstract": null,
+    "full_text_assessed": null,
+    "excluded_full_text": null,
+    "included": 20,
+    "exclusion_reasons_qualitative": [
+      "Tor ile dolaylı ilgili çalışmalar",
+      "Sadece kriptografik primitif analizi (FSM ile ilgisiz)",
+      "Eski sürüm Tor (≤0.2.x), güncel spec ile uyumsuz",
+      "Tam metne açık erişim yok",
+      "Yetersiz metodolojik açıklama"
+    ],
+    "notes": "Ara sayılar (NA) raporlanmaz çünkü açık-web sürecinde audit-edilebilir log tutulmadı. Bu durum tezin sınırlılıklar bölümünde açıkça belirtilir."
+  },
+  "BUDGETS": [
+    50,
+    100,
+    200,
+    500,
+    1000,
+    2000,
+    5000
+  ]
+}

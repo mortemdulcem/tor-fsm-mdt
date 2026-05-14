@@ -35,4 +35,16 @@ title = "Ham Deney Verisi (90 koşu)"
 id = "dVcgP4IiSOBVn5A21t9zD"
 uri = "file://thesis/Tez_Taslagi.pdf"
 type = "pdf"
-title = "Tez Taslağı (Bölüm 1-6 + Kaynakça + Ek A/B)"
+title = "Tez Taslağı (B grubu eklemeleri ile)"
+
+[[outputs]]
+id = "hnVx3t2qWJVIFyMTccuwf"
+uri = "file://paper/Tor_FSM_MDT_Paper.pdf"
+type = "pdf"
+title = "IEEE Konferans Makale Taslağı"
+
+[[outputs]]
+id = "nszqODd5UVnmdw_VMMWB-"
+uri = "file://experiments/b_extensions.json"
+type = "unspecified"
+title = "B grubu ham veri (Wilcoxon + latency + bütçe + rule-based)"

@@ -7,12 +7,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 import { fsmGraphSvg, attackHeatmapSvg, metricBarChart, severitySplitSvg } from "../experiments/figures.mjs";
+import { prismaSvg, budgetCurveSvg, ruleCompletenessSvg } from "../experiments/figures_v2.mjs";
 import { STATES, EVENTS, VALID, totalDomain, totalValid, totalInvalid, k, classifyInvalid } from "../server/fsm.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const puppeteer = (await import(path.resolve(__dirname, "../node_modules/puppeteer-core/lib/cjs/puppeteer/puppeteer-core.js"))).default;
 
 const trials = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/trials.json"), "utf8"));
+const ext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/b_extensions.json"), "utf8"));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -53,6 +55,30 @@ const svg1 = fsmGraphSvg();
 const svg2 = attackHeatmapSvg();
 const svg3 = metricBarChart(stats);
 const svg4 = severitySplitSvg(sevSplit);
+const svg5 = prismaSvg(ext.prisma);
+const svg6_tc = budgetCurveSvg(ext.budgetCurve, ext.BUDGETS, "tc");
+const svg6_itdr = budgetCurveSvg(ext.budgetCurve, ext.BUDGETS, "itdr");
+const svg7 = ruleCompletenessSvg(ext.ruleBased);
+
+// Wilcoxon ve latency tabloları
+const wilcoxonRows = ext.wilcoxon.map((w) => `<tr>
+  <td class="l">${w.a} vs ${w.b}</td><td>${w.metric.toUpperCase()}</td>
+  <td>${w.W.toFixed(1)}</td><td>${w.z.toFixed(2)}</td>
+  <td>${w.p < 0.001 ? "&lt;.001" : w.p.toFixed(4)} ${w.p < 0.001 ? "***" : w.p < 0.01 ? "**" : w.p < 0.05 ? "*" : ""}</td>
+  <td>${w.n}</td>
+</tr>`).join("");
+const probeOrder = ["valid_step", "invalid_critical", "invalid_low"];
+const probeLabels = { valid_step: "Geçerli geçiş (IDLE → CONNECTING)", invalid_critical: "Geçersiz CRITICAL (BYPASS)", invalid_low: "Geçersiz LOW (GHOST)" };
+const latencyRows = probeOrder.map((key) => { const d = ext.latencyData[key]; return `<tr>
+  <td class="l">${probeLabels[key]}</td>
+  <td>${d.mean_ns.toFixed(1)}</td><td>${d.sd_ns.toFixed(1)}</td>
+  <td>${d.p50_ns.toFixed(1)}</td><td>${d.p95_ns.toFixed(1)}</td>
+  <td>${d.min_ns.toFixed(1)}</td><td>${d.max_ns.toFixed(1)}</td>
+</tr>`; }).join("");
+const ruleRows = Object.entries(ext.ruleBased.perRule).map(([r, c]) =>
+  `<tr><td class="l">${r}</td><td>${c}</td></tr>`).join("");
+const missedRows = Object.entries(ext.ruleBased.missedByType).map(([t, c]) =>
+  `<tr><td class="l">${t}</td><td>${c}</td></tr>`).join("");
 
 // ---------- δ tablosu (gerçek VALID'den üretilir) ----------
 function deltaTableHtml() {
@@ -217,7 +243,8 @@ protocol state fuzzing, security testing, transition coverage.</p>
   <div class="lvl2"><span>2.4 Formal Yöntemler ve Protokol Doğrulama</span><span></span></div>
   <div class="lvl2"><span>2.5 Yazılım Testi Metodolojisi</span><span></span></div>
   <div class="lvl2"><span>2.6 Tor Simülasyon Altyapısı</span><span></span></div>
-  <div class="lvl2"><span>2.7 Literatür Boşluğu</span><span></span></div>
+  <div class="lvl2"><span>2.7 PRISMA Akış Diyagramı</span><span></span></div>
+  <div class="lvl2"><span>2.8 Literatür Boşluğu</span><span></span></div>
   <div class="lvl1"><span>3. Yöntem</span><span></span></div>
   <div class="lvl2"><span>3.1 FSM Formal Tanımı</span><span></span></div>
   <div class="lvl2"><span>3.2 Saldırı Sınıflandırıcı</span><span></span></div>
@@ -228,6 +255,10 @@ protocol state fuzzing, security testing, transition coverage.</p>
   <div class="lvl2"><span>4.2 Tanımlayıcı İstatistikler</span><span></span></div>
   <div class="lvl2"><span>4.3 Hipotez Testleri</span><span></span></div>
   <div class="lvl2"><span>4.4 Yorum</span><span></span></div>
+  <div class="lvl2"><span>4.5 Wilcoxon Signed-Rank Doğrulaması</span><span></span></div>
+  <div class="lvl2"><span>4.6 Detection Latency Ölçümü</span><span></span></div>
+  <div class="lvl2"><span>4.7 Bütçe-Kapsama Eğrisi</span><span></span></div>
+  <div class="lvl2"><span>4.8 Rule-Based Detector Karşılaştırması (B0)</span><span></span></div>
   <div class="lvl1"><span>5. Görselleştirme</span><span></span></div>
   <div class="lvl1"><span>6. Sonuç ve Gelecek Çalışmalar</span><span></span></div>
   <div class="lvl2"><span>6.1 Katkıların Yeniden Değerlendirilmesi</span><span></span></div>
@@ -368,7 +399,20 @@ tablosunun otorite kaynağıdır. Microsoft Research'ün veri-tabanlı FSM güve
 çalışması ${cite(20)} state-level analizin endüstriyel uygulanabilirliğini gösterir, ancak
 Tor'a özel değildir.</p>
 
-<h3>2.7 Literatür Boşluğu</h3>
+<h3>2.7 PRISMA Akış Diyagramı</h3>
+<p>Bölüm 2.1'de tarif edilen SLR sürecinin PRISMA akışı Şekil 5'te sunulmuştur. Bu çalışmaya
+özgü iki dürüst not zorunludur: <b>(i)</b> canlı akademik veritabanı erişimi (Scopus, WoS,
+IEEE Xplore) bu ortamda mevcut değildir; bu nedenle "identified through database searching"
+hücresi sıfırdır ve tüm tanımlamalar açık-web kanalları (Google Scholar, arXiv, DOI
+çözümleme) üzerinden yapılmıştır. <b>(ii)</b> Açık-web sürecinde audit-edilebilir sorgu
+logu tutulmadığı için ara aşama sayıları (identified, screened, eligibility) <b>NA olarak
+raporlanır</b>; yalnızca son "included" sayısı (n=${ext.prisma.included}) doğrulanabilir
+ve repodaki <code>Literatur_Notlari.pdf</code>'in atıf sayısı ile birebirdir. Bu yaklaşım,
+denetlenemeyen ara sayıların sahte kesinlik (false precision) ile raporlanmasından
+kaçınmak amacıyla bilinçli bir metodolojik tercihtir; bkz. Bölüm 6.2.</p>
+<div class="fig">${svg5}<div class="cap">Şekil 5. SLR sürecinin PRISMA akış diyagramı (ara sayılar NA).</div></div>
+
+<h3>2.8 Literatür Boşluğu</h3>
 <div class="box">
 20 kaynağın incelenmesi sonucunda <b>tez ölçeğinde dört somut boşluk</b> tespit edilmiştir:
 <ul>
@@ -494,6 +538,107 @@ Cohen's d büyüklük yorumu: 0.2 küçük, 0.5 orta, 0.8 büyük, ≥1.2 çok b
 <h3>4.4 Yorum</h3>
 <p>${interpretFindings()}</p>
 
+<h3>4.5 Wilcoxon Signed-Rank Doğrulaması</h3>
+<p>Bölüm 4.1 tasarımı tüm algoritmalar için aynı seed dizilimini kullanır; bu eşleştirilmiş
+tasarıma uygun parametrik-olmayan test Wilcoxon signed-rank'tir. Welch t (Bölüm 4.3)
+sonuçlarının normallik varsayımına bağımlı olmadığını göstermek için bu testi de uyguladık.
+Tablo 3'teki her satır N=30 koşudan elde edilen eşleştirilmiş farklar üzerinden
+hesaplanmıştır; <i>n (≠0)</i> sütunu sıfır farklar (ties) çıkarıldıktan sonra kalan etkili
+örneklem büyüklüğüdür.</p>
+<table>
+<tr><th>Karşılaştırma</th><th>Metrik</th><th>W</th><th>z</th><th>p</th><th>n (≠0)</th></tr>
+${wilcoxonRows}
+</table>
+<p><b>Yorum (sınırlandırılmış).</b> Tezin ana hipotezleri olan
+<i>B3_MDT &gt; B1_Random</i> ve <i>B3_MDT &gt; B2_GreedySC</i> karşılaştırmaları, hem TC
+hem ITDR boyutlarında p &lt; .001 ile anlamlıdır; bu, Welch sonucunu birebir doğrular.
+<b>SC boyutunda</b> üç algoritmanın B = 500 bütçesi altında ulaştığı ortalama değerler
+şöyledir: B1_Random ${pct(stats.B1_Random.sc.mean)}, B2_GreedySC
+${pct(stats.B2_GreedySC.sc.mean)}, B3_MDT ${pct(stats.B3_MDT.sc.mean)}. Buna göre
+<i>B3 vs B2</i> SC karşılaştırmasında her iki algoritma da %100'de doygundur (n≠0 = 0,
+p = 1.0); buna karşılık <i>B3 vs B1</i> ve <i>B2 vs B1</i> SC karşılaştırmaları
+hâlâ p &lt; .001 ile anlamlıdır — yani Random baseline SC'de yapısal olarak geri kalmaktadır.
+Son olarak <i>B2_GreedySC vs B1_Random</i> karşılaştırması ITDR'de istatistiksel olarak
+anlamlı değildir (p &gt; .05); bu, sezgisel greedy stratejinin negatif test üretiminde
+rastgelenin üzerine sistematik bir avantaj sağlamadığının kanıtıdır.</p>
+
+<h3>4.6 Detection Latency Ölçümü</h3>
+<p>Proposal'da tanımlanan ancak orijinal koşumda ölçülmeyen detection latency metriği,
+<b>nanosaniye çözünürlüklü</b> <code>process.hrtime.bigint()</code> ile <b>batch
+amortizasyon</b> tekniği kullanılarak ölçülmüştür: her ölçüm B = ${ext.latencyData.batchSize.toLocaleString()} step
+çağrısını sarar, toplam süre B'ye bölünür ve önceden kalibre edilmiş boş döngü
+overhead'i (${ext.latencyData.overheadNs.toFixed(2)} ns/iter) çıkarılır.
+N = ${ext.latencyData.repeats} batch tekrarı yapılır. Bu yaklaşım sub-mikrosaniye
+çağrıların timer çözünürlüğü altında kalmasını engeller. Üç temsili (state, event)
+hücresi probe edilmiştir.</p>
+<table>
+<tr><th>Probe</th><th>mean (ns)</th><th>SD (ns)</th>
+    <th>p50</th><th>p95</th><th>min</th><th>max</th></tr>
+${latencyRows}
+</table>
+<p style="font-size:9.5pt;color:#555;"><b>Hedef karşılaştırması.</b> Proposal hedefi
+&lt; 50 ms = 50,000,000 ns idi. Ölçülen en yavaş probe
+(invalid_critical) max ${ext.latencyData.invalid_critical.max_ns.toFixed(0)} ns'dir;
+bu hedeften <b>${(50_000_000 / Math.max(ext.latencyData.invalid_critical.max_ns, 1)).toFixed(0)}×
+daha hızlıdır</b>. Geçersiz tespitin geçerli adımdan ~2× daha pahalı olması
+beklenen bir sonuçtur (<code>classifyInvalid</code> ek bir koşul zinciri çalıştırır).
+<b>Limitler.</b> Bu ölçüm tek-thread, tek-makine, JIT-warm Node.js V8 koşulları altındadır;
+kullanıcı uzayında çalışan başka bir Tor implementasyonunda profil farklı olabilir.</p>
+
+<h3>4.7 Bütçe-Kapsama Eğrisi</h3>
+<p>Bölüm 4.2 tek bir bütçe noktası (B = 500) için algoritmaları karşılaştırır. Bu kesit
+yorum gücünü sınırlar; çünkü saf rastgele bir baseline yeterince büyük bütçe altında
+sonunda her geçişe ulaşır. Bu eleştiriye yanıt olarak bütçeyi bir ondalık derecede gezdirdik
+(B ∈ {50, 100, 200, 500, 1000, 2000, 5000}, her nokta 30 koşu). Şekil 6 sonuç eğrilerini
+verir; gölgeli bantlar ±1 SD'dir.</p>
+<div class="fig">${svg6_tc}<div class="cap">Şekil 6a. Bütçe ↔ Transition Coverage eğrisi.</div></div>
+<div class="fig">${svg6_itdr}<div class="cap">Şekil 6b. Bütçe ↔ ITDR eğrisi.</div></div>
+<p>Eğriler iki temel bulguyu görselleştirir: <b>(i — yalnızca TC için)</b> B3_MDT zaten
+B = 200'de TC = ${pct(ext.budgetCurve.B3_MDT.find(x=>x.budget===200).tc_mean)} değerine
+ulaşır; B1_Random'ın B = 5000'deki TC değeri
+${pct(ext.budgetCurve.B1_Random.find(x=>x.budget===5000).tc_mean)},
+B2_GreedySC'ninki ${pct(ext.budgetCurve.B2_GreedySC.find(x=>x.budget===5000).tc_mean)}.
+Yani <b>TC boyutunda</b> MDT yapısal olarak <i>${(5000 / 200).toFixed(0)}× daha
+bütçe-verimlidir</i>. <b>(ii — ITDR farklı dinamik)</b> ITDR'de B3_MDT@B=200 yalnızca
+${pct(ext.budgetCurve.B3_MDT.find(x=>x.budget===200).itdr_mean)}'tur; bu küçük bütçede
+B1/B2'nin büyük bütçedeki seviyesini geçmez. ITDR boyutunda MDT'nin avantajı bütçe büyüdükçe
+açılır (Şekil 6b): B = 5000'de B3 ITDR ortalaması
+${pct(ext.budgetCurve.B3_MDT.find(x=>x.budget===5000).itdr_mean)} iken B1/B2 sırasıyla
+${pct(ext.budgetCurve.B1_Random.find(x=>x.budget===5000).itdr_mean)} /
+${pct(ext.budgetCurve.B2_GreedySC.find(x=>x.budget===5000).itdr_mean)} platosunda kalır.
+Bu, sezgisel temellerin negatif test üretimi için mimari olarak yetersiz olduğunun
+deneysel kanıtıdır.</p>
+
+<h3>4.8 Rule-Based Detector Karşılaştırması (B0)</h3>
+<p>Proposal'da B1 olarak listelenen "kural-tabanlı denetim" baseline'ı, <b>bütçesiz Q × Σ
+audit</b> koşullarında (yani tüm ${totalDomain} hücrenin enumerate edildiği oracle modunda)
+spec-oracle'ın <i>${totalInvalid}/${totalInvalid} = %100 completeness</i>'a ulaşması karşısında
+elle yazılmış imza kuralı kümesinin <i>completeness limiti</i>ni göstermek için
+gerçekleştirilmiştir. Not: bütçeli koşumda (Bölüm 4.2, B = 500) MDT'nin ITDR'si
+${pct(stats.B3_MDT.itdr.mean)}'tur — yani %100 completeness yalnızca bütçesiz audit
+modunda geçerli bir asimptot olup, bütçeli pratik koşumda hedef bütçenin büyüklüğüne göre
+yaklaşılır (bkz. Şekil 6b ITDR eğrisi). Yedi imza kuralı (her saldırı vektörü için bir tane;
+<code>experiments/b_extensions.mjs</code> 25–34. satırlar) tüm Q × Σ üzerinde
+çalıştırılmıştır.</p>
+<div class="fig">${svg7}<div class="cap">Şekil 7. B0 (rule-based, 7 imza) vs MDT (spec-oracle) — completeness karşılaştırması.</div></div>
+<table style="width:60%;margin-left:auto;margin-right:auto;">
+<tr><th>Kural</th><th>Tetiklenme sayısı</th></tr>
+${ruleRows}
+<tr><th>Toplam (deduplike)</th><th>${ext.ruleBased.detectedByRules}/${ext.ruleBased.totalInvalid} = ${(ext.ruleBased.completeness * 100).toFixed(1)}%</th></tr>
+</table>
+<p><b>Bulgu.</b> Kural tabanlı detector ${(ext.ruleBased.completeness * 100).toFixed(1)}%
+completeness'ta sınırlanmaktadır (${ext.ruleBased.detectedByRules}/${ext.ruleBased.totalInvalid}).
+Kaçırdıklarının <b>${ext.ruleBased.missedBySeverity.CRITICAL}'i CRITICAL,
+${ext.ruleBased.missedBySeverity.HIGH}'i HIGH</b> şiddetindedir — yani en tehlikeli
+saldırı imzaları bile elle yazılmış kural setinden kaçabilmektedir. Bu bulgu, tezin G3
+literatür boşluğunun (her saldırı vektörü ↔ (state, event) çifti satır-satır eşlemesi)
+sayısal gerekçesidir: kategorik düzeyde kalmak ${(100 - ext.ruleBased.completeness * 100).toFixed(0)}%
+geçersiz ikiliyi gözden kaçırır.</p>
+<table style="width:60%;margin-left:auto;margin-right:auto;">
+<tr><th>Kaçırılan saldırı tipi</th><th>İkili sayısı</th></tr>
+${missedRows}
+</table>
+
 <div class="pagebreak"></div>
 
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->
@@ -532,13 +677,14 @@ Cohen's d büyüklük yorumu: 0.2 küçük, 0.5 orta, 0.8 büyük, ≥1.2 çok b
   <li><b>FPR = 0 doğal sonuçtur.</b> Oracle (δ) ve test üreticisi aynı modeli paylaştığı
   için yanlış-pozitif tanımı boş kümeye düşer. FPR'nin bilgilendirici olması için
   <i>bağımsız</i> bir oracle gerekir (örn. paket yakalama tabanlı gözlemci).</li>
-  <li><b>Bütçe tek noktada (500 olay) ölçülmüştür.</b> Bütçe-kapsama eğrisi (B1/B2 için
-  bütçe büyütüldüğünde MDT performansına yaklaşma davranışı) raporun kapsamı dışındadır.</li>
   <li><b>N = 30 koşu</b> CLT için yeterli; ancak güç analizi (β = 0.80, α = 0.05) yapılmamıştır.
   Önerilen genişletme: N = 100.</li>
   <li><b>SLR canlı veritabanı erişimi yok.</b> Bu ortamda Scopus / WoS / IEEE Xplore canlı
-  sorgulanamadığı için tarama açık web kanalları ile sınırlıdır; bulunmayan kaynak olabileceği
-  açıkça kabul edilir.</li>
+  sorgulanamadığı için tarama açık web kanalları ile sınırlıdır (bkz. Şekil 5 PRISMA).
+  Bulunmayan kaynak olabileceği açıkça kabul edilir.</li>
+  <li><b>Latency tek-platform ölçümü.</b> Bölüm 4.6 ölçümü tek-thread, JIT-warm Node.js V8
+  koşulları altındadır; gerçek Tor C implementasyonunda profil farklı olabilir. Karşılaştırmalı
+  ölçüm için aynı δ-tablosunun C/Rust portu gereklidir.</li>
 </ul>
 
 <h3>6.3 Gelecek Çalışmalar</h3>

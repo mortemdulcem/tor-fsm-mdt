@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Tor FSM Invalid Transition Detection — IEEE Paper</title>
+<style>
+  @page { size: A4; margin: 18mm 14mm 18mm 14mm; }
+  body { font-family: "Times New Roman", Times, serif; font-size: 9.5pt; color: #000; line-height: 1.30; }
+  .title { text-align: center; font-size: 18pt; font-weight: bold; margin: 0 0 4pt; line-height: 1.15; }
+  .authors { text-align: center; font-size: 10pt; margin: 6pt 0 4pt; }
+  .affil { text-align: center; font-size: 9pt; font-style: italic; margin-bottom: 8pt; }
+  .abstract { font-size: 9pt; margin: 10pt 14pt; }
+  .abstract b { font-style: italic; }
+  .keywords { font-size: 9pt; margin: 4pt 14pt 14pt; font-style: italic; }
+  .cols { column-count: 2; column-gap: 6mm; column-rule: none; }
+  h2 { font-size: 10.5pt; text-transform: uppercase; letter-spacing: 0.4pt; text-align: center; margin: 12pt 0 4pt; font-weight: bold; }
+  h3 { font-size: 10pt; font-style: italic; margin: 8pt 0 2pt; font-weight: normal; }
+  p { text-align: justify; margin: 2pt 0 4pt; text-indent: 12pt; }
+  p.no-indent, .fig p, table + p { text-indent: 0; }
+  ul, ol { margin: 2pt 0 4pt 16pt; padding: 0; font-size: 9pt; }
+  table { border-collapse: collapse; width: 100%; font-size: 8pt; margin: 4pt 0; }
+  th, td { border: 1px solid #000; padding: 2pt 4pt; text-align: center; }
+  th { background: #ddd; }
+  td.l, th.l { text-align: left; }
+  pre.algo { font-family: "Courier New", monospace; font-size: 7.5pt; line-height: 1.25; white-space: pre-wrap; background: #f4f4f4; padding: 4pt; border: 1px solid #aaa; margin: 4pt 0; }
+  .fig { text-align: center; margin: 4pt 0 6pt; break-inside: avoid; }
+  .fig svg { max-width: 100%; height: auto; }
+  .cap { font-size: 8pt; margin-top: 2pt; }
+  .ref { font-size: 8pt; margin: 2pt 0; text-indent: -16pt; padding-left: 16pt; }
+  code { font-family: "Courier New", monospace; font-size: 8.5pt; }
+</style></head><body>
+
+<div class="title">Detecting Invalid State Transitions in the Tor<br>Circuit Protocol via Model-Driven Testing</div>
+<div class="authors"><b>Nurcan Denli Bayır</b></div>
+<div class="affil">Hacettepe University, Department of Software Engineering<br>Advisor: Nebi Yılmaz · BYZ 658, May 2026</div>
+
+<div class="abstract"><b>Abstract</b>—We present the first published 5-tuple finite-state-machine (FSM)
+formalization of the Tor circuit life-cycle and propose a Model-Driven Testing
+(MDT) engine that systematically detects out-of-spec (invalid) state transitions.
+The Tor circuit is described over 10 states and 13 events; this yields a
+130-cell domain with 25 valid and 105 invalid pairs.
+Every invalid pair is mapped programmatically to one of seven attack vectors
+(CIRCUIT_BYPASS, REPLAY_ATTACK, GHOST_CIRCUIT, HANDSHAKE_SKIP, PREMATURE_DATA,
+CIRCUIT_HIJACK, CREATE_FLOOD) with a four-level severity label. Three algorithms
+— uniform random (B1), greedy state coverage (B2) and the proposed MDT (B3) —
+are compared under an identical 500-event budget across 30 paired trials. MDT
+saturates transition coverage at 100.0% (vs.
+45.9% / 78.3%) and reaches
+an Invalid Transition Detection Rate of 93.8%. Welch
+t-tests, Mann-Whitney U and Wilcoxon signed-rank tests jointly confirm
+B3 &gt; {B1, B2} on TC and ITDR (p &lt; .001; Cohen's d ∈ [3.6, 15.4]); SC
+comparisons are saturated. Under budget-free audit, a hand-written 7-rule
+detector reaches only 20.0%
+completeness — missing
+2 CRITICAL and
+16 HIGH severity invalid pairs —
+quantifying the gap motivating spec-oracle MDT.</div>
+<div class="keywords"><b>Index Terms</b>—Tor, anonymous network, finite-state machine,
+model-driven testing, protocol state fuzzing, security testing, transition coverage.</div>
+
+<div class="cols">
+
+<h2>I. Introduction</h2>
+<p>The Tor anonymous communication network [1] has been studied along
+two dominant axes: traffic correlation / timing attacks [2], [3], [4], [5] and
+formal cryptographic analysis [6], [13]. A third axis — protocol
+<i>state-machine</i> conformance — remains comparatively unexplored. Protocol
+state fuzzing has been applied to TLS implementations [9], [14], but no
+equivalent published study exists for Tor. This paper closes that gap.</p>
+<p class="no-indent"><b>Research questions.</b></p>
+<ul>
+  <li><b>RQ1.</b> Can the Tor circuit life-cycle be formally modeled as a deterministic
+  5-tuple FSM?</li>
+  <li><b>RQ2.</b> Can the resulting invalid-transition set (Q × Σ) ∖ dom(δ) be mapped
+  programmatically to known Tor attack vectors?</li>
+  <li><b>RQ3.</b> Does an MDT-generated test suite deliver statistically significant
+  gains over random and greedy baselines on Transition Coverage (TC) and Invalid
+  Transition Detection Rate (ITDR)?</li>
+</ul>
+<p class="no-indent"><b>Contributions.</b> (i) The first published complete δ-matrix
+for Tor circuits; (ii) a programmatic classifier mapping all
+105 invalid pairs to seven attack vectors and four severity levels;
+(iii) a reference open-source MDT implementation; (iv) a paired three-way
+statistical comparison validated by Welch t, Mann-Whitney U and Wilcoxon
+signed-rank tests.</p>
+
+<h2>II. Related Work</h2>
+<h3>A. Tor security and anonymity</h3>
+<p>Tor's protocol foundations [1], low-cost traffic analysis [2],
+realistic-adversary correlation [3], internet-scale website fingerprinting
+[4] and the comprehensive de-anonymization survey [5] establish the
+attack landscape. AnoA [6] formalizes anonymity probabilistically; our
+state-conformance angle is orthogonal.</p>
+<h3>B. FSM-based testing</h3>
+<p>Lee and Yannakakis' classical survey [7] establishes transition coverage
+methodology; Tretmans' LTS testing theory [8] grounds our oracle as an
+ioco-style relation. de Ruiter and Poll's TLS state fuzzing [9] is
+methodologically closest. Fiterău-Broștean et al. [10] demonstrate model
+learning for TCP — a future-work pointer for automatic Tor extraction.
+Ammann and Offutt [11] formalize transition coverage.</p>
+<h3>C. Formal protocol verification</h3>
+<p>Dolev–Yao [12] bounds our threat model. Bhargavan et al. [13]
+verify TLS 1.3 with ProVerif. Somorovsky [14] fuzz-tests TLS libraries.</p>
+<h3>D. Software testing methodology</h3>
+<p>Felderer et al. [15] taxonomize security testing; Pretschner et al.
+[16] apply MDT to access control. Kitchenham and Charters [17]
+guide our SLR (limited to open-web sources due to no live database access in
+this work).</p>
+<h3>E. Tor experimental infrastructure</h3>
+<p>Shadow [18] provides Tor network simulation. The official Tor
+specification [19] is δ's authority. Microsoft Research [20]
+demonstrates data-driven FSM security analysis in industry but not for Tor.</p>
+
+<h2>III. Method</h2>
+<h3>A. FSM formalization</h3>
+<p>The Tor circuit is modeled as M = (Q, Σ, δ, q₀, F) with |Q| = 10, |Σ| = 13,
+|dom(δ)| = 25, q₀ = IDLE, F = {CLOSED}. The full δ table is in the
+extended thesis appendix; Fig. 1 visualizes the graph.</p>
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 620" font-family="Helvetica,Arial,sans-serif" font-size="9"><defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#345"/>
+    </marker>
+    <marker id="arrSelf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#a55"/>
+    </marker>
+  </defs><path d="M 380.9232433584934 86.79837387624885 Q 419.7121058421729 116.22503487947824 468.3895121458507 115.21788736126273" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="419.7121058421729" y="116.22503487947824" fill="#234" text-anchor="middle">CONNECT</text><path d="M 502.2440310547785 139.8146351137604 Q 516.3283226346397 186.42082527419115 556.3011580344994 214.21788736126274" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="516.3283226346397" y="186.42082527419115" fill="#234" text-anchor="middle">TLS_OK</text><path d="M 467.31275550434407 122.01626123751157 Q 360 106.01626123751157 252.68724449565588 122.01626123751157" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="360" y="106.01626123751157" fill="#234" text-anchor="middle">TLS_FAIL,TIMEOUT</text><path d="M 569.2324335849338 254.01626123751157 Q 553.2324335849338 300 569.2324335849338 345.98373876248843" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="553.2324335849338" y="300" fill="#234" text-anchor="middle">SEND_CREATE</text><path d="M 548.3091902264405 225.21788736126274 Q 404.904110950294 161.7993569767891 251.61048785414926 128.8146351137604" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="404.904110950294" y="161.7993569767891" fill="#234" text-anchor="middle">TLS_FAIL,TIMEOUT</text><path d="M 556.3011580344994 385.78211263873726 Q 516.3283226346397 413.57917472580885 502.2440310547785 460.1853648862396" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="516.3283226346397" y="413.57917472580885" fill="#234" text-anchor="middle">RECV_CREATED</text><path d="M 551.4340597086849 355.052463212054 Q 409.3644030769744 232.05572809000085 248.4856183719047 134.94753678794598" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="409.3644030769744" y="232.05572809000085" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 513.3127555043441 469.98373876248843 c 30 -30, 60 -30, 30 0" stroke="#a55" fill="none" marker-end="url(#arrSelf)"/><text x="527.3127555043441" y="451.98373876248843" fill="#a55">SEND_EXTEND</text><path d="M 468.3895121458507 484.78211263873726 Q 419.7121058421729 483.77496512052176 380.9232433584934 513.2016261237511" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="419.7121058421729" y="483.77496512052176" fill="#234" text-anchor="middle">RECV_EXTENDED</text><path d="M 476.38147995390966 460.1853648862396 Q 372.94427190999915 290.5954359633204 243.61852004609028 139.8146351137604" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="372.94427190999915" y="290.5954359633204" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 339.0767566415066 513.2016261237511 Q 300.2878941578271 483.77496512052176 251.6104878541493 484.78211263873726" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="300.2878941578271" y="483.77496512052176" fill="#234" text-anchor="middle">SEND_RELAY_DATA,RECV_RELAY_DATA</text><path d="M 342.20162612375117 507.0687244495656 Q 264.7883472442127 431.04759747124507 168.56594029131506 380.91501431292284" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="264.7883472442127" y="431.04759747124507" fill="#234" text-anchor="middle">SEND_DESTROY,RECV_DESTROY</text><path d="M 353.20162612375117 499.0767566415066 Q 310.5605265085504 316.06385870875664 237.4856183719047 142.93950459600495" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="310.5605265085504" y="316.06385870875664" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 254.68724449565593 469.98373876248843 c 30 -30, 60 -30, 30 0" stroke="#a55" fill="none" marker-end="url(#arrSelf)"/><text x="268.68724449565593" y="451.98373876248843" fill="#a55">SEND_RELAY_DATA,RECV_RELAY_DATA</text><path d="M 217.75596894522153 460.1853648862396 Q 203.6716773653602 413.57917472580885 163.69884196550063 385.78211263873726" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="203.6716773653602" y="413.57917472580885" fill="#234" text-anchor="middle">SEND_DESTROY,RECV_DESTROY</text><path d="M 230.68724449565593 455.98373876248843 Q 246.6872444956559 300 230.68724449565588 144.01626123751157" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="246.6872444956559" y="300" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 150.76756641506623 345.98373876248843 Q 166.7675664150662 300 150.7675664150662 254.0162612375116" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="166.7675664150662" y="300" fill="#234" text-anchor="middle">CIRCUIT_CLOSED,TIMEOUT</text><path d="M 217.75596894522147 139.8146351137604 Q 177.78313354536186 167.611697200832 163.6988419655006 214.21788736126274" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="177.78313354536186" y="167.611697200832" fill="#234" text-anchor="middle">CIRCUIT_CLOSED</text><circle cx="360" cy="80" r="22" fill="#cfe9d6" stroke="#234" stroke-width="1"/><text x="360" y="83" text-anchor="middle" font-size="8" font-weight="bold">IDLE</text><circle cx="489.31275550434407" cy="122.01626123751157" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="489.31275550434407" y="125.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">CONNECTING</text><circle cx="569.2324335849338" cy="232.01626123751157" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="569.2324335849338" y="235.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">TLS_HANDSHAKE</text><circle cx="569.2324335849338" cy="367.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="569.2324335849338" y="370.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CREATE_SENT</text><circle cx="489.31275550434407" cy="477.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="489.31275550434407" y="480.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CIRCUIT_BUILDING</text><circle cx="360" cy="520" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="360" y="523" text-anchor="middle" font-size="8" font-weight="bold">CIRCUIT_READY</text><circle cx="230.68724449565593" cy="477.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="230.68724449565593" y="480.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">TRANSMITTING</text><circle cx="150.76756641506623" cy="367.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="150.76756641506623" y="370.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CLOSING</text><circle cx="150.7675664150662" cy="232.0162612375116" r="22" fill="#f1d4d4" stroke="#234" stroke-width="1"/><text x="150.7675664150662" y="235.0162612375116" text-anchor="middle" font-size="8" font-weight="bold">CLOSED</text><circle cx="230.68724449565588" cy="122.01626123751157" r="22" fill="#f1d4d4" stroke="#234" stroke-width="1"/><text x="230.68724449565588" y="125.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">ERROR</text><text x="360" y="20" text-anchor="middle" font-size="13" font-weight="bold">Şekil 1: Tor FSM δ-grafiği (25 geçerli geçiş, 10 durum)</text></svg><div class="cap">Fig. 1. Tor circuit FSM δ-graph. 25 valid edges over 10 states.</div></div>
+<h3>B. Attack classification</h3>
+<p>A deterministic <code>classifyInvalid(s, e)</code> function maps every
+(s, e) ∈ Invalid to a (type, severity) pair via nine condition families:
+data-flow before circuit-ready, CREATE/CREATED flow, EXTEND/EXTENDED flow,
+DESTROY out of place, CONNECT misuse, TLS_OK / TLS_FAIL misuse, CIRCUIT_CLOSED
+misuse, TIMEOUT misuse, fallback. The output covers all 105
+invalid pairs.</p>
+
+<h3>C. MDT engine — Algorithm 1</h3>
+<pre class="algo">Input:  M = (Q,Σ,δ,q₀,F);  Budget B
+Output: ⟨SC, TC, ITDR, FPR⟩
+ 1  visited ← {q₀}; coveredV ← ∅; detectedI ← ∅
+ 2  Valid ← {(s,e) | δ(s,e) defined}
+ 3  Invalid ← (Q×Σ) ∖ Valid
+ 4  // Positive phase
+ 5  for (s,e) ∈ Permute(Valid) until events≥B:
+ 6      π ← BFS_PATH(q₀, s);  if π=null continue
+ 7      EXECUTE(π · ⟨e⟩)
+ 8  // Negative phase
+ 9  for (s,e) ∈ Permute(Invalid) until events≥B:
+10      π ← BFS_PATH(q₀, s)
+11      EXECUTE(π · ⟨e⟩)             // δ-oracle flags it
+12  return ⟨|visited|/|Q|, |coveredV|/|Valid|,
+          |detectedI|/|Invalid|, FPR⟩
+</pre>
+<p>Worst-case complexity is O(|Q|² · |Σ|²); empirical mean cost per
+trial is &lt; 10 ms on commodity hardware.</p>
+
+<h3>D. Compared algorithms</h3>
+<p><b>B1</b> draws events uniformly from Σ. <b>B2</b> greedily chooses an
+event leading to an unvisited state, falling back to a 70/30 valid/invalid
+mixture. <b>B3</b> is Algorithm 1.</p>
+
+<h2>IV. Evaluation</h2>
+<h3>A. Design</h3>
+<p>Each algorithm is run for N = 30 paired trials at budget B = 500 events;
+seeds are matched across algorithms (seed = 1000+i). A budget sweep
+B ∈ {50, 100, 200, 500, 1000, 2000, 5000} is also performed.</p>
+
+<h3>B. Coverage and ITDR (B = 500)</h3>
+<table>
+<tr><th>Alg.</th><th>SC</th><th>TC</th><th>ITDR</th></tr>
+<tr><td class="l">B1</td><td>77.0%±16.6%</td>
+<td>45.9%±11.1%</td>
+<td>50.3%±9.8%</td></tr>
+<tr><td class="l">B2</td><td>100.0%±0.0%</td>
+<td>78.3%±8.4%</td>
+<td>47.5%±4.0%</td></tr>
+<tr><td class="l">B3</td><td>100.0%±0.0%</td>
+<td>100.0%±0.0%</td>
+<td>93.8%±1.4%</td></tr>
+</table>
+
+<h3>C. Statistical tests</h3>
+<p>For each (algorithm pair × metric), Welch t and Mann-Whitney U on
+independent samples and Wilcoxon signed-rank on paired samples are computed.
+B3 vs. {B1, B2} comparisons on TC and ITDR yield p &lt; .001 with
+Cohen's d ∈ [3.6, 15.4]. On SC, B2 and B3 saturate at 100% (p = 1.0) while
+B1 lags at 77.0% and is significantly below both
+(p &lt; .001). Under <i>budget-free Q×Σ
+audit</i>, the B0 (rule-based) detector with seven hand-written signatures
+reaches only 20.0% completeness on
+the 105-cell invalid set, missing
+2 CRITICAL and
+16 HIGH severity pairs (Fig. 3); the
+spec-oracle reaches 100%. In the budget-constrained run (B = 500), MDT's
+ITDR is 93.8%, which approaches the audit-mode
+asymptote with budget (Fig. 2).</p>
+
+<h3>D. Budget sensitivity</h3>
+<p>Fig. 2 shows TC versus log-scale budget. <b>For TC</b>, B3 reaches
+100.0% at B = 200,
+exceeding B1 (77.3%)
+and B2 (99.1%)
+at B = 5000 — i.e., MDT is 25× more budget-efficient
+on TC. <b>For ITDR</b> the dynamic differs: at B = 200, B3 ITDR is only
+23.1% and the
+advantage opens up with budget; at B = 5000, B3 reaches
+100.0% while B1/B2
+plateau at 74.3% /
+76.6%.</p>
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 410" font-family="Helvetica,Arial,sans-serif" font-size="10"><text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold">Şekil 6: Bütçe ↔ TC kapsama eğrisi (N=30 ortalama, gölge = SD)</text><line x1="60" y1="340" x2="660" y2="340" stroke="#eee"/><text x="54" y="343" text-anchor="end" font-size="8">0%</text><line x1="60" y1="312" x2="660" y2="312" stroke="#eee"/><text x="54" y="315" text-anchor="end" font-size="8">10%</text><line x1="60" y1="284" x2="660" y2="284" stroke="#eee"/><text x="54" y="287" text-anchor="end" font-size="8">20%</text><line x1="60" y1="256" x2="660" y2="256" stroke="#eee"/><text x="54" y="259" text-anchor="end" font-size="8">30%</text><line x1="60" y1="228" x2="660" y2="228" stroke="#eee"/><text x="54" y="231" text-anchor="end" font-size="8">40%</text><line x1="60" y1="200" x2="660" y2="200" stroke="#eee"/><text x="54" y="203" text-anchor="end" font-size="8">50%</text><line x1="60" y1="172" x2="660" y2="172" stroke="#eee"/><text x="54" y="175" text-anchor="end" font-size="8">60%</text><line x1="60" y1="144" x2="660" y2="144" stroke="#eee"/><text x="54" y="147" text-anchor="end" font-size="8">70%</text><line x1="60" y1="116" x2="660" y2="116" stroke="#eee"/><text x="54" y="119" text-anchor="end" font-size="8">80%</text><line x1="60" y1="88" x2="660" y2="88" stroke="#eee"/><text x="54" y="91" text-anchor="end" font-size="8">90%</text><line x1="60" y1="60" x2="660" y2="60" stroke="#eee"/><text x="54" y="63" text-anchor="end" font-size="8">100%</text><line x1="60" y1="340" x2="60" y2="344" stroke="#234"/><text x="60" y="356" text-anchor="middle" font-size="9">50</text><line x1="150.30899869919438" y1="340" x2="150.30899869919438" y2="344" stroke="#234"/><text x="150.30899869919438" y="356" text-anchor="middle" font-size="9">100</text><line x1="240.61799739838875" y1="340" x2="240.61799739838875" y2="344" stroke="#234"/><text x="240.61799739838875" y="356" text-anchor="middle" font-size="9">200</text><line x1="360" y1="340" x2="360" y2="344" stroke="#234"/><text x="360" y="356" text-anchor="middle" font-size="9">500</text><line x1="450.3089986991944" y1="340" x2="450.3089986991944" y2="344" stroke="#234"/><text x="450.3089986991944" y="356" text-anchor="middle" font-size="9">1000</text><line x1="540.6179973983888" y1="340" x2="540.6179973983888" y2="344" stroke="#234"/><text x="540.6179973983888" y="356" text-anchor="middle" font-size="9">2000</text><line x1="660" y1="340" x2="660" y2="344" stroke="#234"/><text x="660" y="356" text-anchor="middle" font-size="9">5000</text><text x="360" y="372" text-anchor="middle" font-size="10">Olay bütçesi (log ölçek)</text><path d="M 60 273.1668976393858 L 150.30899869919438 252.73297805935348 L 240.61799739838875 229.3521689456176 L 360 180.6224385957418 L 450.3089986991944 150.75060423425248 L 540.6179973983888 134.74711290452467 L 660 89.75955769241173 L 660 157.17377564092163 L 540.6179973983888 189.0928870954753 L 450.3089986991944 223.1160624324142 L 360 242.5242280709249 L 240.61799739838875 274.434497721049 L 150.30899869919438 295.85368860731313 L 60 311.25976902728087 Z" fill="#9aa6b8" opacity="0.18"/><polyline points="60,292.2133333333333 150.30899869919438,274.2933333333333 240.61799739838875,251.89333333333332 360,211.57333333333335 450.3089986991944,186.93333333333334 540.6179973983888,161.92 660,123.46666666666667" fill="none" stroke="#9aa6b8" stroke-width="2"/><circle cx="60" cy="292.2133333333333" r="3" fill="#9aa6b8"/><circle cx="150.30899869919438" cy="274.2933333333333" r="3" fill="#9aa6b8"/><circle cx="240.61799739838875" cy="251.89333333333332" r="3" fill="#9aa6b8"/><circle cx="360" cy="211.57333333333335" r="3" fill="#9aa6b8"/><circle cx="450.3089986991944" cy="186.93333333333334" r="3" fill="#9aa6b8"/><circle cx="540.6179973983888" cy="161.92" r="3" fill="#9aa6b8"/><circle cx="660" cy="123.46666666666667" r="3" fill="#9aa6b8"/><path d="M 60 183.4268185061652 L 150.30899869919438 157.60474374580642 L 240.61799739838875 122.5888222666689 L 360 97.19793760368131 L 450.3089986991944 78.50567474590446 L 540.6179973983888 60 L 660 60 L 660 69.62523126782139 L 540.6179973983888 91.40957679681472 L 450.3089986991944 119.14765858742865 L 360 144.50872906298525 L 240.61799739838875 172.87784439999774 L 150.30899869919438 202.07525625419362 L 60 216.5731814938347 Z" fill="#3b82c4" opacity="0.18"/><polyline points="60,199.99999999999997 150.30899869919438,179.84 240.61799739838875,147.73333333333332 360,120.8533333333333 450.3089986991944,98.82666666666657 540.6179973983888,75.67999999999984 660,62.613333333333344" fill="none" stroke="#3b82c4" stroke-width="2"/><circle cx="60" cy="199.99999999999997" r="3" fill="#3b82c4"/><circle cx="150.30899869919438" cy="179.84" r="3" fill="#3b82c4"/><circle cx="240.61799739838875" cy="147.73333333333332" r="3" fill="#3b82c4"/><circle cx="360" cy="120.8533333333333" r="3" fill="#3b82c4"/><circle cx="450.3089986991944" cy="98.82666666666657" r="3" fill="#3b82c4"/><circle cx="540.6179973983888" cy="75.67999999999984" r="3" fill="#3b82c4"/><circle cx="660" cy="62.613333333333344" r="3" fill="#3b82c4"/><path d="M 60 154.48071475815541 L 150.30899869919438 60 L 240.61799739838875 60 L 360 60 L 450.3089986991944 60 L 540.6179973983888 60 L 660 60 L 660 60 L 540.6179973983888 60 L 450.3089986991944 60 L 360 60 L 240.61799739838875 60 L 150.30899869919438 68.25821098286309 L 60 184.2926185751779 Z" fill="#1d8b5d" opacity="0.18"/><polyline points="60,169.38666666666666 150.30899869919438,62.613333333333344 240.61799739838875,60 360,60 450.3089986991944,60 540.6179973983888,60 660,60" fill="none" stroke="#1d8b5d" stroke-width="2"/><circle cx="60" cy="169.38666666666666" r="3" fill="#1d8b5d"/><circle cx="150.30899869919438" cy="62.613333333333344" r="3" fill="#1d8b5d"/><circle cx="240.61799739838875" cy="60" r="3" fill="#1d8b5d"/><circle cx="360" cy="60" r="3" fill="#1d8b5d"/><circle cx="450.3089986991944" cy="60" r="3" fill="#1d8b5d"/><circle cx="540.6179973983888" cy="60" r="3" fill="#1d8b5d"/><circle cx="660" cy="60" r="3" fill="#1d8b5d"/><line x1="60" y1="390" x2="86" y2="390" stroke="#9aa6b8" stroke-width="2"/><text x="92" y="393" font-size="10">B1_Random</text><line x1="200" y1="390" x2="226" y2="390" stroke="#3b82c4" stroke-width="2"/><text x="232" y="393" font-size="10">B2_GreedySC</text><line x1="340" y1="390" x2="366" y2="390" stroke="#1d8b5d" stroke-width="2"/><text x="372" y="393" font-size="10">B3_MDT</text></svg><div class="cap">Fig. 2. Transition coverage vs. event budget (N=30, shaded ±SD).</div></div>
+
+<h3>E. Detection latency</h3>
+<p>Latency was measured with nanosecond-resolution
+<code>process.hrtime.bigint()</code> using batch amortization
+(B = 100,000 step calls per measurement,
+empty-loop overhead of 2.52 ns/iter
+calibrated and subtracted, N = 30 repeats).
+Three representative cells were probed: a valid step
+(74 ns/call), an invalid CRITICAL
+cell (165 ns/call) and an
+invalid LOW cell (143 ns/call).
+The slowest probe's worst case
+(239 ns) is
+≈209335×
+faster than the proposal target of 50 ms. Invalid handling is ~2× slower than
+valid because <code>classifyInvalid</code> evaluates an additional condition
+chain.</p>
+
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Helvetica,Arial,sans-serif" font-size="10"><text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold">Şekil 7: Tespit completeness — kural-tabanlı (B0) vs. spec-oracle (MDT)</text><rect x="60" y="236" width="220" height="44" fill="#c97a3d"/><text x="170" y="230" text-anchor="middle" font-size="11" font-weight="bold">21/105 = 20.0%</text><text x="170" y="298" text-anchor="middle" font-size="10">B0 — Rule-based (7 imza)</text><rect x="380" y="60" width="220" height="220" fill="#1d8b5d"/><text x="490" y="54" text-anchor="middle" font-size="11" font-weight="bold">105/105 = 100.0%</text><text x="490" y="298" text-anchor="middle" font-size="10">MDT — Spec oracle (δ)</text><line x1="60" y1="280" x2="660" y2="280" stroke="#eee"/><text x="54" y="283" text-anchor="end" font-size="8">0%</text><line x1="60" y1="258" x2="660" y2="258" stroke="#eee"/><text x="54" y="261" text-anchor="end" font-size="8">10%</text><line x1="60" y1="236" x2="660" y2="236" stroke="#eee"/><text x="54" y="239" text-anchor="end" font-size="8">20%</text><line x1="60" y1="214" x2="660" y2="214" stroke="#eee"/><text x="54" y="217" text-anchor="end" font-size="8">30%</text><line x1="60" y1="192" x2="660" y2="192" stroke="#eee"/><text x="54" y="195" text-anchor="end" font-size="8">40%</text><line x1="60" y1="170" x2="660" y2="170" stroke="#eee"/><text x="54" y="173" text-anchor="end" font-size="8">50%</text><line x1="60" y1="148" x2="660" y2="148" stroke="#eee"/><text x="54" y="151" text-anchor="end" font-size="8">60%</text><line x1="60" y1="126" x2="660" y2="126" stroke="#eee"/><text x="54" y="129" text-anchor="end" font-size="8">70%</text><line x1="60" y1="104" x2="660" y2="104" stroke="#eee"/><text x="54" y="107" text-anchor="end" font-size="8">80%</text><line x1="60" y1="82" x2="660" y2="82" stroke="#eee"/><text x="54" y="85" text-anchor="end" font-size="8">90%</text><line x1="60" y1="60" x2="660" y2="60" stroke="#eee"/><text x="54" y="63" text-anchor="end" font-size="8">100%</text><text x="60" y="330" font-size="10" font-weight="bold">Kural tabanlının kaçırdığı (n=84) şiddet dağılımı:</text><text x="60" y="350" font-size="10">LOW: 27</text><text x="190" y="350" font-size="10">MEDIUM: 39</text><text x="320" y="350" font-size="10">HIGH: 16</text><text x="450" y="350" font-size="10">CRITICAL: 2</text></svg><div class="cap">Fig. 3. Hand-written rule set vs. spec-oracle completeness.</div></div>
+
+<h2>V. Discussion</h2>
+<p>The MDT advantage stems from explicit access to δ as a planning oracle:
+positive phase exploits BFS for guaranteed reachability of every valid edge;
+negative phase iterates the algebraically derived Invalid set rather than
+hoping to stumble onto it. The B0 result quantifies the limit of category-level
+rule sets: 7 rules cover only
+20.0% of invalid pairs,
+demonstrating that without the cell-level δ map (research gap G3) even
+high-severity attacks are missed.</p>
+<p class="no-indent"><b>Threats to validity.</b> (i) Ground truth equals the
+specification; deviations of real Tor binaries from spec are not measured.
+(ii) FPR is structurally zero because oracle and generator share the model;
+an independent oracle (e.g., Shadow [18] packet capture) is required to
+populate it. (iii) The SLR was limited to open-web sources due to the absence
+of live academic database access in our environment; PRISMA intermediate counts
+are reported as NA because no auditable query log was retained — only the final
+included set (n=20) is verifiable. (iv) Latency was measured
+on a single-platform, single-thread, JIT-warm Node.js V8 environment; profiles
+on a real Tor C/Rust implementation may differ.</p>
+
+<h2>VI. Conclusion</h2>
+<p>We delivered the first complete published Tor circuit δ-matrix, a
+programmatic invalid-pair classifier, a reference MDT engine, and a paired
+three-way statistical comparison validated by three test families. Future work:
+(a) L*-style automatic δ extraction from real Tor binaries [10];
+(b) Stream and Hidden-Service-v3 sub-FSMs; (c) independent oracle via Shadow
+[18] for genuine FPR measurement.</p>
+
+<h2>References</h2>
+<div class="ref">[1] R. Dingledine, N. Mathewson, P. Syverson, "Tor: The Second-Generation Onion Router," <i>USENIX Security</i>, 2004.</div><div class="ref">[2] S. J. Murdoch, G. Danezis, "Low-Cost Traffic Analysis of Tor," <i>IEEE S&amp;P</i>, 2005.</div><div class="ref">[3] A. Johnson et al., "Users Get Routed: Traffic Correlation on Tor by Realistic Adversaries," <i>ACM CCS</i>, 2013.</div><div class="ref">[4] A. Panchenko et al., "Website Fingerprinting at Internet Scale," <i>NDSS</i>, 2016.</div><div class="ref">[5] I. Karunanayake et al., "De-Anonymisation Attacks on Tor: A Survey," <i>IEEE Comm. Surveys &amp; Tutorials</i>, 23(4), 2021.</div><div class="ref">[6] M. Backes et al., "AnoA: A Framework for Analyzing Anonymous Communication Protocols," <i>IEEE CSF</i>, 2013.</div><div class="ref">[7] D. Lee, M. Yannakakis, "Principles and Methods of Testing FSMs—A Survey," <i>Proc. IEEE</i>, 84(8), 1996.</div><div class="ref">[8] J. Tretmans, "Model Based Testing with Labelled Transition Systems," LNCS 4949, 2008.</div><div class="ref">[9] J. de Ruiter, E. Poll, "Protocol State Fuzzing of TLS Implementations," <i>USENIX Security</i>, 2015.</div><div class="ref">[10] P. Fiterău-Broștean, R. Janssen, F. Vaandrager, "Combining Model Learning and Model Checking to Analyze TCP Implementations," <i>CAV</i>, 2016.</div><div class="ref">[11] P. Ammann, J. Offutt, <i>Introduction to Software Testing</i>, 2nd ed., Cambridge UP, 2016.</div><div class="ref">[12] D. Dolev, A. C. Yao, "On the Security of Public Key Protocols," <i>IEEE TIT</i>, 29(2), 1983.</div><div class="ref">[13] K. Bhargavan, B. Blanchet, N. Kobeissi, "Verified Models and Reference Implementations for the TLS 1.3 Standard Candidate," <i>IEEE S&amp;P</i>, 2017.</div><div class="ref">[14] J. Somorovsky, "Systematic Fuzzing and Testing of TLS Libraries," <i>ACM CCS</i>, 2016.</div><div class="ref">[15] M. Felderer et al., "Security Testing: A Survey," <i>Adv. Computers</i>, vol. 101, 2016.</div><div class="ref">[16] A. Pretschner, T. Mouelhi, Y. Le Traon, "Model-Based Tests for Access Control Policies," <i>ICST</i>, 2008.</div><div class="ref">[17] B. Kitchenham, S. Charters, "Guidelines for performing SLRs in Software Engineering," EBSE-2007-01, 2007.</div><div class="ref">[18] R. Jansen, K. Bauer, N. Hopper, R. Dingledine, "Methodically Modeling the Tor Network," <i>USENIX CSET</i>, 2012.</div><div class="ref">[19] Tor Project, "Tor Protocol Specification (tor-spec)," 2026. https://spec.torproject.org/tor-spec.</div><div class="ref">[20] Microsoft Research, "A Data-Driven FSM Model for Analyzing Security Vulnerabilities," MSR Tech. Rep., 2018.</div>
+
+</div></body></html>
