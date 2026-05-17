@@ -516,6 +516,130 @@ cells were probed (Table VI).</p>
 faster than the proposal target of 50 ms. Invalid handling is ~2× slower than
 valid because <code>classifyInvalid</code> evaluates an additional condition chain.</p>
 
+<h3>H. Bootstrap CIs and post-hoc power</h3>
+<p>To address the N = 30 limitation, we computed paired percentile bootstrap
+95% CIs (B = 10,000 resamples) and post-hoc power for the paired t-test
+(α = 0.05 two-sided, normal approximation of noncentral t). Table VII reports
+the three pairs that drive the main claim. For B3 vs B1 and B3 vs B2, CIs for
+TC and ITDR exclude zero and post-hoc power is ≈1.000, confirming N = 30 is
+sufficient for the observed effect sizes. The B2 vs B1 ITDR difference, by
+contrast, has a CI of
+[-0.0641,
+0.0063]
+that includes zero — a heuristic optimizing positive coverage does not yield
+significant invalid-coverage gains over uniform random, reinforcing the
+algebraic-enumeration argument behind MDT.</p>
+
+<p class="no-indent"><b>Table VII.</b> Paired bootstrap 95% CI (B = 10,000) and post-hoc power.</p>
+<table>
+<tr><th class="l">Pair</th><th>Metric</th><th>Δ</th><th>95% CI</th><th>d<sub>z</sub></th><th>Power</th></tr>
+<tr><td class="l">B3 − B1</td>
+    <td>TC</td>
+    <td>0.541</td>
+    <td>[0.503, 0.579]</td>
+    <td>4.90</td>
+    <td>1.000</td>
+  </tr><tr><td class="l">B3 − B1</td>
+    <td>ITDR</td>
+    <td>0.435</td>
+    <td>[0.400, 0.470]</td>
+    <td>4.31</td>
+    <td>1.000</td>
+  </tr><tr><td class="l">B3 − B1</td>
+    <td>SC</td>
+    <td>0.230</td>
+    <td>[0.173, 0.287]</td>
+    <td>1.38</td>
+    <td>1.000</td>
+  </tr><tr><td class="l">B3 − B2</td>
+    <td>TC</td>
+    <td>0.217</td>
+    <td>[0.188, 0.248]</td>
+    <td>2.57</td>
+    <td>1.000</td>
+  </tr><tr><td class="l">B3 − B2</td>
+    <td>ITDR</td>
+    <td>0.463</td>
+    <td>[0.448, 0.478]</td>
+    <td>10.81</td>
+    <td>1.000</td>
+  </tr><tr><td class="l">B3 − B2</td>
+    <td>SC</td>
+    <td>0.000</td>
+    <td>[0.000, 0.000]</td>
+    <td>0.00</td>
+    <td>0.050</td>
+  </tr><tr><td class="l">B2 − B1</td>
+    <td>TC</td>
+    <td>0.324</td>
+    <td>[0.277, 0.369]</td>
+    <td>2.44</td>
+    <td>1.000</td>
+  </tr><tr><td class="l">B2 − B1</td>
+    <td>ITDR</td>
+    <td>-0.028</td>
+    <td>[-0.064, 0.006]</td>
+    <td>-0.28</td>
+    <td>0.328</td>
+  </tr><tr><td class="l">B2 − B1</td>
+    <td>SC</td>
+    <td>0.230</td>
+    <td>[0.173, 0.287]</td>
+    <td>1.38</td>
+    <td>1.000</td>
+  </tr>
+</table>
+
+<h3>I. Extension to the Tor stream sub-FSM</h3>
+<p>To address the limitation that the circuit FSM does not cover the
+application-layer stream lifecycle (RELAY_BEGIN/CONNECTED/DATA/END), we
+modelled a spec-derived Stream sub-FSM (tor-spec §6) with
+7 states and 8 events, yielding
+17 valid and 39 invalid pairs over a
+56-cell domain. Stream-specific attack vectors
+(STREAM_HIJACK, DATA_INJECTION, RESET_FLOOD, GHOST_STREAM, INVALID_STREAM_TRANSITION, …) were derived
+via the same <code>classifyInvalid</code> pattern. The same B1/B2/B3 harness was
+run with paired seeds (N = 30, budget = 500)
+and evaluated with paired t-tests (df = 29). The result is nuanced: MDT's
+<i>invalid-coverage</i> dominance replicates strongly — B3 reaches
+100.0% ITDR vs.
+71.4% (B2) and
+71.1% (B1) with
+p &lt; .001 and paired d<sub>z</sub> &gt; 4 against both heuristics. However,
+on TC the picture is different: B3 vs B1 is significant (p &lt; .001,
+d<sub>z</sub> = 1.10)
+but B3 vs B2 is <b>not</b> significant
+(p = 0.083,
+d<sub>z</sub> = 0.33).
+On a small FSM (56-cell domain), greedy state coverage already saturates
+positive transitions, so MDT's TC advantage vanishes — exactly as expected.
+The takeaway is that the <i>essential</i> MDT contribution is invalid-pair
+enumeration (ITDR), which is FSM-size-independent; the TC advantage is
+size-dependent and is confirmed on the larger circuit FSM (Sec. IV) but only
+partially on the stream FSM. The stream FSM here is spec-derived, not
+extracted from a real Tor binary — Threats (i) and (v) still apply.</p>
+
+<p class="no-indent"><b>Table VIII.</b> Stream sub-FSM — algorithm comparison (mean ± SD; 30 trials, budget 500).</p>
+<table>
+<tr><th class="l">Algo</th><th>SC</th><th>TC</th><th>ITDR</th></tr>
+<tr>
+  <td class="l">B1</td>
+  <td>99.5±2.6</td>
+  <td>84.7±14.0</td>
+  <td>71.1±6.2</td>
+</tr><tr>
+  <td class="l">B2</td>
+  <td>100.0±0.0</td>
+  <td>99.4±1.8</td>
+  <td>71.4±4.6</td>
+</tr><tr>
+  <td class="l">B3</td>
+  <td>100.0±0.0</td>
+  <td>100.0±0.0</td>
+  <td>100.0±0.0</td>
+</tr>
+</table>
+
 <h2>V. Discussion and Threats to Validity</h2>
 <p>The MDT advantage stems from explicit access to δ as a planning oracle:
 the positive phase exploits BFS for guaranteed reachability of every valid
@@ -537,9 +661,9 @@ enumeration.</p>
   the same δ, the false-positive set is empty by construction. A meaningful
   FPR requires an <i>independent</i> oracle (e.g., packet-capture-based
   observer).</li>
-  <li><b>(iii) N = 30 trials.</b> Sufficient for CLT but no formal power
-  analysis (β = 0.80, α = 0.05) was conducted. Recommended extension:
-  N = 100.</li>
+  <li><b>(iii) N = 30 trials — addressed (Sec. IV-H).</b> Paired bootstrap
+  CIs and post-hoc power confirm sufficiency for the main effects (power ≈ 1.000).
+  Remaining issue: BCa correction and Hedges' g are future work.</li>
   <li><b>(iv) SLR scope.</b> Limited to open-web sources due to the absence
   of live academic database access; PRISMA intermediate counts are reported
   as NA (Sec. II-A). Missing sources may exist.</li>
@@ -557,9 +681,10 @@ seven-point budget sweep and a rule-based baseline. The MDT engine
 saturates transition coverage and yields ITDR gains of up to 43.5
 points over Random with p &lt; .001 and Cohen's d &gt; 3.6. Future work:
 (a) L*-style automatic δ extraction from real Tor binaries [10];
-(b) Stream and Hidden-Service-v3 sub-FSMs;
+(b) Hidden-Service-v3 and Pluggable-Transport sub-FSMs (the Stream sub-FSM
+extension is delivered in Sec. IV-I);
 (c) independent oracle via Shadow [18] for genuine FPR measurement;
-(d) cross-implementation latency profiling.</p>
+(d) cross-implementation latency profiling via a C/Rust port of the δ table.</p>
 
 <h2>References</h2>
 <div class="ref">[1] R. Dingledine, N. Mathewson, P. Syverson, "Tor: The Second-Generation Onion Router," <i>USENIX Security</i>, 2004.</div><div class="ref">[2] S. J. Murdoch, G. Danezis, "Low-Cost Traffic Analysis of Tor," <i>IEEE S&amp;P</i>, 2005.</div><div class="ref">[3] A. Johnson et al., "Users Get Routed: Traffic Correlation on Tor by Realistic Adversaries," <i>ACM CCS</i>, 2013.</div><div class="ref">[4] A. Panchenko et al., "Website Fingerprinting at Internet Scale," <i>NDSS</i>, 2016.</div><div class="ref">[5] I. Karunanayake et al., "De-Anonymisation Attacks on Tor: A Survey," <i>IEEE Comm. Surveys &amp; Tutorials</i>, 23(4), 2021.</div><div class="ref">[6] M. Backes et al., "AnoA: A Framework for Analyzing Anonymous Communication Protocols," <i>IEEE CSF</i>, 2013.</div><div class="ref">[7] D. Lee, M. Yannakakis, "Principles and Methods of Testing FSMs—A Survey," <i>Proc. IEEE</i>, 84(8), 1996.</div><div class="ref">[8] J. Tretmans, "Model Based Testing with Labelled Transition Systems," LNCS 4949, 2008.</div><div class="ref">[9] J. de Ruiter, E. Poll, "Protocol State Fuzzing of TLS Implementations," <i>USENIX Security</i>, 2015.</div><div class="ref">[10] P. Fiterău-Broștean, R. Janssen, F. Vaandrager, "Combining Model Learning and Model Checking to Analyze TCP Implementations," <i>CAV</i>, 2016.</div><div class="ref">[11] P. Ammann, J. Offutt, <i>Introduction to Software Testing</i>, 2nd ed., Cambridge UP, 2016.</div><div class="ref">[12] D. Dolev, A. C. Yao, "On the Security of Public Key Protocols," <i>IEEE TIT</i>, 29(2), 1983.</div><div class="ref">[13] K. Bhargavan, B. Blanchet, N. Kobeissi, "Verified Models and Reference Implementations for the TLS 1.3 Standard Candidate," <i>IEEE S&amp;P</i>, 2017.</div><div class="ref">[14] J. Somorovsky, "Systematic Fuzzing and Testing of TLS Libraries," <i>ACM CCS</i>, 2016.</div><div class="ref">[15] M. Felderer et al., "Security Testing: A Survey," <i>Adv. Computers</i>, vol. 101, 2016.</div><div class="ref">[16] A. Pretschner, T. Mouelhi, Y. Le Traon, "Model-Based Tests for Access Control Policies," <i>ICST</i>, 2008.</div><div class="ref">[17] B. Kitchenham, S. Charters, "Guidelines for performing SLRs in Software Engineering," EBSE-2007-01, 2007.</div><div class="ref">[18] R. Jansen, K. Bauer, N. Hopper, R. Dingledine, "Methodically Modeling the Tor Network," <i>USENIX CSET</i>, 2012.</div><div class="ref">[19] Tor Project, "Tor Protocol Specification (tor-spec)," 2026. https://spec.torproject.org/tor-spec.</div><div class="ref">[20] Microsoft Research, "A Data-Driven FSM Model for Analyzing Security Vulnerabilities," MSR Tech. Rep., 2018.</div>

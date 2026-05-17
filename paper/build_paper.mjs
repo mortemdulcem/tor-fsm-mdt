@@ -9,12 +9,16 @@ import { execSync } from "node:child_process";
 import { fsmGraphSvg, attackHeatmapSvg, severitySplitSvg } from "../experiments/figures.mjs";
 import { prismaSvg, budgetCurveSvg, ruleCompletenessSvg } from "../experiments/figures_v2.mjs";
 import { STATES, EVENTS, VALID, totalDomain, totalValid, totalInvalid, k, classifyInvalid } from "../server/fsm.ts";
+import { STREAM_STATES, STREAM_EVENTS } from "../server/fsm_stream.ts";
+const STREAM_STATES_LEN = STREAM_STATES.length;
+const STREAM_EVENTS_LEN = STREAM_EVENTS.length;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const puppeteer = (await import(path.resolve(__dirname, "../node_modules/puppeteer-core/lib/cjs/puppeteer/puppeteer-core.js"))).default;
 
 const trials = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/trials.json"), "utf8"));
 const ext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/b_extensions.json"), "utf8"));
+const cext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/c_extensions.json"), "utf8"));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -492,6 +496,75 @@ ${ext.latencyData.invalid_critical.max_ns.toFixed(0)} ns —
 faster than the proposal target of 50 ms. Invalid handling is ~2× slower than
 valid because <code>classifyInvalid</code> evaluates an additional condition chain.</p>
 
+<h3>H. Bootstrap CIs and post-hoc power</h3>
+<p>To address the N = 30 limitation, we computed paired percentile bootstrap
+95% CIs (B = 10,000 resamples) and post-hoc power for the paired t-test
+(α = 0.05 two-sided, normal approximation of noncentral t). Table VII reports
+the three pairs that drive the main claim. For B3 vs B1 and B3 vs B2, CIs for
+TC and ITDR exclude zero and post-hoc power is ≈1.000, confirming N = 30 is
+sufficient for the observed effect sizes. The B2 vs B1 ITDR difference, by
+contrast, has a CI of
+[${cext.bootstrap.find((b)=>b.a==="B2_GreedySC"&&b.b==="B1_Random"&&b.metric==="itdr").ci_lo.toFixed(4)},
+${cext.bootstrap.find((b)=>b.a==="B2_GreedySC"&&b.b==="B1_Random"&&b.metric==="itdr").ci_hi.toFixed(4)}]
+that includes zero — a heuristic optimizing positive coverage does not yield
+significant invalid-coverage gains over uniform random, reinforcing the
+algebraic-enumeration argument behind MDT.</p>
+
+<p class="no-indent"><b>Table VII.</b> Paired bootstrap 95% CI (B = 10,000) and post-hoc power.</p>
+<table>
+<tr><th class="l">Pair</th><th>Metric</th><th>Δ</th><th>95% CI</th><th>d<sub>z</sub></th><th>Power</th></tr>
+${cext.bootstrap.map((b, i) => {
+  const p = cext.power[i];
+  return `<tr><td class="l">${b.a.replace("_"," ").replace("B1 Random","B1").replace("B2 GreedySC","B2").replace("B3 MDT","B3")} − ${b.b.replace("_"," ").replace("B1 Random","B1").replace("B2 GreedySC","B2").replace("B3 MDT","B3")}</td>
+    <td>${b.metric.toUpperCase()}</td>
+    <td>${b.observed.toFixed(3)}</td>
+    <td>[${b.ci_lo.toFixed(3)}, ${b.ci_hi.toFixed(3)}]</td>
+    <td>${isFinite(p.d_z) ? p.d_z.toFixed(2) : "—"}</td>
+    <td>${p.power.toFixed(3)}</td>
+  </tr>`;
+}).join("")}
+</table>
+
+<h3>I. Extension to the Tor stream sub-FSM</h3>
+<p>To address the limitation that the circuit FSM does not cover the
+application-layer stream lifecycle (RELAY_BEGIN/CONNECTED/DATA/END), we
+modelled a spec-derived Stream sub-FSM (tor-spec §6) with
+${STREAM_STATES_LEN} states and ${STREAM_EVENTS_LEN} events, yielding
+${cext.stream.valid} valid and ${cext.stream.invalid} invalid pairs over a
+${cext.stream.domain}-cell domain. Stream-specific attack vectors
+(${Object.keys(cext.stream.attackInventory).slice(0,5).join(", ")}, …) were derived
+via the same <code>classifyInvalid</code> pattern. The same B1/B2/B3 harness was
+run with paired seeds (N = ${cext.stream.N_trials}, budget = ${cext.stream.budget})
+and evaluated with paired t-tests (df = 29). The result is nuanced: MDT's
+<i>invalid-coverage</i> dominance replicates strongly — B3 reaches
+${(cext.stream.stats.B3_MDT.itdr.mean*100).toFixed(1)}% ITDR vs.
+${(cext.stream.stats.B2_GreedySC.itdr.mean*100).toFixed(1)}% (B2) and
+${(cext.stream.stats.B1_Random.itdr.mean*100).toFixed(1)}% (B1) with
+p &lt; .001 and paired d<sub>z</sub> &gt; 4 against both heuristics. However,
+on TC the picture is different: B3 vs B1 is significant (p &lt; .001,
+d<sub>z</sub> = ${cext.stream.comparisons.find(c=>c.a==="B3_MDT"&&c.b==="B1_Random"&&c.metric==="tc").d_z.toFixed(2)})
+but B3 vs B2 is <b>not</b> significant
+(p = ${cext.stream.comparisons.find(c=>c.a==="B3_MDT"&&c.b==="B2_GreedySC"&&c.metric==="tc").p.toFixed(3)},
+d<sub>z</sub> = ${cext.stream.comparisons.find(c=>c.a==="B3_MDT"&&c.b==="B2_GreedySC"&&c.metric==="tc").d_z.toFixed(2)}).
+On a small FSM (56-cell domain), greedy state coverage already saturates
+positive transitions, so MDT's TC advantage vanishes — exactly as expected.
+The takeaway is that the <i>essential</i> MDT contribution is invalid-pair
+enumeration (ITDR), which is FSM-size-independent; the TC advantage is
+size-dependent and is confirmed on the larger circuit FSM (Sec. IV) but only
+partially on the stream FSM. The stream FSM here is spec-derived, not
+extracted from a real Tor binary — Threats (i) and (v) still apply.</p>
+
+<p class="no-indent"><b>Table VIII.</b> Stream sub-FSM — algorithm comparison (mean ± SD; ${cext.stream.N_trials} trials, budget ${cext.stream.budget}).</p>
+<table>
+<tr><th class="l">Algo</th><th>SC</th><th>TC</th><th>ITDR</th></tr>
+${Object.entries(cext.stream.stats).map(([n, s]) => `<tr>
+  <td class="l">${n.replace("B1_Random","B1").replace("B2_GreedySC","B2").replace("B3_MDT","B3")}</td>
+  <td>${(s.sc.mean*100).toFixed(1)}±${(s.sc.sd*100).toFixed(1)}</td>
+  <td>${(s.tc.mean*100).toFixed(1)}±${(s.tc.sd*100).toFixed(1)}</td>
+  <td>${(s.itdr.mean*100).toFixed(1)}±${(s.itdr.sd*100).toFixed(1)}</td>
+</tr>`).join("")}
+</table>
+
 <h2>V. Discussion and Threats to Validity</h2>
 <p>The MDT advantage stems from explicit access to δ as a planning oracle:
 the positive phase exploits BFS for guaranteed reachability of every valid
@@ -513,9 +586,9 @@ enumeration.</p>
   the same δ, the false-positive set is empty by construction. A meaningful
   FPR requires an <i>independent</i> oracle (e.g., packet-capture-based
   observer).</li>
-  <li><b>(iii) N = 30 trials.</b> Sufficient for CLT but no formal power
-  analysis (β = 0.80, α = 0.05) was conducted. Recommended extension:
-  N = 100.</li>
+  <li><b>(iii) N = 30 trials — addressed (Sec. IV-H).</b> Paired bootstrap
+  CIs and post-hoc power confirm sufficiency for the main effects (power ≈ 1.000).
+  Remaining issue: BCa correction and Hedges' g are future work.</li>
   <li><b>(iv) SLR scope.</b> Limited to open-web sources due to the absence
   of live academic database access; PRISMA intermediate counts are reported
   as NA (Sec. II-A). Missing sources may exist.</li>
@@ -533,9 +606,10 @@ seven-point budget sweep and a rule-based baseline. The MDT engine
 saturates transition coverage and yields ITDR gains of up to ${((stats.B3_MDT.itdr.mean - stats.B1_Random.itdr.mean) * 100).toFixed(1)}
 points over Random with p &lt; .001 and Cohen's d &gt; 3.6. Future work:
 (a) L*-style automatic δ extraction from real Tor binaries ${cite(10)};
-(b) Stream and Hidden-Service-v3 sub-FSMs;
+(b) Hidden-Service-v3 and Pluggable-Transport sub-FSMs (the Stream sub-FSM
+extension is delivered in Sec. IV-I);
 (c) independent oracle via Shadow ${cite(18)} for genuine FPR measurement;
-(d) cross-implementation latency profiling.</p>
+(d) cross-implementation latency profiling via a C/Rust port of the δ table.</p>
 
 <h2>References</h2>
 ${REFS.map((r) => `<div class="ref">${r}</div>`).join("")}

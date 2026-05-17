@@ -9,12 +9,14 @@ import { execSync } from "node:child_process";
 import { fsmGraphSvg, attackHeatmapSvg, metricBarChart, severitySplitSvg } from "../experiments/figures.mjs";
 import { prismaSvg, budgetCurveSvg, ruleCompletenessSvg } from "../experiments/figures_v2.mjs";
 import { STATES, EVENTS, VALID, totalDomain, totalValid, totalInvalid, k, classifyInvalid } from "../server/fsm.ts";
+import { STREAM_STATES, STREAM_EVENTS, streamValidCount, streamInvalidCount } from "../server/fsm_stream.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const puppeteer = (await import(path.resolve(__dirname, "../node_modules/puppeteer-core/lib/cjs/puppeteer/puppeteer-core.js"))).default;
 
 const trials = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/trials.json"), "utf8"));
 const ext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/b_extensions.json"), "utf8"));
+const cext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/c_extensions.json"), "utf8"));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -640,6 +642,122 @@ geçersiz ikiliyi gözden kaçırır.</p>
 ${missedRows}
 </table>
 
+<h3>4.9 Bootstrap Güven Aralıkları ve Post-hoc Güç Analizi</h3>
+<p>Bölüm 6.2'deki sınırlılıkta belirtilen "N=30 için güç analizi yapılmamıştır"
+maddesinin giderilmesi amacıyla iki ek analiz çalıştırılmıştır:
+(i) <b>eşleştirilmiş bootstrap güven aralığı</b> — her algoritma çifti için
+%95 yüzde-tabanlı CI, B = 10.000 yeniden örnekleme ile;
+(ii) <b>post-hoc güç analizi</b> — eşleştirilmiş t testi için
+d<sub>z</sub> = mean(diff)/sd(diff), ncp = d<sub>z</sub>·√n; güç,
+normal yaklaşımla Φ(|ncp|−z<sub>α/2</sub>) + Φ(−|ncp|−z<sub>α/2</sub>) olarak
+hesaplanır (α = 0.05 iki taraflı, z<sub>α/2</sub> = 1.96).
+β = 0.80 için gerekli N, ((z<sub>α/2</sub> + z<sub>β</sub>) / d<sub>z</sub>)<sup>2</sup>
+formülünden alınır. Tüm hesap mevcut N = 30 koşu üzerinde, dış kütüphane olmadan
+yapılmıştır (kod: <code>experiments/c_extensions.mjs</code>).</p>
+
+<p class="no-indent"><b>Tablo 4.9-A.</b> Bootstrap %95 CI (B = 10.000), eşleştirilmiş ortalama fark.</p>
+<table>
+<tr><th>Karşılaştırma</th><th>Metrik</th><th>Gözlenen fark</th><th>%95 CI alt</th><th>%95 CI üst</th><th>0 dışı?</th></tr>
+${cext.bootstrap.map((b) => `<tr>
+  <td class="l">${b.a} − ${b.b}</td><td>${b.metric.toUpperCase()}</td>
+  <td>${b.observed.toFixed(4)}</td>
+  <td>${b.ci_lo.toFixed(4)}</td>
+  <td>${b.ci_hi.toFixed(4)}</td>
+  <td>${(b.ci_lo > 0 || b.ci_hi < 0) ? "Evet" : "Hayır"}</td>
+</tr>`).join("")}
+</table>
+
+<p class="no-indent"><b>Tablo 4.9-B.</b> Post-hoc güç (paired t, α = 0.05, normal yaklaşım).</p>
+<table>
+<tr><th>Karşılaştırma</th><th>Metrik</th><th>d<sub>z</sub></th><th>Güç</th><th>β=0.80 için N</th></tr>
+${cext.power.map((p) => `<tr>
+  <td class="l">${p.a} − ${p.b}</td><td>${p.metric.toUpperCase()}</td>
+  <td>${isFinite(p.d_z) ? p.d_z.toFixed(3) : "—"}</td>
+  <td>${(p.power).toFixed(3)}</td>
+  <td>${isFinite(p.n_required_80) ? p.n_required_80 : "—"}</td>
+</tr>`).join("")}
+</table>
+<p><b>Yorum.</b> B3 − B1 ve B3 − B2 karşılaştırmalarında TC ve ITDR için CI
+sıfırı kapsamamakta ve güç ≈ 1.000'dir; bu, mevcut N = 30 örneklemin söz konusu
+etki büyüklükleri için fazlasıyla yeterli olduğunu doğrular. B2 − B1 ITDR
+karşılaştırmasında CI sıfırı kapsamaktadır
+(${cext.bootstrap.find((b)=>b.a==="B2_GreedySC"&&b.b==="B1_Random"&&b.metric==="itdr").ci_lo.toFixed(4)},
+${cext.bootstrap.find((b)=>b.a==="B2_GreedySC"&&b.b==="B1_Random"&&b.metric==="itdr").ci_hi.toFixed(4)});
+yani bu çift için yokluk hipotezi reddedilemez — pozitif kapsama optimize eden
+sezgisel algoritmanın saf rassallığa karşı invalid kapsamada anlamlı üstünlüğü
+yoktur. Bu bulgu, MDT'nin gerekçesini güçlendirir: invalid kapsama için
+<i>algebraik enumere</i> etmek gerekir, sezgisellikle düşmez.</p>
+
+<h3>4.10 Stream Alt-FSM Modeli ve Deneysel Karşılaştırma</h3>
+<p>Bölüm 6.2'deki bir diğer sınırlılık — uygulama katmanı saldırılarının
+(RELAY_BEGIN / END / DATA hücreleri) kapsam dışı kalması — için spec-tabanlı bir
+<b>stream alt-FSM</b> modellenmiş ve devre FSM'i ile aynı metodoloji uygulanmıştır
+(kod: <code>server/fsm_stream.ts</code>; spec referansı tor-spec §6).
+Alt-FSM ${STREAM_STATES.length} durum
+(${STREAM_STATES.join(", ")}) ve ${STREAM_EVENTS.length} olay
+(${STREAM_EVENTS.join(", ")}) üzerinden tanımlanmış; toplam
+${cext.stream.domain} ikili domeninden ${streamValidCount} geçerli, ${streamInvalidCount}
+geçersiz çift türetilmiştir. Stream-özgül saldırı vektörleri:
+${Object.keys(cext.stream.attackInventory).join(", ")}.
+Bu modelleme <i>gerçek Tor binary'sinden çıkarılmamıştır</i>; aynı devre FSM'inde
+olduğu gibi spec'ten türetilmiştir (sınırlılık: Bölüm 6.2-i ile aynı kapsamda kalır).</p>
+
+<p class="no-indent"><b>Tablo 4.10-A.</b> Stream alt-FSM — algoritma karşılaştırması (N = ${cext.stream.N_trials}, bütçe = ${cext.stream.budget}).</p>
+<table>
+<tr><th>Algoritma</th><th>SC ort. ± SD</th><th>TC ort. ± SD</th><th>ITDR ort. ± SD</th></tr>
+${Object.entries(cext.stream.stats).map(([n, s]) => `<tr>
+  <td class="l">${n}</td>
+  <td>${(s.sc.mean*100).toFixed(2)}% ± ${(s.sc.sd*100).toFixed(2)}</td>
+  <td>${(s.tc.mean*100).toFixed(2)}% ± ${(s.tc.sd*100).toFixed(2)}</td>
+  <td>${(s.itdr.mean*100).toFixed(2)}% ± ${(s.itdr.sd*100).toFixed(2)}</td>
+</tr>`).join("")}
+</table>
+
+<p class="no-indent"><b>Tablo 4.10-B.</b> Stream alt-FSM — eşleştirilmiş t testi (paired, df = 29) ve d<sub>z</sub>.</p>
+<table>
+<tr><th>Karşılaştırma</th><th>Metrik</th><th>t</th><th>df</th><th>p</th><th>d<sub>z</sub></th></tr>
+${cext.stream.comparisons.map((c) => `<tr>
+  <td class="l">${c.a} vs ${c.b}</td><td>${c.metric.toUpperCase()}</td>
+  <td>${fmt(c.t,2)}</td><td>${c.df}</td>
+  <td>${sig(c.p)} ${stars(c.p)}</td>
+  <td>${isFinite(c.d_z) ? fmt(c.d_z,2) : "—"}</td>
+</tr>`).join("")}
+</table>
+
+<p class="no-indent"><b>Tablo 4.10-C.</b> Stream-özgül saldırı vektörü envanteri (${streamInvalidCount} geçersiz ikili üzerinde).</p>
+<table>
+<tr><th>Vektör</th><th>İkili</th><th>LOW</th><th>MEDIUM</th><th>HIGH</th><th>CRITICAL</th></tr>
+${Object.entries(cext.stream.attackInventory).sort((a,b)=>b[1].count-a[1].count).map(([t, v]) => `<tr>
+  <td class="l">${t}</td><td>${v.count}</td>
+  <td>${v.sev.LOW}</td><td>${v.sev.MEDIUM}</td><td>${v.sev.HIGH}</td><td>${v.sev.CRITICAL}</td>
+</tr>`).join("")}
+</table>
+
+<p><b>Bulgu (nüanslı).</b> Stream alt-FSM küçük olduğu için (${STREAM_STATES.length} durum,
+${STREAM_EVENTS.length} olay) devre FSM'indeki gibi tam baskınlık görülmez:</p>
+<ul>
+  <li><b>ITDR'de MDT baskındır.</b> B3, ${(cext.stream.stats.B3_MDT.itdr.mean*100).toFixed(1)}%
+  ITDR ile hem B1'e (d<sub>z</sub> = ${cext.stream.comparisons.find(c=>c.a==="B3_MDT"&&c.b==="B1_Random"&&c.metric==="itdr").d_z.toFixed(2)},
+  p &lt; .001) hem B2'ye (d<sub>z</sub> = ${cext.stream.comparisons.find(c=>c.a==="B3_MDT"&&c.b==="B2_GreedySC"&&c.metric==="itdr").d_z.toFixed(2)},
+  p &lt; .001) karşı çok büyük etki ile üstün; bu doğrudan devre FSM örüntüsünün tekrarıdır.</li>
+  <li><b>TC'de B3 vs B1 anlamlı</b> (d<sub>z</sub> =
+  ${cext.stream.comparisons.find(c=>c.a==="B3_MDT"&&c.b==="B1_Random"&&c.metric==="tc").d_z.toFixed(2)},
+  p &lt; .001), ancak <b>B3 vs B2 TC için anlamlı değildir</b>
+  (d<sub>z</sub> = ${cext.stream.comparisons.find(c=>c.a==="B3_MDT"&&c.b==="B2_GreedySC"&&c.metric==="tc").d_z.toFixed(2)},
+  p = ${cext.stream.comparisons.find(c=>c.a==="B3_MDT"&&c.b==="B2_GreedySC"&&c.metric==="tc").p.toFixed(3)}).
+  Beklenen davranış: küçük bir FSM'de greedy state-coverage sezgiseli pozitif geçişleri
+  ~${(cext.stream.stats.B2_GreedySC.tc.mean*100).toFixed(0)}% TC ile zaten doyurmaktadır;
+  bu metrikte MDT'nin avantajı küçük FSM'ler için yok olur.</li>
+  <li><b>SC iki çift için anlamsızdır</b> (B3 vs B2 ve B2 vs B1 — küçük FSM'de tüm
+  algoritmalar state coverage'ı kolayca doyurur).</li>
+</ul>
+<p>Sonuç: MDT'nin <b>asıl katkısı invalid kapsama (ITDR)</b>'dır ve bu, alt-FSM
+boyutundan bağımsız olarak anlamlıdır. TC için MDT'nin avantajı yalnızca
+yeterince geniş arama uzayı olan FSM'lerde gözlenir; bu, devre FSM (10×13 = 130
+hücre) için doğrulanmış, stream FSM (7×8 = 56 hücre) için <i>kısmen</i>
+doğrulanmıştır. Bu bulgu, MDT'nin gerekçesini bozmaz, tam tersine doğru çerçeveye
+oturtur: <i>sezgiselin tükenebildiği yer Invalid kümesidir</i>.</p>
+
 <div class="pagebreak"></div>
 
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->
@@ -678,28 +796,37 @@ ${missedRows}
   <li><b>FPR = 0 doğal sonuçtur.</b> Oracle (δ) ve test üreticisi aynı modeli paylaştığı
   için yanlış-pozitif tanımı boş kümeye düşer. FPR'nin bilgilendirici olması için
   <i>bağımsız</i> bir oracle gerekir (örn. paket yakalama tabanlı gözlemci).</li>
-  <li><b>N = 30 koşu</b> CLT için yeterli; ancak güç analizi (β = 0.80, α = 0.05) yapılmamıştır.
-  Önerilen genişletme: N = 100.</li>
-  <li><b>SLR canlı veritabanı erişimi yok.</b> Bu ortamda Scopus / WoS / IEEE Xplore canlı
-  sorgulanamadığı için tarama açık web kanalları ile sınırlıdır (bkz. Şekil 5 PRISMA).
+  <li><b>N = 30 koşu — giderildi (Bölüm 4.9).</b> Eşleştirilmiş bootstrap %95 CI
+  (B = 10.000) ve post-hoc güç analizi (α = 0.05, β = 0.80) eklenmiştir; B3'ün TC/ITDR
+  üstünlüğü için güç ≈ 1.000 bulunmuştur. Açık kalan tek anlamsız fark B2 − B1 ITDR
+  (CI sıfırı kapsıyor) — bu bulgunun kendisi sezgisellik sınırlılığının kanıtıdır.</li>
+  <li><b>Stream / uygulama katmanı eksikti — kısmen giderildi (Bölüm 4.10).</b>
+  Spec-türevli stream alt-FSM (${STREAM_STATES.length} durum, ${STREAM_EVENTS.length} olay,
+  ${streamValidCount} geçerli / ${streamInvalidCount} geçersiz ikili) modellenmiş ve aynı B1/B2/B3
+  karşılaştırması uygulanmıştır. Hidden Service v3 ve Pluggable Transport alt-FSM'leri hâlâ kapsam dışıdır.</li>
+  <li><b>SLR canlı veritabanı erişimi yok — bu ortamda giderilemez.</b> Scopus / WoS /
+  IEEE Xplore canlı sorgulaması bu çalışma ortamında mevcut değildir; uydurmak yerine
+  açık-web (Google Scholar, arXiv, DOI çözümleme) ile sınırlanmıştır (bkz. Şekil 5 PRISMA).
   Bulunmayan kaynak olabileceği açıkça kabul edilir.</li>
-  <li><b>Latency tek-platform ölçümü.</b> Bölüm 4.6 ölçümü tek-thread, JIT-warm Node.js V8
-  koşulları altındadır; gerçek Tor C implementasyonunda profil farklı olabilir. Karşılaştırmalı
-  ölçüm için aynı δ-tablosunun C/Rust portu gereklidir.</li>
+  <li><b>Latency tek-platform ölçümü — bu ortamda giderilemez.</b> Bölüm 4.6 ölçümü
+  tek-thread, JIT-warm Node.js V8 koşulları altındadır; gerçek Tor C implementasyonunda
+  profil farklı olabilir. Karşılaştırmalı ölçüm için aynı δ-tablosunun C/Rust portu
+  gereklidir; bu portun gerçekleştirilmediği açıkça belirtilir.</li>
 </ul>
 
 <h3>6.3 Gelecek Çalışmalar</h3>
 <ol>
   <li><b>Implementasyon doğrulaması.</b> tor 0.4.x kaynağından gerçek FSM'i L*-tipi model
   öğrenme ${cite(10)} ile çıkarıp, bu tezdeki spec δ ile farkı raporlamak.</li>
-  <li><b>Stream FSM uzantısı.</b> RELAY_BEGIN / RELAY_END / RELAY_DATA hücreleriyle yönetilen
-  stream alt-FSM'inin ayrı δ tablosu olarak modellenmesi.</li>
-  <li><b>Hidden service v3 protokolü.</b> Devre FSM'inden ayrı bir alt-FSM gerektirir.</li>
+  <li><b>Stream alt-FSM ayrıştırması (kısmen tamamlandı, Bölüm 4.10).</b> Hidden Service
+  v3 ve Pluggable Transport alt-FSM'leri için aynı δ-tablo + classifyInvalid yaklaşımının
+  uygulanması; alt-FSM'lerin hiyerarşik birleştirilmesi.</li>
   <li><b>Bağımsız oracle.</b> Shadow ${cite(18)} üzerinde paket yakalama tabanlı bağımsız
-  bir gözlemci ile FPR'nin gerçek ölçümü.</li>
-  <li><b>Detection latency ölçümü.</b> Bu çalışmada metrik tanımlandı ancak ölçülmedi.</li>
-  <li><b>İstatistiksel güç artışı.</b> N = 100 koşu, güç analizi raporlu, etki büyüklüğü
-  güven aralığı (BCa bootstrap).</li>
+  bir gözlemci ile FPR'nin gerçek ölçümü (yapısal FPR = 0 sınırını kıran tek yol).</li>
+  <li><b>Cross-implementation latency.</b> δ tablosunun C/Rust portu + gerçek Tor
+  relay üzerinde Bölüm 4.6 latency probelarının tekrarı.</li>
+  <li><b>İstatistiksel güç (tamamlandı, Bölüm 4.9).</b> Bundan sonraki adım: BCa-corrected
+  bootstrap CI, etki büyüklüğü için Hedges g düzeltmesi.</li>
 </ol>
 
 <div class="pagebreak"></div>
