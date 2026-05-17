@@ -1,0 +1,266 @@
+{
+  "config": {
+    "N": 100,
+    "seedBase": 1000,
+    "eventBudget": 500,
+    "bootstrapR": 5000,
+    "alpha": 0.05,
+    "beta": 0.2,
+    "power": 0.8
+  },
+  "descriptive": {
+    "B1_Random": {
+      "stateCoverage": {
+        "mean": 0.7360000000000001,
+        "sd": 0.16050425589876474,
+        "n": 100
+      },
+      "transitionCoverage": {
+        "mean": 0.4311999999999998,
+        "sd": 0.1066030113092591,
+        "n": 100
+      },
+      "itdr": {
+        "mean": 0.48038095238095224,
+        "sd": 0.07768283512281278,
+        "n": 100
+      },
+      "eventsConsumed": {
+        "mean": 500,
+        "sd": 0,
+        "n": 100
+      }
+    },
+    "B2_GreedySC": {
+      "stateCoverage": {
+        "mean": 0.996,
+        "sd": 0.019694638556693227,
+        "n": 100
+      },
+      "transitionCoverage": {
+        "mean": 0.7636,
+        "sd": 0.08936950873149685,
+        "n": 100
+      },
+      "itdr": {
+        "mean": 0.4672380952380948,
+        "sd": 0.034427050887941006,
+        "n": 100
+      },
+      "eventsConsumed": {
+        "mean": 500,
+        "sd": 0,
+        "n": 100
+      }
+    },
+    "B3_MDT": {
+      "stateCoverage": {
+        "mean": 1,
+        "sd": 0,
+        "n": 100
+      },
+      "transitionCoverage": {
+        "mean": 1,
+        "sd": 0,
+        "n": 100
+      },
+      "itdr": {
+        "mean": 0.9414285714285704,
+        "sd": 0.01409200072022315,
+        "n": 100
+      },
+      "eventsConsumed": {
+        "mean": 500,
+        "sd": 0,
+        "n": 100
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "metric": "stateCoverage",
+      "A": "B3_MDT",
+      "B": "B2_GreedySC",
+      "xMean": 1,
+      "yMean": 0.996,
+      "diffMean": 0.003999999999999999,
+      "diffSD": 0.019694638556693227,
+      "cohensDz_paired": 0.20310096011589907,
+      "paired_t": 2.0310096011589907,
+      "df": 99,
+      "pTwoSided": 0.04493472155462608,
+      "approxN_paired_for_power_080": 191,
+      "bca95": {
+        "mean": 0.003999999999999999,
+        "lo": 0.0009999999999999998,
+        "hi": 0.007999999999999998,
+        "R": 5000,
+        "z0": -0.1728109876934203,
+        "a": 0.07824758900557591
+      }
+    },
+    {
+      "metric": "stateCoverage",
+      "A": "B3_MDT",
+      "B": "B1_Random",
+      "xMean": 1,
+      "yMean": 0.7360000000000001,
+      "diffMean": 0.26400000000000007,
+      "diffSD": 0.16050425589876474,
+      "cohensDz_paired": 1.644816198310115,
+      "paired_t": 16.44816198310115,
+      "df": 99,
+      "pTwoSided": 0,
+      "approxN_paired_for_power_080": 3,
+      "bca95": {
+        "mean": 0.26400000000000007,
+        "lo": 0.23100000000000015,
+        "hi": 0.295,
+        "R": 5000,
+        "z0": -0.015040336695360994,
+        "a": -0.006706438327471985
+      }
+    },
+    {
+      "metric": "transitionCoverage",
+      "A": "B3_MDT",
+      "B": "B2_GreedySC",
+      "xMean": 1,
+      "yMean": 0.7636,
+      "diffMean": 0.23639999999999986,
+      "diffSD": 0.08936950873149686,
+      "cohensDz_paired": 2.645197487996087,
+      "paired_t": 26.45197487996087,
+      "df": 99,
+      "pTwoSided": 0,
+      "approxN_paired_for_power_080": 2,
+      "bca95": {
+        "mean": 0.23639999999999986,
+        "lo": 0.21919999999999987,
+        "hi": 0.2539999999999999,
+        "R": 5000,
+        "z0": 0.016043109148390137,
+        "a": 0.0028900967046504846
+      }
+    },
+    {
+      "metric": "transitionCoverage",
+      "A": "B3_MDT",
+      "B": "B1_Random",
+      "xMean": 1,
+      "yMean": 0.4311999999999998,
+      "diffMean": 0.5688000000000002,
+      "diffSD": 0.1066030113092591,
+      "cohensDz_paired": 5.335684170777234,
+      "paired_t": 53.35684170777234,
+      "df": 99,
+      "pTwoSided": 0,
+      "approxN_paired_for_power_080": 1,
+      "bca95": {
+        "mean": 0.5688000000000002,
+        "lo": 0.5472000000000002,
+        "hi": 0.5896000000000002,
+        "R": 5000,
+        "z0": 0.005514610161003501,
+        "a": -0.007393532691650958
+      }
+    },
+    {
+      "metric": "itdr",
+      "A": "B3_MDT",
+      "B": "B2_GreedySC",
+      "xMean": 0.9414285714285704,
+      "yMean": 0.4672380952380948,
+      "diffMean": 0.4741904761904763,
+      "diffSD": 0.037909479766626654,
+      "cohensDz_paired": 12.508493366557,
+      "paired_t": 125.08493366556999,
+      "df": 99,
+      "pTwoSided": 0,
+      "approxN_paired_for_power_080": 1,
+      "bca95": {
+        "mean": 0.4741904761904763,
+        "lo": 0.4665714285714283,
+        "hi": 0.4814285714285713,
+        "R": 5000,
+        "z0": 0.014538956203250951,
+        "a": -0.004388653609050212
+      }
+    },
+    {
+      "metric": "itdr",
+      "A": "B3_MDT",
+      "B": "B1_Random",
+      "xMean": 0.9414285714285704,
+      "yMean": 0.48038095238095224,
+      "diffMean": 0.4610476190476189,
+      "diffSD": 0.08113009946521633,
+      "cohensDz_paired": 5.682818363180833,
+      "paired_t": 56.828183631808336,
+      "df": 99,
+      "pTwoSided": 0,
+      "approxN_paired_for_power_080": 1,
+      "bca95": {
+        "mean": 0.4610476190476189,
+        "lo": 0.44390476190476186,
+        "hi": 0.47590476190476194,
+        "R": 5000,
+        "z0": -0.02958252784547742,
+        "a": -0.010960347476128146
+      }
+    },
+    {
+      "metric": "eventsConsumed",
+      "A": "B3_MDT",
+      "B": "B2_GreedySC",
+      "xMean": 500,
+      "yMean": 500,
+      "diffMean": 0,
+      "diffSD": 0,
+      "cohensDz_paired": 0,
+      "paired_t": 0,
+      "df": 99,
+      "pTwoSided": 1,
+      "approxN_paired_for_power_080": null,
+      "bca95": {
+        "mean": 0,
+        "lo": 0,
+        "hi": 0,
+        "R": 5000,
+        "z0": -3.7190164821251033,
+        "a": 0
+      }
+    },
+    {
+      "metric": "eventsConsumed",
+      "A": "B3_MDT",
+      "B": "B1_Random",
+      "xMean": 500,
+      "yMean": 500,
+      "diffMean": 0,
+      "diffSD": 0,
+      "cohensDz_paired": 0,
+      "paired_t": 0,
+      "df": 99,
+      "pTwoSided": 1,
+      "approxN_paired_for_power_080": null,
+      "bca95": {
+        "mean": 0,
+        "lo": 0,
+        "hi": 0,
+        "R": 5000,
+        "z0": -3.7190164821251033,
+        "a": 0
+      }
+    }
+  ],
+  "notes": [
+    "N increased from 30 to 100 (3.3× the original).",
+    "Paired seeds: trial i across algorithms uses seed = 1000+i (same as N=30 run).",
+    "BCa bootstrap: 5000 resamples on paired differences. Bias-correction z0 from bootstrap distribution position relative to point estimate; acceleration a from leave-one-out jackknife on the paired-difference vector; final percentile lookup uses BCa-adjusted indices [floor(αlo·R), ceil(αhi·R)-1] without further interpolation (no tie-handling beyond array sort).",
+    "Cohen's dz_paired = mean(diff) / sd(diff); paired t = mean(diff) / (sd(diff)/sqrt(n)), df = n-1; two-sided p from Student's t CDF.",
+    "Approximate sample size for paired design at power 0.80: N ≈ ((z_{1-α/2}+z_{1-β})/dz)². This is a pilot-effect-size estimate, NOT a strict a-priori power calculation (which would require an effect size assumed BEFORE collecting data).",
+    "Limitations preserved: N=100 reduces sampling variance but does NOT broaden the input space (still BUDGET=500 events/trial, same seed family). Generalization across different traffic mixes still future work."
+  ],
+  "generatedAt": "2026-05-17T14:13:06.841Z"
+}

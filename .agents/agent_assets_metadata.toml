@@ -35,13 +35,13 @@ title = "Ham Deney Verisi (90 koşu)"
 id = "dVcgP4IiSOBVn5A21t9zD"
 uri = "file://thesis/Tez_Taslagi.pdf"
 type = "pdf"
-title = "Tez Taslağı v6 (33 sayfa) — Bölüm 4.12 düzeltildi"
+title = "Tez Taslağı v8 (35 sayfa) — 4.13 paired-difference düzeltildi + 4.14 L*"
 
 [[outputs]]
 id = "hnVx3t2qWJVIFyMTccuwf"
 uri = "file://paper/Tor_FSM_MDT_Paper.pdf"
 type = "pdf"
-title = "IEEE Paper v3 (7 sayfa) — IV-K gözlem/yorum ayrımı"
+title = "IEEE Paper v5 (7 sayfa) — paired d_z + dz_paired t + BCa"
 
 [[outputs]]
 id = "nszqODd5UVnmdw_VMMWB-"

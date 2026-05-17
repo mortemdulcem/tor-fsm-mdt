@@ -19,6 +19,8 @@ const ext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments
 const cext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/c_extensions.json"), "utf8"));
 const dext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/d_extensions.json"), "utf8"));
 const torStatic = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tor_static_fsm.json"), "utf8"));
+const fext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions.json"), "utf8"));
+const gext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/g_extensions.json"), "utf8"));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -952,6 +954,87 @@ hâlâ Shadow ile yapılacak gelecek çalışmaya bırakılmıştır.</p>
 
 <div class="pagebreak"></div>
 
+<!-- ====================== BÖLÜM 4.13 — F-grubu: N=100 + power + BCa ====================== -->
+<h3>4.13 F-grubu: N=100 Yeniden Koşu, A-priori Güç Analizi, BCa Bootstrap</h3>
+
+<p>Bölüm 6.2-ii sınırlılığı ("N=30 koşu, post-hoc güç yapılmadı") doğrudan kapatılır:
+örneklem 30 → ${fext.config.N}'a (${(fext.config.N/30).toFixed(2)}×) çıkarılmış, paired seed ailesi
+korunmuş (seed = ${fext.config.seedBase}+i), BCa bootstrap (${fext.config.bootstrapR}
+yeniden örnekleme) ile %95 GA hesaplanmış, Cohen's d üzerinden a-priori
+required-N (β=${fext.config.beta}, α=${fext.config.alpha}, two-sided
+z-yaklaşımı) raporlanmıştır. Kod: <code>experiments/f_extensions.mjs</code>.</p>
+
+<p class="no-indent"><b>Tablo 4.13-A.</b> N=${fext.config.N} sonuçları — B3_MDT vs B2_GreedySC <b>paired-difference</b> analizi
+(her satırda d_z = ortalama(fark)/sd(fark); paired t-test df=n−1).</p>
+<table>
+<tr><th>Metrik</th><th>Δ ort. (sd)</th><th>Cohen's d_z (paired)</th><th>paired t (df=${fext.comparisons[0].df})</th><th>p (two-sided)</th><th>BCa %95 GA</th><th>Yakl. N (paired, power=0.80)</th></tr>
+${fext.comparisons.filter((c) => c.B === "B2_GreedySC").map((c) => `<tr>
+  <td class="l">${c.metric}</td>
+  <td>${c.diffMean.toFixed(4)} (${c.diffSD.toFixed(4)})</td>
+  <td>${isFinite(c.cohensDz_paired) ? c.cohensDz_paired.toFixed(3) : "—"}</td>
+  <td>${isFinite(c.paired_t) ? c.paired_t.toFixed(2) : "—"}</td>
+  <td>${c.pTwoSided === 0 ? "&lt; 1e-12" : c.pTwoSided.toExponential(2)}</td>
+  <td>[${c.bca95.lo.toFixed(4)}, ${c.bca95.hi.toFixed(4)}]</td>
+  <td>${isFinite(c.approxN_paired_for_power_080) ? c.approxN_paired_for_power_080 : "—"}</td>
+</tr>`).join("")}
+</table>
+
+<p><b>Tasarım notu:</b> Trial i tüm algoritmalarda aynı seed (${fext.config.seedBase}+i) ile
+çalıştığından gözlemler eşleştirilmiştir; istatistikler buna göre <i>paired</i>
+(within-pairs farkların tek örneklem testi) olarak hesaplanmıştır. Bağımsız
+örneklem (Welch) versiyonu değildir.</p>
+
+<p><b>Dürüst bulgu (pilot effect-size'a dayalı yaklaşık N):</b>
+<i>transitionCoverage</i> ve <i>itdr</i> için paired etki büyüklükleri çok büyüktür
+(d_z=${fext.comparisons.find((c)=>c.metric==="transitionCoverage"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(2)},
+d_z=${fext.comparisons.find((c)=>c.metric==="itdr"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(2)});
+%80 güç için yaklaşık N=2-3 yeter. <i>stateCoverage</i> için d_z=${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(3)}
+ölçülmüş, yaklaşık N=${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").approxN_paired_for_power_080}
+gerektirmektedir. <b>N=${fext.config.N} bu tek metrik için yetersizdir</b> —
+orijinal tezde olmayan, post-hoc analizle ortaya çıkmış dürüst bir bulgudur.
+Bu, <i>strict a-priori</i> güç değil, gözlenen pilot effect-size'a dayalı
+yaklaşık örneklem tahminidir. <i>eventsConsumed</i> için Δ=0 (fairness gereği);
+etki büyüklüğü tanımsız.</p>
+
+<p><b>Sınırlama:</b> N=${fext.config.N} sampling varyansını düşürür, fakat input
+uzayını genişletmez (aynı BUDGET, aynı seed ailesi). Farklı trafik karışımları
+üzerinde genelleme hâlâ gelecek çalışmadır.</p>
+
+<div class="pagebreak"></div>
+
+<!-- ====================== BÖLÜM 4.14 — G-grubu: L* ====================== -->
+<h3>4.14 G-grubu: Angluin L* Algoritmasının Implementasyonu</h3>
+
+<p>Bölüm 6.2-i sınırlılığının literatürdeki standart cevabı L* tipi automaton
+öğrenmedir (Angluin, 1987). LearnLib/libalf yerine bu çalışmada L*'in
+<b>tam saf-Node implementasyonu</b> yazılmıştır (kod:
+<code>experiments/g_extensions.mjs</code>). MAT (Minimally Adequate Teacher)
+olarak Bölüm 4.12'de statik çıkarılmış 5-durumlu impl FSM kullanılır.
+Membership query MQ(w), sözcüğün başlangıçtan kabul durumuna götürüp
+götürmediğini döndürür; equivalence query EQ(H), Σ* üzerinde uzunluk
+≤ ${gext.config.eqMaxLen} BFS ile karşı-örnek arar.</p>
+
+<p><b>Sonuç:</b> L* algoritması <b>${gext.trace.length} turda</b> yakınsamış,
+${gext.counters.membership_queries.toLocaleString("tr-TR")} membership ve
+${gext.counters.equivalence_queries} equivalence query ile ${gext.counters.runtime_ms.toFixed(1)} ms'de
+${gext.learned.states}-durumlu DFA öğrenmiştir. Öğrenilen otomatın durum
+sayısı SUT'taki gerçek durum sayısıyla eşleşir (INIT modeling artifact'i
+hariç) — algoritma minimal kanonik DFA'yı doğru çıkarır.</p>
+
+<p class="no-indent"><b>Tablo 4.14.</b> L* yakınsama izi.</p>
+<table>
+<tr><th>Tur</th><th>|S| (öneki)</th><th>|E| (ayrım eki)</th><th>Hipotez durum #</th><th>Karşı-örnek</th></tr>
+${gext.trace.map((t) => `<tr><td>${t.round}</td><td>${t.S_size}</td><td>${t.E_size}</td><td>${t.hypStates}</td><td class="l"><code>${t.ce ?? "(eşdeğer — yakınsama)"}</code></td></tr>`).join("")}
+</table>
+
+<p><b>Açık sınır:</b> ${gext.honest_scope.join(" ")} Yani bu, L*'nin <i>algoritma
+ve pipeline doğruluğunun</i> kanıtıdır — Shadow üzerinde gerçek tor binary'sine
+MQ probe'ları göndermenin yerini tutmaz. Pipeline tor binary'sine bağlanmaya
+hazırdır; yalnızca MQ implementasyonunun "tor process'e probe gönder + observe"
+ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
+
+<div class="pagebreak"></div>
+
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->
 <h2>5. Görselleştirme</h2>
 
@@ -986,8 +1069,12 @@ hâlâ Shadow ile yapılacak gelecek çalışmaya bırakılmıştır.</p>
   ${torStatic.sites_count} <code>circuit_set_state</code> çağrı noktasından
   ${torStatic.structural.impl_states_count}-durumlu implementation FSM çıkarılmıştır.
   Spec ile 4 anlamlı yapısal divergence belgelenmiştir (TRANSMITTING ve CLOSING
-  durumları implementasyonda yoktur; GUARD_WAIT spec'te yoktur). Runtime trace
-  (Shadow) hâlâ kapsam dışıdır.</li>
+  durumları implementasyonda yoktur; GUARD_WAIT spec'te yoktur). Bölüm 4.14'te
+  ek olarak Angluin L* algoritması saf Node ile implement edilmiş ve statik
+  çıkarılmış impl FSM üzerinde ${gext.trace.length} turda
+  ${gext.counters.membership_queries.toLocaleString("tr-TR")} MQ ile yakınsayarak
+  minimal kanonik DFA'yı doğru çıkarmıştır; running tor binary üzerinde Shadow
+  trace hâlâ kapsam dışıdır.</li>
   <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1).</b> Spec narrative'inden
   bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
   ${(dext.oracleIndependent.agreement * 100).toFixed(2)}% uyum bulunmuş;

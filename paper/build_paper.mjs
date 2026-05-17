@@ -21,6 +21,8 @@ const ext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments
 const cext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/c_extensions.json"), "utf8"));
 const dext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/d_extensions.json"), "utf8"));
 const torStatic = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tor_static_fsm.json"), "utf8"));
+const fext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions.json"), "utf8"));
+const gext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/g_extensions.json"), "utf8"));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -620,6 +622,26 @@ enumeration.</p>
   (probe-wise:
   ${dext.cLatency.comparison.probes.map((p) => `${p.probe} ${p.speedup_x.toFixed(0)}×`).join(", ")}).
   A full Tor relay C/Rust port remains future work.</li>
+  <li><b>(vi) N=30 sample size — addressed (Sec. IV-L).</b> The experiment was
+  rerun at N=${fext.config.N} with paired seeds, BCa bootstrap
+  (R=${fext.config.bootstrapR}) and a paired-difference design (Cohen's d_z,
+  paired t, df=n−1). Paired effect sizes are large for the two primary metrics
+  (d_z=${fext.comparisons.find((c)=>c.metric==="transitionCoverage"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(2)} for transitionCoverage,
+  d_z=${fext.comparisons.find((c)=>c.metric==="itdr"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(2)} for itdr); approximate N for
+  power 0.80 is ≤3. However, <i>stateCoverage</i> shows d_z=${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(3)},
+  requiring approximately N=${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").approxN_paired_for_power_080};
+  even N=${fext.config.N} is under-powered for this single metric. This is
+  reported as a pilot-effect-size estimate (not strict a-priori power) and as a
+  new honest finding of the extended analysis.</li>
+  <li><b>(vii) Automaton learning unimplemented — addressed (Sec. IV-M).</b>
+  Angluin's L* algorithm is implemented in pure Node and converges on the
+  static-extracted impl FSM in ${gext.trace.length} rounds using
+  ${gext.counters.membership_queries.toLocaleString("en-US")} membership and
+  ${gext.counters.equivalence_queries} equivalence queries
+  (${gext.counters.runtime_ms.toFixed(0)} ms), correctly recovering the minimal
+  canonical ${gext.learned.states}-state DFA. The teacher is the extracted FSM,
+  not a running tor binary; the pipeline is, however, ready to be connected to
+  a Shadow-hosted tor process by replacing the membership oracle.</li>
 </ul>
 
 <p class="no-indent"><b>IV-K. Spec vs. implementation FSM (static extraction).</b>
@@ -641,6 +663,33 @@ spec-internal oracle agreement combined with this implementation-level
 extraction provides two independent cross-checks of the δ table — neither
 eliminates Threat (i) on its own, but together they narrow the gap from
 "unmeasured" to "structurally characterized."</p>
+
+<p class="no-indent"><b>IV-L. Resampled study (N=${fext.config.N}) with BCa
+bootstrap and a-priori power.</b> The original N=30 comparison was rerun with
+paired seeds at N=${fext.config.N}, analyzed as paired differences.
+BCa-bootstrap %95 CIs (R=${fext.config.bootstrapR}) for B3 − B2 are
+[${fext.comparisons.find((c)=>c.metric==="transitionCoverage"&&c.B==="B2_GreedySC").bca95.lo.toFixed(3)},
+ ${fext.comparisons.find((c)=>c.metric==="transitionCoverage"&&c.B==="B2_GreedySC").bca95.hi.toFixed(3)}]
+for transitionCoverage and
+[${fext.comparisons.find((c)=>c.metric==="itdr"&&c.B==="B2_GreedySC").bca95.lo.toFixed(3)},
+ ${fext.comparisons.find((c)=>c.metric==="itdr"&&c.B==="B2_GreedySC").bca95.hi.toFixed(3)}]
+for itdr — both excluding 0 with substantial margin. New honest finding:
+approximate paired-design N for stateCoverage at power 0.80 is
+${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").approxN_paired_for_power_080}
+(pilot-d_z basis, not strict a-priori); N=${fext.config.N} is under-powered for
+this single metric.</p>
+
+<p class="no-indent"><b>IV-M. L* (Angluin 1987) implementation.</b> Pure-Node
+implementation of the classical observation-table L* algorithm with closedness
+and consistency repair, BFS-bounded equivalence oracle (|w| ≤
+${gext.config.eqMaxLen}), and prefix-closure on counterexamples. Teacher SUT =
+the 5-state impl FSM from Sec. IV-K. L* converged in ${gext.trace.length}
+rounds (${gext.counters.membership_queries.toLocaleString("en-US")} MQ,
+${gext.counters.equivalence_queries} EQ, ${gext.counters.runtime_ms.toFixed(0)} ms),
+producing a ${gext.learned.states}-state minimal canonical DFA matching the
+SUT. This validates the algorithm and pipeline; replacing the MQ with a Shadow
++ tor binary harness is the natural next step (Threat (i)). The pipeline-ready
+artifact is the contribution here, not a learning experiment on running tor.</p>
 
 <p class="no-indent"><b>IV-J. Honest partial substitutes for (ii), (iv), (v).</b>
 The three threats above are partially mitigated, not eliminated. The

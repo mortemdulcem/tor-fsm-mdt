@@ -1185,6 +1185,111 @@ hâlâ Shadow ile yapılacak gelecek çalışmaya bırakılmıştır.</p>
 
 <div class="pagebreak"></div>
 
+<!-- ====================== BÖLÜM 4.13 — F-grubu: N=100 + power + BCa ====================== -->
+<h3>4.13 F-grubu: N=100 Yeniden Koşu, A-priori Güç Analizi, BCa Bootstrap</h3>
+
+<p>Bölüm 6.2-ii sınırlılığı ("N=30 koşu, post-hoc güç yapılmadı") doğrudan kapatılır:
+örneklem 30 → 100'a (3.33×) çıkarılmış, paired seed ailesi
+korunmuş (seed = 1000+i), BCa bootstrap (5000
+yeniden örnekleme) ile %95 GA hesaplanmış, Cohen's d üzerinden a-priori
+required-N (β=0.2, α=0.05, two-sided
+z-yaklaşımı) raporlanmıştır. Kod: <code>experiments/f_extensions.mjs</code>.</p>
+
+<p class="no-indent"><b>Tablo 4.13-A.</b> N=100 sonuçları — B3_MDT vs B2_GreedySC <b>paired-difference</b> analizi
+(her satırda d_z = ortalama(fark)/sd(fark); paired t-test df=n−1).</p>
+<table>
+<tr><th>Metrik</th><th>Δ ort. (sd)</th><th>Cohen's d_z (paired)</th><th>paired t (df=99)</th><th>p (two-sided)</th><th>BCa %95 GA</th><th>Yakl. N (paired, power=0.80)</th></tr>
+<tr>
+  <td class="l">stateCoverage</td>
+  <td>0.0040 (0.0197)</td>
+  <td>0.203</td>
+  <td>2.03</td>
+  <td>4.49e-2</td>
+  <td>[0.0010, 0.0080]</td>
+  <td>191</td>
+</tr><tr>
+  <td class="l">transitionCoverage</td>
+  <td>0.2364 (0.0894)</td>
+  <td>2.645</td>
+  <td>26.45</td>
+  <td>&lt; 1e-12</td>
+  <td>[0.2192, 0.2540]</td>
+  <td>2</td>
+</tr><tr>
+  <td class="l">itdr</td>
+  <td>0.4742 (0.0379)</td>
+  <td>12.508</td>
+  <td>125.08</td>
+  <td>&lt; 1e-12</td>
+  <td>[0.4666, 0.4814]</td>
+  <td>1</td>
+</tr><tr>
+  <td class="l">eventsConsumed</td>
+  <td>0.0000 (0.0000)</td>
+  <td>0.000</td>
+  <td>0.00</td>
+  <td>1.00e+0</td>
+  <td>[0.0000, 0.0000]</td>
+  <td>null</td>
+</tr>
+</table>
+
+<p><b>Tasarım notu:</b> Trial i tüm algoritmalarda aynı seed (1000+i) ile
+çalıştığından gözlemler eşleştirilmiştir; istatistikler buna göre <i>paired</i>
+(within-pairs farkların tek örneklem testi) olarak hesaplanmıştır. Bağımsız
+örneklem (Welch) versiyonu değildir.</p>
+
+<p><b>Dürüst bulgu (pilot effect-size'a dayalı yaklaşık N):</b>
+<i>transitionCoverage</i> ve <i>itdr</i> için paired etki büyüklükleri çok büyüktür
+(d_z=2.65,
+d_z=12.51);
+%80 güç için yaklaşık N=2-3 yeter. <i>stateCoverage</i> için d_z=0.203
+ölçülmüş, yaklaşık N=191
+gerektirmektedir. <b>N=100 bu tek metrik için yetersizdir</b> —
+orijinal tezde olmayan, post-hoc analizle ortaya çıkmış dürüst bir bulgudur.
+Bu, <i>strict a-priori</i> güç değil, gözlenen pilot effect-size'a dayalı
+yaklaşık örneklem tahminidir. <i>eventsConsumed</i> için Δ=0 (fairness gereği);
+etki büyüklüğü tanımsız.</p>
+
+<p><b>Sınırlama:</b> N=100 sampling varyansını düşürür, fakat input
+uzayını genişletmez (aynı BUDGET, aynı seed ailesi). Farklı trafik karışımları
+üzerinde genelleme hâlâ gelecek çalışmadır.</p>
+
+<div class="pagebreak"></div>
+
+<!-- ====================== BÖLÜM 4.14 — G-grubu: L* ====================== -->
+<h3>4.14 G-grubu: Angluin L* Algoritmasının Implementasyonu</h3>
+
+<p>Bölüm 6.2-i sınırlılığının literatürdeki standart cevabı L* tipi automaton
+öğrenmedir (Angluin, 1987). LearnLib/libalf yerine bu çalışmada L*'in
+<b>tam saf-Node implementasyonu</b> yazılmıştır (kod:
+<code>experiments/g_extensions.mjs</code>). MAT (Minimally Adequate Teacher)
+olarak Bölüm 4.12'de statik çıkarılmış 5-durumlu impl FSM kullanılır.
+Membership query MQ(w), sözcüğün başlangıçtan kabul durumuna götürüp
+götürmediğini döndürür; equivalence query EQ(H), Σ* üzerinde uzunluk
+≤ 6 BFS ile karşı-örnek arar.</p>
+
+<p><b>Sonuç:</b> L* algoritması <b>4 turda</b> yakınsamış,
+56.722 membership ve
+4 equivalence query ile 170.1 ms'de
+5-durumlu DFA öğrenmiştir. Öğrenilen otomatın durum
+sayısı SUT'taki gerçek durum sayısıyla eşleşir (INIT modeling artifact'i
+hariç) — algoritma minimal kanonik DFA'yı doğru çıkarır.</p>
+
+<p class="no-indent"><b>Tablo 4.14.</b> L* yakınsama izi.</p>
+<table>
+<tr><th>Tur</th><th>|S| (öneki)</th><th>|E| (ayrım eki)</th><th>Hipotez durum #</th><th>Karşı-örnek</th></tr>
+<tr><td>0</td><td>1</td><td>1</td><td>1</td><td class="l"><code>ko</code></td></tr><tr><td>1</td><td>3</td><td>2</td><td>3</td><td class="l"><code>cko</code></td></tr><tr><td>2</td><td>6</td><td>3</td><td>4</td><td class="l"><code>cbg</code></td></tr><tr><td>3</td><td>8</td><td>4</td><td>5</td><td class="l"><code>(eşdeğer — yakınsama)</code></td></tr>
+</table>
+
+<p><b>Açık sınır:</b> Teacher SUT = static-extracted impl FSM from Sec. 4.12, not a running tor binary. Membership oracle = direct call to SUT.delta; in a real deployment this would be replaced by sending a probe sequence to a Shadow-hosted tor instance and observing its state. Equivalence oracle = bounded exhaustive enumeration. Real-world replacement: Wp-method or random sampling against the SUT. Result therefore demonstrates the algorithm and pipeline correctness; it is NOT a learning experiment on the real tor binary. Yani bu, L*'nin <i>algoritma
+ve pipeline doğruluğunun</i> kanıtıdır — Shadow üzerinde gerçek tor binary'sine
+MQ probe'ları göndermenin yerini tutmaz. Pipeline tor binary'sine bağlanmaya
+hazırdır; yalnızca MQ implementasyonunun "tor process'e probe gönder + observe"
+ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
+
+<div class="pagebreak"></div>
+
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->
 <h2>5. Görselleştirme</h2>
 
@@ -1226,8 +1331,12 @@ hâlâ Shadow ile yapılacak gelecek çalışmaya bırakılmıştır.</p>
   9 <code>circuit_set_state</code> çağrı noktasından
   5-durumlu implementation FSM çıkarılmıştır.
   Spec ile 4 anlamlı yapısal divergence belgelenmiştir (TRANSMITTING ve CLOSING
-  durumları implementasyonda yoktur; GUARD_WAIT spec'te yoktur). Runtime trace
-  (Shadow) hâlâ kapsam dışıdır.</li>
+  durumları implementasyonda yoktur; GUARD_WAIT spec'te yoktur). Bölüm 4.14'te
+  ek olarak Angluin L* algoritması saf Node ile implement edilmiş ve statik
+  çıkarılmış impl FSM üzerinde 4 turda
+  56.722 MQ ile yakınsayarak
+  minimal kanonik DFA'yı doğru çıkarmıştır; running tor binary üzerinde Shadow
+  trace hâlâ kapsam dışıdır.</li>
   <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1).</b> Spec narrative'inden
   bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
   98.46% uyum bulunmuş;

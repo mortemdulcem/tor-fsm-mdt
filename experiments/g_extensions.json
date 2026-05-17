@@ -1,0 +1,140 @@
+{
+  "config": {
+    "alphabet": [
+      "c",
+      "k",
+      "b",
+      "o",
+      "g",
+      "u"
+    ],
+    "eqMaxLen": 6,
+    "sutStates": 6,
+    "sutAccepting": [
+      "OPEN",
+      "GUARD_WAIT"
+    ]
+  },
+  "sut": {
+    "delta": {
+      "INIT": {
+        "c": "ONIONSKIN_PENDING",
+        "k": "CHAN_WAIT"
+      },
+      "CHAN_WAIT": {
+        "o": "OPEN"
+      },
+      "ONIONSKIN_PENDING": {
+        "b": "BUILDING"
+      },
+      "BUILDING": {
+        "o": "OPEN",
+        "g": "GUARD_WAIT"
+      },
+      "GUARD_WAIT": {
+        "u": "OPEN"
+      },
+      "OPEN": {}
+    },
+    "accepting": [
+      "OPEN",
+      "GUARD_WAIT"
+    ],
+    "init": "INIT"
+  },
+  "learned": {
+    "states": 5,
+    "accepting": [
+      "ko"
+    ],
+    "delta": {
+      "": {
+        "c": "c",
+        "k": "k",
+        "b": "",
+        "o": "",
+        "g": "",
+        "u": ""
+      },
+      "k": {
+        "c": "k",
+        "k": "k",
+        "b": "k",
+        "o": "ko",
+        "g": "k",
+        "u": "k"
+      },
+      "ko": {
+        "c": "ko",
+        "k": "ko",
+        "b": "ko",
+        "o": "ko",
+        "g": "ko",
+        "u": "ko"
+      },
+      "c": {
+        "c": "c",
+        "k": "c",
+        "b": "cb",
+        "o": "c",
+        "g": "c",
+        "u": "c"
+      },
+      "cb": {
+        "c": "cb",
+        "k": "cb",
+        "b": "cb",
+        "o": "ko",
+        "g": "ko",
+        "u": "cb"
+      }
+    }
+  },
+  "trace": [
+    {
+      "round": 0,
+      "S_size": 1,
+      "E_size": 1,
+      "hypStates": 1,
+      "ce": "ko"
+    },
+    {
+      "round": 1,
+      "S_size": 3,
+      "E_size": 2,
+      "hypStates": 3,
+      "ce": "cko"
+    },
+    {
+      "round": 2,
+      "S_size": 6,
+      "E_size": 3,
+      "hypStates": 4,
+      "ce": "cbg"
+    },
+    {
+      "round": 3,
+      "S_size": 8,
+      "E_size": 4,
+      "hypStates": 5,
+      "ce": null
+    }
+  ],
+  "counters": {
+    "membership_queries": 56722,
+    "equivalence_queries": 4,
+    "runtime_ms": 170.066875
+  },
+  "conclusion": [
+    "L* converged in 4 round(s) using 56722 membership + 4 equivalence queries.",
+    "Learned DFA has 5 states; SUT has 6 distinct states.",
+    "EQ is bounded (words up to length 6, |Σ|=6); full equivalence beyond this bound is not proved by this experiment."
+  ],
+  "honest_scope": [
+    "Teacher SUT = static-extracted impl FSM from Sec. 4.12, not a running tor binary.",
+    "Membership oracle = direct call to SUT.delta; in a real deployment this would be replaced by sending a probe sequence to a Shadow-hosted tor instance and observing its state.",
+    "Equivalence oracle = bounded exhaustive enumeration. Real-world replacement: Wp-method or random sampling against the SUT.",
+    "Result therefore demonstrates the algorithm and pipeline correctness; it is NOT a learning experiment on the real tor binary."
+  ],
+  "generatedAt": "2026-05-17T14:09:28.176Z"
+}
