@@ -1193,19 +1193,124 @@ ama uzun), <i>etik veya bilimsel değil</i>; gerçek bir araştırma laboratuvar
 </ul>
 
 <h3>6.3 Gelecek Çalışmalar</h3>
+
+<p>Bu bölüm iki düzeye ayrılmıştır: (a) bu çalışmada kısmen ele alınmış ancak derinleştirilmesi
+gereken konular, (b) Bölüm 6.2.1-B'de "ortam engelleri nedeniyle uygulanmadı" olarak işaretlenen
+<b>Shadow + running tor</b> entegrasyonunun adım adım uygulama planı. (b) planı, Sec. 6.2.1-B'deki
+gerekçelerin "yapılacak iş bellidir, yalnızca uygun ortam ve zaman gerekir" iddiasını somut hâle
+getirir; herhangi bir araştırmacı veya otonom kod ajanı tarafından doğrudan takip edilebilir.</p>
+
+<h4>6.3.1 Konu Bazlı Genişletmeler</h4>
 <ol>
-  <li><b>Implementasyon doğrulaması.</b> tor 0.4.x kaynağından gerçek FSM'i L*-tipi model
-  öğrenme ${cite(10)} ile çıkarıp, bu tezdeki spec δ ile farkı raporlamak.</li>
   <li><b>Stream alt-FSM ayrıştırması (kısmen tamamlandı, Bölüm 4.10).</b> Hidden Service
   v3 ve Pluggable Transport alt-FSM'leri için aynı δ-tablo + classifyInvalid yaklaşımının
   uygulanması; alt-FSM'lerin hiyerarşik birleştirilmesi.</li>
-  <li><b>Bağımsız oracle.</b> Shadow ${cite(18)} üzerinde paket yakalama tabanlı bağımsız
-  bir gözlemci ile FPR'nin gerçek ölçümü (yapısal FPR = 0 sınırını kıran tek yol).</li>
-  <li><b>Cross-implementation latency.</b> δ tablosunun C/Rust portu + gerçek Tor
-  relay üzerinde Bölüm 4.6 latency probelarının tekrarı.</li>
-  <li><b>İstatistiksel güç (tamamlandı, Bölüm 4.9).</b> Bundan sonraki adım: BCa-corrected
-  bootstrap CI, etki büyüklüğü için Hedges g düzeltmesi.</li>
+  <li><b>Cross-implementation latency.</b> δ tablosunun Rust portu + gerçek Tor
+  relay üzerinde Bölüm 4.11 latency probelarının tekrarı (mevcut C-port karşılaştırması
+  Bölüm 4.11.3'te yapılmıştır; Rust için Bölüm 6.2.1-A'daki gerekçe bkz.).</li>
+  <li><b>İstatistiksel güç genişletmesi.</b> Bölüm 4.13'teki N=100 paired tasarım,
+  stateCoverage için N=193 gerekliliğini ortaya çıkarmıştır; bu örneklem hedefiyle
+  yeniden koşu ve Hedges g düzeltmesi.</li>
+  <li><b>Canlı akademik veritabanı entegrasyonu.</b> Scopus/WoS/IEEE Xplore API anahtarı
+  edinilmesi hâlinde, Bölüm 6.2-v'te belirtilen "açık web ile sınırlı" sınırlılığının
+  kapatılması ve bibliyometrik haritalama (Bölüm 2'nin sayısal güçlendirilmesi).</li>
 </ol>
+
+<h4>6.3.2 Shadow + Running Tor Entegrasyon Planı (10 adım)</h4>
+<p>Aşağıdaki plan, Bölüm 6.2.1-B'de listelenen engellerin aşıldığı bir ortamda
+(Ubuntu 22.04, sudo erişimi, 8 GB+ RAM, kalıcı disk) uygulanır. Toplam tahmini iş
+yükü 4-6 hafta tam zamanlı bir araştırmacı; otonom kod ajanı (örn. Claude Code, Devin)
+ile insan denetiminde 2-3 haftaya kadar inebilir. Her adım, mevcut repo'daki bir
+dosyaya somut bir bağlantı içerir.</p>
+
+<table style="margin: 8pt 0; width: 100%;">
+<tr style="background:#eaeaea;"><th style="text-align:left;padding:4pt;border:1px solid #999;width:5%;">#</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:30%;">Adım</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:35%;">Teknik içerik</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:15%;">Repo bağlantısı</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:15%;">Süre</th></tr>
+
+<tr><td style="padding:4pt;border:1px solid #999;">1</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Ortam hazırlığı</b></td>
+<td style="padding:4pt;border:1px solid #999;">Ubuntu 22.04 LTS makine (VPS veya lab); <code>apt install cmake gcc g++ libglib2.0-dev libigraph-dev libssl-dev libevent-dev libyaml-dev libelf-dev zlib1g-dev autoconf libtool</code>; <code>sysctl kernel.yama.ptrace_scope=0</code></td>
+<td style="padding:4pt;border:1px solid #999;">—</td>
+<td style="padding:4pt;border:1px solid #999;">1 gün</td></tr>
+
+<tr><td style="padding:4pt;border:1px solid #999;">2</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Shadow kurulumu</b></td>
+<td style="padding:4pt;border:1px solid #999;"><code>git clone github.com/shadow/shadow</code> &rarr; <code>./setup build --jobs 4 &amp;&amp; ./setup install</code> &rarr; <code>shadow --version</code> ile doğrulama (Shadow 3.x bekleniyor) ${cite(18)}</td>
+<td style="padding:4pt;border:1px solid #999;">—</td>
+<td style="padding:4pt;border:1px solid #999;">yarım gün</td></tr>
+
+<tr><td style="padding:4pt;border:1px solid #999;">3</td>
+<td style="padding:4pt;border:1px solid #999;"><b>tor binary (debug)</b></td>
+<td style="padding:4pt;border:1px solid #999;"><code>git clone gitlab.torproject.org/tpo/core/tor</code>, <code>tor-0.4.8</code> stable branch; <code>./configure --disable-asciidoc CFLAGS="-g -O0 -fno-omit-frame-pointer"</code>; <code>make -j4</code> &rarr; çıktı <code>src/app/tor</code></td>
+<td style="padding:4pt;border:1px solid #999;">Bölüm 4.12 statik FSM ile aynı sürüm</td>
+<td style="padding:4pt;border:1px solid #999;">yarım gün</td></tr>
+
+<tr><td style="padding:4pt;border:1px solid #999;">4</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Tor ağ topolojisi</b></td>
+<td style="padding:4pt;border:1px solid #999;"><code>pip install tornettools</code>; CollecTor'dan tarihsel consensus + descriptor indirme; <code>tornettools generate --network-scale 0.001</code> &rarr; ~30 relay topoloji. Alternatif: Shadow repo <code>examples/tor/minimal/</code> şablonu (5 relay)</td>
+<td style="padding:4pt;border:1px solid #999;">—</td>
+<td style="padding:4pt;border:1px solid #999;">1 gün</td></tr>
+
+<tr><td style="padding:4pt;border:1px solid #999;">5</td>
+<td style="padding:4pt;border:1px solid #999;"><b>İlk simülasyon</b></td>
+<td style="padding:4pt;border:1px solid #999;"><code>shadow shadow.config.yaml</code>; 30 dk simülasyon ~30 dk gerçek zaman; çıktı dizini <code>shadow.data/hosts/&lt;relay&gt;/tor.*.stdout</code> + opsiyonel pcap; pipeline'ın uçtan uca koştuğu doğrulanır</td>
+<td style="padding:4pt;border:1px solid #999;">—</td>
+<td style="padding:4pt;border:1px solid #999;">yarım gün</td></tr>
+
+<tr><td style="padding:4pt;border:1px solid #999;">6</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Control protocol harness (Yol A)</b></td>
+<td style="padding:4pt;border:1px solid #999;">Her tor instance'ına <code>ControlPort 9051</code> ekle; Python + <code>stem.control.Controller</code> ile <code>EventType.CIRC</code> dinleyicisi; CIRC.status (<code>LAUNCHED/EXTENDED/BUILT/FAILED/CLOSED</code>) &rarr; Σ alfabesi (<code>CREATE/EXTEND/READY/FAIL/DESTROY</code>) eşlemesi; akış HTTP POST ile pipeline'a</td>
+<td style="padding:4pt;border:1px solid #999;"><code>server/routes.ts</code> &rarr; <code>runFSMSimulation</code></td>
+<td style="padding:4pt;border:1px solid #999;">1-2 hafta</td></tr>
+
+<tr><td style="padding:4pt;border:1px solid #999;">7</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Algoritmalar gerçek trafikte</b></td>
+<td style="padding:4pt;border:1px solid #999;">B1_Random / B2_GreedySC / B3_MDT'yi Shadow olay akışına bağla; aynı metrikleri (stateCoverage, transitionCoverage, ITDR) gerçek ölçümle hesapla; N=100 paired karşılaştırma (Bölüm 4.13) gerçek veriyle tekrarlanır</td>
+<td style="padding:4pt;border:1px solid #999;"><code>experiments/baselines.mjs</code></td>
+<td style="padding:4pt;border:1px solid #999;">1 hafta</td></tr>
+
+<tr><td style="padding:4pt;border:1px solid #999;">8</td>
+<td style="padding:4pt;border:1px solid #999;"><b>L* &rarr; running tor</b></td>
+<td style="padding:4pt;border:1px solid #999;">MQ oracle fonksiyonunu değiştir: statik <code>SUT_DELTA</code> dict yerine control protocol probe + tor circuit state sorgusu; öğrenilen DFA &harr; Bölüm 4.12 statik FSM karşılaştırması = <i>gerçek</i> divergence kanıtı</td>
+<td style="padding:4pt;border:1px solid #999;"><code>experiments/g_extensions.mjs</code> &rarr; <code>MQ()</code></td>
+<td style="padding:4pt;border:1px solid #999;">2-3 hafta</td></tr>
+
+<tr><td style="padding:4pt;border:1px solid #999;">9</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Saldırı senaryoları</b></td>
+<td style="padding:4pt;border:1px solid #999;">Shadow içinde modifiye tor client (CREATE atlayan, REPLAY yapan, premature DATA gönderen); 4 saldırı sınıfı (CIRCUIT_BYPASS, REPLAY_ATTACK, HANDSHAKE_SKIP, PREMATURE_DATA) gerçek hücre trafiğinde tetiklenir; classifyInvalid'in <b>gerçek FPR/TPR</b>'si ölçülür &mdash; Bölüm 6.2-ii'nin "yapısal FPR=0" sınırını kıran tek yol</td>
+<td style="padding:4pt;border:1px solid #999;"><code>server/fsm.ts</code> &rarr; <code>classifyInvalid</code></td>
+<td style="padding:4pt;border:1px solid #999;">1 hafta</td></tr>
+
+<tr><td style="padding:4pt;border:1px solid #999;">10</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Tez/paper güncelleme</b></td>
+<td style="padding:4pt;border:1px solid #999;">Bölüm 4.13'e "real-trace" satırı; Bölüm 4.14'e "L* on running tor" sonucu; Bölüm 6.2.1-B'yi "addressed" olarak işaretle; gerçek FPR/TPR tablosu (yeni Tablo 4.X); kaynakça güncelleme</td>
+<td style="padding:4pt;border:1px solid #999;"><code>thesis/build_thesis.mjs</code>, <code>paper/build_paper.mjs</code></td>
+<td style="padding:4pt;border:1px solid #999;">3-5 gün</td></tr>
+</table>
+
+<p><b>Kritik insan onay noktaları (otonom ajan kullanımı durumunda):</b>
+(a) Adım 5 tamamlandığında, ilk Shadow log'ları üretilince "pipeline uçtan uca çalıştı"
+teyidi; (b) Adım 6'da ilk gerçek CIRC event'inin classifyInvalid çıktısı; (c) Adım 9'da
+saldırı senaryoları kodlanmadan önce, hangi FSM-ihlali türünün "anlamlı saldırı" sayılacağının
+araştırmacı onayı. Bu üç kontrol noktası, "kod derlendi/çöktü" tipi yüzeysel teyitlerin
+ötesinde <i>semantik</i> doğrulama sağlar.</p>
+
+<p><b>Bağımsız doğrulama.</b> Adım 7-9 sonunda elde edilen rakamlar (gerçek FPR/TPR,
+gerçek trafikte algoritma performansı, L*'in tor binary'sinden çıkardığı DFA), bu tezin
+simülasyon-temelli bulgularını ya teyit eder ya da düzeltir. Her iki sonuç da bilimsel
+değer taşır: teyit, modelin dış geçerliğini güçlendirir; düzeltme, Bölüm 4.12'de tespit edilen
+"spec &harr; implementation divergence"ın niceliksel boyutunu ortaya koyar.</p>
+
+<h4>6.3.3 Mevcut Çalışmanın Konumu</h4>
+<p>Bölüm 4.10-4.14 ve 6.2.1, bu çalışmanın <b>simülasyon-doğrulamalı metodoloji önerisi
++ kısmi yapısal kanıt</b> seviyesinde olduğunu açıkça konumlandırır. 6.3.2 planı tamamlandığında,
+çalışma <b>runtime-doğrulamalı güvenlik aracı</b> seviyesine taşınır. Bu iki seviye arasındaki
+fark, tezin katkısını geçersiz kılmaz; aksine, mevcut metodoloji + algoritma + istatistik
++ statik FSM + L* zincirinin <i>kullanılmaya hazır</i> olduğunu ve sonraki adımın yalnızca
+ortam + zaman meselesi olduğunu kanıtlar.</p>
 
 <div class="pagebreak"></div>
 
