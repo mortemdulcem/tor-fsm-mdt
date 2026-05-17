@@ -1,0 +1,95 @@
+{
+  "seed": 137,
+  "scenario": "benign",
+  "wallTime": "4.6",
+  "circuitCount": 73,
+  "rawEventCount": 667,
+  "injectedCount": 0,
+  "fsmResult": {
+    "validCount": 504,
+    "invalidCount": 163,
+    "circuitCount": 73
+  },
+  "metrics": {
+    "scenario": "benign",
+    "totalEvents": 667,
+    "circuitCount": 73,
+    "validTransitions": 504,
+    "structuralViolations": 163,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "tn": 504,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "fpr": 0,
+    "violationRate": 0.24437781109445278,
+    "violationBreakdown": {
+      "CIRCUIT_HIJACK": 144,
+      "REPLAY_ATTACK": 4,
+      "GHOST_CIRCUIT": 4,
+      "PREMATURE_DATA": 11
+    }
+  },
+  "sampleCircuit": [
+    {
+      "cid": "4uthority_circ1",
+      "eventCount": 6,
+      "validCount": 6,
+      "invalidCount": 0,
+      "finalState": "CIRCUIT_READY"
+    },
+    {
+      "cid": "4uthority_circ2",
+      "eventCount": 8,
+      "validCount": 6,
+      "invalidCount": 2,
+      "finalState": "CIRCUIT_READY"
+    },
+    {
+      "cid": "4uthority_circ3",
+      "eventCount": 8,
+      "validCount": 6,
+      "invalidCount": 2,
+      "finalState": "CIRCUIT_READY"
+    }
+  ],
+  "sampleViolations": [
+    {
+      "from": "CIRCUIT_READY",
+      "event": "SEND_EXTEND",
+      "type": "CIRCUIT_HIJACK",
+      "severity": "CRITICAL",
+      "injected": false
+    },
+    {
+      "from": "CIRCUIT_READY",
+      "event": "RECV_EXTENDED",
+      "type": "CIRCUIT_HIJACK",
+      "severity": "CRITICAL",
+      "injected": false
+    },
+    {
+      "from": "CIRCUIT_READY",
+      "event": "SEND_EXTEND",
+      "type": "CIRCUIT_HIJACK",
+      "severity": "CRITICAL",
+      "injected": false
+    },
+    {
+      "from": "CIRCUIT_READY",
+      "event": "RECV_EXTENDED",
+      "type": "CIRCUIT_HIJACK",
+      "severity": "CRITICAL",
+      "injected": false
+    },
+    {
+      "from": "CIRCUIT_READY",
+      "event": "SEND_EXTEND",
+      "type": "CIRCUIT_HIJACK",
+      "severity": "CRITICAL",
+      "injected": false
+    }
+  ]
+}

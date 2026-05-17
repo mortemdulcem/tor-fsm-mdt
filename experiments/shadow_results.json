@@ -1,0 +1,1043 @@
+{
+  "metadata": {
+    "shadow_version": "3.3.0",
+    "tor_version": "Tor version 0.4.6.10.",
+    "run_date": "2026-05-17T16:47:19.132Z",
+    "seeds": [
+      42,
+      137,
+      2718
+    ],
+    "scenarios": [
+      "benign",
+      "replay_attack",
+      "circuit_bypass"
+    ],
+    "simulated_time": "30 min",
+    "repetitions": 3,
+    "network_topology": {
+      "authorities": 1,
+      "relays": 6,
+      "clients": 2,
+      "note": "Shadow example topology: 1 DA, 4 non-exit relays, 2 exit relays, 1 direct client, 1 tor client"
+    },
+    "fsm_spec": {
+      "states": 10,
+      "events": 13,
+      "valid_transitions": 25
+    }
+  },
+  "runs": [
+    {
+      "seed": 42,
+      "scenario": "benign",
+      "wallTime": "4.4",
+      "circuitCount": 75,
+      "rawEventCount": 687,
+      "injectedCount": 0,
+      "fsmResult": {
+        "validCount": 508,
+        "invalidCount": 179,
+        "circuitCount": 75
+      },
+      "metrics": {
+        "scenario": "benign",
+        "totalEvents": 687,
+        "circuitCount": 75,
+        "validTransitions": 508,
+        "structuralViolations": 179,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 508,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": 0,
+        "violationRate": 0.26055312954876275,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 152,
+          "HANDSHAKE_SKIP": 6,
+          "REPLAY_ATTACK": 4,
+          "GHOST_CIRCUIT": 4,
+          "PREMATURE_DATA": 13
+        }
+      },
+      "sampleCircuit": [
+        {
+          "cid": "4uthority_circ1",
+          "eventCount": 6,
+          "validCount": 6,
+          "invalidCount": 0,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ2",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ3",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        }
+      ],
+      "sampleViolations": [
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        }
+      ]
+    },
+    {
+      "seed": 137,
+      "scenario": "benign",
+      "wallTime": "4.6",
+      "circuitCount": 73,
+      "rawEventCount": 667,
+      "injectedCount": 0,
+      "fsmResult": {
+        "validCount": 504,
+        "invalidCount": 163,
+        "circuitCount": 73
+      },
+      "metrics": {
+        "scenario": "benign",
+        "totalEvents": 667,
+        "circuitCount": 73,
+        "validTransitions": 504,
+        "structuralViolations": 163,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 504,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": 0,
+        "violationRate": 0.24437781109445278,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 144,
+          "REPLAY_ATTACK": 4,
+          "GHOST_CIRCUIT": 4,
+          "PREMATURE_DATA": 11
+        }
+      },
+      "sampleCircuit": [
+        {
+          "cid": "4uthority_circ1",
+          "eventCount": 6,
+          "validCount": 6,
+          "invalidCount": 0,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ2",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ3",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        }
+      ],
+      "sampleViolations": [
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        }
+      ]
+    },
+    {
+      "seed": 2718,
+      "scenario": "benign",
+      "wallTime": "4.5",
+      "circuitCount": 74,
+      "rawEventCount": 677,
+      "injectedCount": 0,
+      "fsmResult": {
+        "validCount": 510,
+        "invalidCount": 167,
+        "circuitCount": 74
+      },
+      "metrics": {
+        "scenario": "benign",
+        "totalEvents": 677,
+        "circuitCount": 74,
+        "validTransitions": 510,
+        "structuralViolations": 167,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 510,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": 0,
+        "violationRate": 0.2466765140324963,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 148,
+          "REPLAY_ATTACK": 4,
+          "GHOST_CIRCUIT": 4,
+          "PREMATURE_DATA": 11
+        }
+      },
+      "sampleCircuit": [
+        {
+          "cid": "4uthority_circ1",
+          "eventCount": 6,
+          "validCount": 6,
+          "invalidCount": 0,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ2",
+          "eventCount": 6,
+          "validCount": 6,
+          "invalidCount": 0,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ3",
+          "eventCount": 10,
+          "validCount": 6,
+          "invalidCount": 4,
+          "finalState": "CIRCUIT_READY"
+        }
+      ],
+      "sampleViolations": [
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        }
+      ]
+    },
+    {
+      "seed": 42,
+      "scenario": "replay_attack",
+      "wallTime": "4.5",
+      "circuitCount": 75,
+      "rawEventCount": 687,
+      "injectedCount": 102,
+      "fsmResult": {
+        "validCount": 508,
+        "invalidCount": 281,
+        "circuitCount": 75
+      },
+      "metrics": {
+        "scenario": "replay_attack",
+        "totalEvents": 789,
+        "circuitCount": 75,
+        "validTransitions": 508,
+        "totalViolations": 281,
+        "injectedAttacks": 102,
+        "detectedAttacks": 102,
+        "tp": 102,
+        "fp": 179,
+        "fn": 0,
+        "tn": 508,
+        "precision": 0.36298932384341637,
+        "recall": 1,
+        "f1": 0.5326370757180157,
+        "fpr": 0.26055312954876275,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 164,
+          "HANDSHAKE_SKIP": 96,
+          "REPLAY_ATTACK": 4,
+          "GHOST_CIRCUIT": 4,
+          "PREMATURE_DATA": 13
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 90,
+          "CIRCUIT_HIJACK": 12
+        }
+      },
+      "sampleCircuit": [
+        {
+          "cid": "4uthority_circ1",
+          "eventCount": 6,
+          "validCount": 6,
+          "invalidCount": 0,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ2",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ3",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        }
+      ],
+      "sampleViolations": [
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        }
+      ]
+    },
+    {
+      "seed": 137,
+      "scenario": "replay_attack",
+      "wallTime": "4.8",
+      "circuitCount": 73,
+      "rawEventCount": 667,
+      "injectedCount": 96,
+      "fsmResult": {
+        "validCount": 504,
+        "invalidCount": 259,
+        "circuitCount": 73
+      },
+      "metrics": {
+        "scenario": "replay_attack",
+        "totalEvents": 763,
+        "circuitCount": 73,
+        "validTransitions": 504,
+        "totalViolations": 259,
+        "injectedAttacks": 96,
+        "detectedAttacks": 96,
+        "tp": 96,
+        "fp": 163,
+        "fn": 0,
+        "tn": 504,
+        "precision": 0.37065637065637064,
+        "recall": 1,
+        "f1": 0.5408450704225353,
+        "fpr": 0.24437781109445278,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 156,
+          "HANDSHAKE_SKIP": 84,
+          "REPLAY_ATTACK": 4,
+          "GHOST_CIRCUIT": 4,
+          "PREMATURE_DATA": 11
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 84,
+          "CIRCUIT_HIJACK": 12
+        }
+      },
+      "sampleCircuit": [
+        {
+          "cid": "4uthority_circ1",
+          "eventCount": 6,
+          "validCount": 6,
+          "invalidCount": 0,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ2",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ3",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        }
+      ],
+      "sampleViolations": [
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        }
+      ]
+    },
+    {
+      "seed": 2718,
+      "scenario": "replay_attack",
+      "wallTime": "4.4",
+      "circuitCount": 74,
+      "rawEventCount": 677,
+      "injectedCount": 99,
+      "fsmResult": {
+        "validCount": 510,
+        "invalidCount": 266,
+        "circuitCount": 74
+      },
+      "metrics": {
+        "scenario": "replay_attack",
+        "totalEvents": 776,
+        "circuitCount": 74,
+        "validTransitions": 510,
+        "totalViolations": 266,
+        "injectedAttacks": 99,
+        "detectedAttacks": 99,
+        "tp": 99,
+        "fp": 167,
+        "fn": 0,
+        "tn": 510,
+        "precision": 0.37218045112781956,
+        "recall": 1,
+        "f1": 0.5424657534246575,
+        "fpr": 0.2466765140324963,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 160,
+          "HANDSHAKE_SKIP": 87,
+          "REPLAY_ATTACK": 4,
+          "GHOST_CIRCUIT": 4,
+          "PREMATURE_DATA": 11
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 87,
+          "CIRCUIT_HIJACK": 12
+        }
+      },
+      "sampleCircuit": [
+        {
+          "cid": "4uthority_circ1",
+          "eventCount": 6,
+          "validCount": 6,
+          "invalidCount": 0,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ2",
+          "eventCount": 6,
+          "validCount": 6,
+          "invalidCount": 0,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ3",
+          "eventCount": 10,
+          "validCount": 6,
+          "invalidCount": 4,
+          "finalState": "CIRCUIT_READY"
+        }
+      ],
+      "sampleViolations": [
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "RECV_EXTENDED",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        }
+      ]
+    },
+    {
+      "seed": 42,
+      "scenario": "circuit_bypass",
+      "wallTime": "4.5",
+      "circuitCount": 75,
+      "rawEventCount": 687,
+      "injectedCount": 150,
+      "fsmResult": {
+        "validCount": 508,
+        "invalidCount": 329,
+        "circuitCount": 75
+      },
+      "metrics": {
+        "scenario": "circuit_bypass",
+        "totalEvents": 837,
+        "circuitCount": 75,
+        "validTransitions": 508,
+        "totalViolations": 329,
+        "injectedAttacks": 150,
+        "detectedAttacks": 150,
+        "tp": 150,
+        "fp": 179,
+        "fn": 0,
+        "tn": 508,
+        "precision": 0.45592705167173253,
+        "recall": 1,
+        "f1": 0.6263048016701461,
+        "fpr": 0.26055312954876275,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 75,
+          "HANDSHAKE_SKIP": 81,
+          "CIRCUIT_HIJACK": 152,
+          "REPLAY_ATTACK": 4,
+          "GHOST_CIRCUIT": 4,
+          "PREMATURE_DATA": 13
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 75,
+          "HANDSHAKE_SKIP": 75
+        }
+      },
+      "sampleCircuit": [
+        {
+          "cid": "4uthority_circ1",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ2",
+          "eventCount": 10,
+          "validCount": 6,
+          "invalidCount": 4,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ3",
+          "eventCount": 10,
+          "validCount": 6,
+          "invalidCount": 4,
+          "finalState": "CIRCUIT_READY"
+        }
+      ],
+      "sampleViolations": [
+        {
+          "from": "CONNECTING",
+          "event": "SEND_RELAY_DATA",
+          "type": "CIRCUIT_BYPASS",
+          "severity": "CRITICAL",
+          "injected": true
+        },
+        {
+          "from": "CONNECTING",
+          "event": "SEND_CREATE",
+          "type": "HANDSHAKE_SKIP",
+          "severity": "HIGH",
+          "injected": true
+        },
+        {
+          "from": "CONNECTING",
+          "event": "SEND_RELAY_DATA",
+          "type": "CIRCUIT_BYPASS",
+          "severity": "CRITICAL",
+          "injected": true
+        },
+        {
+          "from": "CONNECTING",
+          "event": "SEND_CREATE",
+          "type": "HANDSHAKE_SKIP",
+          "severity": "HIGH",
+          "injected": true
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        }
+      ]
+    },
+    {
+      "seed": 137,
+      "scenario": "circuit_bypass",
+      "wallTime": "4.6",
+      "circuitCount": 73,
+      "rawEventCount": 667,
+      "injectedCount": 146,
+      "fsmResult": {
+        "validCount": 504,
+        "invalidCount": 309,
+        "circuitCount": 73
+      },
+      "metrics": {
+        "scenario": "circuit_bypass",
+        "totalEvents": 813,
+        "circuitCount": 73,
+        "validTransitions": 504,
+        "totalViolations": 309,
+        "injectedAttacks": 146,
+        "detectedAttacks": 146,
+        "tp": 146,
+        "fp": 163,
+        "fn": 0,
+        "tn": 504,
+        "precision": 0.47249190938511326,
+        "recall": 1,
+        "f1": 0.6417582417582418,
+        "fpr": 0.24437781109445278,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 73,
+          "HANDSHAKE_SKIP": 73,
+          "CIRCUIT_HIJACK": 144,
+          "REPLAY_ATTACK": 4,
+          "GHOST_CIRCUIT": 4,
+          "PREMATURE_DATA": 11
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 73,
+          "HANDSHAKE_SKIP": 73
+        }
+      },
+      "sampleCircuit": [
+        {
+          "cid": "4uthority_circ1",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ2",
+          "eventCount": 10,
+          "validCount": 6,
+          "invalidCount": 4,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ3",
+          "eventCount": 10,
+          "validCount": 6,
+          "invalidCount": 4,
+          "finalState": "CIRCUIT_READY"
+        }
+      ],
+      "sampleViolations": [
+        {
+          "from": "CONNECTING",
+          "event": "SEND_RELAY_DATA",
+          "type": "CIRCUIT_BYPASS",
+          "severity": "CRITICAL",
+          "injected": true
+        },
+        {
+          "from": "CONNECTING",
+          "event": "SEND_CREATE",
+          "type": "HANDSHAKE_SKIP",
+          "severity": "HIGH",
+          "injected": true
+        },
+        {
+          "from": "CONNECTING",
+          "event": "SEND_RELAY_DATA",
+          "type": "CIRCUIT_BYPASS",
+          "severity": "CRITICAL",
+          "injected": true
+        },
+        {
+          "from": "CONNECTING",
+          "event": "SEND_CREATE",
+          "type": "HANDSHAKE_SKIP",
+          "severity": "HIGH",
+          "injected": true
+        },
+        {
+          "from": "CIRCUIT_READY",
+          "event": "SEND_EXTEND",
+          "type": "CIRCUIT_HIJACK",
+          "severity": "CRITICAL",
+          "injected": false
+        }
+      ]
+    },
+    {
+      "seed": 2718,
+      "scenario": "circuit_bypass",
+      "wallTime": "4.5",
+      "circuitCount": 74,
+      "rawEventCount": 677,
+      "injectedCount": 148,
+      "fsmResult": {
+        "validCount": 510,
+        "invalidCount": 315,
+        "circuitCount": 74
+      },
+      "metrics": {
+        "scenario": "circuit_bypass",
+        "totalEvents": 825,
+        "circuitCount": 74,
+        "validTransitions": 510,
+        "totalViolations": 315,
+        "injectedAttacks": 148,
+        "detectedAttacks": 148,
+        "tp": 148,
+        "fp": 167,
+        "fn": 0,
+        "tn": 510,
+        "precision": 0.46984126984126984,
+        "recall": 1,
+        "f1": 0.6393088552915767,
+        "fpr": 0.2466765140324963,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 74,
+          "HANDSHAKE_SKIP": 74,
+          "CIRCUIT_HIJACK": 148,
+          "REPLAY_ATTACK": 4,
+          "GHOST_CIRCUIT": 4,
+          "PREMATURE_DATA": 11
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 74,
+          "HANDSHAKE_SKIP": 74
+        }
+      },
+      "sampleCircuit": [
+        {
+          "cid": "4uthority_circ1",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ2",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ3",
+          "eventCount": 12,
+          "validCount": 6,
+          "invalidCount": 6,
+          "finalState": "CIRCUIT_READY"
+        }
+      ],
+      "sampleViolations": [
+        {
+          "from": "CONNECTING",
+          "event": "SEND_RELAY_DATA",
+          "type": "CIRCUIT_BYPASS",
+          "severity": "CRITICAL",
+          "injected": true
+        },
+        {
+          "from": "CONNECTING",
+          "event": "SEND_CREATE",
+          "type": "HANDSHAKE_SKIP",
+          "severity": "HIGH",
+          "injected": true
+        },
+        {
+          "from": "CONNECTING",
+          "event": "SEND_RELAY_DATA",
+          "type": "CIRCUIT_BYPASS",
+          "severity": "CRITICAL",
+          "injected": true
+        },
+        {
+          "from": "CONNECTING",
+          "event": "SEND_CREATE",
+          "type": "HANDSHAKE_SKIP",
+          "severity": "HIGH",
+          "injected": true
+        },
+        {
+          "from": "CONNECTING",
+          "event": "SEND_RELAY_DATA",
+          "type": "CIRCUIT_BYPASS",
+          "severity": "CRITICAL",
+          "injected": true
+        }
+      ]
+    }
+  ],
+  "perScenario": {
+    "benign": {
+      "runsCompleted": 3,
+      "runsTotal": 3,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "fpr": {
+        "mean": 0,
+        "sd": 0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "avgCircuits": 74,
+      "avgEvents": 677,
+      "avgValid": 507.3333333333333,
+      "avgInvalid": 169.66666666666666
+    },
+    "replay_attack": {
+      "runsCompleted": 3,
+      "runsTotal": 3,
+      "precision": {
+        "mean": 0.3686087152092022,
+        "sd": 0.004021929455063755,
+        "values": [
+          0.36298932384341637,
+          0.37065637065637064,
+          0.37218045112781956
+        ]
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0,
+        "values": [
+          1,
+          1,
+          1
+        ]
+      },
+      "f1": {
+        "mean": 0.5386492998550695,
+        "sd": 0.0043024630661960325,
+        "values": [
+          0.5326370757180157,
+          0.5408450704225353,
+          0.5424657534246575
+        ]
+      },
+      "fpr": {
+        "mean": 0.2505358182252373,
+        "sd": 0.007145203678630221,
+        "values": [
+          0.26055312954876275,
+          0.24437781109445278,
+          0.2466765140324963
+        ]
+      },
+      "avgCircuits": 74,
+      "avgEvents": 677,
+      "avgValid": 507.3333333333333,
+      "avgInvalid": 268.6666666666667
+    },
+    "circuit_bypass": {
+      "runsCompleted": 3,
+      "runsTotal": 3,
+      "precision": {
+        "mean": 0.46608674363270525,
+        "sd": 0.007265029389903218,
+        "values": [
+          0.45592705167173253,
+          0.47249190938511326,
+          0.46984126984126984
+        ]
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0,
+        "values": [
+          1,
+          1,
+          1
+        ]
+      },
+      "f1": {
+        "mean": 0.6357906329066548,
+        "sd": 0.006781623168603727,
+        "values": [
+          0.6263048016701461,
+          0.6417582417582418,
+          0.6393088552915767
+        ]
+      },
+      "fpr": {
+        "mean": 0.2505358182252373,
+        "sd": 0.007145203678630221,
+        "values": [
+          0.26055312954876275,
+          0.24437781109445278,
+          0.2466765140324963
+        ]
+      },
+      "avgCircuits": 74,
+      "avgEvents": 677,
+      "avgValid": 507.3333333333333,
+      "avgInvalid": 317.6666666666667
+    }
+  },
+  "summary": {
+    "totalSimulations": 9,
+    "successfulSimulations": 9,
+    "totalEventsProcessed": 6093,
+    "totalCircuitsAnalyzed": 666
+  }
+}

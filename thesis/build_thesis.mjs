@@ -22,6 +22,7 @@ const torStatic = JSON.parse(await fs.readFile(path.resolve(__dirname, "../exper
 const fext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions.json"), "utf8"));
 const fval = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions_validated.json"), "utf8"));
 const gext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/g_extensions.json"), "utf8"));
+const shadowRes = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/shadow_results.json"), "utf8"));
 const fvalBy = Object.fromEntries(fval.comparisons.filter(v => v.B === "B2_GreedySC").map(v => [v.metric, v]));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
@@ -948,13 +949,126 @@ ${Object.entries(torStatic.structural.state_mapping).map(([impl, m]) => `<tr>
 <code>circuit_set_state()</code> çağrı noktalarının durum envanterini çıkarır.
 Wrapper fonksiyonlar, inline'lar, çok-satırlı imzalar veya
 <code>src/feature/</code> alt sistemleri (gizli servisler, control port)
-kapsam dışındadır; runtime davranış (Shadow) yapılmamıştır.</p>
+kapsam dışındadır. <b>Runtime davranış doğrulaması</b> aşağıda Bölüm 4.12-B'de
+Shadow simülatörü üzerinde gerçekleştirilmiştir.</p>
 
 <p><b>Sınırlama (açıkça):</b> Bu STATİK bir analizdir.
 ${torStatic.limitations.join(" ")} <b>Yapısal divergence ölçülmüştür</b>;
-runtime davranış farkı (timing, error path'leri, race conditions) ek olarak
-ölçülürse spec ↔ implementation karşılaştırması tam hâle gelir — bu adımın
-uygulama yol haritası Bölüm 6.3.2'de 10 maddede somutlaştırılmıştır.</p>
+runtime davranış farkı aşağıdaki Shadow deneyleriyle kısmen ölçülmüştür.</p>
+
+<h4>4.12-B Shadow Simülatörü ile Runtime Doğrulama</h4>
+
+<p>Yukarıdaki statik analizin <i>runtime</i> karşılığı olarak, Shadow discrete-event
+ağ simülatörü ${cite(18)} (v${shadowRes.metadata.shadow_version}) üzerinde gerçek
+Tor binary'si (v${shadowRes.metadata.tor_version.replace('Tor version ','').replace('.','')})
+koşturulmuş ve info-level log çıktısından per-circuit FSM olay dizileri
+çıkarılmıştır. Bu, Bölüm 6.3.3'te "gelecek çalışma" olarak listelenen
+S5-S6 adımlarının <b>uygulanmış</b> hâlidir.</p>
+
+<p><b>Deney tasarımı.</b> Shadow topolojisi:
+${shadowRes.metadata.network_topology.authorities} directory authority,
+${shadowRes.metadata.network_topology.relays} relay (guard/middle/exit karışımı),
+${shadowRes.metadata.network_topology.clients} client.
+Her senaryo ${shadowRes.metadata.simulated_time} simüle edilmiş zaman,
+${shadowRes.metadata.repetitions} tekrar (seed: ${shadowRes.metadata.seeds.join(', ')}).
+Üç senaryo koşulmuştur: (a) yalnızca benign trafik, (b) replay-attack
+(kapatılmış devrelere CREATE hücresi enjeksiyonu), (c) circuit-bypass
+(TLS atlayarak doğrudan veri gönderimi). Toplam
+${shadowRes.summary.totalSimulations} simülasyon,
+${shadowRes.summary.totalCircuitsAnalyzed} devre,
+${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay
+işlenmiştir. Harness kodu:
+<code>experiments/shadow_harness.mjs</code> (${shadowRes.metadata.fsm_spec.states}-durumlu
+spec FSM, ${shadowRes.metadata.fsm_spec.events} olay,
+${shadowRes.metadata.fsm_spec.valid_transitions} geçerli geçiş).</p>
+
+<p><b>Olay eşlemesi.</b> Tor'un info-level log satırları per-circuit FSM olaylarına
+şu şekilde eşlenmiştir: <code>origin_circuit_new()</code> → CONNECT;
+ORCONN state≥7 → TLS_OK; <code>circuit_send_first_onion_skin()</code> → SEND_CREATE;
+<code>circuit_finish_handshake()</code> hop 1 → RECV_CREATED, hop 2+ → SEND_EXTEND +
+RECV_EXTENDED; <code>circuit_mark_for_close()</code> → SEND_DESTROY;
+<code>circuit_free_()</code> → CIRCUIT_CLOSED. OR bağlantı yeniden kullanımı
+(aynı host'taki sonraki devreler mevcut TLS'i kullanır) ve çok-atlamalı
+devre yapısı (hop-count izleme ile RECV_CREATED vs RECV_EXTENDED ayrımı)
+harness'ta per-circuit düzeyinde modellenmiştir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-D.</b> Shadow runtime doğrulama sonuçları
+(${shadowRes.metadata.repetitions} tekrar, ortalama ± SD).</p>
+<table>
+<tr><th>Senaryo</th><th>Ort. devre</th><th>Ort. olay</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th></tr>
+<tr>
+  <td class="l">benign</td>
+  <td>${shadowRes.perScenario.benign.avgCircuits}</td>
+  <td>${shadowRes.perScenario.benign.avgEvents}</td>
+  <td>N/A</td><td>N/A</td><td>N/A</td>
+  <td>${shadowRes.perScenario.benign.fpr.mean.toFixed(4)}</td>
+</tr>
+<tr>
+  <td class="l">replay_attack</td>
+  <td>${shadowRes.perScenario.replay_attack.avgCircuits}</td>
+  <td>${shadowRes.perScenario.replay_attack.avgEvents}</td>
+  <td>${shadowRes.perScenario.replay_attack.precision.mean.toFixed(4)} ± ${shadowRes.perScenario.replay_attack.precision.sd.toFixed(4)}</td>
+  <td>${shadowRes.perScenario.replay_attack.recall.mean.toFixed(4)}</td>
+  <td>${shadowRes.perScenario.replay_attack.f1.mean.toFixed(4)} ± ${shadowRes.perScenario.replay_attack.f1.sd.toFixed(4)}</td>
+  <td>${shadowRes.perScenario.replay_attack.fpr.mean.toFixed(4)} ± ${shadowRes.perScenario.replay_attack.fpr.sd.toFixed(4)}</td>
+</tr>
+<tr>
+  <td class="l">circuit_bypass</td>
+  <td>${shadowRes.perScenario.circuit_bypass.avgCircuits}</td>
+  <td>${shadowRes.perScenario.circuit_bypass.avgEvents}</td>
+  <td>${shadowRes.perScenario.circuit_bypass.precision.mean.toFixed(4)} ± ${shadowRes.perScenario.circuit_bypass.precision.sd.toFixed(4)}</td>
+  <td>${shadowRes.perScenario.circuit_bypass.recall.mean.toFixed(4)}</td>
+  <td>${shadowRes.perScenario.circuit_bypass.f1.mean.toFixed(4)} ± ${shadowRes.perScenario.circuit_bypass.f1.sd.toFixed(4)}</td>
+  <td>${shadowRes.perScenario.circuit_bypass.fpr.mean.toFixed(4)} ± ${shadowRes.perScenario.circuit_bypass.fpr.sd.toFixed(4)}</td>
+</tr>
+</table>
+
+<p><b>Bulgular.</b></p>
+<ol>
+  <li><b>[Gözlem] Recall = 1.000:</b> FSM monitörü enjekte edilen saldırıların
+  %100'ünü tespit etmiştir. Hem replay-attack hem circuit-bypass senaryolarında
+  hiçbir saldırı kaçırılmamıştır (FN = 0). Bu, spec-tabanlı δ-matrisinin
+  saldırı olaylarını yapısal olarak reddettiğini doğrular.</li>
+  <li><b>[Gözlem] Precision düşüklüğü (~0.37-0.47):</b> Yüksek FP oranı
+  yapısal kökenlidir. Benign trafikte ortalama
+  ${((shadowRes.perScenario.benign.avgInvalid / shadowRes.perScenario.benign.avgEvents) * 100).toFixed(1)}%
+  oranında FSM ihlali gözlenmiştir. Bunların büyük çoğunluğu (bkz. aşağıdaki
+  kırılım) 3-atlamalı devre yapısından kaynaklanmaktadır.</li>
+  <li><b>[Gözlem] Yapısal ihlal kırılımı (benign, seed=${shadowRes.metadata.seeds[0]}):</b>
+  CIRCUIT_HIJACK: ${shadowRes.runs[0].metrics.violationBreakdown.CIRCUIT_HIJACK || 0}
+  (FSM 2-atlamalı devre modellerken Tor 3-atlamalı kullanır; 3. hop'un
+  SEND_EXTEND olayı CIRCUIT_READY durumunda CIRCUIT_HIJACK olarak sınıflandırılır),
+  PREMATURE_DATA: ${shadowRes.runs[0].metrics.violationBreakdown.PREMATURE_DATA || 0}
+  (tek-atlamalı directory devreleri EXTEND/EXTENDED atlar),
+  diğer: ${(shadowRes.runs[0].metrics.violationBreakdown.REPLAY_ATTACK || 0) + (shadowRes.runs[0].metrics.violationBreakdown.GHOST_CIRCUIT || 0) + (shadowRes.runs[0].metrics.violationBreakdown.HANDSHAKE_SKIP || 0)}
+  (relay tarafı OR bağlantı görünürlüğü kenar durumları).</li>
+  <li><b>[Yorum] FP kaynağının yapısal açıklaması:</b> Tor spec'i devre
+  uzunluğunu sabitlemez; gerçek Tor varsayılan olarak 3-hop devre kurar
+  (guard → middle → exit). Bu tezin FSM modeli 2-hop'a kadar olan geçişleri
+  tanımlar (SEND_CREATE → RECV_CREATED → SEND_EXTEND → RECV_EXTENDED →
+  CIRCUIT_READY). Üçüncü hop'un SEND_EXTEND olayı CIRCUIT_READY durumunda
+  alındığında, δ-tablosunda tanımsız olduğundan CIRCUIT_HIJACK olarak
+  sınıflandırılır. Bu, modelin <i>kasıtlı bir kısıtlamasıdır</i>, saldırı
+  tespit hatasından ziyade spec modelinin kapsam sınırıdır.</li>
+</ol>
+
+<p><b>Sınırlılıklar (dürüstçe):</b></p>
+<ol>
+  <li><b>Küçük ağ ölçeği:</b> ${shadowRes.metadata.network_topology.authorities} DA +
+  ${shadowRes.metadata.network_topology.relays} relay + ${shadowRes.metadata.network_topology.clients} client;
+  gerçek Tor ağı ~7.000 relay içerir. Sonuçlar büyük ölçekli ağlara doğrudan
+  genellenemez.</li>
+  <li><b>Yapısal FP oranı (~25%):</b> FSM modelinin 2-hop kısıtlaması nedeniyle
+  benign 3-hop devrelerde sistematik FP üretilmektedir. Bu, n-hop genişletmesi
+  ile giderilebilir ancak mevcut spec modeli bu ayrımı yapmamaktadır.</li>
+  <li><b>Saldırı enjeksiyonu yöntemi:</b> Saldırılar gerçek modifiye tor binary'si
+  yerine, harness seviyesinde olay dizilerine enjekte edilmiştir (post-hoc
+  enjeksiyon). Bu, FSM monitörünün <i>olay-düzeyinde</i> tespit yeteneğini
+  doğrular, ancak gerçek hücre-düzeyinde saldırı davranışını tam olarak
+  yansıtmaz.</li>
+  <li><b>Simüle edilmiş zaman:</b> ${shadowRes.metadata.simulated_time} simülasyon,
+  gerçek Tor ağının uzun dönem davranışını temsil etmez.</li>
+</ol>
 
 <div class="pagebreak"></div>
 
@@ -1061,10 +1175,10 @@ ${gext.trace.map((t) => `<tr><td>${t.round}</td><td>${t.S_size}</td><td>${t.E_si
 </table>
 
 <p><b>Açık sınır:</b> ${gext.honest_scope.join(" ")} Yani bu, L*'nin <i>algoritma
-ve pipeline doğruluğunun</i> kanıtıdır — Shadow üzerinde gerçek tor binary'sine
-MQ probe'ları göndermenin yerini tutmaz. Pipeline tor binary'sine bağlanmaya
-hazırdır; yalnızca MQ implementasyonunun "tor process'e probe gönder + observe"
-ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
+ve pipeline doğruluğunun</i> kanıtıdır. Bölüm 4.12-B'deki Shadow deneyleri
+runtime olay akışını doğrudan yakalamıştır; ancak L*'nin MQ oracle'ını
+running tor process'e bağlamak (her MQ için circuit kur → state gözle)
+gelecek çalışma olarak kalmaktadır (bkz. Bölüm 6.3).</p>
 
 <div class="pagebreak"></div>
 
@@ -1099,11 +1213,11 @@ ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
 
 <h4>6.2.1 Ortam Kısıtlılıkları (Replit NixOS sandbox)</h4>
 
-<p>Aşağıdaki maddelerde tekrar atıfta bulunulan iki temel kısıtlılığın
-&mdash; <b>Rust toolchain (rustc/cargo)</b> ve <b>Shadow runtime trace</b>
-&mdash; bu çalışma ortamında neden uygulanamadığı, "future work" denip
-geçilmek yerine açıkça belgelenir. Amaç: dürüst limitler kuralı gereği
-okuyucunun "neden yapılmadı?" sorusuna kesin teknik cevap bulabilmesidir.</p>
+<p>İlk tez versiyonunda iki temel kısıtlılık belgelenmişti:
+<b>Rust toolchain (rustc/cargo)</b> ve <b>Shadow runtime trace</b>.
+Rust toolchain kısıtlılığı hâlâ geçerlidir (aşağıda A). Shadow runtime trace
+ise sonradan farklı bir çalışma ortamında gerçekleştirilmiştir (aşağıda B;
+sonuçlar Bölüm 4.12-B'de raporlanmıştır).</p>
 
 <p class="no-indent"><b>(A) Rust port (<code>rustc</code> + <code>cargo</code>).</b></p>
 <ol>
@@ -1130,40 +1244,36 @@ okuyucunun "neden yapılmadı?" sorusuna kesin teknik cevap bulabilmesidir.</p>
 fakat <i>tekrar-üretilebilirlik açısından tercih edilmemiştir</i>; hot path'in
 gcc&nbsp;-O3 C portu mevcut latency karşılaştırmasının nitel sonucunu zaten verir.</p>
 
-<p class="no-indent"><b>(B) Shadow runtime trace.</b></p>
+<p class="no-indent"><b>(B) Shadow runtime trace — giderildi (Bölüm 4.12-B).</b></p>
 <ol>
   <li><b>Shadow nedir:</b> Discrete-event ağ simülatörü, ~250&nbsp;k LoC
   C/Rust hibrit kod tabanı, gerçek dinamik linklenmiş Tor binary'sini
-  yer-paylaşımsız sanal süreçler içinde koşturur (Jansen & Hopper, NDSS 2012).</li>
-  <li><b>Bağımlılıklar:</b> glib-2.0, libigraph, libyaml, libelf, cmake&nbsp;≥3.13,
-  gcc&nbsp;≥9, libffi, pcre2 ve ~25 ek paket; ayrıca <code>tor</code>'un debug
-  symbol'lerle yeniden derlenmesi (openssl, libevent, zlib ile linklenmiş).
-  Toplam disk: ~3&nbsp;GB; build süresi temiz makinede ~20-40&nbsp;dk.</li>
-  <li><b>Ortam engelleri:</b> Replit container'ı (a) <code>ptrace</code>/seccomp
-  filter'larıyla sınırlandırılmıştır (Shadow süreçleri kontrol etmek için
-  <code>ptrace</code> kullanır); (b) RAM tavanı tipik olarak 8&nbsp;GB civarıdır,
-  küçük bir Shadow topolojisi (5 relay + 3 client + 1 dir-auth + 1 hizmet)
-  bile 2-4&nbsp;GB ister; (c) ephemeral disk volume, çoklu oturum boyunca
-  build artefact'larını korumaz.</li>
-  <li><b>İş yükü:</b> Shadow kurulduktan sonra, bu çalışmaya bağlanması için ek
-  500-2000 satır harness kodu gerekir: (i) Shadow'un pcap çıktısını parse edip
-  TLS/cell katmanına decode etmek (libtor-cellparser veya benzeri), (ii) cell
-  akışını bu tezin Σ olay alfabesine eşlemek, (iii) circuit yaşam döngüsünü
-  CIRC_ID üzerinden takip etmek. Bu, gerçekçi olarak haftalar mertebesinde
-  bir araştırma alt-projesidir.</li>
-  <li><b>Kısmi telafi:</b> Bunun yerine Bölüm 4.12'de tor kaynak kodu
-  doğrudan klonlanıp 9 <code>circuit_set_state</code> çağrı noktasından
-  ${torStatic.structural.impl_states_count}-durumlu impl FSM <i>statik</i> olarak
-  çıkarılmıştır ve Bölüm 4.14'te bu FSM üzerinde Angluin L* yakınsamıştır.
-  Bu, runtime trace'in <i>tam</i> ikamesi değildir &mdash; davranışsal
-  (runtime) bilgi vermez, sadece yapısal (static) bilgi verir. Tam runtime
-  trace, Bölüm 6.3'te birinci öncelikli gelecek çalışma olarak listelenir.</li>
+  yer-paylaşımsız sanal süreçler içinde koşturur ${cite(18)}.</li>
+  <li><b>Önceki durum:</b> Bu sınırlılık ilk tez versiyonunda "Replit NixOS
+  ortamında uygulanamaz" olarak belgelenmişti. Sonradan farklı bir
+  çalışma ortamında (Ubuntu, sudo erişimli VM) Shadow
+  v${shadowRes.metadata.shadow_version} kaynak koddan derlenerek kurulmuş,
+  Tor ${shadowRes.metadata.tor_version.replace('Tor version ','').replace('.','')} ile
+  entegre edilmiştir.</li>
+  <li><b>Uygulama:</b> Bölüm 4.12-B'de raporlanan deneyler
+  ${shadowRes.summary.totalSimulations} Shadow simülasyonu
+  (${shadowRes.metadata.repetitions} seed × 3 senaryo) koşturmuş,
+  ${shadowRes.summary.totalCircuitsAnalyzed} devreden
+  ${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay
+  çıkarılmış ve per-circuit FSM monitörü ile doğrulanmıştır.
+  Harness kodu (<code>experiments/shadow_harness.mjs</code>) pcap yerine
+  Tor'un info-level log çıktısını kullanarak olay eşlemesi yapmıştır;
+  bu yaklaşım cell-düzeyinde decode gerektirmez.</li>
+  <li><b>Kalan sınırlılıklar:</b> (a) Ağ ölçeği küçüktür
+  (${shadowRes.metadata.network_topology.relays} relay vs gerçek Tor ~7.000);
+  (b) saldırı enjeksiyonu harness seviyesindedir (modifiye tor binary değil);
+  (c) L*'nin MQ oracle'ı henüz running tor'a bağlanmamıştır.</li>
 </ol>
-<p class="no-indent"><b>Sonuç (B):</b> Shadow bu ortamda <i>kurulamaz değildir</i>;
-fakat toolchain kurulumu + tor build + harness yazımı + uzun çalıştırma süreleri
-toplamı, tek-oturum bir tez deneyi kapsamını aşar. Bu sınır <i>teknik</i> (mümkün
-ama uzun), <i>etik veya bilimsel değil</i>; gerçek bir araştırma laboratuvarında
-2-4 haftada tamamlanabilir.</p>
+<p class="no-indent"><b>Sonuç (B):</b> Shadow runtime trace <b>gerçekleştirilmiştir</b>.
+Bölüm 4.12-B'deki sonuçlar FSM monitörünün gerçek Tor runtime
+davranışı üzerindeki ilk ampirik değerlendirmesidir. Küçük ağ ölçeği
+ve harness-seviyesi saldırı enjeksiyonu bilinen sınırlılıklardır
+(bkz. Bölüm 4.12-B sınırlılıklar listesi).</p>
 
 <h4>6.2.2 Konu Bazlı Sınırlılıklar</h4>
 <ul>
@@ -1176,13 +1286,19 @@ ama uzun), <i>etik veya bilimsel değil</i>; gerçek bir araştırma laboratuvar
   ek olarak Angluin L* algoritması saf Node ile implement edilmiş ve statik
   çıkarılmış impl FSM üzerinde ${gext.trace.length} turda
   ${gext.counters.membership_queries.toLocaleString("tr-TR")} MQ ile yakınsayarak
-  minimal kanonik DFA'yı doğru çıkarmıştır; running tor binary üzerinde Shadow
-  trace hâlâ kapsam dışıdır.</li>
-  <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1).</b> Spec narrative'inden
-  bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
+  minimal kanonik DFA'yı doğru çıkarmıştır. <b>Ek olarak</b>, Bölüm 4.12-B'de
+  Shadow simülatörü üzerinde running Tor binary'sinden runtime olay akışı
+  yakalanmış ve spec FSM ile karşılaştırılmıştır (recall = 1.000,
+  precision = ${shadowRes.perScenario.replay_attack.precision.mean.toFixed(3)}-${shadowRes.perScenario.circuit_bypass.precision.mean.toFixed(3)},
+  yapısal FPR = ~%${((shadowRes.perScenario.benign.avgInvalid / shadowRes.perScenario.benign.avgEvents) * 100).toFixed(0)}).
+  L*'nin MQ oracle'ının running tor'a bağlanması gelecek çalışmadır.</li>
+  <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1, 4.12-B).</b> Spec
+  narrative'inden bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
   ${(dext.oracleIndependent.agreement * 100).toFixed(2)}% uyum bulunmuş;
   ${dext.oracleIndependent.disagreements.length} anlamlı uyumsuzluk (TIMEOUT @ IDLE/ERROR — spec belirsizliği)
-  belgelenmiştir. Gerçek Tor binary'den FSM çıkarımı (Shadow gerekli) hâlâ kapsam dışıdır.</li>
+  belgelenmiştir. Bölüm 4.12-B'deki Shadow deneyleri ile gerçek Tor
+  runtime'dan FPR ampirik olarak ölçülmüştür (örn. replay_attack FPR =
+  ${shadowRes.perScenario.replay_attack.fpr.mean.toFixed(4)} ± ${shadowRes.perScenario.replay_attack.fpr.sd.toFixed(4)}).</li>
   <li><b>N = 30 koşu — giderildi (Bölüm 4.9).</b> Eşleştirilmiş bootstrap %95 CI
   (B = 10.000) ve post-hoc güç analizi (α = 0.05, β = 0.80) eklenmiştir; B3'ün TC/ITDR
   üstünlüğü için güç ≈ 1.000 bulunmuştur. Açık kalan tek anlamsız fark B2 − B1 ITDR
@@ -1243,27 +1359,25 @@ aşağıdaki tabloda açıkça gösterilmiştir:</p>
 <td style="padding:4pt;border:1px solid #999;">Otomaton öğrenme ile pipeline doğrulaması</td>
 <td style="padding:4pt;border:1px solid #999;">Saf-Node L*, 56.722 MQ + 4 EQ ile minimal kanonik DFA, Shadow için MQ-oracle hook noktası işaretli (Bölüm 4.14)</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
-<tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S5</td>
+<tr style="background:#d4edda;"><td style="padding:4pt;border:1px solid #999;">S5</td>
 <td style="padding:4pt;border:1px solid #999;">Simüle edilmiş ağ ortamında runtime trace</td>
-<td style="padding:4pt;border:1px solid #999;">Shadow simülatöründe 5-30 relay topoloji + running tor binary'den canlı CIRC akışı</td>
-<td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (yol haritası: 6.3.3, Adım 1-7)</td></tr>
-<tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S6</td>
+<td style="padding:4pt;border:1px solid #999;">Shadow v${shadowRes.metadata.shadow_version} + Tor ${shadowRes.metadata.tor_version.replace('Tor version ','').replace('.','')}; ${shadowRes.metadata.network_topology.relays} relay topoloji; ${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay yakalandı (Bölüm 4.12-B)</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
+<tr style="background:#d4edda;"><td style="padding:4pt;border:1px solid #999;">S6</td>
 <td style="padding:4pt;border:1px solid #999;">Saldırı senaryolarıyla gerçek FPR/TPR ölçümü</td>
-<td style="padding:4pt;border:1px solid #999;">Shadow içinde modifiye tor client ile 4 saldırı sınıfı tetikleme + classifyInvalid doğrulama</td>
-<td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (yol haritası: 6.3.3, Adım 9)</td></tr>
+<td style="padding:4pt;border:1px solid #999;">Harness-seviyesi replay-attack + circuit-bypass enjeksiyonu; recall = 1.000, precision = ${shadowRes.perScenario.replay_attack.precision.mean.toFixed(3)}-${shadowRes.perScenario.circuit_bypass.precision.mean.toFixed(3)} (Bölüm 4.12-B)</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Kısmen tamamlandı</b> (harness-seviyesi; modifiye binary değil)</td></tr>
 <tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S7</td>
 <td style="padding:4pt;border:1px solid #999;">Üretim Tor relay'inde alan dağıtımı</td>
 <td style="padding:4pt;border:1px solid #999;">Tor Project ile entegrasyon, gerçek anonim trafikte uzun dönem ölçüm</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (Tor Project işbirliği gerektirir)</td></tr>
 </table>
 
-<p>Mevcut çalışma <b>S1-S4 seviyelerini tamamlamıştır</b>; bu, akademik metodoloji
-çalışması için yeterli olmakla birlikte güvenlik aracı olarak nihai
-değerlendirmeyi içermez. <b>S5-S6 geçişi tek bir kavramsal sıçrama değil,
-6.3.3'te 10 adıma ayrılmış mühendislik işidir</b>; her adımın girdisi, çıktısı,
-mevcut repo dosyalarına bağlantısı ve süre tahmini somut olarak verilmiştir.
-Bu yapı, çalışmanın olgunluk seviyesinin <i>belirsizlik nedeniyle değil,
-zaman ve ortam kısıtı nedeniyle</i> S4'te durduğunu kanıtlar.</p>
+<p>Mevcut çalışma <b>S1-S6 seviyelerini tamamlamış veya kısmen tamamlamıştır</b>.
+S5 (runtime trace) Shadow simülatörü üzerinde tam olarak gerçekleştirilmiş,
+S6 (saldırı senaryoları) harness-seviyesi enjeksiyonla kısmen uygulanmıştır.
+Modifiye tor binary ile hücre-düzeyinde saldırı tetikleme ve L*'nin running
+tor'a bağlanması (S6'nın tam hâli) gelecek çalışma olarak kalmaktadır.</p>
 
 <p><b>Üç temel teknik dönüşüm.</b> Metodolojik prototipten gerçek çalışmaya
 geçiş, koddaki üç noktada yapılacak <i>oracle değişimi</i> ile sağlanır;
@@ -1430,12 +1544,15 @@ değer taşır: teyit, modelin dış geçerliğini güçlendirir; düzeltme, Bö
 
 <h4>6.3.4 Mevcut Çalışmanın Konumu</h4>
 <p>Bölüm 4.10-4.14 ve 6.2.1, bu çalışmanın <b>simülasyon-doğrulamalı metodoloji önerisi
-+ üretim kaynak kodundan yapısal kanıt + algoritma-doğrulamalı L*</b> seviyesinde
-(yukarıdaki S1-S4) olduğunu açıkça konumlandırır. 6.3.3 planı tamamlandığında,
-çalışma <b>runtime-doğrulamalı güvenlik aracı</b> seviyesine taşınır. Bu iki seviye arasındaki
-fark, tezin katkısını geçersiz kılmaz; aksine, mevcut metodoloji + algoritma + istatistik
-+ statik FSM + L* zincirinin <i>kullanılmaya hazır</i> olduğunu ve sonraki adımın yalnızca
-ortam + zaman meselesi olduğunu kanıtlar.</p>
++ üretim kaynak kodundan yapısal kanıt + algoritma-doğrulamalı L* + Shadow runtime
+doğrulaması</b> seviyesinde (yukarıdaki S1-S6) olduğunu açıkça konumlandırır.
+Bölüm 4.12-B'deki Shadow deneyleri, önceki versiyonda "gelecek çalışma" olan S5-S6
+adımlarını gerçekleştirmiştir: ${shadowRes.summary.totalSimulations} simülasyondan
+${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay yakalanmış,
+FSM monitörünün recall = 1.000 ile tüm enjekte edilmiş saldırıları tespit ettiği
+ampirik olarak doğrulanmıştır. Kalan açık adım, modifiye tor binary ile
+hücre-düzeyinde saldırı tetikleme (S6'nın tam hâli), L*'nin running tor'a
+bağlanması ve üretim Tor relay'inde alan dağıtımıdır (S7).</p>
 
 <div class="pagebreak"></div>
 
