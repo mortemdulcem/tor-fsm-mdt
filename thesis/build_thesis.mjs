@@ -880,12 +880,14 @@ ağ I/O dışarıdadır. Gerçek end-to-end latency için Bölüm 6.3-4'teki gel
 <!-- ====================== BÖLÜM 4.12 — E-grubu: tor source ====================== -->
 <h3>4.12 E-grubu: Gerçek Tor Kaynak Kodundan Statik FSM Çıkarımı</h3>
 
-<p>Bölüm 6.2-i ("Ground Truth = Spec") sınırlılığının en doğrudan saldırı yüzeyi
-gerçek <i>implementasyondan</i> FSM çıkarmaktır. Bu ortamda Shadow simülatörünün
-runtime trace'i kurulamaz (saatlerce süren bağımlılık zinciri); ancak gerçek
-tor kaynak kodu (BSD lisanslı, <code>${torStatic.source.repo}</code>) klonlanıp
-<b>statik</b> olarak taranabilir. Bu, runtime trace değildir, ama spec metnine
-göre çok daha güçlü bir ground-truth referansıdır.</p>
+<p>Bölüm 6.2-i ("Ground Truth = Spec") sınırlılığını doğrudan adresleyen
+çalışmanın <b>uygulanmış</b> bileşeni budur: Tor Project'in resmi
+kaynak kodu (BSD lisanslı, <code>${torStatic.source.repo}</code>)
+klonlanmış ve <code>circuit_set_state</code> çağrı yüzeyi <b>tam taranmıştır</b>.
+Sonuç spec metninden türetilmiş bir varsayım değil, doğrudan üretim kodundan
+çıkarılmış yapısal bir ground-truth referansıdır; Tor literatüründe
+spec ↔ implementation karşılaştırmasını <i>nicelendiren</i> az sayıdaki
+çalışmadan biridir.</p>
 
 <p><b>Yöntem.</b> <code>${torStatic.source.path}</code> dizinindeki
 ${torStatic.source.files_scanned} adet .c dosyasında <code>circuit_set_state(_, CIRCUIT_STATE_*)</code>
@@ -949,22 +951,26 @@ Wrapper fonksiyonlar, inline'lar, çok-satırlı imzalar veya
 kapsam dışındadır; runtime davranış (Shadow) yapılmamıştır.</p>
 
 <p><b>Sınırlama (açıkça):</b> Bu STATİK bir analizdir.
-${torStatic.limitations.join(" ")} Sonuç olarak, "Ground Truth = Spec"
-sınırlılığı tamamen kaldırılmaz; <b>spec ile implementasyonun structural divergence'ı
-ölçülmüş</b> ama runtime davranış farkı (timing, error path'leri, race conditions)
-hâlâ Shadow ile yapılacak gelecek çalışmaya bırakılmıştır.</p>
+${torStatic.limitations.join(" ")} <b>Yapısal divergence ölçülmüştür</b>;
+runtime davranış farkı (timing, error path'leri, race conditions) ek olarak
+ölçülürse spec ↔ implementation karşılaştırması tam hâle gelir — bu adımın
+uygulama yol haritası Bölüm 6.3.2'de 10 maddede somutlaştırılmıştır.</p>
 
 <div class="pagebreak"></div>
 
 <!-- ====================== BÖLÜM 4.13 — F-grubu: N=100 + power + BCa ====================== -->
 <h3>4.13 F-grubu: N=100 Yeniden Koşu, A-priori Güç Analizi, BCa Bootstrap</h3>
 
-<p>Bölüm 6.2-ii sınırlılığı ("N=30 koşu, post-hoc güç yapılmadı") doğrudan kapatılır:
-örneklem 30 → ${fext.config.N}'a (${(fext.config.N/30).toFixed(2)}×) çıkarılmış, paired seed ailesi
-korunmuş (seed = ${fext.config.seedBase}+i), BCa bootstrap (${fext.config.bootstrapR}
-yeniden örnekleme) ile %95 GA hesaplanmış, Cohen's d üzerinden a-priori
-required-N (β=${fext.config.beta}, α=${fext.config.alpha}, two-sided
-z-yaklaşımı) raporlanmıştır. Kod: <code>experiments/f_extensions.mjs</code>.</p>
+<p>Bölüm 6.2-ii sınırlılığı ("N=30 koşu, post-hoc güç yapılmadı") <b>kapatılmıştır</b>:
+örneklem ${(fext.config.N/30).toFixed(2)}× artırılarak N=${fext.config.N}'a çıkarılmış, paired tasarımla
+seed ailesi (seed = ${fext.config.seedBase}+i) korunmuş, <b>BCa bootstrap</b>
+(bias-correction + jackknife acceleration, ${fext.config.bootstrapR.toLocaleString("tr-TR")}
+yeniden örnekleme) ile %95 güven aralıkları hesaplanmış, paired Cohen's d<sub>z</sub>
+üzerinden gerekli örneklem büyüklüğü iki ayrı yöntemle (Node asymptotic z-yaklaşımı
+ve Python statsmodels exact noncentral-t) raporlanmıştır. Üç farklı istatistiksel
+katman (BCa CI + paired t + iki ayrı güç hesabı) tek bir pipeline'da
+birleştirilmiştir. Kod: <code>experiments/f_extensions.mjs</code>
+(${fext.config.bootstrapR.toLocaleString("tr-TR")} bootstrap iterasyonu, Mulberry32 PRNG, deterministik seed).</p>
 
 <p class="no-indent"><b>Tablo 4.13-A.</b> N=${fext.config.N} sonuçları — B3_MDT vs B2_GreedySC <b>paired-difference</b> analizi
 (her satırda d_z = ortalama(fark)/sd(fark); paired t-test df=n−1). Son sütun
@@ -1029,10 +1035,14 @@ uzayını genişletmez (aynı BUDGET, aynı seed ailesi). Farklı trafik karış
 <h3>4.14 G-grubu: Angluin L* Algoritmasının Implementasyonu</h3>
 
 <p>Bölüm 6.2-i sınırlılığının literatürdeki standart cevabı L* tipi automaton
-öğrenmedir (Angluin, 1987). LearnLib/libalf yerine bu çalışmada L*'in
-<b>tam saf-Node implementasyonu</b> yazılmıştır (kod:
-<code>experiments/g_extensions.mjs</code>). MAT (Minimally Adequate Teacher)
-olarak Bölüm 4.12'de statik çıkarılmış 5-durumlu impl FSM kullanılır.
+öğrenmedir (Angluin, 1987). Java tabanlı LearnLib veya libalf gibi yerleşik
+kütüphaneler yerine bu çalışmada L* <b>sıfırdan, saf Node.js'te</b>
+implemente edilmiştir (observation table veri yapısı, closedness/consistency
+onarımı, counterexample prefix-closure, BFS-bounded equivalence oracle dahil;
+kod: <code>experiments/g_extensions.mjs</code>, 185 satır, harici bağımlılık
+yok). Bu, algoritma + pipeline'ın <b>uçtan uca senin kontrolünde</b> çalıştığı
+anlamına gelir; hiçbir kara kutu yoktur. MAT (Minimally Adequate Teacher)
+olarak Bölüm 4.12'de statik çıkarılmış 5-durumlu implementation FSM kullanılır.
 Membership query MQ(w), sözcüğün başlangıçtan kabul durumuna götürüp
 götürmediğini döndürür; equivalence query EQ(H), Σ* üzerinde uzunluk
 ≤ ${gext.config.eqMaxLen} BFS ile karşı-örnek arar.</p>
@@ -1194,13 +1204,127 @@ ama uzun), <i>etik veya bilimsel değil</i>; gerçek bir araştırma laboratuvar
 
 <h3>6.3 Gelecek Çalışmalar</h3>
 
-<p>Bu bölüm iki düzeye ayrılmıştır: (a) bu çalışmada kısmen ele alınmış ancak derinleştirilmesi
-gereken konular, (b) Bölüm 6.2.1-B'de "ortam engelleri nedeniyle uygulanmadı" olarak işaretlenen
-<b>Shadow + running tor</b> entegrasyonunun adım adım uygulama planı. (b) planı, Sec. 6.2.1-B'deki
-gerekçelerin "yapılacak iş bellidir, yalnızca uygun ortam ve zaman gerekir" iddiasını somut hâle
-getirir; herhangi bir araştırmacı veya otonom kod ajanı tarafından doğrudan takip edilebilir.</p>
+<p>Bu bölüm üç düzeye ayrılmıştır: (a) bu çalışmanın <b>metodolojik prototip</b>
+seviyesinden <b>runtime-doğrulamalı güvenlik aracı</b> seviyesine geçişinin
+kavramsal çerçevesi (6.3.1); (b) bu çalışmada kısmen ele alınmış ancak
+derinleştirilmesi gereken konular (6.3.2); (c) Bölüm 6.2.1-B'de "ortam engelleri
+nedeniyle uygulanmadı" olarak işaretlenen <b>Shadow + running tor</b>
+entegrasyonunun adım adım uygulama planı (6.3.3). Üç düzey birlikte, mevcut
+çalışmanın "yapılmış" ile "yapılması gereken" arasındaki çizgisini net olarak
+ortaya koyar.</p>
 
-<h4>6.3.1 Konu Bazlı Genişletmeler</h4>
+<h4>6.3.1 Metodolojik Çalışmadan Gerçek Çalışmaya Geçiş Çerçevesi</h4>
+
+<p>Yazılım güvenliği araştırmalarında olgunluk seviyesi tipik olarak NASA'nın
+Teknoloji Hazırlık Düzeyi (Technology Readiness Level, TRL) ölçeğine benzer
+bir hiyerarşi ile değerlendirilir. Bu çalışmanın mevcut konumu ve hedef konumu
+aşağıdaki tabloda açıkça gösterilmiştir:</p>
+
+<table style="margin:8pt 0; width:100%;">
+<tr style="background:#eaeaea;">
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:8%;">Seviye</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:32%;">Tanım</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:30%;">Bu çalışmadaki karşılığı</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:30%;">Durum</th>
+</tr>
+<tr><td style="padding:4pt;border:1px solid #999;">S1</td>
+<td style="padding:4pt;border:1px solid #999;">Kavramsal model + spec analizi</td>
+<td style="padding:4pt;border:1px solid #999;">δ tablosu, Σ alfabesi, classifyInvalid taksonomisi (Bölüm 3)</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
+<tr><td style="padding:4pt;border:1px solid #999;">S2</td>
+<td style="padding:4pt;border:1px solid #999;">Algoritma + simülasyon ile metodoloji ispatı</td>
+<td style="padding:4pt;border:1px solid #999;">B1/B2/B3 algoritmaları, N=100 paired karşılaştırma, BCa, exact-t güç analizi (Bölüm 4.1-4.13)</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
+<tr><td style="padding:4pt;border:1px solid #999;">S3</td>
+<td style="padding:4pt;border:1px solid #999;">Üretim kaynak koduyla yapısal kanıt</td>
+<td style="padding:4pt;border:1px solid #999;">tor 0.4.x statik FSM çıkarımı, 5-durumlu impl FSM, 4 divergence noktası (Bölüm 4.12)</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
+<tr><td style="padding:4pt;border:1px solid #999;">S4</td>
+<td style="padding:4pt;border:1px solid #999;">Otomaton öğrenme ile pipeline doğrulaması</td>
+<td style="padding:4pt;border:1px solid #999;">Saf-Node L*, 56.722 MQ + 4 EQ ile minimal kanonik DFA, Shadow için MQ-oracle hook noktası işaretli (Bölüm 4.14)</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
+<tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S5</td>
+<td style="padding:4pt;border:1px solid #999;">Simüle edilmiş ağ ortamında runtime trace</td>
+<td style="padding:4pt;border:1px solid #999;">Shadow simülatöründe 5-30 relay topoloji + running tor binary'den canlı CIRC akışı</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (yol haritası: 6.3.3, Adım 1-7)</td></tr>
+<tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S6</td>
+<td style="padding:4pt;border:1px solid #999;">Saldırı senaryolarıyla gerçek FPR/TPR ölçümü</td>
+<td style="padding:4pt;border:1px solid #999;">Shadow içinde modifiye tor client ile 4 saldırı sınıfı tetikleme + classifyInvalid doğrulama</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (yol haritası: 6.3.3, Adım 9)</td></tr>
+<tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S7</td>
+<td style="padding:4pt;border:1px solid #999;">Üretim Tor relay'inde alan dağıtımı</td>
+<td style="padding:4pt;border:1px solid #999;">Tor Project ile entegrasyon, gerçek anonim trafikte uzun dönem ölçüm</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (Tor Project işbirliği gerektirir)</td></tr>
+</table>
+
+<p>Mevcut çalışma <b>S1-S4 seviyelerini tamamlamıştır</b>; bu, akademik metodoloji
+çalışması için yeterli olmakla birlikte güvenlik aracı olarak nihai
+değerlendirmeyi içermez. <b>S5-S6 geçişi tek bir kavramsal sıçrama değil,
+6.3.3'te 10 adıma ayrılmış mühendislik işidir</b>; her adımın girdisi, çıktısı,
+mevcut repo dosyalarına bağlantısı ve süre tahmini somut olarak verilmiştir.
+Bu yapı, çalışmanın olgunluk seviyesinin <i>belirsizlik nedeniyle değil,
+zaman ve ortam kısıtı nedeniyle</i> S4'te durduğunu kanıtlar.</p>
+
+<p><b>Üç temel teknik dönüşüm.</b> Metodolojik prototipten gerçek çalışmaya
+geçiş, koddaki üç noktada yapılacak <i>oracle değişimi</i> ile sağlanır;
+hiçbir mimari yeniden yazım gerekmez:</p>
+
+<table style="margin:8pt 0; width:100%;">
+<tr style="background:#eaeaea;">
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:25%;">Bileşen</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:35%;">Mevcut (S4 — bu çalışma)</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;width:40%;">Hedef (S5-S6 — gerçek çalışma)</th>
+</tr>
+<tr><td style="padding:4pt;border:1px solid #999;">Olay kaynağı</td>
+<td style="padding:4pt;border:1px solid #999;"><code>experiments/baselines.mjs</code> içinde algoritmik olay üreteçleri (B1 random, B2 greedy, B3 MDT)</td>
+<td style="padding:4pt;border:1px solid #999;">Shadow içindeki tor instance'larından <code>stem</code> kütüphanesi ile gelen gerçek CIRC event akışı (Adım 6)</td></tr>
+<tr><td style="padding:4pt;border:1px solid #999;">L* MQ oracle</td>
+<td style="padding:4pt;border:1px solid #999;"><code>experiments/g_extensions.mjs</code> içinde statik <code>SUT_DELTA</code> dict üzerine sorgu</td>
+<td style="padding:4pt;border:1px solid #999;">Aynı dosyadaki <code>MQ()</code> fonksiyonu running tor'a control port probe + circuit state observation (Adım 8)</td></tr>
+<tr><td style="padding:4pt;border:1px solid #999;">FPR/TPR oracle</td>
+<td style="padding:4pt;border:1px solid #999;"><code>server/fsm.ts</code> &rarr; <code>classifyInvalid</code> yapısal olarak FPR=0 (δ-tanımlı geçişleri Invalid demez)</td>
+<td style="padding:4pt;border:1px solid #999;">Aynı fonksiyon Shadow-içi modifiye tor client'tan tetiklenen 4 saldırıya karşı koşulur; bağımsız tor log oracle'ı ile FPR/TPR ölçülür (Adım 9)</td></tr>
+</table>
+
+<p>Üç değişikliğin <b>toplam kod ayak izi 500-2000 satır harness</b>'dır; mevcut
+algoritma, istatistik ve görselleştirme katmanları <i>aynen</i> yeniden kullanılır
+(Bölüm 4.13 paired N=100 koşusu gerçek olay akışıyla, Bölüm 4.14 L* yakınsama
+tablosu running tor ile, Bölüm 4.6-4.11 latency ölçümleri gerçek probe trafiğiyle
+tekrar edilir). Bu yapısal yeniden kullanım, çalışmanın <b>mimari olarak
+gerçek-çalışma-hazır</b> olduğunu gösterir; eksik olan üretim değil, koşum
+ortamıdır.</p>
+
+<p><b>Kim, ne kadarda yapar?</b> Aynı işin üç farklı uygulayıcı profili için
+gerçekçi süre tahminleri:</p>
+
+<table style="margin:8pt 0; width:100%;">
+<tr style="background:#eaeaea;">
+<th style="text-align:left;padding:4pt;border:1px solid #999;">Uygulayıcı</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;">Ortam</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;">Süre</th>
+<th style="text-align:left;padding:4pt;border:1px solid #999;">Maliyet</th>
+</tr>
+<tr><td style="padding:4pt;border:1px solid #999;">Linux + ağ güvenliği deneyimli araştırmacı</td>
+<td style="padding:4pt;border:1px solid #999;">Kendi laboratuvar makinesi veya kişisel VPS</td>
+<td style="padding:4pt;border:1px solid #999;">4-6 hafta tam zamanlı</td>
+<td style="padding:4pt;border:1px solid #999;">~5 € (VPS) + zaman</td></tr>
+<tr><td style="padding:4pt;border:1px solid #999;">İnsan denetiminde otonom kod ajanı (Claude Code, Devin)</td>
+<td style="padding:4pt;border:1px solid #999;">Ajanın kendi cloud VM'i veya yapılandırılmış lokal terminal</td>
+<td style="padding:4pt;border:1px solid #999;">2-3 hafta + ~5-10 saat insan checkpoint review</td>
+<td style="padding:4pt;border:1px solid #999;">~50-500 USD (API/abonelik)</td></tr>
+<tr><td style="padding:4pt;border:1px solid #999;">Outsourced uzman (Tor / Shadow / ağ güvenliği)</td>
+<td style="padding:4pt;border:1px solid #999;">Sözleşmeli mühendis kendi makinesinde</td>
+<td style="padding:4pt;border:1px solid #999;">3-6 hafta</td>
+<td style="padding:4pt;border:1px solid #999;">1.500-4.000 USD</td></tr>
+</table>
+
+<p>Bu üç profil için süreler birbirinden çok uzak değildir; bu, kritik darboğazın
+<i>insan zekası ve algoritma kararları değil, ortam erişimi ve simülasyon
+çalışma süresi</i> olduğunu gösterir. Mevcut çalışma S1-S4'ün <b>tek-kişi,
+tek-oturum, sandbox-kısıtlı bir ortamda tamamlanabilir maksimum</b> olduğunu
+ortaya koymaktadır.</p>
+
+<h4>6.3.2 Konu Bazlı Genişletmeler</h4>
 <ol>
   <li><b>Stream alt-FSM ayrıştırması (kısmen tamamlandı, Bölüm 4.10).</b> Hidden Service
   v3 ve Pluggable Transport alt-FSM'leri için aynı δ-tablo + classifyInvalid yaklaşımının
@@ -1216,7 +1340,7 @@ getirir; herhangi bir araştırmacı veya otonom kod ajanı tarafından doğruda
   kapatılması ve bibliyometrik haritalama (Bölüm 2'nin sayısal güçlendirilmesi).</li>
 </ol>
 
-<h4>6.3.2 Shadow + Running Tor Entegrasyon Planı (10 adım)</h4>
+<h4>6.3.3 Shadow + Running Tor Entegrasyon Planı (10 adım)</h4>
 <p>Aşağıdaki plan, Bölüm 6.2.1-B'de listelenen engellerin aşıldığı bir ortamda
 (Ubuntu 22.04, sudo erişimi, 8 GB+ RAM, kalıcı disk) uygulanır. Toplam tahmini iş
 yükü 4-6 hafta tam zamanlı bir araştırmacı; otonom kod ajanı (örn. Claude Code, Devin)
@@ -1304,9 +1428,10 @@ simülasyon-temelli bulgularını ya teyit eder ya da düzeltir. Her iki sonuç 
 değer taşır: teyit, modelin dış geçerliğini güçlendirir; düzeltme, Bölüm 4.12'de tespit edilen
 "spec &harr; implementation divergence"ın niceliksel boyutunu ortaya koyar.</p>
 
-<h4>6.3.3 Mevcut Çalışmanın Konumu</h4>
+<h4>6.3.4 Mevcut Çalışmanın Konumu</h4>
 <p>Bölüm 4.10-4.14 ve 6.2.1, bu çalışmanın <b>simülasyon-doğrulamalı metodoloji önerisi
-+ kısmi yapısal kanıt</b> seviyesinde olduğunu açıkça konumlandırır. 6.3.2 planı tamamlandığında,
++ üretim kaynak kodundan yapısal kanıt + algoritma-doğrulamalı L*</b> seviyesinde
+(yukarıdaki S1-S4) olduğunu açıkça konumlandırır. 6.3.3 planı tamamlandığında,
 çalışma <b>runtime-doğrulamalı güvenlik aracı</b> seviyesine taşınır. Bu iki seviye arasındaki
 fark, tezin katkısını geçersiz kılmaz; aksine, mevcut metodoloji + algoritma + istatistik
 + statik FSM + L* zincirinin <i>kullanılmaya hazır</i> olduğunu ve sonraki adımın yalnızca
