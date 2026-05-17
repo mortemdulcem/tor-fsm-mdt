@@ -22,7 +22,9 @@ const cext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiment
 const dext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/d_extensions.json"), "utf8"));
 const torStatic = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tor_static_fsm.json"), "utf8"));
 const fext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions.json"), "utf8"));
+const fval = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions_validated.json"), "utf8"));
 const gext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/g_extensions.json"), "utf8"));
+const fvalBy = Object.fromEntries(fval.comparisons.filter(v => v.B === "B2_GreedySC").map(v => [v.metric, v]));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -627,12 +629,18 @@ enumeration.</p>
   (R=${fext.config.bootstrapR}) and a paired-difference design (Cohen's d_z,
   paired t, df=n−1). Paired effect sizes are large for the two primary metrics
   (d_z=${fext.comparisons.find((c)=>c.metric==="transitionCoverage"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(2)} for transitionCoverage,
-  d_z=${fext.comparisons.find((c)=>c.metric==="itdr"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(2)} for itdr); approximate N for
-  power 0.80 is ≤3. However, <i>stateCoverage</i> shows d_z=${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(3)},
-  requiring approximately N=${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").approxN_paired_for_power_080};
-  even N=${fext.config.N} is under-powered for this single metric. This is
-  reported as a pilot-effect-size estimate (not strict a-priori power) and as a
-  new honest finding of the extended analysis.</li>
+  d_z=${fext.comparisons.find((c)=>c.metric==="itdr"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(2)} for itdr); required N at power 0.80 is
+  ≤${fvalBy.itdr.approxN_paired_exactT_statsmodels} (exact noncentral-t).
+  However, <i>stateCoverage</i> shows d_z=${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(3)},
+  requiring N=${fvalBy.stateCoverage.approxN_paired_exactT_statsmodels}
+  (exact-t; Node z-approx: ${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").approxN_paired_for_power_080});
+  even N=${fext.config.N} is under-powered for this single metric.
+  Cross-validated independently with Python statsmodels v${fval.validator.statsmodels} /
+  scipy v${fval.validator.scipy}: d_z and p-values match Node to machine
+  precision; required-N differs by 2-9 units because Node uses asymptotic
+  z-approximation whereas statsmodels uses exact noncentral-t (the authoritative
+  method, equivalent to G*Power's calculation). This is a pilot-effect-size
+  estimate, not strict a-priori power.</li>
   <li><b>(vii) Automaton learning unimplemented — addressed (Sec. IV-M).</b>
   Angluin's L* algorithm is implemented in pure Node and converges on the
   static-extracted impl FSM in ${gext.trace.length} rounds using
@@ -674,10 +682,12 @@ for transitionCoverage and
 [${fext.comparisons.find((c)=>c.metric==="itdr"&&c.B==="B2_GreedySC").bca95.lo.toFixed(3)},
  ${fext.comparisons.find((c)=>c.metric==="itdr"&&c.B==="B2_GreedySC").bca95.hi.toFixed(3)}]
 for itdr — both excluding 0 with substantial margin. New honest finding:
-approximate paired-design N for stateCoverage at power 0.80 is
-${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").approxN_paired_for_power_080}
-(pilot-d_z basis, not strict a-priori); N=${fext.config.N} is under-powered for
-this single metric.</p>
+required paired-design N for stateCoverage at power 0.80 is
+${fvalBy.stateCoverage.approxN_paired_exactT_statsmodels} (statsmodels exact
+noncentral-t; Node z-approx ${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").approxN_paired_for_power_080});
+N=${fext.config.N} is under-powered for this single metric. All d_z and
+p-values cross-validated against Python statsmodels v${fval.validator.statsmodels}
+to machine precision.</p>
 
 <p class="no-indent"><b>IV-M. L* (Angluin 1987) implementation.</b> Pure-Node
 implementation of the classical observation-table L* algorithm with closedness

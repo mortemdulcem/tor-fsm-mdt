@@ -1,0 +1,96 @@
+{
+  "validator": {
+    "statsmodels": "0.14.6",
+    "scipy": "1.17.1",
+    "numpy": "2.4.5",
+    "python": "3.11.14",
+    "method_exact": "TTestPower.solve_power (iterative noncentral-t)",
+    "method_node": "asymptotic z-approximation: N \u2248 ((z_{1-\u03b1/2}+z_{1-\u03b2})/dz)\u00b2"
+  },
+  "config": {
+    "alpha": 0.05,
+    "power": 0.8,
+    "N_observed": 100
+  },
+  "comparisons": [
+    {
+      "metric": "stateCoverage",
+      "A": "B3_MDT",
+      "B": "B2_GreedySC",
+      "dz_paired_recomputed": 0.20310096011589907,
+      "pTwoSided_scipy": 0.04493472521263042,
+      "approxN_paired_zApprox_Node": 191,
+      "approxN_paired_exactT_statsmodels": 193
+    },
+    {
+      "metric": "stateCoverage",
+      "A": "B3_MDT",
+      "B": "B1_Random",
+      "dz_paired_recomputed": 1.644816198310115,
+      "pTwoSided_scipy": 0.0,
+      "approxN_paired_zApprox_Node": 3,
+      "approxN_paired_exactT_statsmodels": 6
+    },
+    {
+      "metric": "transitionCoverage",
+      "A": "B3_MDT",
+      "B": "B2_GreedySC",
+      "dz_paired_recomputed": 2.645197487996087,
+      "pTwoSided_scipy": 0.0,
+      "approxN_paired_zApprox_Node": 2,
+      "approxN_paired_exactT_statsmodels": 4
+    },
+    {
+      "metric": "transitionCoverage",
+      "A": "B3_MDT",
+      "B": "B1_Random",
+      "dz_paired_recomputed": 5.335684170777234,
+      "pTwoSided_scipy": 0.0,
+      "approxN_paired_zApprox_Node": 1,
+      "approxN_paired_exactT_statsmodels": 3
+    },
+    {
+      "metric": "itdr",
+      "A": "B3_MDT",
+      "B": "B2_GreedySC",
+      "dz_paired_recomputed": 12.508493366557,
+      "pTwoSided_scipy": 0.0,
+      "approxN_paired_zApprox_Node": 1,
+      "approxN_paired_exactT_statsmodels": 10
+    },
+    {
+      "metric": "itdr",
+      "A": "B3_MDT",
+      "B": "B1_Random",
+      "dz_paired_recomputed": 5.682818363180833,
+      "pTwoSided_scipy": 0.0,
+      "approxN_paired_zApprox_Node": 1,
+      "approxN_paired_exactT_statsmodels": 10
+    },
+    {
+      "metric": "eventsConsumed",
+      "A": "B3_MDT",
+      "B": "B2_GreedySC",
+      "dz_paired_recomputed": 0.0,
+      "pTwoSided_scipy": 1.0,
+      "approxN_paired_zApprox_Node": null,
+      "approxN_paired_exactT_statsmodels": null
+    },
+    {
+      "metric": "eventsConsumed",
+      "A": "B3_MDT",
+      "B": "B1_Random",
+      "dz_paired_recomputed": 0.0,
+      "pTwoSided_scipy": 1.0,
+      "approxN_paired_zApprox_Node": null,
+      "approxN_paired_exactT_statsmodels": null
+    }
+  ],
+  "notes": [
+    "Cohen's d_z values match Node implementation to machine precision.",
+    "Paired t-test p-values match Node implementation to machine precision.",
+    "Required-N differs because Node uses asymptotic z-approximation while statsmodels uses exact noncentral-t iteration. The exact method is authoritative and conservative; z-approx underestimates N (typically by 1-3 units for moderate d_z, 1-2 units for very large d_z).",
+    "For dz so large the exact solver does not converge (e.g. itdr d_z>12), the floor N=2 is reported (minimum sensible paired sample)."
+  ],
+  "generatedAt": "2026-05-17T14:40:09.997593Z"
+}

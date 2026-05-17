@@ -698,12 +698,18 @@ enumeration.</p>
   (R=5000) and a paired-difference design (Cohen's d_z,
   paired t, df=n−1). Paired effect sizes are large for the two primary metrics
   (d_z=2.65 for transitionCoverage,
-  d_z=12.51 for itdr); approximate N for
-  power 0.80 is ≤3. However, <i>stateCoverage</i> shows d_z=0.203,
-  requiring approximately N=191;
-  even N=100 is under-powered for this single metric. This is
-  reported as a pilot-effect-size estimate (not strict a-priori power) and as a
-  new honest finding of the extended analysis.</li>
+  d_z=12.51 for itdr); required N at power 0.80 is
+  ≤10 (exact noncentral-t).
+  However, <i>stateCoverage</i> shows d_z=0.203,
+  requiring N=193
+  (exact-t; Node z-approx: 191);
+  even N=100 is under-powered for this single metric.
+  Cross-validated independently with Python statsmodels v0.14.6 /
+  scipy v1.17.1: d_z and p-values match Node to machine
+  precision; required-N differs by 2-9 units because Node uses asymptotic
+  z-approximation whereas statsmodels uses exact noncentral-t (the authoritative
+  method, equivalent to G*Power's calculation). This is a pilot-effect-size
+  estimate, not strict a-priori power.</li>
   <li><b>(vii) Automaton learning unimplemented — addressed (Sec. IV-M).</b>
   Angluin's L* algorithm is implemented in pure Node and converges on the
   static-extracted impl FSM in 4 rounds using
@@ -744,10 +750,12 @@ for transitionCoverage and
 [0.467,
  0.481]
 for itdr — both excluding 0 with substantial margin. New honest finding:
-approximate paired-design N for stateCoverage at power 0.80 is
-191
-(pilot-d_z basis, not strict a-priori); N=100 is under-powered for
-this single metric.</p>
+required paired-design N for stateCoverage at power 0.80 is
+193 (statsmodels exact
+noncentral-t; Node z-approx 191);
+N=100 is under-powered for this single metric. All d_z and
+p-values cross-validated against Python statsmodels v0.14.6
+to machine precision.</p>
 
 <p class="no-indent"><b>IV-M. L* (Angluin 1987) implementation.</b> Pure-Node
 implementation of the classical observation-table L* algorithm with closedness

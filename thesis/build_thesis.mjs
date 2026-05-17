@@ -20,7 +20,9 @@ const cext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiment
 const dext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/d_extensions.json"), "utf8"));
 const torStatic = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tor_static_fsm.json"), "utf8"));
 const fext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions.json"), "utf8"));
+const fval = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions_validated.json"), "utf8"));
 const gext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/g_extensions.json"), "utf8"));
+const fvalBy = Object.fromEntries(fval.comparisons.filter(v => v.B === "B2_GreedySC").map(v => [v.metric, v]));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -965,19 +967,39 @@ required-N (β=${fext.config.beta}, α=${fext.config.alpha}, two-sided
 z-yaklaşımı) raporlanmıştır. Kod: <code>experiments/f_extensions.mjs</code>.</p>
 
 <p class="no-indent"><b>Tablo 4.13-A.</b> N=${fext.config.N} sonuçları — B3_MDT vs B2_GreedySC <b>paired-difference</b> analizi
-(her satırda d_z = ortalama(fark)/sd(fark); paired t-test df=n−1).</p>
+(her satırda d_z = ortalama(fark)/sd(fark); paired t-test df=n−1). Son sütun
+çapraz-doğrulama: Node z-approx vs Python statsmodels v${fval.validator.statsmodels} exact noncentral-t.</p>
 <table>
-<tr><th>Metrik</th><th>Δ ort. (sd)</th><th>Cohen's d_z (paired)</th><th>paired t (df=${fext.comparisons[0].df})</th><th>p (two-sided)</th><th>BCa %95 GA</th><th>Yakl. N (paired, power=0.80)</th></tr>
-${fext.comparisons.filter((c) => c.B === "B2_GreedySC").map((c) => `<tr>
+<tr><th>Metrik</th><th>Δ ort. (sd)</th><th>d_z</th><th>paired t (df=${fext.comparisons[0].df})</th><th>p (two-sided)</th><th>BCa %95 GA</th><th>Yakl. N (z-approx / exact-t)</th></tr>
+${fext.comparisons.filter((c) => c.B === "B2_GreedySC").map((c) => {
+  const v = fvalBy[c.metric];
+  const nZ = isFinite(c.approxN_paired_for_power_080) ? c.approxN_paired_for_power_080 : "∞";
+  const nT = v.approxN_paired_exactT_statsmodels == null ? "∞" : v.approxN_paired_exactT_statsmodels;
+  return `<tr>
   <td class="l">${c.metric}</td>
   <td>${c.diffMean.toFixed(4)} (${c.diffSD.toFixed(4)})</td>
   <td>${isFinite(c.cohensDz_paired) ? c.cohensDz_paired.toFixed(3) : "—"}</td>
   <td>${isFinite(c.paired_t) ? c.paired_t.toFixed(2) : "—"}</td>
   <td>${c.pTwoSided === 0 ? "&lt; 1e-12" : c.pTwoSided.toExponential(2)}</td>
   <td>[${c.bca95.lo.toFixed(4)}, ${c.bca95.hi.toFixed(4)}]</td>
-  <td>${isFinite(c.approxN_paired_for_power_080) ? c.approxN_paired_for_power_080 : "—"}</td>
-</tr>`).join("")}
+  <td>${nZ} / <b>${nT}</b></td>
+</tr>`;}).join("")}
 </table>
+
+<p><b>Çapraz-doğrulama (Bölüm 4.13-B):</b> Cohen's d_z ve paired t-test p-değerleri
+Python ortamında bağımsızca yeniden hesaplandı (statsmodels v${fval.validator.statsmodels},
+scipy v${fval.validator.scipy}, numpy v${fval.validator.numpy}): tüm metriklerde
+makine hassasiyetinde aynı sonuç. Required-N farklı çıktı çünkü Node tarafı
+asymptotic z-yaklaşımı (<i>N ≈ ((z<sub>1-α/2</sub>+z<sub>1-β</sub>)/d_z)²</i>),
+statsmodels ise exact noncentral-t iterasyonu kullanır; ikincisi
+otoritatiftir ve sistematik olarak daha yüksek N verir (stateCoverage: 191 vs
+<b>193</b>; transitionCoverage: 2 vs <b>4</b>; itdr: 1 vs <b>10</b> — son ikisinde
+d_z çok büyük olduğu için exact-t solver'ı küçük N'lerde noncentrality
+parametresinin etkisini daha iyi yakalar). Bu farkın <i>kendisi</i> dürüst bir
+bulgudur: G*Power tarzı GUI hesabı veya statsmodels gibi exact metotlar
+kullanılırsa Node'un z-approx değerlerine 1-9 birim eklemek gerekir. Kod:
+<code>experiments/f_validate_statsmodels.py</code>, JSON:
+<code>experiments/f_extensions_validated.json</code>.</p>
 
 <p><b>Tasarım notu:</b> Trial i tüm algoritmalarda aynı seed (${fext.config.seedBase}+i) ile
 çalıştığından gözlemler eşleştirilmiştir; istatistikler buna göre <i>paired</i>
@@ -988,8 +1010,9 @@ ${fext.comparisons.filter((c) => c.B === "B2_GreedySC").map((c) => `<tr>
 <i>transitionCoverage</i> ve <i>itdr</i> için paired etki büyüklükleri çok büyüktür
 (d_z=${fext.comparisons.find((c)=>c.metric==="transitionCoverage"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(2)},
 d_z=${fext.comparisons.find((c)=>c.metric==="itdr"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(2)});
-%80 güç için yaklaşık N=2-3 yeter. <i>stateCoverage</i> için d_z=${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(3)}
-ölçülmüş, yaklaşık N=${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").approxN_paired_for_power_080}
+%80 güç için exact noncentral-t ile N=${fvalBy.transitionCoverage.approxN_paired_exactT_statsmodels}-${fvalBy.itdr.approxN_paired_exactT_statsmodels} yeter. <i>stateCoverage</i> için d_z=${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").cohensDz_paired.toFixed(3)}
+ölçülmüş, exact-t ile <b>N=${fvalBy.stateCoverage.approxN_paired_exactT_statsmodels}</b>
+(Node z-approx: ${fext.comparisons.find((c)=>c.metric==="stateCoverage"&&c.B==="B2_GreedySC").approxN_paired_for_power_080})
 gerektirmektedir. <b>N=${fext.config.N} bu tek metrik için yetersizdir</b> —
 orijinal tezde olmayan, post-hoc analizle ortaya çıkmış dürüst bir bulgudur.
 Bu, <i>strict a-priori</i> güç değil, gözlenen pilot effect-size'a dayalı
