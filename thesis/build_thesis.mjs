@@ -1086,6 +1086,76 @@ ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
 </ul>
 
 <h3>6.2 Sınırlılıklar</h3>
+
+<h4>6.2.1 Ortam Kısıtlılıkları (Replit NixOS sandbox)</h4>
+
+<p>Aşağıdaki maddelerde tekrar atıfta bulunulan iki temel kısıtlılığın
+&mdash; <b>Rust toolchain (rustc/cargo)</b> ve <b>Shadow runtime trace</b>
+&mdash; bu çalışma ortamında neden uygulanamadığı, "future work" denip
+geçilmek yerine açıkça belgelenir. Amaç: dürüst limitler kuralı gereği
+okuyucunun "neden yapılmadı?" sorusuna kesin teknik cevap bulabilmesidir.</p>
+
+<p class="no-indent"><b>(A) Rust port (<code>rustc</code> + <code>cargo</code>).</b></p>
+<ol>
+  <li><b>Toolchain mevcudiyeti:</b> Çalışma ortamı bir Replit NixOS container'ıdır;
+  default image'da <code>rustc</code> ve <code>cargo</code> yüklü değildir.
+  Modül olarak kurulabilir (nix store'a ~700&nbsp;MB indirme + ~2&nbsp;dk
+  kurulum), fakat container ephemeral olduğundan oturum başı yeniden kurulum
+  gerekir; tez deneylerinin tekrar üretilebilirliği için bu güvenilir
+  değildir.</li>
+  <li><b>Port iş yükü:</b> Latency karşılaştırması "tam Tor relay'in Rust portu"
+  değil, sadece δ-lookup + classifyInvalid hot path'inin port'unu gerektirir
+  (yaklaşık 120&nbsp;satır). Aynı hot path zaten gcc&nbsp;-O3 ile C'ye
+  portlanmış ve Bölüm 4.11.3'te
+  ${(dext.cLatency.comparison.probes.reduce((a,p)=>a+p.speedup_x,0)/3).toFixed(0)}× hızlanma
+  ölçülmüştür. Rust -O3'ün aynı hot path'te ortaya koyacağı fark literatür
+  bulgularına göre C'ye ±10-20% mertebesindedir (LLVM aynı backend,
+  benzer auto-vectorization). Yani Rust portu <i>nitel</i> sonucu (Node
+  vs derlenmiş dil ≈ ${(dext.cLatency.comparison.probes.reduce((a,p)=>a+p.speedup_x,0)/3).toFixed(0)}× fark) değiştirmez.</li>
+  <li><b>Tam relay Rust portu (Arti)</b> ise Tor Project'in başlattığı çok yıllık
+  bir mühendislik projesidir (2021&ndash;); kapsamı bu tezin sınırlarının çok
+  ötesindedir.</li>
+</ol>
+<p class="no-indent"><b>Sonuç (A):</b> Rust toolchain bu ortamda <i>yüklenebilir</i>
+fakat <i>tekrar-üretilebilirlik açısından tercih edilmemiştir</i>; hot path'in
+gcc&nbsp;-O3 C portu mevcut latency karşılaştırmasının nitel sonucunu zaten verir.</p>
+
+<p class="no-indent"><b>(B) Shadow runtime trace.</b></p>
+<ol>
+  <li><b>Shadow nedir:</b> Discrete-event ağ simülatörü, ~250&nbsp;k LoC
+  C/Rust hibrit kod tabanı, gerçek dinamik linklenmiş Tor binary'sini
+  yer-paylaşımsız sanal süreçler içinde koşturur (Jansen & Hopper, NDSS 2012).</li>
+  <li><b>Bağımlılıklar:</b> glib-2.0, libigraph, libyaml, libelf, cmake&nbsp;≥3.13,
+  gcc&nbsp;≥9, libffi, pcre2 ve ~25 ek paket; ayrıca <code>tor</code>'un debug
+  symbol'lerle yeniden derlenmesi (openssl, libevent, zlib ile linklenmiş).
+  Toplam disk: ~3&nbsp;GB; build süresi temiz makinede ~20-40&nbsp;dk.</li>
+  <li><b>Ortam engelleri:</b> Replit container'ı (a) <code>ptrace</code>/seccomp
+  filter'larıyla sınırlandırılmıştır (Shadow süreçleri kontrol etmek için
+  <code>ptrace</code> kullanır); (b) RAM tavanı tipik olarak 8&nbsp;GB civarıdır,
+  küçük bir Shadow topolojisi (5 relay + 3 client + 1 dir-auth + 1 hizmet)
+  bile 2-4&nbsp;GB ister; (c) ephemeral disk volume, çoklu oturum boyunca
+  build artefact'larını korumaz.</li>
+  <li><b>İş yükü:</b> Shadow kurulduktan sonra, bu çalışmaya bağlanması için ek
+  500-2000 satır harness kodu gerekir: (i) Shadow'un pcap çıktısını parse edip
+  TLS/cell katmanına decode etmek (libtor-cellparser veya benzeri), (ii) cell
+  akışını bu tezin Σ olay alfabesine eşlemek, (iii) circuit yaşam döngüsünü
+  CIRC_ID üzerinden takip etmek. Bu, gerçekçi olarak haftalar mertebesinde
+  bir araştırma alt-projesidir.</li>
+  <li><b>Kısmi telafi:</b> Bunun yerine Bölüm 4.12'de tor kaynak kodu
+  doğrudan klonlanıp 9 <code>circuit_set_state</code> çağrı noktasından
+  ${torStatic.structural.impl_states_count}-durumlu impl FSM <i>statik</i> olarak
+  çıkarılmıştır ve Bölüm 4.14'te bu FSM üzerinde Angluin L* yakınsamıştır.
+  Bu, runtime trace'in <i>tam</i> ikamesi değildir &mdash; davranışsal
+  (runtime) bilgi vermez, sadece yapısal (static) bilgi verir. Tam runtime
+  trace, Bölüm 6.3'te birinci öncelikli gelecek çalışma olarak listelenir.</li>
+</ol>
+<p class="no-indent"><b>Sonuç (B):</b> Shadow bu ortamda <i>kurulamaz değildir</i>;
+fakat toolchain kurulumu + tor build + harness yazımı + uzun çalıştırma süreleri
+toplamı, tek-oturum bir tez deneyi kapsamını aşar. Bu sınır <i>teknik</i> (mümkün
+ama uzun), <i>etik veya bilimsel değil</i>; gerçek bir araştırma laboratuvarında
+2-4 haftada tamamlanabilir.</p>
+
+<h4>6.2.2 Konu Bazlı Sınırlılıklar</h4>
 <ul>
   <li><b>Ground Truth = Spec — kısmen giderildi (Bölüm 4.12).</b> Gerçek tor
   kaynak kodu (BSD, ${torStatic.source.files_scanned} dosya) statik taranmış,

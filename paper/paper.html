@@ -652,6 +652,30 @@ heuristics that optimize <i>positive</i> coverage do not automatically
 generate good <i>negative</i> tests — invalid-pair coverage requires explicit
 enumeration.</p>
 
+<p class="no-indent"><b>Environment constraints.</b> Two recurring "future work"
+items below &mdash; <i>Rust port</i> and <i>Shadow runtime trace</i> &mdash; deserve
+concrete justification rather than a generic disclaimer. <b>(A) Rust:</b> the
+Replit NixOS container ships without <code>rustc</code>/<code>cargo</code>;
+the toolchain is installable (~700&nbsp;MB, ~2&nbsp;min) but ephemeral across
+sessions, harming reproducibility. More importantly, the latency comparison
+requires only the δ-lookup + classifyInvalid hot path (~120 LoC), already
+ported to gcc&nbsp;-O3 C (Sec.&nbsp;IV-J): a Rust&nbsp;-O3 port would change
+the result by ±10-20% on the same LLVM backend, not the qualitative
+107× factor.
+Full Rust relay (Arti) is a multi-year Tor Project effort, out of scope.
+<b>(B) Shadow:</b> the simulator (~250&nbsp;k LoC) requires ~25 system
+packages (glib-2.0, libigraph, libyaml, libelf, cmake&nbsp;≥3.13), a
+debug-symbol tor build with openssl/libevent/zlib, ~3&nbsp;GB disk and
+~20-40&nbsp;min build time; the container also restricts <code>ptrace</code>
+(Shadow's process-control primitive) and has limited RAM headroom (a 5-relay
+topology needs 2-4&nbsp;GB). Beyond installation, an additional 500-2000&nbsp;LoC
+harness is needed to map Shadow's pcap output back into the Σ event alphabet of
+this work. The substitute used (Sec.&nbsp;IV-K, static extraction of the impl
+FSM from tor source, plus Sec.&nbsp;IV-M Angluin L* against that FSM) provides
+structural ground-truth only, not dynamic. The Shadow path is technically
+feasible &mdash; 2-4 weeks of engineering &mdash; but exceeds a single-session
+thesis experiment.</p>
+
 <p class="no-indent"><b>Threats to validity.</b></p>
 <ul>
   <li><b>(i) Ground truth = specification — partially addressed (Sec. IV-K).</b>
