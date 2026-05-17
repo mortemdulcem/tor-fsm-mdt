@@ -56,7 +56,7 @@
 <p>Bu çalışma, Tor anonim ağ protokolünün devre yaşam döngüsünü deterministik bir Sonlu Durum
 Makinesi (FSM) olarak formal şekilde modeller, Model-Driven Testing (MDT) yaklaşımıyla
 spesifikasyon dışı (geçersiz) durum geçişlerinin otomatik tespitini sağlar ve tespit edilen
-her geçişi yedi saldırı vektörüne (CIRCUIT_BYPASS, REPLAY_ATTACK, GHOST_CIRCUIT,
+her geçişi yedi ana saldırı vektörü + 1 fallback'e (CIRCUIT_BYPASS, REPLAY_ATTACK, GHOST_CIRCUIT,
 HANDSHAKE_SKIP, PREMATURE_DATA, CIRCUIT_HIJACK, CREATE_FLOOD) eşleyen bir sınıflandırma
 çerçevesi sunar. Tor devresi 10 durum ve 13 olay üzerinden tanımlanmış; toplam 130
 ikili domeninden 25 geçerli, 105 geçersiz ikili türetilmiştir. Önerilen
@@ -78,7 +78,7 @@ protokol state fuzzing, güvenlik testi, geçiş kapsamı.</p>
 <p>This work formally models the circuit life-cycle of the Tor anonymous network protocol
 as a deterministic finite-state machine (FSM), enables automatic detection of out-of-spec
 (invalid) state transitions through a Model-Driven Testing (MDT) approach, and proposes a
-classification framework that maps every detected transition to one of seven attack vectors
+classification framework that maps every detected transition to one of seven primary attack vectors plus a deterministic fallback,
 (CIRCUIT_BYPASS, REPLAY_ATTACK, GHOST_CIRCUIT, HANDSHAKE_SKIP, PREMATURE_DATA,
 CIRCUIT_HIJACK, CREATE_FLOOD). The Tor circuit is described over 10 states and 13 events,
 yielding 25 valid and 105 invalid pairs from a domain of size
@@ -174,7 +174,7 @@ sistematik literatür taraması (SLR, bkz. Bölüm 2) ile teyit edilmiştir.</p>
 <ol>
   <li>Tor devre protokolü için yayımlanmış ilk <b>tam δ-matrisi</b> (25 geçerli ikili,
   105 geçersiz ikili, toplam domen 130; bkz. Ek A).</li>
-  <li>Tüm 105 geçersiz ikiliyi yedi saldırı vektörü ve dört şiddet seviyesine eşleyen
+  <li>Tüm 105 geçersiz ikiliyi yedi ana saldırı vektörü + 1 fallback ve dört şiddet seviyesine eşleyen
   <b>programatik sınıflandırıcı</b> (bkz. Bölüm 3.2 ve Ek B).</li>
   <li>BFS-planlı pozitif faz + tam negatif tanık enjeksiyonu içeren <b>referans MDT
   implementasyonu</b> (kaynak kodu açık, üretilebilir).</li>
@@ -320,9 +320,10 @@ modellenmiştir:</p>
 
 <h3>3.2 Saldırı Sınıflandırıcı</h3>
 <p>Invalid kümesindeki her ikili, deterministik bir <code>classifyInvalid(state, event)</code>
-fonksiyonu (kod referansı: <code>server/fsm.ts</code>, 64–204. satırlar) ile yedi kategoriden
-birine eşlenir: CIRCUIT_BYPASS, REPLAY_ATTACK, GHOST_CIRCUIT, HANDSHAKE_SKIP, PREMATURE_DATA,
-CIRCUIT_HIJACK, CREATE_FLOOD. Sınıflandırma mantığı dokuz koşul ailesi üzerinden işler:
+fonksiyonu (kod referansı: <code>server/fsm.ts</code>, 64–204. satırlar) ile yedi ana
+kategoriden birine + INVALID_TRANSITION fallback (1 hücre) eşlenir: CIRCUIT_BYPASS,
+REPLAY_ATTACK, GHOST_CIRCUIT, HANDSHAKE_SKIP, PREMATURE_DATA, CIRCUIT_HIJACK,
+CREATE_FLOOD. Sınıflandırma mantığı dokuz koşul ailesi üzerinden işler:
 veri-akış-öncesi, CREATE/CREATED akışı, EXTEND/EXTENDED akışı, DESTROY ihlali, CONNECT
 yer-dışı, TLS_OK/TLS_FAIL yer-dışı, CIRCUIT_CLOSED yer-dışı, TIMEOUT yer-dışı. Her ikiliye
 LOW/MEDIUM/HIGH/CRITICAL şiddet etiketi atanır. Kategorilerin nicel dağılımı Ek B'dedir.</p>
@@ -689,7 +690,7 @@ geçersiz ikiliyi gözden kaçırır.</p>
   <li><b>Katkı 1 (tam δ-matrisi):</b> Ek A'da 25 geçerli ikili tek tablo olarak
   verilmiştir; literatürde benzer bir derleme mevcut değildir (G1).</li>
   <li><b>Katkı 2 (programatik sınıflandırıcı):</b> Ek B'de 105 geçersiz ikilinin
-  yedi vektör ve dört şiddet seviyesine dağılımı raporlanmıştır (G3).</li>
+  yedi ana vektör + 1 fallback ve dört şiddet seviyesine dağılımı raporlanmıştır (G3).</li>
   <li><b>Katkı 3 (referans MDT implementasyonu):</b> Algoritma 1 ile tarif edilen motor
   açık kaynak olarak repodadır; tek komutla yeniden çalıştırılabilir (G2).</li>
   <li><b>Katkı 4 (istatistiksel karşılaştırma):</b> Bölüm 4'teki Welch t ve Mann-Whitney U

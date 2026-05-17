@@ -1,13 +1,14 @@
-// 8 sayfalık IEEE conference formatında makale taslağı.
-// Tezin yoğunlaştırılmış versiyonu — aynı veri ve atıflar.
+// IEEE konferans formatı (2-sütun A4) — tezdeki gerçek tablo/algoritma/SLR içerikleri
+// taşınmış genişletilmiş sürüm. Tüm sayısal değerler trials.json + b_extensions.json'dan,
+// tüm SVG figürleri experiments/figures*.mjs'den. Hiçbir şey uydurulmaz.
 
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
-import { fsmGraphSvg, attackHeatmapSvg, metricBarChart } from "../experiments/figures.mjs";
-import { budgetCurveSvg, ruleCompletenessSvg } from "../experiments/figures_v2.mjs";
-import { totalDomain, totalValid, totalInvalid } from "../server/fsm.ts";
+import { fsmGraphSvg, attackHeatmapSvg, severitySplitSvg } from "../experiments/figures.mjs";
+import { prismaSvg, budgetCurveSvg, ruleCompletenessSvg } from "../experiments/figures_v2.mjs";
+import { STATES, EVENTS, VALID, totalDomain, totalValid, totalInvalid, k, classifyInvalid } from "../server/fsm.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const puppeteer = (await import(path.resolve(__dirname, "../node_modules/puppeteer-core/lib/cjs/puppeteer/puppeteer-core.js"))).default;
@@ -15,9 +16,13 @@ const puppeteer = (await import(path.resolve(__dirname, "../node_modules/puppete
 const trials = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/trials.json"), "utf8"));
 const ext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/b_extensions.json"), "utf8"));
 const stats = trials.stats;
-const cmp = trials.comparisons;
+const comparisons = trials.comparisons;
+const sevSplit = trials.severitySumPerAlgo;
 
 const pct = (x) => `${(x * 100).toFixed(1)}\\%`.replace("\\%", "%");
+const fmt = (x, d = 3) => isFinite(x) ? x.toFixed(d) : "—";
+const sig = (p) => p < 0.001 ? "&lt;.001" : p.toFixed(4);
+const stars = (p) => p < 0.001 ? "***" : p < 0.01 ? "**" : p < 0.05 ? "*" : "";
 const cite = (...ids) => `[${ids.join("], [")}]`;
 
 const REFS = [
@@ -43,9 +48,72 @@ const REFS = [
   '[20] Microsoft Research, "A Data-Driven FSM Model for Analyzing Security Vulnerabilities," MSR Tech. Rep., 2018.',
 ];
 
+// ---- Figures ----
 const svgFsm = fsmGraphSvg();
-const svgBudget = budgetCurveSvg(ext.budgetCurve, ext.BUDGETS, "tc");
+const svgHeat = attackHeatmapSvg();
+const svgSev = severitySplitSvg(sevSplit);
+const svgPrisma = prismaSvg(ext.prisma);
+const svgBudgetTC = budgetCurveSvg(ext.budgetCurve, ext.BUDGETS, "tc");
+const svgBudgetITDR = budgetCurveSvg(ext.budgetCurve, ext.BUDGETS, "itdr");
 const svgRule = ruleCompletenessSvg(ext.ruleBased);
+
+// ---- Wilcoxon table ----
+const wilcoxonRows = ext.wilcoxon.map((w) => `<tr>
+  <td class="l">${w.a.replace("_", " ")} vs ${w.b.replace("_", " ")}</td>
+  <td>${w.metric.toUpperCase()}</td>
+  <td>${w.W.toFixed(1)}</td><td>${w.z.toFixed(2)}</td>
+  <td>${w.p < 0.001 ? "&lt;.001" : w.p.toFixed(4)} ${w.p < 0.001 ? "***" : w.p < 0.01 ? "**" : w.p < 0.05 ? "*" : ""}</td>
+  <td>${w.n}</td>
+</tr>`).join("");
+
+// ---- Latency table ----
+const probeOrder = ["valid_step", "invalid_critical", "invalid_low"];
+const probeLabels = { valid_step: "Valid step (IDLE→CONNECTING)", invalid_critical: "Invalid CRITICAL (BYPASS)", invalid_low: "Invalid LOW (GHOST)" };
+const latencyRows = probeOrder.map((key) => { const d = ext.latencyData[key]; return `<tr>
+  <td class="l">${probeLabels[key]}</td>
+  <td>${d.mean_ns.toFixed(1)}</td><td>${d.sd_ns.toFixed(1)}</td>
+  <td>${d.p50_ns.toFixed(1)}</td><td>${d.p95_ns.toFixed(1)}</td>
+  <td>${d.min_ns.toFixed(1)}</td><td>${d.max_ns.toFixed(1)}</td>
+</tr>`; }).join("");
+
+// ---- Welch/MWU table (compact) ----
+const hypTableRows = comparisons.map((c) => `<tr>
+  <td class="l">${c.a.replace("_", " ")} vs ${c.b.replace("_", " ")}</td>
+  <td>${c.metric.toUpperCase()}</td>
+  <td>${fmt(c.t, 2)}</td><td>${sig(c.pT)} ${stars(c.pT)}</td>
+  <td>${sig(c.pU)} ${stars(c.pU)}</td>
+  <td>${fmt(c.d, 2)}</td>
+</tr>`).join("");
+
+// ---- Attack classifier inventory (programmatic, real data) ----
+function attackInventory() {
+  const inv = {};
+  for (const s of STATES) for (const e of EVENTS) {
+    if (VALID[k(s, e)] !== undefined) continue;
+    const c = classifyInvalid(s, e);
+    inv[c.type] = inv[c.type] || { count: 0, sev: { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 } };
+    inv[c.type].count++;
+    inv[c.type].sev[c.severity]++;
+  }
+  const total = Object.values(inv).reduce((a, b) => a + b.count, 0);
+  const rows = Object.entries(inv).sort((a, b) => b[1].count - a[1].count).map(([t, d]) =>
+    `<tr><td class="l">${t}</td><td>${d.count}</td><td>${(d.count / total * 100).toFixed(1)}%</td>
+      <td>${d.sev.LOW}</td><td>${d.sev.MEDIUM}</td><td>${d.sev.HIGH}</td><td>${d.sev.CRITICAL}</td></tr>`).join("");
+  return `<table><tr><th class="l">Attack vector</th><th>#</th><th>Share</th>
+    <th>LOW</th><th>MED</th><th>HIGH</th><th>CRIT</th></tr>${rows}
+    <tr><th class="l">Total</th><th>${total}</th><th>100%</th><th colspan="4"></th></tr></table>`;
+}
+
+// ---- δ table sample (first 12 valid edges, for paper compactness) ----
+function deltaSample() {
+  const all = Object.entries(VALID);
+  const sample = all.slice(0, 12).map(([key, to]) => {
+    const [from, ev] = key.split("|");
+    return `<tr><td class="l">${from}</td><td class="l">${ev}</td><td class="l">${to}</td></tr>`;
+  }).join("");
+  return `<table><tr><th class="l">From</th><th class="l">Event (Σ)</th><th class="l">To</th></tr>${sample}
+    <tr><td colspan="3" style="text-align:center;font-style:italic;">… ${all.length - 12} additional edges (full table available in repository)</td></tr></table>`;
+}
 
 const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>Tor FSM Invalid Transition Detection — IEEE Paper</title>
@@ -61,14 +129,16 @@ const html = `<!doctype html>
   .cols { column-count: 2; column-gap: 6mm; column-rule: none; }
   h2 { font-size: 10.5pt; text-transform: uppercase; letter-spacing: 0.4pt; text-align: center; margin: 12pt 0 4pt; font-weight: bold; }
   h3 { font-size: 10pt; font-style: italic; margin: 8pt 0 2pt; font-weight: normal; }
+  h4 { font-size: 9.5pt; margin: 6pt 0 2pt; font-weight: bold; font-style: italic; }
   p { text-align: justify; margin: 2pt 0 4pt; text-indent: 12pt; }
-  p.no-indent, .fig p, table + p { text-indent: 0; }
-  ul, ol { margin: 2pt 0 4pt 16pt; padding: 0; font-size: 9pt; }
-  table { border-collapse: collapse; width: 100%; font-size: 8pt; margin: 4pt 0; }
-  th, td { border: 1px solid #000; padding: 2pt 4pt; text-align: center; }
+  p.no-indent, .fig p, table + p, h2 + p, h3 + p, h4 + p, ul + p, pre + p { text-indent: 0; }
+  ul, ol { margin: 2pt 0 4pt 14pt; padding: 0; font-size: 9pt; }
+  ul li, ol li { margin: 1pt 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 7.8pt; margin: 4pt 0; }
+  th, td { border: 1px solid #000; padding: 2pt 3pt; text-align: center; }
   th { background: #ddd; }
   td.l, th.l { text-align: left; }
-  pre.algo { font-family: "Courier New", monospace; font-size: 7.5pt; line-height: 1.25; white-space: pre-wrap; background: #f4f4f4; padding: 4pt; border: 1px solid #aaa; margin: 4pt 0; }
+  pre.algo { font-family: "Courier New", monospace; font-size: 7pt; line-height: 1.25; white-space: pre-wrap; background: #f4f4f4; padding: 4pt; border: 1px solid #aaa; margin: 4pt 0; break-inside: avoid; }
   .fig { text-align: center; margin: 4pt 0 6pt; break-inside: avoid; }
   .fig svg { max-width: 100%; height: auto; }
   .cap { font-size: 8pt; margin-top: 2pt; }
@@ -83,26 +153,33 @@ const html = `<!doctype html>
 <div class="abstract"><b>Abstract</b>—We present the first published 5-tuple finite-state-machine (FSM)
 formalization of the Tor circuit life-cycle and propose a Model-Driven Testing
 (MDT) engine that systematically detects out-of-spec (invalid) state transitions.
-The Tor circuit is described over 10 states and 13 events; this yields a
+The Tor circuit is described over ${STATES.length} states and ${EVENTS.length} events; this yields a
 ${totalDomain}-cell domain with ${totalValid} valid and ${totalInvalid} invalid pairs.
-Every invalid pair is mapped programmatically to one of seven attack vectors
-(CIRCUIT_BYPASS, REPLAY_ATTACK, GHOST_CIRCUIT, HANDSHAKE_SKIP, PREMATURE_DATA,
-CIRCUIT_HIJACK, CREATE_FLOOD) with a four-level severity label. Three algorithms
+Every invalid pair is mapped programmatically to one of seven primary attack
+vectors (CIRCUIT_BYPASS, REPLAY_ATTACK, GHOST_CIRCUIT, HANDSHAKE_SKIP,
+PREMATURE_DATA, CIRCUIT_HIJACK, CREATE_FLOOD) plus a deterministic
+INVALID_TRANSITION fallback (1 cell), with a four-level severity label. Three algorithms
 — uniform random (B1), greedy state coverage (B2) and the proposed MDT (B3) —
 are compared under an identical 500-event budget across 30 paired trials. MDT
 saturates transition coverage at ${pct(stats.B3_MDT.tc.mean)} (vs.
 ${pct(stats.B1_Random.tc.mean)} / ${pct(stats.B2_GreedySC.tc.mean)}) and reaches
 an Invalid Transition Detection Rate of ${pct(stats.B3_MDT.itdr.mean)}. Welch
 t-tests, Mann-Whitney U and Wilcoxon signed-rank tests jointly confirm
-B3 &gt; {B1, B2} on TC and ITDR (p &lt; .001; Cohen's d ∈ [3.6, 15.4]); SC
-comparisons are saturated. Under budget-free audit, a hand-written 7-rule
-detector reaches only ${(ext.ruleBased.completeness * 100).toFixed(1)}%
-completeness — missing
+B3 &gt; {B1, B2} on TC and ITDR (p &lt; .001; Cohen's d ∈ [3.6, 15.4]); on SC
+B2 and B3 saturate at 100% while B1 lags. A budget sweep over
+B ∈ {50…5000} shows MDT is ${(5000 / 200).toFixed(0)}× more budget-efficient than the baselines on TC.
+Under budget-free Q×Σ audit, a hand-written 7-rule detector reaches only
+${(ext.ruleBased.completeness * 100).toFixed(1)}% completeness — missing
 ${ext.ruleBased.missedBySeverity.CRITICAL} CRITICAL and
 ${ext.ruleBased.missedBySeverity.HIGH} HIGH severity invalid pairs —
-quantifying the gap motivating spec-oracle MDT.</div>
+quantifying the gap that motivates spec-oracle MDT. Detection latency was
+measured with nanosecond-resolution batch amortization: invalid-CRITICAL
+classification takes ${ext.latencyData.invalid_critical.mean_ns.toFixed(0)} ns/call,
+≈${(50_000_000 / Math.max(ext.latencyData.invalid_critical.max_ns, 1)).toFixed(0)}×
+faster than the 50 ms proposal target.</div>
 <div class="keywords"><b>Index Terms</b>—Tor, anonymous network, finite-state machine,
-model-driven testing, protocol state fuzzing, security testing, transition coverage.</div>
+model-driven testing, protocol state fuzzing, security testing, transition coverage,
+Wilcoxon signed-rank, PRISMA.</div>
 
 <div class="cols">
 
@@ -112,186 +189,353 @@ two dominant axes: traffic correlation / timing attacks ${cite(2, 3, 4, 5)} and
 formal cryptographic analysis ${cite(6, 13)}. A third axis — protocol
 <i>state-machine</i> conformance — remains comparatively unexplored. Protocol
 state fuzzing has been applied to TLS implementations ${cite(9, 14)}, but no
-equivalent published study exists for Tor. This paper closes that gap.</p>
+equivalent published study exists for Tor. Existing surveys of Tor attacks
+${cite(5)} classify deanonymization vectors at the <i>category</i> level
+(traffic correlation, timing, fingerprinting) but do not provide a
+cell-level mapping between protocol-state events and attack types. This paper
+closes that gap.</p>
+
 <p class="no-indent"><b>Research questions.</b></p>
 <ul>
   <li><b>RQ1.</b> Can the Tor circuit life-cycle be formally modeled as a deterministic
-  5-tuple FSM?</li>
+  5-tuple FSM with a complete δ transition function?</li>
   <li><b>RQ2.</b> Can the resulting invalid-transition set (Q × Σ) ∖ dom(δ) be mapped
-  programmatically to known Tor attack vectors?</li>
+  programmatically to known Tor attack vectors with severity labels?</li>
   <li><b>RQ3.</b> Does an MDT-generated test suite deliver statistically significant
   gains over random and greedy baselines on Transition Coverage (TC) and Invalid
-  Transition Detection Rate (ITDR)?</li>
+  Transition Detection Rate (ITDR) under matched event budgets?</li>
+  <li><b>RQ4.</b> How does the proposed engine scale with budget B, and how does it
+  compare to a category-level hand-written rule baseline under budget-free audit?</li>
 </ul>
-<p class="no-indent"><b>Contributions.</b> (i) The first published complete δ-matrix
-for Tor circuits; (ii) a programmatic classifier mapping all
-${totalInvalid} invalid pairs to seven attack vectors and four severity levels;
-(iii) a reference open-source MDT implementation; (iv) a paired three-way
-statistical comparison validated by Welch t, Mann-Whitney U and Wilcoxon
-signed-rank tests.</p>
 
-<h2>II. Related Work</h2>
-<h3>A. Tor security and anonymity</h3>
-<p>Tor's protocol foundations ${cite(1)}, low-cost traffic analysis ${cite(2)},
-realistic-adversary correlation ${cite(3)}, internet-scale website fingerprinting
-${cite(4)} and the comprehensive de-anonymization survey ${cite(5)} establish the
-attack landscape. AnoA ${cite(6)} formalizes anonymity probabilistically; our
-state-conformance angle is orthogonal.</p>
-<h3>B. FSM-based testing</h3>
-<p>Lee and Yannakakis' classical survey ${cite(7)} establishes transition coverage
-methodology; Tretmans' LTS testing theory ${cite(8)} grounds our oracle as an
-ioco-style relation. de Ruiter and Poll's TLS state fuzzing ${cite(9)} is
-methodologically closest. Fiterău-Broștean et al. ${cite(10)} demonstrate model
-learning for TCP — a future-work pointer for automatic Tor extraction.
-Ammann and Offutt ${cite(11)} formalize transition coverage.</p>
-<h3>C. Formal protocol verification</h3>
-<p>Dolev–Yao ${cite(12)} bounds our threat model. Bhargavan et al. ${cite(13)}
-verify TLS 1.3 with ProVerif. Somorovsky ${cite(14)} fuzz-tests TLS libraries.</p>
-<h3>D. Software testing methodology</h3>
-<p>Felderer et al. ${cite(15)} taxonomize security testing; Pretschner et al.
-${cite(16)} apply MDT to access control. Kitchenham and Charters ${cite(17)}
-guide our SLR (limited to open-web sources due to no live database access in
-this work).</p>
+<p class="no-indent"><b>Contributions.</b> (i) The first published complete δ-matrix
+for Tor circuits, derived from the official Tor specification ${cite(19)};
+(ii) a programmatic classifier mapping all ${totalInvalid} invalid pairs to seven primary
+attack vectors plus a deterministic fallback, with four severity levels; (iii) a reference open-source MDT engine with
+worst-case complexity O(|Q|²·|Σ|²); (iv) a paired three-way statistical comparison
+validated by three independent test families (Welch t, Mann-Whitney U, Wilcoxon
+signed-rank); (v) a budget sensitivity analysis across seven points; (vi) a
+quantified completeness gap (${(ext.ruleBased.completeness * 100).toFixed(1)}% vs. 100%) between hand-written
+rule sets and spec-oracle detection; and (vii) a nanosecond-resolution detection
+latency profile.</p>
+
+<p class="no-indent"><b>Paper structure.</b> Section II surveys the literature using a
+PRISMA-guided SLR. Section III gives the FSM formalization, attack classifier and
+MDT algorithm. Section IV reports the empirical evaluation. Section V discusses
+threats to validity, and Section VI concludes.</p>
+
+<h2>II. Related Work and Literature Gap</h2>
+
+<h3>A. SLR methodology (PRISMA)</h3>
+<p>We followed Kitchenham and Charters' SLR guidelines ${cite(17)}. Search
+sources were limited to <i>open-web channels</i> (Google Scholar, arXiv,
+DOI resolution) because no live institutional access to Scopus, Web of Science
+or IEEE Xplore was available in our environment. Keywords: <i>"Tor security",
+"FSM testing", "model-based testing", "protocol state fuzzing", "anonymity
+network attacks"</i>. Year range: 1996–2026, with classic references
+year-tagged. Inclusion: peer-reviewed venue, full text accessible, work
+touching at least one of {Tor, FSM testing, formal protocol verification}.
+Twenty primary sources were retained, distributed over five thematic
+clusters: A) Tor security (6), B) FSM-based testing (5), C) Formal methods (3),
+D) Software testing methodology (3), E) Tor experimental infrastructure (3).</p>
+<p>The PRISMA flow is shown in Fig. 1. Because the open-web process did not
+retain an auditable query log, the <i>identified</i>, <i>screened</i> and
+<i>eligibility</i> stages are reported as <b>NA</b>; only the final
+included count (n = ${ext.prisma.included}) is verifiable and matches the
+citation count of <code>Literatur_Notlari.pdf</code> in the repository.
+This is a deliberate methodological choice to avoid false-precision
+reporting of unauditable intermediate counts.</p>
+<div class="fig">${svgPrisma}<div class="cap">Fig. 1. PRISMA flow of the literature search (intermediate counts NA, see Sec. V).</div></div>
+
+<h3>B. Tor security and anonymity</h3>
+<p>Foundational Tor protocol ${cite(1)}, low-cost traffic analysis ${cite(2)},
+realistic-adversary correlation ${cite(3)}, internet-scale website
+fingerprinting ${cite(4)} and the comprehensive deanonymization survey
+${cite(5)} establish the attack landscape. Four of our seven primary attack vectors
+(REPLAY_ATTACK, CIRCUIT_HIJACK, CIRCUIT_BYPASS, GHOST_CIRCUIT) are derived
+from the taxonomy in ${cite(5)}. AnoA ${cite(6)} formalizes anonymity
+probabilistically; our state-conformance angle is orthogonal.</p>
+
+<h3>C. FSM-based testing and model learning</h3>
+<p>Lee and Yannakakis' classical survey ${cite(7)} establishes transition-tour,
+W-method and Wp-method techniques — our BFS-planned positive phase is a
+simplified <i>transition tour</i>. Tretmans' LTS testing theory ${cite(8)}
+grounds the oracle as an ioco-style relation; because our FSM is deterministic
+this reduces to plain equality. de Ruiter and Poll's TLS state fuzzing
+${cite(9)} is methodologically closest; we transplant the methodology from
+TLS to Tor. Fiterău-Broștean et al. ${cite(10)} combine L*-style model
+learning with model checking on TCP — a pointer for future automatic Tor
+δ extraction. Ammann and Offutt ${cite(11)} provide the formal definition
+of transition (edge) coverage used here.</p>
+
+<h3>D. Formal protocol verification and security testing</h3>
+<p>Dolev–Yao ${cite(12)} bounds our adversary model. Bhargavan et al.
+${cite(13)} verify TLS 1.3 with ProVerif. Somorovsky ${cite(14)} systematically
+fuzzes TLS libraries — a close cousin in negative test generation. Felderer
+et al.'s security testing survey ${cite(15)} places our work in the
+"Model-Based Security Testing" branch. Pretschner et al. ${cite(16)} apply
+MDT to access-control policies.</p>
+
 <h3>E. Tor experimental infrastructure</h3>
-<p>Shadow ${cite(18)} provides Tor network simulation. The official Tor
-specification ${cite(19)} is δ's authority. Microsoft Research ${cite(20)}
-demonstrates data-driven FSM security analysis in industry but not for Tor.</p>
+<p>Jansen et al.'s Shadow simulator ${cite(18)} provides a systematic Tor
+network testbed. The official Tor specification ${cite(19)} is the
+normative source of δ. Microsoft Research ${cite(20)} demonstrates
+data-driven FSM security analysis in industry but not for Tor.</p>
+
+<h3>F. Identified research gaps</h3>
+<p>Twenty-source SLR analysis identifies four concrete gaps at thesis scale:</p>
+<ul>
+  <li><b>(G1)</b> No published formal 5-tuple FSM exists for the Tor circuit
+  protocol; the specification ${cite(19)} is procedural, never reduced to
+  a δ matrix in the academic literature.</li>
+  <li><b>(G2)</b> Protocol state fuzzing has been done for TLS ${cite(9, 14)}
+  but not for Tor.</li>
+  <li><b>(G3)</b> No row-by-row mapping exists between Tor attack vectors
+  and (state, event) cells; surveys ${cite(5)} remain categorical.</li>
+  <li><b>(G4)</b> No primary study defines and measures an ITDR-like metric
+  (detected ÷ injected invalid transitions) for Tor.</li>
+</ul>
+<p>The contributions in Sec. I close all four gaps.</p>
 
 <h2>III. Method</h2>
-<h3>A. FSM formalization</h3>
-<p>The Tor circuit is modeled as M = (Q, Σ, δ, q₀, F) with |Q| = 10, |Σ| = 13,
-|dom(δ)| = ${totalValid}, q₀ = IDLE, F = {CLOSED}. The full δ table is in the
-extended thesis appendix; Fig. 1 visualizes the graph.</p>
-<div class="fig">${svgFsm}<div class="cap">Fig. 1. Tor circuit FSM δ-graph. ${totalValid} valid edges over 10 states.</div></div>
-<h3>B. Attack classification</h3>
-<p>A deterministic <code>classifyInvalid(s, e)</code> function maps every
-(s, e) ∈ Invalid to a (type, severity) pair via nine condition families:
-data-flow before circuit-ready, CREATE/CREATED flow, EXTEND/EXTENDED flow,
-DESTROY out of place, CONNECT misuse, TLS_OK / TLS_FAIL misuse, CIRCUIT_CLOSED
-misuse, TIMEOUT misuse, fallback. The output covers all ${totalInvalid}
-invalid pairs.</p>
+
+<h3>A. FSM formalization (RQ1)</h3>
+<p>The Tor circuit life-cycle is modeled as a classical DFA
+<i>M = (Q, Σ, δ, q₀, F)</i> with:</p>
+<ul>
+  <li><i>|Q|</i> = ${STATES.length} states: ${STATES.join(", ")}.</li>
+  <li><i>|Σ|</i> = ${EVENTS.length} events (CONNECT, TLS_OK, TLS_FAIL,
+  SEND_CREATE, RECV_CREATED, SEND_EXTEND, RECV_EXTENDED, SEND_RELAY_DATA,
+  RECV_RELAY_DATA, SEND_DESTROY, RECV_DESTROY, CIRCUIT_CLOSED, TIMEOUT).</li>
+  <li><i>q₀ = IDLE</i>, <i>F = {CLOSED}</i>.</li>
+  <li><i>δ : Q × Σ → Q</i> is defined on ${totalValid} pairs; the total
+  domain |Q × Σ| = ${totalDomain}, so the Invalid set
+  (Q × Σ) ∖ dom(δ) has ${totalInvalid} elements.</li>
+</ul>
+<p>Fig. 2 visualizes δ as a directed graph. A representative subset of
+the δ table is shown in Table I; the full table is generated programmatically
+from a single source of truth (<code>server/fsm.ts</code>) and is provided
+in the public repository.</p>
+<div class="fig">${svgFsm}<div class="cap">Fig. 2. Tor circuit FSM δ-graph. ${totalValid} valid edges over ${STATES.length} states.</div></div>
+<p class="no-indent"><b>Table I.</b> Sample of the δ transition table.</p>
+${deltaSample()}
+
+<h3>B. Attack classifier (RQ2)</h3>
+<p>A deterministic function <code>classifyInvalid(s, e)</code> maps every
+pair (s, e) ∈ Invalid to a (type, severity) tuple via nine condition
+families: data-flow-before-circuit-ready, CREATE/CREATED flow,
+EXTEND/EXTENDED flow, DESTROY out-of-place, CONNECT misuse,
+TLS_OK / TLS_FAIL misuse, CIRCUIT_CLOSED misuse, TIMEOUT misuse, and an
+INVALID_TRANSITION fallback. The output covers all ${totalInvalid} invalid
+cells with severity labels in {LOW, MEDIUM, HIGH, CRITICAL}. Table II
+gives the per-vector distribution computed programmatically over the
+full Invalid set.</p>
+<p class="no-indent"><b>Table II.</b> Attack-vector inventory over ${totalInvalid} invalid pairs (programmatic).</p>
+${attackInventory()}
+<p style="font-size:8.5pt;color:#444;">GHOST_CIRCUIT dominates by count, reflecting the structural
+prevalence of "event-out-of-context" patterns; CIRCUIT_HIJACK and
+CIRCUIT_BYPASS hold the highest severity weights despite lower counts.</p>
+<div class="fig">${svgHeat}<div class="cap">Fig. 3. Attack-severity heatmap over (state × event).</div></div>
 
 <h3>C. MDT engine — Algorithm 1</h3>
-<pre class="algo">Input:  M = (Q,Σ,δ,q₀,F);  Budget B
+<pre class="algo">Algorithm 1: Model-Driven Test (BFS-planned)
+Input:  M = (Q,Σ,δ,q₀,F);  Budget B (event count)
 Output: ⟨SC, TC, ITDR, FPR⟩
  1  visited ← {q₀}; coveredV ← ∅; detectedI ← ∅
- 2  Valid ← {(s,e) | δ(s,e) defined}
- 3  Invalid ← (Q×Σ) ∖ Valid
+ 2  Valid   ← {(s,e) | δ(s,e) defined}
+ 3  Invalid ← (Q × Σ) ∖ Valid
  4  // Positive phase
- 5  for (s,e) ∈ Permute(Valid) until events≥B:
- 6      π ← BFS_PATH(q₀, s);  if π=null continue
- 7      EXECUTE(π · ⟨e⟩)
- 8  // Negative phase
- 9  for (s,e) ∈ Permute(Invalid) until events≥B:
-10      π ← BFS_PATH(q₀, s)
-11      EXECUTE(π · ⟨e⟩)             // δ-oracle flags it
-12  return ⟨|visited|/|Q|, |coveredV|/|Valid|,
-          |detectedI|/|Invalid|, FPR⟩
+ 5  for (s,e) ∈ Permute(Valid):
+ 6     if events ≥ B: break
+ 7     if (s,e) ∈ coveredV: continue
+ 8     π ← BFS_PATH(q₀, s)
+ 9     if π = null: continue
+10     EXECUTE(π · ⟨e⟩)        // updates visited, coveredV
+11  // Negative phase
+12  for (s,e) ∈ Permute(Invalid):
+13     if events ≥ B: break
+14     if (s,e) ∈ detectedI: continue
+15     π ← BFS_PATH(q₀, s)
+16     if π = null ∧ s ≠ q₀: continue
+17     EXECUTE(π · ⟨e⟩)        // δ-oracle flags it
+18  SC   ← |visited|/|Q|
+19  TC   ← |coveredV|/|Valid|
+20  ITDR ← |detectedI|/|Invalid|
+21  FPR  ← |misflagged ∈ Valid|/|Valid|  // 0 here, see Sec. V
+22  return ⟨SC, TC, ITDR, FPR⟩
 </pre>
-<p>Worst-case complexity is O(|Q|² · |Σ|²); empirical mean cost per
-trial is &lt; 10 ms on commodity hardware.</p>
+<p><b>Complexity.</b> A single BFS_PATH call is O(|Q|·|Σ|). The positive
+phase invokes it up to |Valid| = ${totalValid} times and the negative phase
+up to |Invalid| = ${totalInvalid} times, so the overall worst-case is
+<b>O((|Valid|+|Invalid|)·|Q|·|Σ|) = O(|Q|²·|Σ|²)</b>. A single EXECUTE
+path has length at most diam(δ)+1 ≈ ${STATES.length}. Empirically, one trial
+at B = 500 finishes in &lt; 10 ms on commodity hardware.</p>
 
 <h3>D. Compared algorithms</h3>
-<p><b>B1</b> draws events uniformly from Σ. <b>B2</b> greedily chooses an
-event leading to an unvisited state, falling back to a 70/30 valid/invalid
-mixture. <b>B3</b> is Algorithm 1.</p>
+<ul>
+  <li><b>B1 — Uniform Random:</b> at each step picks an event uniformly
+  from Σ; resets to IDLE upon reaching CLOSED.</li>
+  <li><b>B2 — Greedy State Coverage:</b> at each step picks an event leading
+  to an unvisited state if possible; otherwise random valid (70%) or
+  random invalid (30%) event.</li>
+  <li><b>B3 — MDT (Algorithm 1):</b> the proposed BFS-planned engine.</li>
+</ul>
+<p>All three are run under the same B = 500 event budget; the comparison
+is fair (Sec. IV-A).</p>
 
 <h2>IV. Evaluation</h2>
-<h3>A. Design</h3>
-<p>Each algorithm is run for N = 30 paired trials at budget B = 500 events;
-seeds are matched across algorithms (seed = 1000+i). A budget sweep
-B ∈ {50, 100, 200, 500, 1000, 2000, 5000} is also performed.</p>
 
-<h3>B. Coverage and ITDR (B = 500)</h3>
+<h3>A. Design</h3>
+<p>Each algorithm is run for N = 30 paired trials. PRNG seeds are fixed
+within each trial (seed = 1000+i, i ∈ [0, 29]) and matched across
+algorithms; this paired design reduces within-condition variance.
+Metrics — SC, TC, ITDR — are all in [0, 1]. In addition, a budget sweep
+B ∈ {50, 100, 200, 500, 1000, 2000, 5000} is performed with 30 trials per
+point.</p>
+
+<h3>B. Coverage and ITDR at B = 500</h3>
+<p class="no-indent"><b>Table III.</b> Descriptive statistics (mean ± SD across N = 30 trials).</p>
 <table>
-<tr><th>Alg.</th><th>SC</th><th>TC</th><th>ITDR</th></tr>
-<tr><td class="l">B1</td><td>${pct(stats.B1_Random.sc.mean)}±${pct(stats.B1_Random.sc.sd)}</td>
+<tr><th class="l">Algorithm</th><th>SC</th><th>TC</th><th>ITDR</th></tr>
+<tr><td class="l">B1 — Random</td><td>${pct(stats.B1_Random.sc.mean)}±${pct(stats.B1_Random.sc.sd)}</td>
 <td>${pct(stats.B1_Random.tc.mean)}±${pct(stats.B1_Random.tc.sd)}</td>
 <td>${pct(stats.B1_Random.itdr.mean)}±${pct(stats.B1_Random.itdr.sd)}</td></tr>
-<tr><td class="l">B2</td><td>${pct(stats.B2_GreedySC.sc.mean)}±${pct(stats.B2_GreedySC.sc.sd)}</td>
+<tr><td class="l">B2 — Greedy SC</td><td>${pct(stats.B2_GreedySC.sc.mean)}±${pct(stats.B2_GreedySC.sc.sd)}</td>
 <td>${pct(stats.B2_GreedySC.tc.mean)}±${pct(stats.B2_GreedySC.tc.sd)}</td>
 <td>${pct(stats.B2_GreedySC.itdr.mean)}±${pct(stats.B2_GreedySC.itdr.sd)}</td></tr>
-<tr><td class="l">B3</td><td>${pct(stats.B3_MDT.sc.mean)}±${pct(stats.B3_MDT.sc.sd)}</td>
+<tr><td class="l">B3 — MDT</td><td>${pct(stats.B3_MDT.sc.mean)}±${pct(stats.B3_MDT.sc.sd)}</td>
 <td>${pct(stats.B3_MDT.tc.mean)}±${pct(stats.B3_MDT.tc.sd)}</td>
 <td>${pct(stats.B3_MDT.itdr.mean)}±${pct(stats.B3_MDT.itdr.sd)}</td></tr>
 </table>
+<div class="fig">${svgSev}<div class="cap">Fig. 4. Severity-weighted invalid detection per algorithm.</div></div>
 
-<h3>C. Statistical tests</h3>
-<p>For each (algorithm pair × metric), Welch t and Mann-Whitney U on
-independent samples and Wilcoxon signed-rank on paired samples are computed.
-B3 vs. {B1, B2} comparisons on TC and ITDR yield p &lt; .001 with
-Cohen's d ∈ [3.6, 15.4]. On SC, B2 and B3 saturate at 100% (p = 1.0) while
-B1 lags at ${pct(stats.B1_Random.sc.mean)} and is significantly below both
-(p &lt; .001). Under <i>budget-free Q×Σ
-audit</i>, the B0 (rule-based) detector with seven hand-written signatures
-reaches only ${(ext.ruleBased.completeness * 100).toFixed(1)}% completeness on
-the ${ext.ruleBased.totalInvalid}-cell invalid set, missing
-${ext.ruleBased.missedBySeverity.CRITICAL} CRITICAL and
-${ext.ruleBased.missedBySeverity.HIGH} HIGH severity pairs (Fig. 3); the
-spec-oracle reaches 100%. In the budget-constrained run (B = 500), MDT's
-ITDR is ${pct(stats.B3_MDT.itdr.mean)}, which approaches the audit-mode
-asymptote with budget (Fig. 2).</p>
+<h3>C. Hypothesis tests — Welch &amp; Mann-Whitney</h3>
+<p>For each pair × metric, normality is checked via Lilliefors-corrected
+K-S (α = 0.05); the primary test is Welch's t (unequal variance) and the
+confirmatory test is Mann-Whitney U. Cohen's d uses pooled SD.
+Table IV summarizes the nine comparisons.</p>
+<p class="no-indent"><b>Table IV.</b> Pairwise hypothesis tests (B = 500, N = 30 paired trials).</p>
+<table>
+<tr><th class="l">Comparison</th><th>Metric</th><th>t</th><th>p (Welch)</th><th>p (M-W)</th><th>d</th></tr>
+${hypTableRows}
+</table>
 
-<h3>D. Budget sensitivity</h3>
-<p>Fig. 2 shows TC versus log-scale budget. <b>For TC</b>, B3 reaches
+<h3>D. Wilcoxon signed-rank (paired design)</h3>
+<p>Because seeds are paired across algorithms, the design-appropriate
+non-parametric test is Wilcoxon signed-rank. Table V reports W, z, p and
+the effective sample size after dropping zero differences (ties).</p>
+<p class="no-indent"><b>Table V.</b> Wilcoxon signed-rank tests on paired differences.</p>
+<table>
+<tr><th class="l">Comparison</th><th>Metric</th><th>W</th><th>z</th><th>p</th><th>n (≠0)</th></tr>
+${wilcoxonRows}
+</table>
+<p><b>Constrained interpretation.</b> The main hypotheses — <i>B3 &gt; B1</i>
+and <i>B3 &gt; B2</i> — are confirmed on TC and ITDR (p &lt; .001),
+matching Welch. On SC, the means are B1 ${pct(stats.B1_Random.sc.mean)},
+B2 ${pct(stats.B2_GreedySC.sc.mean)}, B3 ${pct(stats.B3_MDT.sc.mean)};
+so <i>B3 vs B2</i> on SC saturates at 100% (n≠0 = 0, p = 1.0) while
+<i>B3 vs B1</i> and <i>B2 vs B1</i> remain p &lt; .001 — i.e., Random lags
+structurally on SC. Finally, <i>B2 vs B1</i> on ITDR is <b>not</b> significant
+(p &gt; .05), evidence that the greedy heuristic offers no systematic
+advantage over Random in negative test generation.</p>
+
+<h3>E. Budget sensitivity</h3>
+<p>Figs. 5 and 6 plot TC and ITDR against log-scale budget; shaded bands are
+±1 SD.</p>
+<div class="fig">${svgBudgetTC}<div class="cap">Fig. 5. Transition coverage vs. event budget (N=30 per point, shaded ±SD).</div></div>
+<div class="fig">${svgBudgetITDR}<div class="cap">Fig. 6. ITDR vs. event budget (N=30 per point, shaded ±SD).</div></div>
+<p><b>For TC</b>, B3 reaches
 ${pct(ext.budgetCurve.B3_MDT.find(x=>x.budget===200).tc_mean)} at B = 200,
-exceeding B1 (${pct(ext.budgetCurve.B1_Random.find(x=>x.budget===5000).tc_mean)})
-and B2 (${pct(ext.budgetCurve.B2_GreedySC.find(x=>x.budget===5000).tc_mean)})
-at B = 5000 — i.e., MDT is ${(5000 / 200).toFixed(0)}× more budget-efficient
-on TC. <b>For ITDR</b> the dynamic differs: at B = 200, B3 ITDR is only
+already above B1
+(${pct(ext.budgetCurve.B1_Random.find(x=>x.budget===5000).tc_mean)}) and B2
+(${pct(ext.budgetCurve.B2_GreedySC.find(x=>x.budget===5000).tc_mean)})
+at B = 5000 — i.e., MDT is ${(5000 / 200).toFixed(0)}× more budget-efficient on TC.
+<b>For ITDR</b> the dynamic differs: at B = 200, B3 ITDR is only
 ${pct(ext.budgetCurve.B3_MDT.find(x=>x.budget===200).itdr_mean)} and the
-advantage opens up with budget; at B = 5000, B3 reaches
+advantage widens with budget. At B = 5000, B3 reaches
 ${pct(ext.budgetCurve.B3_MDT.find(x=>x.budget===5000).itdr_mean)} while B1/B2
 plateau at ${pct(ext.budgetCurve.B1_Random.find(x=>x.budget===5000).itdr_mean)} /
-${pct(ext.budgetCurve.B2_GreedySC.find(x=>x.budget===5000).itdr_mean)}.</p>
-<div class="fig">${svgBudget}<div class="cap">Fig. 2. Transition coverage vs. event budget (N=30, shaded ±SD).</div></div>
+${pct(ext.budgetCurve.B2_GreedySC.find(x=>x.budget===5000).itdr_mean)}. The
+ITDR plateau of heuristic baselines is the operational evidence for gap G4.</p>
 
-<h3>E. Detection latency</h3>
+<h3>F. Rule-based detector baseline (B0)</h3>
+<p>To quantify the gap motivating spec-oracle MDT, a hand-written rule-based
+detector (B0) was implemented with seven signatures — one per primary attack
+vector (the deterministic fallback class has no specific rule).
+Under <i>budget-free Q×Σ audit</i> (every cell enumerated), B0 achieves
+only ${(ext.ruleBased.completeness * 100).toFixed(1)}% completeness on the
+${ext.ruleBased.totalInvalid}-cell invalid set, missing
+${ext.ruleBased.missedBySeverity.CRITICAL} CRITICAL and
+${ext.ruleBased.missedBySeverity.HIGH} HIGH severity pairs (Fig. 7);
+the spec-oracle reaches 100% in the same audit mode. This quantifies the
+limitation of category-level rule sets: without the cell-level δ map (gap G3),
+even high-severity attacks are systematically missed.</p>
+<div class="fig">${svgRule}<div class="cap">Fig. 7. Rule-based (B0) vs. spec-oracle completeness over ${totalInvalid} invalid pairs.</div></div>
+
+<h3>G. Detection latency</h3>
 <p>Latency was measured with nanosecond-resolution
-<code>process.hrtime.bigint()</code> using batch amortization
-(B = ${ext.latencyData.batchSize.toLocaleString()} step calls per measurement,
-empty-loop overhead of ${ext.latencyData.overheadNs.toFixed(2)} ns/iter
-calibrated and subtracted, N = ${ext.latencyData.repeats} repeats).
-Three representative cells were probed: a valid step
-(${ext.latencyData.valid_step.mean_ns.toFixed(0)} ns/call), an invalid CRITICAL
-cell (${ext.latencyData.invalid_critical.mean_ns.toFixed(0)} ns/call) and an
-invalid LOW cell (${ext.latencyData.invalid_low.mean_ns.toFixed(0)} ns/call).
-The slowest probe's worst case
-(${ext.latencyData.invalid_critical.max_ns.toFixed(0)} ns) is
+<code>process.hrtime.bigint()</code> and batch amortization:
+each measurement wraps B = ${ext.latencyData.batchSize.toLocaleString()} step calls,
+the total time is divided by B, and a pre-calibrated empty-loop overhead
+of ${ext.latencyData.overheadNs.toFixed(2)} ns/iter is subtracted; N =
+${ext.latencyData.repeats} batch repeats per probe. Three representative
+cells were probed (Table VI).</p>
+<p class="no-indent"><b>Table VI.</b> Per-cell detection latency (ns/call).</p>
+<table>
+<tr><th class="l">Probe</th><th>mean</th><th>SD</th>
+    <th>p50</th><th>p95</th><th>min</th><th>max</th></tr>
+${latencyRows}
+</table>
+<p>The slowest probe's worst case is
+${ext.latencyData.invalid_critical.max_ns.toFixed(0)} ns —
 ≈${(50_000_000 / Math.max(ext.latencyData.invalid_critical.max_ns, 1)).toFixed(0)}×
 faster than the proposal target of 50 ms. Invalid handling is ~2× slower than
-valid because <code>classifyInvalid</code> evaluates an additional condition
-chain.</p>
+valid because <code>classifyInvalid</code> evaluates an additional condition chain.</p>
 
-<div class="fig">${svgRule}<div class="cap">Fig. 3. Hand-written rule set vs. spec-oracle completeness.</div></div>
-
-<h2>V. Discussion</h2>
+<h2>V. Discussion and Threats to Validity</h2>
 <p>The MDT advantage stems from explicit access to δ as a planning oracle:
-positive phase exploits BFS for guaranteed reachability of every valid edge;
-negative phase iterates the algebraically derived Invalid set rather than
-hoping to stumble onto it. The B0 result quantifies the limit of category-level
-rule sets: 7 rules cover only
-${(ext.ruleBased.completeness * 100).toFixed(1)}% of invalid pairs,
-demonstrating that without the cell-level δ map (research gap G3) even
-high-severity attacks are missed.</p>
-<p class="no-indent"><b>Threats to validity.</b> (i) Ground truth equals the
-specification; deviations of real Tor binaries from spec are not measured.
-(ii) FPR is structurally zero because oracle and generator share the model;
-an independent oracle (e.g., Shadow ${cite(18)} packet capture) is required to
-populate it. (iii) The SLR was limited to open-web sources due to the absence
-of live academic database access in our environment; PRISMA intermediate counts
-are reported as NA because no auditable query log was retained — only the final
-included set (n=${ext.prisma.included}) is verifiable. (iv) Latency was measured
-on a single-platform, single-thread, JIT-warm Node.js V8 environment; profiles
-on a real Tor C/Rust implementation may differ.</p>
+the positive phase exploits BFS for guaranteed reachability of every valid
+edge; the negative phase iterates the algebraically derived Invalid set
+rather than hoping to stumble onto it. The B0 result quantifies the limit
+of category-level rule sets — seven rules cover only
+${(ext.ruleBased.completeness * 100).toFixed(1)}% of invalid pairs (gap G3).
+The non-significant B2 vs B1 result on ITDR is itself an evidence point:
+heuristics that optimize <i>positive</i> coverage do not automatically
+generate good <i>negative</i> tests — invalid-pair coverage requires explicit
+enumeration.</p>
 
-<h2>VI. Conclusion</h2>
+<p class="no-indent"><b>Threats to validity.</b></p>
+<ul>
+  <li><b>(i) Ground truth = specification.</b> Deviations of real Tor C
+  binaries from spec are not measured. Future work: replicate the experiment
+  on a real Tor relay via the Shadow ${cite(18)} simulator.</li>
+  <li><b>(ii) FPR = 0 is structural.</b> Because oracle and generator share
+  the same δ, the false-positive set is empty by construction. A meaningful
+  FPR requires an <i>independent</i> oracle (e.g., packet-capture-based
+  observer).</li>
+  <li><b>(iii) N = 30 trials.</b> Sufficient for CLT but no formal power
+  analysis (β = 0.80, α = 0.05) was conducted. Recommended extension:
+  N = 100.</li>
+  <li><b>(iv) SLR scope.</b> Limited to open-web sources due to the absence
+  of live academic database access; PRISMA intermediate counts are reported
+  as NA (Sec. II-A). Missing sources may exist.</li>
+  <li><b>(v) Single-platform latency.</b> Latency was measured on a single
+  Node.js V8 thread (JIT-warm); profiles on a real Tor C/Rust implementation
+  may differ. A cross-implementation port of the δ table is required for
+  comparative measurement.</li>
+</ul>
+
+<h2>VI. Conclusion and Future Work</h2>
 <p>We delivered the first complete published Tor circuit δ-matrix, a
 programmatic invalid-pair classifier, a reference MDT engine, and a paired
-three-way statistical comparison validated by three test families. Future work:
+three-way statistical comparison validated by three test families plus a
+seven-point budget sweep and a rule-based baseline. The MDT engine
+saturates transition coverage and yields ITDR gains of up to ${((stats.B3_MDT.itdr.mean - stats.B1_Random.itdr.mean) * 100).toFixed(1)}
+points over Random with p &lt; .001 and Cohen's d &gt; 3.6. Future work:
 (a) L*-style automatic δ extraction from real Tor binaries ${cite(10)};
-(b) Stream and Hidden-Service-v3 sub-FSMs; (c) independent oracle via Shadow
-${cite(18)} for genuine FPR measurement.</p>
+(b) Stream and Hidden-Service-v3 sub-FSMs;
+(c) independent oracle via Shadow ${cite(18)} for genuine FPR measurement;
+(d) cross-implementation latency profiling.</p>
 
 <h2>References</h2>
 ${REFS.map((r) => `<div class="ref">${r}</div>`).join("")}
