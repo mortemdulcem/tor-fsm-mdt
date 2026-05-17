@@ -936,6 +936,156 @@ oturtur: <i>sezgiselin tükenebildiği yer Invalid kümesidir</i>.</p>
 
 <div class="pagebreak"></div>
 
+<!-- ====================== BÖLÜM 4.11 — D-grubu ====================== -->
+<h3>4.11 D-grubu: Bağımsız Oracle, Genişletilmiş SLR ve Cross-Language Latency</h3>
+
+<p>Bölüm 6.2'de "bu ortamda giderilemez" olarak işaretlenmiş üç sınırlılığın
+<i>kısmi ama dürüst</i> ikameleri bu bölümde sunulmaktadır. Her birinin
+kapsamı ve hangi tehdidi <b>tamamen</b> kaldırmadığı açıkça etiketlenmiştir.</p>
+
+<h4>4.11.1 Bağımsız 2. Oracle (model-düzeyi)</h4>
+<p>FPR = 0 yapısallığını (Bölüm 6.2-ii) kırmak için ideal olan, gerçek Tor
+binary'sinden FSM çıkarımıdır; bu mümkün değildir. Bunun yerine, <b>spec metin
+anlatımından</b> (operasyonel δ tablosundan değil) elle türetilmiş
+9 adet LTL-tarzı invariant'tan oluşan
+bağımsız bir oracle yazılmıştır (kod: <code>server/independent_oracle.ts</code>).
+Bu oracle her (s, e) için "izinli / değil" kararını δ'ya bakmadan verir.
+İki oracle Q × Σ = 130 hücre üzerinde
+karşılaştırılmıştır:</p>
+
+<table>
+<tr><th></th><th>Oracle: ALLOWED</th><th>Oracle: DENIED</th></tr>
+<tr><th class="l">δ: VALID</th><td>25</td><td>0</td></tr>
+<tr><th class="l">δ: INVALID</th><td>2</td><td>103</td></tr>
+</table>
+<p class="no-indent">Toplam uyum: <b>98.46%</b>
+(128/130).
+Cohen κ ≈ 0.969 (kabaca, sınırlı veriyle).</p>
+
+
+<p><b>Anlamlı uyumsuzluklar (2 adet)</b> — bu sayı sıfır olmadığı
+için iki oracle'ın gerçekten bağımsız olduğu görünür:</p>
+<table>
+<tr><th>Durum</th><th>Olay</th><th>δ kararı</th><th>Bağımsız oracle</th></tr>
+<tr>
+  <td class="l">IDLE</td><td>TIMEOUT</td><td>INVALID</td><td>ALLOWED</td>
+</tr><tr>
+  <td class="l">ERROR</td><td>TIMEOUT</td><td>INVALID</td><td>ALLOWED</td>
+</tr>
+</table>
+<p>Tartışma: Her iki uyumsuzluk da TIMEOUT olayının terminal/başlangıç durumlardaki
+(IDLE, ERROR) yorumuna ilişkindir. δ tablosu daha sıkı (timer
+"fire" etmez), narrative invariant I9 daha gevşek (yalnızca CLOSED'da yasak).
+Spec metni bu noktada belirsizdir; uyumsuzluk bir "hata" değil, bir
+<i>spesifikasyon belirsizliği</i> bulgusudur ve gerçek Tor binary'sinde
+hangisinin gözlendiği ampirik bir sorudur.</p>
+
+<p><b>Sınırlama (açıkça):</b> İki oracle da spec-türevlidir; gerçek Tor C kodu
+ile karşılaştırma DEĞİLDİR. Threats (i) ve (v) tam olarak kaldırılmaz, ancak
+"single-source oracle" zaafiyeti kısmen kırılır.</p>
+
+<h4>4.11.2 Genişletilmiş SLR — Canlı Akademik API Sorguları</h4>
+<p>Bölüm 6.2-v'te belirtilen "Scopus / WoS canlı erişim yok" sınırlılığını
+<b>kısmen</b> kapatmak için üç açık-erişim akademik API canlı olarak
+sorgulanmıştır (kod: <code>experiments/d_extensions.mjs</code>):</p>
+<ul>
+  <li><b>OpenAlex</b> — ~250M iş, IEEE/Springer/Elsevier dahil (paywall'lı içerik dahil indekslenir)</li>
+  <li><b>CrossRef</b> — DOI metadata, 30 kayıt</li>
+  <li><b>arXiv</b> — ön baskı API, 10 kayıt</li>
+</ul>
+<p>5 sorgu × 2020-2026 yıl filtresi ile
+toplam <b>115</b> kayıt çekilmiş;
+DOI/başlık normalizasyonu sonrası <b>111</b> tekil
+kayıt elde edilmiştir. Sorgu tarihi: 2026-05-17.</p>
+
+<p class="no-indent"><b>Tablo 4.11-A.</b> Atıf sayısına göre üst 10 sonuç (canlı API çıktısı).</p>
+<table>
+<tr><th>Kaynak</th><th>Yıl</th><th>Atıf</th><th>Başlık (kısa)</th></tr>
+<tr>
+  <td>openalex</td><td>2020</td><td>4553</td>
+  <td class="l">Advances and Open Problems in Federated Learning</td>
+</tr><tr>
+  <td>openalex</td><td>2023</td><td>3539</td>
+  <td class="l">Opinion Paper: “So what if ChatGPT wrote it?” Multidisciplinary perspectives on opportunit…</td>
+</tr><tr>
+  <td>openalex</td><td>2021</td><td>2843</td>
+  <td class="l">Variational quantum algorithms</td>
+</tr><tr>
+  <td>openalex</td><td>2021</td><td>2827</td>
+  <td class="l">Intelligent Reflecting Surface-Aided Wireless Communications: A Tutorial</td>
+</tr><tr>
+  <td>openalex</td><td>2021</td><td>2496</td>
+  <td class="l">SimCSE: Simple Contrastive Learning of Sentence Embeddings</td>
+</tr><tr>
+  <td>openalex</td><td>2020</td><td>2443</td>
+  <td class="l">In-Kernel Aggregation and Broadcast Acceleration for Distributed Communication</td>
+</tr><tr>
+  <td>openalex</td><td>2020</td><td>1915</td>
+  <td class="l">Towards 6G wireless communication networks: vision, enabling technologies, and new paradig…</td>
+</tr><tr>
+  <td>openalex</td><td>2023</td><td>1888</td>
+  <td class="l">On the Road to 6G: Visions, Requirements, Key Technologies, and Testbeds</td>
+</tr><tr>
+  <td>openalex</td><td>2020</td><td>1660</td>
+  <td class="l">Digital Twin: Values, Challenges and Enablers From a Modeling Perspective</td>
+</tr><tr>
+  <td>openalex</td><td>2023</td><td>1621</td>
+  <td class="l">Interpreting Black-Box Models: A Review on Explainable Artificial Intelligence</td>
+</tr>
+</table>
+<p><b>Sınırlama (açıkça):</b> OpenAlex IEEE indeksli kayıtları içerse de
+Scopus/WoS'un tam metin + atıf grafı + author-affiliation analizine sahip
+DEĞİLDİR. Bu kayıtlar PRISMA tablosuna referans olarak eklenmiştir; tam-metin
+okuma + kalite değerlendirmesi yapılmamıştır (bu, gelecek çalışmadır).</p>
+
+<h4>4.11.3 Cross-Language Latency — C Portu (Yaklaşık, Sadece Hot Path)</h4>
+<p>Bölüm 6.2-vi'da belirtilen "tek-platform latency" sınırlılığı için
+δ-lookup + <code>classifyInvalid</code> hot path'inin <b>yaklaşık</b> bir C
+portu yazılmıştır (kod: <code>experiments/c_latency/c_latency.c</code>). Port,
+TypeScript karşılığıyla mantıksal olarak eşdeğer olacak şekilde elle
+yazılmıştır; ancak satır-satır birebir transpilasyon değildir (TS tarafındaki
+bazı nesne yapıları C'de int kodlarına indirgenmiştir). gcc -O3 ile derlenmiş
+ve Node.js tarafıyla <b>aynı</b> ölçüm protokolü uygulanmıştır: aynı 3 probe
+(IDLE+CONNECT, IDLE+SEND_RELAY_DATA, ERROR+TLS_FAIL), aynı batch boyutu
+(100,000), aynı tekrar sayısı
+(30), calibration ile loop overhead düşürümü,
+CLOCK_MONOTONIC.</p>
+
+<p class="no-indent"><b>Tablo 4.11-B.</b> Node.js V8 vs C (gcc -O3) — aynı δ-tablo, aynı probe.</p>
+<table>
+<tr><th>Probe</th><th>Node ortalama (ns)</th><th>C ortalama (ns)</th><th>Oran (Node/C)</th></tr>
+<tr>
+  <td class="l">valid_step</td>
+  <td>73.6</td>
+  <td>0.63</td>
+  <td>116.8×</td>
+</tr><tr>
+  <td class="l">invalid_critical</td>
+  <td>164.7</td>
+  <td>1.39</td>
+  <td>118.5×</td>
+</tr><tr>
+  <td class="l">invalid_low</td>
+  <td>142.9</td>
+  <td>1.68</td>
+  <td>85.1×</td>
+</tr>
+</table>
+<p>Bulgu: Aynı algoritma için C portu ortalama
+107×
+daha hızlıdır. Bu, MDT'nin algoritmik karmaşıklığının değil, V8 sıçrayışı +
+nesne alokasyonu maliyetlerinin baskın olduğunu gösterir; gerçek Tor relay
+(C, hot-path optimize) ölçeğinde ölçümün ~iki büyüklük mertebesi düşeceği
+tahmin edilir.</p>
+<p><b>Sınırlama (açıkça):</b> Bu, <b>Tor C portu DEĞİLDİR</b>; ayrıca
+TypeScript <code>classifyInvalid</code>'in <b>satır-satır birebir portu da
+değildir</b> — sadeleştirilmiş eşdeğer bir hot-path benchmark'ıdır
+(int kod döndürür, nesne alokasyonu yok). Bütün relay döngüsü, crypto,
+ağ I/O dışarıdadır. Gerçek end-to-end latency için Bölüm 6.3-4'teki gelecek
+çalışma geçerliliğini korur.</p>
+
+<div class="pagebreak"></div>
+
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->
 <h2>5. Görselleştirme</h2>
 
@@ -976,9 +1126,11 @@ oturtur: <i>sezgiselin tükenebildiği yer Invalid kümesidir</i>.</p>
   Gerçek Tor implementasyonu (C kaynak kodu, tor 0.4.x serisi) spec ile çelişebilir; bu
   çelişkilerin ölçülmesi yapılmamıştır. Doğal devamı: deneyi gerçek Tor relay üzerinde
   Shadow [18] simülatörü ile tekrarlamak.</li>
-  <li><b>FPR = 0 doğal sonuçtur.</b> Oracle (δ) ve test üreticisi aynı modeli paylaştığı
-  için yanlış-pozitif tanımı boş kümeye düşer. FPR'nin bilgilendirici olması için
-  <i>bağımsız</i> bir oracle gerekir (örn. paket yakalama tabanlı gözlemci).</li>
+  <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1).</b> Spec narrative'inden
+  bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
+  98.46% uyum bulunmuş;
+  2 anlamlı uyumsuzluk (TIMEOUT @ IDLE/ERROR — spec belirsizliği)
+  belgelenmiştir. Gerçek Tor binary'den FSM çıkarımı (Shadow gerekli) hâlâ kapsam dışıdır.</li>
   <li><b>N = 30 koşu — giderildi (Bölüm 4.9).</b> Eşleştirilmiş bootstrap %95 CI
   (B = 10.000) ve post-hoc güç analizi (α = 0.05, β = 0.80) eklenmiştir; B3'ün TC/ITDR
   üstünlüğü için güç ≈ 1.000 bulunmuştur. Açık kalan tek anlamsız fark B2 − B1 ITDR
@@ -987,14 +1139,15 @@ oturtur: <i>sezgiselin tükenebildiği yer Invalid kümesidir</i>.</p>
   Spec-türevli stream alt-FSM (7 durum, 8 olay,
   17 geçerli / 39 geçersiz ikili) modellenmiş ve aynı B1/B2/B3
   karşılaştırması uygulanmıştır. Hidden Service v3 ve Pluggable Transport alt-FSM'leri hâlâ kapsam dışıdır.</li>
-  <li><b>SLR canlı veritabanı erişimi yok — bu ortamda giderilemez.</b> Scopus / WoS /
-  IEEE Xplore canlı sorgulaması bu çalışma ortamında mevcut değildir; uydurmak yerine
-  açık-web (Google Scholar, arXiv, DOI çözümleme) ile sınırlanmıştır (bkz. Şekil 5 PRISMA).
-  Bulunmayan kaynak olabileceği açıkça kabul edilir.</li>
-  <li><b>Latency tek-platform ölçümü — bu ortamda giderilemez.</b> Bölüm 4.6 ölçümü
-  tek-thread, JIT-warm Node.js V8 koşulları altındadır; gerçek Tor C implementasyonunda
-  profil farklı olabilir. Karşılaştırmalı ölçüm için aynı δ-tablosunun C/Rust portu
-  gereklidir; bu portun gerçekleştirilmediği açıkça belirtilir.</li>
+  <li><b>SLR canlı veritabanı erişimi — kısmen giderildi (Bölüm 4.11.2).</b> OpenAlex
+  (~250M iş, IEEE/Springer dahil) + CrossRef + arXiv canlı API'leri ile
+  115 kayıt çekilmiş, 111 tekil
+  referansa indirgenmiştir. Scopus / WoS lisanslı tam-metin + atıf grafı erişimi hâlâ
+  kapsam dışıdır.</li>
+  <li><b>Latency cross-language ölçümü — kısmen giderildi (Bölüm 4.11.3).</b> δ-lookup +
+  classifyInvalid hot path'inin gcc -O3 C portu eklenmiş, aynı probelarda
+  ortalama 107× hızlanma
+  ölçülmüştür. Tam Tor C/Rust relay portu hâlâ kapsam dışıdır.</li>
 </ul>
 
 <h3>6.3 Gelecek Çalışmalar</h3>

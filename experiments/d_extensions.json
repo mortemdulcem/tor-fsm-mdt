@@ -1,0 +1,342 @@
+{
+  "oracleIndependent": {
+    "invariants": [
+      {
+        "name": "I1_CONNECT_ONLY_IDLE",
+        "spec": "§2: A TLS connection is initiated only when the OP has no existing connection."
+      },
+      {
+        "name": "I2_TLS_AFTER_CONNECT",
+        "spec": "§2: TLS handshake events occur only on an active in-progress connection."
+      },
+      {
+        "name": "I3_CREATE_AFTER_TLS",
+        "spec": "§5.1: CREATE cells are sent after TLS handshake completes (TLS_HANDSHAKE)."
+      },
+      {
+        "name": "I4_CREATED_ECHOES_CREATE",
+        "spec": "§5.1: A CREATED cell can only follow a previously sent CREATE on the same circuit."
+      },
+      {
+        "name": "I5_EXTEND_DURING_BUILD",
+        "spec": "§5.2: EXTEND/EXTENDED only during multi-hop circuit construction (CIRCUIT_BUILDING)."
+      },
+      {
+        "name": "I6_DATA_AFTER_READY",
+        "spec": "§6.1: RELAY_DATA cells require an established circuit (CIRCUIT_READY or TRANSMITTING)."
+      },
+      {
+        "name": "I7_DESTROY_ON_LIVE_CIRC",
+        "spec": "§5.4: DESTROY tears down an existing circuit (CIRCUIT_READY or TRANSMITTING)."
+      },
+      {
+        "name": "I8_CLOSED_AFTER_TEARDOWN",
+        "spec": "§5.4: CIRCUIT_CLOSED notification only after CLOSING or ERROR."
+      },
+      {
+        "name": "I9_TIMEOUT_NOT_TERMINAL",
+        "spec": "tor implementation: timers do not fire on already-terminal circuits (CLOSED)."
+      }
+    ],
+    "matrix": {
+      "TT": 25,
+      "TF": 0,
+      "FT": 2,
+      "FF": 103
+    },
+    "agreement": 0.9846153846153847,
+    "disagreements": [
+      {
+        "s": "IDLE",
+        "e": "TIMEOUT",
+        "delta": "INVALID",
+        "oracle": "ALLOWED"
+      },
+      {
+        "s": "ERROR",
+        "e": "TIMEOUT",
+        "delta": "INVALID",
+        "oracle": "ALLOWED"
+      }
+    ],
+    "note": "İki oracle da spec-türevli (biri δ tablosu, diğeri narrative invariants). Gerçek Tor binary'den çıkarma DEĞİLDİR; o Shadow gerektirir."
+  },
+  "slrLive": {
+    "prisma": {
+      "identified": 115,
+      "after_dedup": 111,
+      "by_source": {
+        "openalex": 75,
+        "crossref": 30,
+        "arxiv": 10
+      },
+      "queries": [
+        "tor anonymity network protocol attack",
+        "model-based testing finite state machine protocol",
+        "protocol state fuzzing TLS",
+        "tor deanonymization circuit",
+        "finite state machine security vulnerability detection"
+      ],
+      "fetched_at": "2026-05-17T13:49:41.442Z",
+      "note": "OpenAlex + CrossRef + arXiv canlı sorgular; Scopus/WoS lisanslı erişim hâlâ yok."
+    },
+    "topByCitations": [
+      {
+        "source": "openalex",
+        "title": "Advances and Open Problems in Federated Learning",
+        "year": 2020,
+        "cites": 4553,
+        "doi": "https://doi.org/10.1561/2200000083",
+        "venue": "Foundations and Trends® in Machine Learning"
+      },
+      {
+        "source": "openalex",
+        "title": "Opinion Paper: “So what if ChatGPT wrote it?” Multidisciplinary perspectives on opportunities, challenges and implications of generative conversational AI for research, practice and policy",
+        "year": 2023,
+        "cites": 3539,
+        "doi": "https://doi.org/10.1016/j.ijinfomgt.2023.102642",
+        "venue": "International Journal of Information Management"
+      },
+      {
+        "source": "openalex",
+        "title": "Variational quantum algorithms",
+        "year": 2021,
+        "cites": 2843,
+        "doi": "https://doi.org/10.1038/s42254-021-00348-9",
+        "venue": "Nature Reviews Physics"
+      },
+      {
+        "source": "openalex",
+        "title": "Intelligent Reflecting Surface-Aided Wireless Communications: A Tutorial",
+        "year": 2021,
+        "cites": 2827,
+        "doi": "https://doi.org/10.1109/tcomm.2021.3051897",
+        "venue": "IEEE Transactions on Communications"
+      },
+      {
+        "source": "openalex",
+        "title": "SimCSE: Simple Contrastive Learning of Sentence Embeddings",
+        "year": 2021,
+        "cites": 2496,
+        "doi": "https://doi.org/10.18653/v1/2021.emnlp-main.552",
+        "venue": "Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing"
+      },
+      {
+        "source": "openalex",
+        "title": "In-Kernel Aggregation and Broadcast Acceleration for Distributed Communication",
+        "year": 2020,
+        "cites": 2443,
+        "doi": "https://doi.org/10.4230/oasics.nines.2026.13",
+        "venue": "arXiv (Cornell University)"
+      },
+      {
+        "source": "openalex",
+        "title": "Towards 6G wireless communication networks: vision, enabling technologies, and new paradigm shifts",
+        "year": 2020,
+        "cites": 1915,
+        "doi": "https://doi.org/10.1007/s11432-020-2955-6",
+        "venue": "Science China Information Sciences"
+      },
+      {
+        "source": "openalex",
+        "title": "On the Road to 6G: Visions, Requirements, Key Technologies, and Testbeds",
+        "year": 2023,
+        "cites": 1888,
+        "doi": "https://doi.org/10.1109/comst.2023.3249835",
+        "venue": "IEEE Communications Surveys & Tutorials"
+      },
+      {
+        "source": "openalex",
+        "title": "Digital Twin: Values, Challenges and Enablers From a Modeling Perspective",
+        "year": 2020,
+        "cites": 1660,
+        "doi": "https://doi.org/10.1109/access.2020.2970143",
+        "venue": "IEEE Access"
+      },
+      {
+        "source": "openalex",
+        "title": "Interpreting Black-Box Models: A Review on Explainable Artificial Intelligence",
+        "year": 2023,
+        "cites": 1621,
+        "doi": "https://doi.org/10.1007/s12559-023-10179-8",
+        "venue": "Cognitive Computation"
+      },
+      {
+        "source": "openalex",
+        "title": "Noisy intermediate-scale quantum algorithms",
+        "year": 2022,
+        "cites": 1595,
+        "doi": "https://doi.org/10.1103/revmodphys.94.015004",
+        "venue": "Reviews of Modern Physics"
+      },
+      {
+        "source": "openalex",
+        "title": "",
+        "year": 2020,
+        "cites": 1583,
+        "doi": null,
+        "venue": "White Rose Research Online (University of Leeds, The University of Sheffield, University of York)"
+      },
+      {
+        "source": "openalex",
+        "title": "Improved protein structure prediction using predicted interresidue orientations",
+        "year": 2020,
+        "cites": 1551,
+        "doi": "https://doi.org/10.1073/pnas.1914677117",
+        "venue": "Proceedings of the National Academy of Sciences"
+      },
+      {
+        "source": "openalex",
+        "title": "The Road Towards 6G: A Comprehensive Survey",
+        "year": 2021,
+        "cites": 1463,
+        "doi": "https://doi.org/10.1109/ojcoms.2021.3057679",
+        "venue": "IEEE Open Journal of the Communications Society"
+      },
+      {
+        "source": "openalex",
+        "title": "Unmanned aerial vehicles (UAVs): practical aspects, applications, open challenges, security issues, and future trends",
+        "year": 2023,
+        "cites": 902,
+        "doi": "https://doi.org/10.1007/s11370-022-00452-4",
+        "venue": "Intelligent Service Robotics"
+      },
+      {
+        "source": "openalex",
+        "title": "Artificial intelligence-enhanced electrocardiography in cardiovascular disease management",
+        "year": 2021,
+        "cites": 837,
+        "doi": "https://doi.org/10.1038/s41569-020-00503-2",
+        "venue": "Nature Reviews Cardiology"
+      },
+      {
+        "source": "openalex",
+        "title": "The Roadmap to 6G Security and Privacy",
+        "year": 2021,
+        "cites": 400,
+        "doi": "https://doi.org/10.1109/ojcoms.2021.3078081",
+        "venue": "IEEE Open Journal of the Communications Society"
+      },
+      {
+        "source": "openalex",
+        "title": "A Systematic Survey of Industrial Internet of Things Security: Requirements and Fog Computing Opportunities",
+        "year": 2020,
+        "cites": 381,
+        "doi": "https://doi.org/10.1109/comst.2020.3011208",
+        "venue": "IEEE Communications Surveys & Tutorials"
+      },
+      {
+        "source": "openalex",
+        "title": "Cryptocurrencies and future financial crime",
+        "year": 2022,
+        "cites": 170,
+        "doi": "https://doi.org/10.1186/s40163-021-00163-8",
+        "venue": "Crime Science"
+      },
+      {
+        "source": "openalex",
+        "title": "A Blockchain-Based Decentralized, Fair and Authenticated Information Sharing Scheme in Zero Trust Internet-of-Things",
+        "year": 2022,
+        "cites": 153,
+        "doi": "https://doi.org/10.1109/tc.2022.3157996",
+        "venue": "IEEE Transactions on Computers"
+      },
+      {
+        "source": "openalex",
+        "title": "Not All Coverage Measurements Are Equal: Fuzzing by Coverage Accounting for Input Prioritization",
+        "year": 2020,
+        "cites": 134,
+        "doi": "https://doi.org/10.14722/ndss.2020.24422",
+        "venue": null
+      },
+      {
+        "source": "openalex",
+        "title": "Machine-Learning-Based Darknet Traffic Detection System for IoT Applications",
+        "year": 2022,
+        "cites": 118,
+        "doi": "https://doi.org/10.3390/electronics11040556",
+        "venue": "Electronics"
+      },
+      {
+        "source": "openalex",
+        "title": "StateAFL: Greybox fuzzing for stateful network servers",
+        "year": 2022,
+        "cites": 117,
+        "doi": "https://doi.org/10.1007/s10664-022-10233-3",
+        "venue": "Empirical Software Engineering"
+      },
+      {
+        "source": "openalex",
+        "title": "De-Anonymisation Attacks on Tor: A Survey",
+        "year": 2021,
+        "cites": 77,
+        "doi": "https://doi.org/10.1109/comst.2021.3093615",
+        "venue": "IEEE Communications Surveys & Tutorials"
+      },
+      {
+        "source": "openalex",
+        "title": "Formal Analysis of 5G EAP-TLS Authentication Protocol Using Proverif",
+        "year": 2020,
+        "cites": 67,
+        "doi": "https://doi.org/10.1109/access.2020.2969474",
+        "venue": "IEEE Access"
+      }
+    ],
+    "note": "OpenAlex IEEE/Springer/Elsevier dahil indeksli kataloglara erişir; Scopus/WoS değildir."
+  },
+  "cLatency": {
+    "raw": {
+      "compiler": "gcc -O3",
+      "trials": 30,
+      "batch": 100000,
+      "overhead_ns_per_iter": 0.15,
+      "valid_step": {
+        "mean_ns": 0.63,
+        "sd_ns": 0.06,
+        "p50_ns": 0.6,
+        "p95_ns": 0.75,
+        "min_ns": 0.6,
+        "max_ns": 0.83
+      },
+      "invalid_critical": {
+        "mean_ns": 1.39,
+        "sd_ns": 0.17,
+        "p50_ns": 1.32,
+        "p95_ns": 1.71,
+        "min_ns": 1.3,
+        "max_ns": 2.07
+      },
+      "invalid_low": {
+        "mean_ns": 1.68,
+        "sd_ns": 0.17,
+        "p50_ns": 1.6,
+        "p95_ns": 2.05,
+        "min_ns": 1.59,
+        "max_ns": 2.33
+      }
+    },
+    "comparison": {
+      "probes": [
+        {
+          "probe": "valid_step",
+          "node_mean_ns": 73.612523,
+          "c_mean_ns": 0.63,
+          "speedup_x": 116.8452746031746
+        },
+        {
+          "probe": "invalid_critical",
+          "node_mean_ns": 164.71986933333338,
+          "c_mean_ns": 1.39,
+          "speedup_x": 118.50350311750604
+        },
+        {
+          "probe": "invalid_low",
+          "node_mean_ns": 142.89388,
+          "c_mean_ns": 1.68,
+          "speedup_x": 85.05588095238096
+        }
+      ]
+    },
+    "note": "Tor C portu DEĞİLDİR; sadece δ-lookup + classifyInvalid hot path'i için cross-language karşılaştırma."
+  }
+}

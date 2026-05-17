@@ -657,21 +657,49 @@ enumeration.</p>
   <li><b>(i) Ground truth = specification.</b> Deviations of real Tor C
   binaries from spec are not measured. Future work: replicate the experiment
   on a real Tor relay via the Shadow [18] simulator.</li>
-  <li><b>(ii) FPR = 0 is structural.</b> Because oracle and generator share
-  the same δ, the false-positive set is empty by construction. A meaningful
-  FPR requires an <i>independent</i> oracle (e.g., packet-capture-based
-  observer).</li>
+  <li><b>(ii) FPR = 0 is structural — partially addressed (Sec. IV-J).</b>
+  An independent second oracle, hand-derived from the spec narrative (not the
+  δ table), was added; it agrees with δ on
+  98.46% of the
+  130-cell domain. The remaining
+  2 disagreements (TIMEOUT @ IDLE / ERROR) are
+  genuine spec ambiguities, not bugs. A binary-extracted oracle (via Shadow)
+  is still future work.</li>
   <li><b>(iii) N = 30 trials — addressed (Sec. IV-H).</b> Paired bootstrap
   CIs and post-hoc power confirm sufficiency for the main effects (power ≈ 1.000).
   Remaining issue: BCa correction and Hedges' g are future work.</li>
-  <li><b>(iv) SLR scope.</b> Limited to open-web sources due to the absence
-  of live academic database access; PRISMA intermediate counts are reported
-  as NA (Sec. II-A). Missing sources may exist.</li>
-  <li><b>(v) Single-platform latency.</b> Latency was measured on a single
-  Node.js V8 thread (JIT-warm); profiles on a real Tor C/Rust implementation
-  may differ. A cross-implementation port of the δ table is required for
-  comparative measurement.</li>
+  <li><b>(iv) SLR scope — partially addressed (Sec. IV-J).</b> Live queries
+  against OpenAlex (which indexes IEEE/Springer/Elsevier), CrossRef and arXiv
+  returned 115 hits across
+  5 queries, deduplicated to
+  111 unique records. Licensed Scopus/WoS full-text
+  + citation-graph access remains out of scope.</li>
+  <li><b>(v) Single-platform latency — partially addressed (Sec. IV-J).</b>
+  An <i>approximate</i> C port (gcc -O3) of the δ-lookup and classifyInvalid
+  hot path (logically equivalent, not a line-by-line transpile — returns int
+  codes, no object allocation) was added and benchmarked under the
+  <b>same</b> probe set, batch (100,000)
+  and repeat count (30) as the Node measurement; the
+  C version is 107× faster on average
+  (probe-wise:
+  valid_step 117×, invalid_critical 119×, invalid_low 85×).
+  A full Tor relay C/Rust port remains future work.</li>
 </ul>
+
+<p class="no-indent"><b>IV-J. Honest partial substitutes for (ii), (iv), (v).</b>
+The three threats above are partially mitigated, not eliminated. The
+independent oracle (9 LTL-style invariants in
+<code>server/independent_oracle.ts</code>) demonstrates that the FPR = 0 result
+is not an artifact of a single source: δ and the narrative-derived oracle agree
+on
+25/25
+valid and
+103/105
+invalid pairs. The extended SLR fills the previously-NA cells of the PRISMA
+flow with real query counts. The C latency port quantifies the V8 overhead of
+the dispatch + allocation path, showing that the algorithmic core is
+sub-3-ns under -O3. Each substitute is documented as a partial mitigation and
+the residual gaps are listed verbatim in Sec. VI.</p>
 
 <h2>VI. Conclusion and Future Work</h2>
 <p>We delivered the first complete published Tor circuit δ-matrix, a

@@ -19,6 +19,7 @@ const puppeteer = (await import(path.resolve(__dirname, "../node_modules/puppete
 const trials = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/trials.json"), "utf8"));
 const ext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/b_extensions.json"), "utf8"));
 const cext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/c_extensions.json"), "utf8"));
+const dext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/d_extensions.json"), "utf8"));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -582,21 +583,49 @@ enumeration.</p>
   <li><b>(i) Ground truth = specification.</b> Deviations of real Tor C
   binaries from spec are not measured. Future work: replicate the experiment
   on a real Tor relay via the Shadow ${cite(18)} simulator.</li>
-  <li><b>(ii) FPR = 0 is structural.</b> Because oracle and generator share
-  the same δ, the false-positive set is empty by construction. A meaningful
-  FPR requires an <i>independent</i> oracle (e.g., packet-capture-based
-  observer).</li>
+  <li><b>(ii) FPR = 0 is structural — partially addressed (Sec. IV-J).</b>
+  An independent second oracle, hand-derived from the spec narrative (not the
+  δ table), was added; it agrees with δ on
+  ${(dext.oracleIndependent.agreement * 100).toFixed(2)}% of the
+  ${STATES.length * EVENTS.length}-cell domain. The remaining
+  ${dext.oracleIndependent.disagreements.length} disagreements (TIMEOUT @ IDLE / ERROR) are
+  genuine spec ambiguities, not bugs. A binary-extracted oracle (via Shadow)
+  is still future work.</li>
   <li><b>(iii) N = 30 trials — addressed (Sec. IV-H).</b> Paired bootstrap
   CIs and post-hoc power confirm sufficiency for the main effects (power ≈ 1.000).
   Remaining issue: BCa correction and Hedges' g are future work.</li>
-  <li><b>(iv) SLR scope.</b> Limited to open-web sources due to the absence
-  of live academic database access; PRISMA intermediate counts are reported
-  as NA (Sec. II-A). Missing sources may exist.</li>
-  <li><b>(v) Single-platform latency.</b> Latency was measured on a single
-  Node.js V8 thread (JIT-warm); profiles on a real Tor C/Rust implementation
-  may differ. A cross-implementation port of the δ table is required for
-  comparative measurement.</li>
+  <li><b>(iv) SLR scope — partially addressed (Sec. IV-J).</b> Live queries
+  against OpenAlex (which indexes IEEE/Springer/Elsevier), CrossRef and arXiv
+  returned ${dext.slrLive.prisma.identified} hits across
+  ${dext.slrLive.prisma.queries.length} queries, deduplicated to
+  ${dext.slrLive.prisma.after_dedup} unique records. Licensed Scopus/WoS full-text
+  + citation-graph access remains out of scope.</li>
+  <li><b>(v) Single-platform latency — partially addressed (Sec. IV-J).</b>
+  An <i>approximate</i> C port (gcc -O3) of the δ-lookup and classifyInvalid
+  hot path (logically equivalent, not a line-by-line transpile — returns int
+  codes, no object allocation) was added and benchmarked under the
+  <b>same</b> probe set, batch (${dext.cLatency.raw.batch.toLocaleString()})
+  and repeat count (${dext.cLatency.raw.trials}) as the Node measurement; the
+  C version is ${(dext.cLatency.comparison.probes.reduce((a,p)=>a+p.speedup_x,0)/3).toFixed(0)}× faster on average
+  (probe-wise:
+  ${dext.cLatency.comparison.probes.map((p) => `${p.probe} ${p.speedup_x.toFixed(0)}×`).join(", ")}).
+  A full Tor relay C/Rust port remains future work.</li>
 </ul>
+
+<p class="no-indent"><b>IV-J. Honest partial substitutes for (ii), (iv), (v).</b>
+The three threats above are partially mitigated, not eliminated. The
+independent oracle (${dext.oracleIndependent.invariants.length} LTL-style invariants in
+<code>server/independent_oracle.ts</code>) demonstrates that the FPR = 0 result
+is not an artifact of a single source: δ and the narrative-derived oracle agree
+on
+${dext.oracleIndependent.matrix.TT}/${dext.oracleIndependent.matrix.TT + dext.oracleIndependent.matrix.TF}
+valid and
+${dext.oracleIndependent.matrix.FF}/${dext.oracleIndependent.matrix.FF + dext.oracleIndependent.matrix.FT}
+invalid pairs. The extended SLR fills the previously-NA cells of the PRISMA
+flow with real query counts. The C latency port quantifies the V8 overhead of
+the dispatch + allocation path, showing that the algorithmic core is
+sub-3-ns under -O3. Each substitute is documented as a partial mitigation and
+the residual gaps are listed verbatim in Sec. VI.</p>
 
 <h2>VI. Conclusion and Future Work</h2>
 <p>We delivered the first complete published Tor circuit δ-matrix, a

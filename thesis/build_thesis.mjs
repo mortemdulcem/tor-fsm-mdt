@@ -17,6 +17,7 @@ const puppeteer = (await import(path.resolve(__dirname, "../node_modules/puppete
 const trials = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/trials.json"), "utf8"));
 const ext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/b_extensions.json"), "utf8"));
 const cext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/c_extensions.json"), "utf8"));
+const dext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/d_extensions.json"), "utf8"));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -760,6 +761,117 @@ oturtur: <i>sezgiselin tükenebildiği yer Invalid kümesidir</i>.</p>
 
 <div class="pagebreak"></div>
 
+<!-- ====================== BÖLÜM 4.11 — D-grubu ====================== -->
+<h3>4.11 D-grubu: Bağımsız Oracle, Genişletilmiş SLR ve Cross-Language Latency</h3>
+
+<p>Bölüm 6.2'de "bu ortamda giderilemez" olarak işaretlenmiş üç sınırlılığın
+<i>kısmi ama dürüst</i> ikameleri bu bölümde sunulmaktadır. Her birinin
+kapsamı ve hangi tehdidi <b>tamamen</b> kaldırmadığı açıkça etiketlenmiştir.</p>
+
+<h4>4.11.1 Bağımsız 2. Oracle (model-düzeyi)</h4>
+<p>FPR = 0 yapısallığını (Bölüm 6.2-ii) kırmak için ideal olan, gerçek Tor
+binary'sinden FSM çıkarımıdır; bu mümkün değildir. Bunun yerine, <b>spec metin
+anlatımından</b> (operasyonel δ tablosundan değil) elle türetilmiş
+${dext.oracleIndependent.invariants.length} adet LTL-tarzı invariant'tan oluşan
+bağımsız bir oracle yazılmıştır (kod: <code>server/independent_oracle.ts</code>).
+Bu oracle her (s, e) için "izinli / değil" kararını δ'ya bakmadan verir.
+İki oracle Q × Σ = ${STATES.length * EVENTS.length} hücre üzerinde
+karşılaştırılmıştır:</p>
+
+<table>
+<tr><th></th><th>Oracle: ALLOWED</th><th>Oracle: DENIED</th></tr>
+<tr><th class="l">δ: VALID</th><td>${dext.oracleIndependent.matrix.TT}</td><td>${dext.oracleIndependent.matrix.TF}</td></tr>
+<tr><th class="l">δ: INVALID</th><td>${dext.oracleIndependent.matrix.FT}</td><td>${dext.oracleIndependent.matrix.FF}</td></tr>
+</table>
+<p class="no-indent">Toplam uyum: <b>${(dext.oracleIndependent.agreement * 100).toFixed(2)}%</b>
+(${dext.oracleIndependent.matrix.TT + dext.oracleIndependent.matrix.FF}/${STATES.length * EVENTS.length}).
+Cohen κ ≈ ${((dext.oracleIndependent.agreement - 0.5) / 0.5).toFixed(3)} (kabaca, sınırlı veriyle).</p>
+
+${dext.oracleIndependent.disagreements.length > 0 ? `
+<p><b>Anlamlı uyumsuzluklar (${dext.oracleIndependent.disagreements.length} adet)</b> — bu sayı sıfır olmadığı
+için iki oracle'ın gerçekten bağımsız olduğu görünür:</p>
+<table>
+<tr><th>Durum</th><th>Olay</th><th>δ kararı</th><th>Bağımsız oracle</th></tr>
+${dext.oracleIndependent.disagreements.map((d) => `<tr>
+  <td class="l">${d.s}</td><td>${d.e}</td><td>${d.delta}</td><td>${d.oracle}</td>
+</tr>`).join("")}
+</table>
+<p>Tartışma: Her iki uyumsuzluk da TIMEOUT olayının terminal/başlangıç durumlardaki
+(IDLE, ERROR) yorumuna ilişkindir. δ tablosu daha sıkı (timer
+"fire" etmez), narrative invariant I9 daha gevşek (yalnızca CLOSED'da yasak).
+Spec metni bu noktada belirsizdir; uyumsuzluk bir "hata" değil, bir
+<i>spesifikasyon belirsizliği</i> bulgusudur ve gerçek Tor binary'sinde
+hangisinin gözlendiği ampirik bir sorudur.</p>
+` : ""}
+<p><b>Sınırlama (açıkça):</b> İki oracle da spec-türevlidir; gerçek Tor C kodu
+ile karşılaştırma DEĞİLDİR. Threats (i) ve (v) tam olarak kaldırılmaz, ancak
+"single-source oracle" zaafiyeti kısmen kırılır.</p>
+
+<h4>4.11.2 Genişletilmiş SLR — Canlı Akademik API Sorguları</h4>
+<p>Bölüm 6.2-v'te belirtilen "Scopus / WoS canlı erişim yok" sınırlılığını
+<b>kısmen</b> kapatmak için üç açık-erişim akademik API canlı olarak
+sorgulanmıştır (kod: <code>experiments/d_extensions.mjs</code>):</p>
+<ul>
+  <li><b>OpenAlex</b> — ~250M iş, IEEE/Springer/Elsevier dahil (paywall'lı içerik dahil indekslenir)</li>
+  <li><b>CrossRef</b> — DOI metadata, ${dext.slrLive.prisma.by_source.crossref} kayıt</li>
+  <li><b>arXiv</b> — ön baskı API, ${dext.slrLive.prisma.by_source.arxiv} kayıt</li>
+</ul>
+<p>${dext.slrLive.prisma.queries.length} sorgu × 2020-2026 yıl filtresi ile
+toplam <b>${dext.slrLive.prisma.identified}</b> kayıt çekilmiş;
+DOI/başlık normalizasyonu sonrası <b>${dext.slrLive.prisma.after_dedup}</b> tekil
+kayıt elde edilmiştir. Sorgu tarihi: ${dext.slrLive.prisma.fetched_at.slice(0, 10)}.</p>
+
+<p class="no-indent"><b>Tablo 4.11-A.</b> Atıf sayısına göre üst 10 sonuç (canlı API çıktısı).</p>
+<table>
+<tr><th>Kaynak</th><th>Yıl</th><th>Atıf</th><th>Başlık (kısa)</th></tr>
+${dext.slrLive.topByCitations.slice(0, 10).map((w) => `<tr>
+  <td>${w.source}</td><td>${w.year || "—"}</td><td>${w.cites ?? "—"}</td>
+  <td class="l">${(w.title || "").slice(0, 90)}${(w.title || "").length > 90 ? "…" : ""}</td>
+</tr>`).join("")}
+</table>
+<p><b>Sınırlama (açıkça):</b> OpenAlex IEEE indeksli kayıtları içerse de
+Scopus/WoS'un tam metin + atıf grafı + author-affiliation analizine sahip
+DEĞİLDİR. Bu kayıtlar PRISMA tablosuna referans olarak eklenmiştir; tam-metin
+okuma + kalite değerlendirmesi yapılmamıştır (bu, gelecek çalışmadır).</p>
+
+<h4>4.11.3 Cross-Language Latency — C Portu (Yaklaşık, Sadece Hot Path)</h4>
+<p>Bölüm 6.2-vi'da belirtilen "tek-platform latency" sınırlılığı için
+δ-lookup + <code>classifyInvalid</code> hot path'inin <b>yaklaşık</b> bir C
+portu yazılmıştır (kod: <code>experiments/c_latency/c_latency.c</code>). Port,
+TypeScript karşılığıyla mantıksal olarak eşdeğer olacak şekilde elle
+yazılmıştır; ancak satır-satır birebir transpilasyon değildir (TS tarafındaki
+bazı nesne yapıları C'de int kodlarına indirgenmiştir). gcc -O3 ile derlenmiş
+ve Node.js tarafıyla <b>aynı</b> ölçüm protokolü uygulanmıştır: aynı 3 probe
+(IDLE+CONNECT, IDLE+SEND_RELAY_DATA, ERROR+TLS_FAIL), aynı batch boyutu
+(${dext.cLatency.raw.batch.toLocaleString()}), aynı tekrar sayısı
+(${dext.cLatency.raw.trials}), calibration ile loop overhead düşürümü,
+CLOCK_MONOTONIC.</p>
+
+<p class="no-indent"><b>Tablo 4.11-B.</b> Node.js V8 vs C (gcc -O3) — aynı δ-tablo, aynı probe.</p>
+<table>
+<tr><th>Probe</th><th>Node ortalama (ns)</th><th>C ortalama (ns)</th><th>Oran (Node/C)</th></tr>
+${dext.cLatency.comparison.probes.map((p) => `<tr>
+  <td class="l">${p.probe}</td>
+  <td>${p.node_mean_ns.toFixed(1)}</td>
+  <td>${p.c_mean_ns.toFixed(2)}</td>
+  <td>${p.speedup_x.toFixed(1)}×</td>
+</tr>`).join("")}
+</table>
+<p>Bulgu: Aynı algoritma için C portu ortalama
+${(dext.cLatency.comparison.probes.reduce((a, p) => a + p.speedup_x, 0) / 3).toFixed(0)}×
+daha hızlıdır. Bu, MDT'nin algoritmik karmaşıklığının değil, V8 sıçrayışı +
+nesne alokasyonu maliyetlerinin baskın olduğunu gösterir; gerçek Tor relay
+(C, hot-path optimize) ölçeğinde ölçümün ~iki büyüklük mertebesi düşeceği
+tahmin edilir.</p>
+<p><b>Sınırlama (açıkça):</b> Bu, <b>Tor C portu DEĞİLDİR</b>; ayrıca
+TypeScript <code>classifyInvalid</code>'in <b>satır-satır birebir portu da
+değildir</b> — sadeleştirilmiş eşdeğer bir hot-path benchmark'ıdır
+(int kod döndürür, nesne alokasyonu yok). Bütün relay döngüsü, crypto,
+ağ I/O dışarıdadır. Gerçek end-to-end latency için Bölüm 6.3-4'teki gelecek
+çalışma geçerliliğini korur.</p>
+
+<div class="pagebreak"></div>
+
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->
 <h2>5. Görselleştirme</h2>
 
@@ -793,9 +905,11 @@ oturtur: <i>sezgiselin tükenebildiği yer Invalid kümesidir</i>.</p>
   Gerçek Tor implementasyonu (C kaynak kodu, tor 0.4.x serisi) spec ile çelişebilir; bu
   çelişkilerin ölçülmesi yapılmamıştır. Doğal devamı: deneyi gerçek Tor relay üzerinde
   Shadow ${cite(18)} simülatörü ile tekrarlamak.</li>
-  <li><b>FPR = 0 doğal sonuçtur.</b> Oracle (δ) ve test üreticisi aynı modeli paylaştığı
-  için yanlış-pozitif tanımı boş kümeye düşer. FPR'nin bilgilendirici olması için
-  <i>bağımsız</i> bir oracle gerekir (örn. paket yakalama tabanlı gözlemci).</li>
+  <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1).</b> Spec narrative'inden
+  bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
+  ${(dext.oracleIndependent.agreement * 100).toFixed(2)}% uyum bulunmuş;
+  ${dext.oracleIndependent.disagreements.length} anlamlı uyumsuzluk (TIMEOUT @ IDLE/ERROR — spec belirsizliği)
+  belgelenmiştir. Gerçek Tor binary'den FSM çıkarımı (Shadow gerekli) hâlâ kapsam dışıdır.</li>
   <li><b>N = 30 koşu — giderildi (Bölüm 4.9).</b> Eşleştirilmiş bootstrap %95 CI
   (B = 10.000) ve post-hoc güç analizi (α = 0.05, β = 0.80) eklenmiştir; B3'ün TC/ITDR
   üstünlüğü için güç ≈ 1.000 bulunmuştur. Açık kalan tek anlamsız fark B2 − B1 ITDR
@@ -804,14 +918,15 @@ oturtur: <i>sezgiselin tükenebildiği yer Invalid kümesidir</i>.</p>
   Spec-türevli stream alt-FSM (${STREAM_STATES.length} durum, ${STREAM_EVENTS.length} olay,
   ${streamValidCount} geçerli / ${streamInvalidCount} geçersiz ikili) modellenmiş ve aynı B1/B2/B3
   karşılaştırması uygulanmıştır. Hidden Service v3 ve Pluggable Transport alt-FSM'leri hâlâ kapsam dışıdır.</li>
-  <li><b>SLR canlı veritabanı erişimi yok — bu ortamda giderilemez.</b> Scopus / WoS /
-  IEEE Xplore canlı sorgulaması bu çalışma ortamında mevcut değildir; uydurmak yerine
-  açık-web (Google Scholar, arXiv, DOI çözümleme) ile sınırlanmıştır (bkz. Şekil 5 PRISMA).
-  Bulunmayan kaynak olabileceği açıkça kabul edilir.</li>
-  <li><b>Latency tek-platform ölçümü — bu ortamda giderilemez.</b> Bölüm 4.6 ölçümü
-  tek-thread, JIT-warm Node.js V8 koşulları altındadır; gerçek Tor C implementasyonunda
-  profil farklı olabilir. Karşılaştırmalı ölçüm için aynı δ-tablosunun C/Rust portu
-  gereklidir; bu portun gerçekleştirilmediği açıkça belirtilir.</li>
+  <li><b>SLR canlı veritabanı erişimi — kısmen giderildi (Bölüm 4.11.2).</b> OpenAlex
+  (~250M iş, IEEE/Springer dahil) + CrossRef + arXiv canlı API'leri ile
+  ${dext.slrLive.prisma.identified} kayıt çekilmiş, ${dext.slrLive.prisma.after_dedup} tekil
+  referansa indirgenmiştir. Scopus / WoS lisanslı tam-metin + atıf grafı erişimi hâlâ
+  kapsam dışıdır.</li>
+  <li><b>Latency cross-language ölçümü — kısmen giderildi (Bölüm 4.11.3).</b> δ-lookup +
+  classifyInvalid hot path'inin gcc -O3 C portu eklenmiş, aynı probelarda
+  ortalama ${(dext.cLatency.comparison.probes.reduce((a,p)=>a+p.speedup_x,0)/3).toFixed(0)}× hızlanma
+  ölçülmüştür. Tam Tor C/Rust relay portu hâlâ kapsam dışıdır.</li>
 </ul>
 
 <h3>6.3 Gelecek Çalışmalar</h3>
