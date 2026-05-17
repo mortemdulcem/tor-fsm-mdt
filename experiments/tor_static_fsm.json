@@ -1,0 +1,222 @@
+{
+  "source": {
+    "repo": "https://gitlab.torproject.org/tpo/core/tor",
+    "path": "src/core/or",
+    "files_scanned": 47,
+    "method": "regex scan of circuit_set_state() call sites + column-0 function-header heuristic for enclosing function name",
+    "scanned_at": "2026-05-17T14:06:16.735Z"
+  },
+  "sites_count": 9,
+  "implementation_transitions": [
+    {
+      "file": "circuitbuild.c",
+      "line": 452,
+      "fn": "origin_circuit_init",
+      "target": "CIRCUIT_STATE_CHAN_WAIT",
+      "event_proxy": "(initialization, no spec event)",
+      "spec_state": "TLS_HANDSHAKE",
+      "note": "approximate"
+    },
+    {
+      "file": "circuitbuild.c",
+      "line": 753,
+      "fn": "circuit_n_chan_done",
+      "target": "CIRCUIT_STATE_OPEN",
+      "event_proxy": "TLS_OK",
+      "spec_state": "CIRCUIT_READY",
+      "note": "implementation merges READY+TRANSMITTING"
+    },
+    {
+      "file": "circuitbuild.c",
+      "line": 1042,
+      "fn": "circuit_send_first_onion_skin",
+      "target": "CIRCUIT_STATE_BUILDING",
+      "event_proxy": "SEND_CREATE",
+      "spec_state": "CIRCUIT_BUILDING",
+      "note": "1:1"
+    },
+    {
+      "file": "circuitbuild.c",
+      "line": 1073,
+      "fn": "circuit_build_no_more_hops",
+      "target": "CIRCUIT_STATE_OPEN",
+      "event_proxy": "(unmapped function)",
+      "spec_state": "CIRCUIT_READY",
+      "note": "implementation merges READY+TRANSMITTING"
+    },
+    {
+      "file": "circuitbuild.c",
+      "line": 1077,
+      "fn": "circuit_build_no_more_hops",
+      "target": "CIRCUIT_STATE_GUARD_WAIT",
+      "event_proxy": "(unmapped function)",
+      "spec_state": "(no spec analog)",
+      "note": "vanguards-specific gate state"
+    },
+    {
+      "file": "circuitbuild.c",
+      "line": 2174,
+      "fn": "circuit_extend_to_new_exit",
+      "target": "CIRCUIT_STATE_BUILDING",
+      "event_proxy": "SEND_EXTEND",
+      "spec_state": "CIRCUIT_BUILDING",
+      "note": "1:1"
+    },
+    {
+      "file": "circuitbuild.c",
+      "line": 2633,
+      "fn": "circuit_upgrade_circuits_from_guard_wait",
+      "target": "CIRCUIT_STATE_OPEN",
+      "event_proxy": "(unmapped function)",
+      "spec_state": "CIRCUIT_READY",
+      "note": "implementation merges READY+TRANSMITTING"
+    },
+    {
+      "file": "command.c",
+      "line": 324,
+      "fn": "command_process_create_cell",
+      "target": "CIRCUIT_STATE_ONIONSKIN_PENDING",
+      "event_proxy": "SEND_CREATE",
+      "spec_state": "CREATE_SENT",
+      "note": "approximate (server-side variant)"
+    },
+    {
+      "file": "relay.c",
+      "line": 1924,
+      "fn": "handle_relay_msg",
+      "target": "CIRCUIT_STATE_OPEN",
+      "event_proxy": "(unmapped function)",
+      "spec_state": "CIRCUIT_READY",
+      "note": "implementation merges READY+TRANSMITTING"
+    }
+  ],
+  "per_impl_state": {
+    "CIRCUIT_STATE_CHAN_WAIT": [
+      {
+        "fn": "origin_circuit_init",
+        "where": "circuitbuild.c:452",
+        "event_proxy": "(initialization, no spec event)"
+      }
+    ],
+    "CIRCUIT_STATE_OPEN": [
+      {
+        "fn": "circuit_n_chan_done",
+        "where": "circuitbuild.c:753",
+        "event_proxy": "TLS_OK"
+      },
+      {
+        "fn": "circuit_build_no_more_hops",
+        "where": "circuitbuild.c:1073",
+        "event_proxy": "(unmapped function)"
+      },
+      {
+        "fn": "circuit_upgrade_circuits_from_guard_wait",
+        "where": "circuitbuild.c:2633",
+        "event_proxy": "(unmapped function)"
+      },
+      {
+        "fn": "handle_relay_msg",
+        "where": "relay.c:1924",
+        "event_proxy": "(unmapped function)"
+      }
+    ],
+    "CIRCUIT_STATE_BUILDING": [
+      {
+        "fn": "circuit_send_first_onion_skin",
+        "where": "circuitbuild.c:1042",
+        "event_proxy": "SEND_CREATE"
+      },
+      {
+        "fn": "circuit_extend_to_new_exit",
+        "where": "circuitbuild.c:2174",
+        "event_proxy": "SEND_EXTEND"
+      }
+    ],
+    "CIRCUIT_STATE_GUARD_WAIT": [
+      {
+        "fn": "circuit_build_no_more_hops",
+        "where": "circuitbuild.c:1077",
+        "event_proxy": "(unmapped function)"
+      }
+    ],
+    "CIRCUIT_STATE_ONIONSKIN_PENDING": [
+      {
+        "fn": "command_process_create_cell",
+        "where": "command.c:324",
+        "event_proxy": "SEND_CREATE"
+      }
+    ]
+  },
+  "structural": {
+    "spec_states_count": 10,
+    "impl_states_count": 5,
+    "spec_states": [
+      "IDLE",
+      "CONNECTING",
+      "TLS_HANDSHAKE",
+      "CREATE_SENT",
+      "CIRCUIT_BUILDING",
+      "CIRCUIT_READY",
+      "TRANSMITTING",
+      "CLOSING",
+      "CLOSED",
+      "ERROR"
+    ],
+    "impl_states": [
+      "CIRCUIT_STATE_CHAN_WAIT",
+      "CIRCUIT_STATE_OPEN",
+      "CIRCUIT_STATE_BUILDING",
+      "CIRCUIT_STATE_GUARD_WAIT",
+      "CIRCUIT_STATE_ONIONSKIN_PENDING"
+    ],
+    "state_mapping": {
+      "CIRCUIT_STATE_BUILDING": {
+        "spec": "CIRCUIT_BUILDING",
+        "note": "1:1"
+      },
+      "CIRCUIT_STATE_ONIONSKIN_PENDING": {
+        "spec": "CREATE_SENT",
+        "note": "approximate (server-side variant)"
+      },
+      "CIRCUIT_STATE_CHAN_WAIT": {
+        "spec": "TLS_HANDSHAKE",
+        "note": "approximate"
+      },
+      "CIRCUIT_STATE_GUARD_WAIT": {
+        "spec": "(no spec analog)",
+        "note": "vanguards-specific gate state"
+      },
+      "CIRCUIT_STATE_OPEN": {
+        "spec": "CIRCUIT_READY",
+        "note": "implementation merges READY+TRANSMITTING"
+      }
+    },
+    "unmapped_in_spec": [
+      "CIRCUIT_STATE_GUARD_WAIT"
+    ],
+    "unrepresented_in_impl": [
+      "IDLE",
+      "CONNECTING",
+      "TRANSMITTING",
+      "CLOSING",
+      "CLOSED",
+      "ERROR"
+    ]
+  },
+  "findings": [
+    "Spec FSM: 10 states, 13 events, 25 valid pairs.",
+    "Implementation (tor src/core/or, static scan): 5 circuit states.",
+    "Observed divergence 1 (extractor-supported): no CIRCUIT_STATE_TRANSMITTING appears in the set of circuit_set_state targets; spec's READY and TRANSMITTING are not distinguished at this call surface.",
+    "Observed divergence 2 (extractor-supported): no CIRCUIT_STATE_CLOSING appears in the set of circuit_set_state targets; spec's CLOSING has no corresponding state-set entry in this surface. (Mechanism of teardown — e.g. circuit_mark_for_close() flag — is a code-reading hypothesis, not extracted here.)",
+    "Observed divergence 3 (extractor-supported): no CIRCUIT_STATE_IDLE / CIRCUIT_STATE_CONNECTING in the impl set. (Whether these are absent because the circuit object is constructed only at BUILDING, or because they live in another subsystem, is a hypothesis beyond this static scan.)",
+    "Observed divergence 4 (extractor-supported): CIRCUIT_STATE_GUARD_WAIT exists in impl with no spec analog in the state set used in this thesis.",
+    "Implication: 4 of 10 spec states (40%) are spec-only abstractions; 1 of 5 impl states (20%) is impl-only.",
+    "MDT methodology validity: the technique transfers — Q×Σ + δ + classifyInvalid pattern applies equally to the 5-state impl FSM (smaller, but same skeleton). The state count does not affect the algorithm."
+  ],
+  "limitations": [
+    "STATIC analysis only — dynamic execution trace (Shadow) not performed.",
+    "Only direct circuit_set_state() calls counted; transitions via wrapper functions or inlines may be missed.",
+    "Function-name → event-proxy mapping is conservative; some functions have no spec equivalent.",
+    "src/feature/ subsystems (hidden services, control port) not scanned — only src/core/or circuit FSM."
+  ]
+}

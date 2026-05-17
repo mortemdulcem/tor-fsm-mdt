@@ -35,13 +35,13 @@ title = "Ham Deney Verisi (90 koşu)"
 id = "dVcgP4IiSOBVn5A21t9zD"
 uri = "file://thesis/Tez_Taslagi.pdf"
 type = "pdf"
-title = "Tez Taslağı (35 sayfa) — 4.11 güncel: aligned C protocol, SLR 111 dedupe kayıt"
+title = "Tez Taslağı v6 (33 sayfa) — Bölüm 4.12 düzeltildi"
 
 [[outputs]]
 id = "hnVx3t2qWJVIFyMTccuwf"
 uri = "file://paper/Tor_FSM_MDT_Paper.pdf"
 type = "pdf"
-title = "IEEE Paper (7 sayfa) — hizalanmış C latency + dürüst etiketler"
+title = "IEEE Paper v3 (7 sayfa) — IV-K gözlem/yorum ayrımı"
 
 [[outputs]]
 id = "nszqODd5UVnmdw_VMMWB-"

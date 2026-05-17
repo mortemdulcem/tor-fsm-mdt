@@ -20,6 +20,7 @@ const trials = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experime
 const ext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/b_extensions.json"), "utf8"));
 const cext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/c_extensions.json"), "utf8"));
 const dext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/d_extensions.json"), "utf8"));
+const torStatic = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tor_static_fsm.json"), "utf8"));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -580,9 +581,18 @@ enumeration.</p>
 
 <p class="no-indent"><b>Threats to validity.</b></p>
 <ul>
-  <li><b>(i) Ground truth = specification.</b> Deviations of real Tor C
-  binaries from spec are not measured. Future work: replicate the experiment
-  on a real Tor relay via the Shadow ${cite(18)} simulator.</li>
+  <li><b>(i) Ground truth = specification — partially addressed (Sec. IV-K).</b>
+  Static extraction of the real Tor source (BSD-licensed, master branch,
+  ${torStatic.source.files_scanned} files in <code>src/core/or</code>) found
+  ${torStatic.sites_count} <code>circuit_set_state</code> call sites resolving
+  to ${torStatic.structural.impl_states_count} distinct implementation states.
+  Four state-set divergences are <i>observed</i> directly from the extractor
+  output: TRANSMITTING, CLOSING, IDLE, and CONNECTING do not appear as targets
+  of any <code>circuit_set_state</code> call, and <code>CIRCUIT_STATE_GUARD_WAIT</code>
+  appears in the impl with no spec analog. Mechanisms (e.g., teardown via
+  <code>circuit_mark_for_close()</code> flag) are code-reading interpretations
+  beyond the extractor's evidence and are flagged as such in the thesis.
+  Dynamic trace via Shadow ${cite(18)} remains future work.</li>
   <li><b>(ii) FPR = 0 is structural — partially addressed (Sec. IV-J).</b>
   An independent second oracle, hand-derived from the spec narrative (not the
   δ table), was added; it agrees with δ on
@@ -611,6 +621,26 @@ enumeration.</p>
   ${dext.cLatency.comparison.probes.map((p) => `${p.probe} ${p.speedup_x.toFixed(0)}×`).join(", ")}).
   A full Tor relay C/Rust port remains future work.</li>
 </ul>
+
+<p class="no-indent"><b>IV-K. Spec vs. implementation FSM (static extraction).</b>
+The Tor source repository was cloned and the
+${torStatic.source.files_scanned} C files in <code>src/core/or</code> were
+scanned by regex for <code>circuit_set_state(_, CIRCUIT_STATE_*)</code> call
+sites; the enclosing function for each call was extracted as an event proxy.
+This yielded the ${torStatic.structural.impl_states_count}-state implementation
+FSM <i>{ ${torStatic.structural.impl_states.map((s) => s.replace("CIRCUIT_STATE_", "")).join(", ")} }</i>
+with ${torStatic.sites_count} transition sites. The mapping to the
+${torStatic.structural.spec_states_count}-state spec FSM is reported in
+<a href="https://github.com/...">the artifact</a> (Table; see thesis Sec. 4.12).
+The MDT methodology transfers unchanged: Q × Σ + δ + classifyInvalid applies
+to the smaller impl FSM exactly as it does to the
+${cext.stream.domain}-cell stream sub-FSM (Sec. IV-I). The
+${(dext.oracleIndependent.matrix.TT + dext.oracleIndependent.matrix.FF) /
+  (STATES.length * EVENTS.length) * 100 | 0}%
+spec-internal oracle agreement combined with this implementation-level
+extraction provides two independent cross-checks of the δ table — neither
+eliminates Threat (i) on its own, but together they narrow the gap from
+"unmeasured" to "structurally characterized."</p>
 
 <p class="no-indent"><b>IV-J. Honest partial substitutes for (ii), (iv), (v).</b>
 The three threats above are partially mitigated, not eliminated. The

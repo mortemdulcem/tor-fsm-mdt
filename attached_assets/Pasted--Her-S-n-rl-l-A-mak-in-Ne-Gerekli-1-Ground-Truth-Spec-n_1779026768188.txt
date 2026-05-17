@@ -1,0 +1,108 @@
+# 🔧 Her Sınırlılığı Aşmak İçin Ne Gerekli?
+
+---
+
+## 1️⃣ Ground Truth = Spec → Öncelik: 🔴 YÜKSEK
+
+**Sorun:** Şu an "doğru davranış" delta matrisiyle tanımlı. Ama gerçek Tor C kodu farklı davranıyor olabilir.
+
+### Ne Gerekli?
+
+| İhtiyaç | Detay |
+|---|---|
+| **L* Algoritması** | Gerçek Tor relay'den otomatik FSM öğrenmek için model öğrenme algoritması — Angluin'in L* veya TTT algoritması |
+| **Shadow Simülatörü** | Tor ağını sanal ortamda çalıştıran simülasyon altyapısı — Jansen et al. 2012 |
+| **libalf / LearnLib** | L* tipi model öğrenme kütüphanesi — Java veya C++ tabanlı |
+| **Gerçek Tor Relay** | tor 0.4.x kaynak kodu derlenmiş, kontrollü test ortamında çalışır halde |
+| **Bağımsız Oracle** | Paket yakalama tabanlı gözlemci — pcap/Wireshark entegrasyonu |
+| **Teknik Bilgi** | Automata learning, model checking, C dili, ağ programlama |
+
+> 💡 **Özetle:** Bir test laboratuvarı kurman lazım. Shadow + gerçek Tor + LearnLib üçlüsü. Bu ciddi bir altyapı yatırımı.
+
+---
+
+## 2️⃣ N = 30 Koşu → Öncelik: 🟡 ORTA
+
+**Sorun:** 30 koşu CLT için yeterli ama güç analizi yapılmamış. Küçük etki büyüklüklerinde yanıltıcı olabilir.
+
+### Ne Gerekli?
+
+| İhtiyaç | Detay |
+|---|---|
+| **Daha fazla hesaplama süresi** | N=100 koşu için mevcut kodun 3.3× daha uzun çalıştırılması |
+| **G*Power veya R paketi** | Önceden güç analizi (a priori power analysis) için |
+| **BCa Bootstrap** | Güven aralıkları için bootstrap implementasyonu — R'da `boot` paketi veya Python'da `scipy` |
+| **İstatistik bilgisi** | β=0.80, α=0.05 parametreleriyle örnek büyüklüğü hesabı |
+
+> 💡 **Özetle:** Bu en kolay aşılacak sınırlılık. Sadece kodu daha uzun çalıştır, R veya Python'da güç analizi yap. Ekstra donanım gerektirmiyor.
+
+---
+
+## 3️⃣ SLR Veritabanı Erişimi → Öncelik: 🟢 DÜŞÜK
+
+**Sorun:** Scopus, Web of Science, IEEE Xplore'a canlı erişim olmadığı için ara sayılar NA raporlandı.
+
+### Ne Gerekli?
+
+| İhtiyaç | Detay |
+|---|---|
+| **Kurumsal abonelik** | Hacettepe Üniversitesi kütüphanesi üzerinden Scopus + IEEE Xplore erişimi |
+| **VPN / Kampüs ağı** | Üniversite ağından erişim sağlanması |
+| **Sorgu logu tutma** | Her arama sorgusunun tarih, anahtar kelime, sonuç sayısıyla kayıt altına alınması |
+| **Zotero / Mendeley** | Referans yönetimi ve duplikat tespiti için |
+| **Zaman** | Sistematik tarama 2-4 hafta sürebilir |
+
+> 💡 **Özetle:** Teknik değil, erişim sorunu. Üniversite kütüphanesiyle iletişime geç, kampüs ağına bağlan, sorgu logunu tut.
+
+---
+
+## 4️⃣ Latency Tek-Platform → Öncelik: 🟢 DÜŞÜK
+
+**Sorun:** Şu an ölçüm sadece Node.js V8 üzerinde. Gerçek Tor C implementasyonunda profil farklı olabilir.
+
+### Ne Gerekli?
+
+| İhtiyaç | Detay |
+|---|---|
+| **C veya Rust portu** | Mevcut delta tablosunun ve classifyInvalid fonksiyonunun C veya Rust'a yeniden yazılması |
+| **C programlama bilgisi** | Tor'un kendi diliyle aynı platformda ölçüm için |
+| **perf / valgrind** | Linux üzerinde nanosaniye çözünürlüklü profiling araçları |
+| **Aynı donanım** | Karşılaştırmalı ölçüm için kontrollü, aynı makine ortamı |
+| **Tor kaynak kodu entegrasyonu** | delta tablosunu Tor'un C koduna gömmek |
+
+> 💡 **Özetle:** Orta düzey yazılım mühendisliği işi. Mevcut JavaScript kodunu C'ye port etmek gerekiyor. Tor zaten C ile yazılı, bu yüzden entegrasyon mantıklı.
+
+---
+
+## 5️⃣ Stream FSM Eksik → Öncelik: 🔴 YÜKSEK
+
+**Sorun:** RELAY_BEGIN / RELAY_END / RELAY_DATA ile yönetilen stream alt-FSM modellenmedi. Uygulama katmanı saldırıları kapsam dışı.
+
+### Ne Gerekli?
+
+| İhtiyaç | Detay |
+|---|---|
+| **Tor stream spesifikasyonu** | tor-spec'in stream yönetimi bölümünün derinlemesine incelenmesi |
+| **Yeni delta matrisi** | Stream FSM için ayrı Q, Sigma, delta tanımı — muhtemelen devre FSM'inden daha karmaşık |
+| **Hiyerarşik FSM tasarımı** | Devre FSM + Stream FSM'in birlikte çalışması — concurrent/hierarchical state machine mimarisi |
+| **classifyInvalid genişletmesi** | Stream katmanı saldırıları için yeni vektörler tanımlanması |
+| **Daha büyük test bütçesi** | İki FSM'in kombinasyonu çok daha büyük bir domain yaratır |
+| **Akademik bilgi** | Hiyerarşik FSM, UML statechart, Statecharts teorisi |
+
+> 💡 **Özetle:** Bu en kapsamlı iş. Yeni bir tez konusu olabilecek kadar büyük. Devre FSM'i 10 durum 13 olaydı — stream FSM muhtemelen daha büyük ve ikisinin kombinasyonu katlanarak büyür.
+
+---
+
+## 📊 Genel Özet: Zorluk ve Öncelik Matrisi
+
+```
+Sınırlılık          Zorluk      Öncelik    Tahmini Süre
+─────────────────────────────────────────────────────
+Ground Truth        ⭐⭐⭐⭐⭐    🔴 Yüksek   6-12 ay
+N=30 Koşu           ⭐           🟡 Orta     1-2 hafta
+SLR Erişimi         ⭐⭐          🟢 Düşük    2-4 hafta
+Latency Platform    ⭐⭐⭐         🟢 Düşük    1-2 ay
+Stream FSM          ⭐⭐⭐⭐⭐    🔴 Yüksek   12+ ay
+```
+
+> 🎯 **Tavsiye:** Önce N=100 koşuyu hallet — en kolay, en hızlı. Sonra SLR erişimini tamamla. Ardından Ground Truth problemine geç — bu en değerli ama en zor olanı. Stream FSM ise ayrı bir araştırma projesi olarak planla.

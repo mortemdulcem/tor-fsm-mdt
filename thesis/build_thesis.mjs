@@ -18,6 +18,7 @@ const trials = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experime
 const ext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/b_extensions.json"), "utf8"));
 const cext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/c_extensions.json"), "utf8"));
 const dext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/d_extensions.json"), "utf8"));
+const torStatic = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tor_static_fsm.json"), "utf8"));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
 const sevSplit = trials.severitySumPerAlgo;
@@ -872,6 +873,85 @@ ağ I/O dışarıdadır. Gerçek end-to-end latency için Bölüm 6.3-4'teki gel
 
 <div class="pagebreak"></div>
 
+<!-- ====================== BÖLÜM 4.12 — E-grubu: tor source ====================== -->
+<h3>4.12 E-grubu: Gerçek Tor Kaynak Kodundan Statik FSM Çıkarımı</h3>
+
+<p>Bölüm 6.2-i ("Ground Truth = Spec") sınırlılığının en doğrudan saldırı yüzeyi
+gerçek <i>implementasyondan</i> FSM çıkarmaktır. Bu ortamda Shadow simülatörünün
+runtime trace'i kurulamaz (saatlerce süren bağımlılık zinciri); ancak gerçek
+tor kaynak kodu (BSD lisanslı, <code>${torStatic.source.repo}</code>) klonlanıp
+<b>statik</b> olarak taranabilir. Bu, runtime trace değildir, ama spec metnine
+göre çok daha güçlü bir ground-truth referansıdır.</p>
+
+<p><b>Yöntem.</b> <code>${torStatic.source.path}</code> dizinindeki
+${torStatic.source.files_scanned} adet .c dosyasında <code>circuit_set_state(_, CIRCUIT_STATE_*)</code>
+çağrı noktaları <b>regex taraması</b> ile bulunmuş; her çağrı için saran fonksiyon
+adı <b>column-0 fonksiyon-başlığı sezgisi</b> ile çıkarılmıştır (kod:
+<code>experiments/tor_static_fsm.mjs</code> — AST parser değil, sözdizimsel
+taramadır). Toplam <b>${torStatic.sites_count} transition site</b> bulunmuş,
+${torStatic.sites_count}/${torStatic.sites_count}'inin saran fonksiyonu çözülmüş,
+<b>${torStatic.structural.impl_states_count} farklı circuit durumu</b> gözlenmiştir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-A.</b> Yapısal karşılaştırma — spec FSM vs implementation FSM.</p>
+<table>
+<tr><th></th><th>Spec (bu tez)</th><th>Implementation (tor master)</th></tr>
+<tr><th class="l">Durum sayısı</th><td>${torStatic.structural.spec_states_count}</td><td>${torStatic.structural.impl_states_count}</td></tr>
+<tr><th class="l">Transition site / valid geçiş</th><td>${Object.keys(VALID).length}</td><td>${torStatic.sites_count}</td></tr>
+</table>
+
+<p class="no-indent"><b>Tablo 4.12-B.</b> Implementation circuit_set_state çağrı haritası.</p>
+<table>
+<tr><th>Implementation durumu</th><th>Çağrı sayısı</th><th>Saran fonksiyonlar (örnek)</th></tr>
+${Object.entries(torStatic.per_impl_state).map(([s, calls]) => `<tr>
+  <td class="l">${s}</td><td>${calls.length}</td>
+  <td class="l">${calls.slice(0, 3).map((c) => `<code>${c.fn}</code>`).join(", ")}${calls.length > 3 ? ", …" : ""}</td>
+</tr>`).join("")}
+</table>
+
+<p class="no-indent"><b>Tablo 4.12-C.</b> Spec ↔ Implementation durum eşlemesi.</p>
+<table>
+<tr><th>Implementation</th><th>Spec karşılığı</th><th>Not</th></tr>
+${Object.entries(torStatic.structural.state_mapping).map(([impl, m]) => `<tr>
+  <td class="l">${impl}</td><td>${m.spec}</td><td class="l">${m.note}</td>
+</tr>`).join("")}
+</table>
+
+<p><b>Bulgular — gözlemsel (extractor çıktısından doğrudan) vs yorumsal
+(kod okuma hipotezi) ayrımı korunarak:</b></p>
+<ol>
+  <li><b>[Gözlem]</b> <code>circuit_set_state</code> hedef kümesinde
+  <code>CIRCUIT_STATE_TRANSMITTING</code> <i>yoktur</i>; spec'in READY ve
+  TRANSMITTING ayrımı bu çağrı yüzeyinde görünmez.</li>
+  <li><b>[Gözlem]</b> Hedef kümesinde <code>CIRCUIT_STATE_CLOSING</code>
+  <i>yoktur</i>. <i>[Yorum, kapsam dışı]</i> Teardown mekanizmasının
+  <code>circuit_mark_for_close()</code> bayrağı olduğu kod-okuma hipotezidir;
+  bu statik tarama tarafından üretilmemiştir.</li>
+  <li><b>[Gözlem]</b> Hedef kümesinde <code>CIRCUIT_STATE_IDLE</code> ve
+  <code>CIRCUIT_STATE_CONNECTING</code> <i>yoktur</i>. <i>[Yorum, kapsam dışı]</i>
+  Bunun nedeninin "circuit nesnesi BUILDING'den önce inşa edilmiyor" veya "TLS
+  başka katmanda" olması hipotezdir; tarama doğrudan kanıt vermez.</li>
+  <li><b>[Gözlem]</b> <code>CIRCUIT_STATE_GUARD_WAIT</code> implementasyonda
+  vardır, bu tezde kullanılan spec durum kümesinde yoktur. Vanguards
+  entegrasyonuyla ilişkilendirilmesi yorumdur.</li>
+  <li><b>MDT metodolojisinin transfer edilebilirliği teyit edilir.</b>
+  Q × Σ + δ + classifyInvalid örüntüsü 5-durumlu implementation FSM'ine de
+  birebir uygulanır; algoritma durum sayısından bağımsızdır.</li>
+</ol>
+
+<p><b>Çıkarımın kapsamı, açıkça:</b> Bu tarama yalnızca <i>doğrudan</i>
+<code>circuit_set_state()</code> çağrı noktalarının durum envanterini çıkarır.
+Wrapper fonksiyonlar, inline'lar, çok-satırlı imzalar veya
+<code>src/feature/</code> alt sistemleri (gizli servisler, control port)
+kapsam dışındadır; runtime davranış (Shadow) yapılmamıştır.</p>
+
+<p><b>Sınırlama (açıkça):</b> Bu STATİK bir analizdir.
+${torStatic.limitations.join(" ")} Sonuç olarak, "Ground Truth = Spec"
+sınırlılığı tamamen kaldırılmaz; <b>spec ile implementasyonun structural divergence'ı
+ölçülmüş</b> ama runtime davranış farkı (timing, error path'leri, race conditions)
+hâlâ Shadow ile yapılacak gelecek çalışmaya bırakılmıştır.</p>
+
+<div class="pagebreak"></div>
+
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->
 <h2>5. Görselleştirme</h2>
 
@@ -901,10 +981,13 @@ ağ I/O dışarıdadır. Gerçek end-to-end latency için Bölüm 6.3-4'teki gel
 
 <h3>6.2 Sınırlılıklar</h3>
 <ul>
-  <li><b>Ground Truth = Spec.</b> Bu deneyde "doğru" davranış, FSM δ tarafından tanımlanır.
-  Gerçek Tor implementasyonu (C kaynak kodu, tor 0.4.x serisi) spec ile çelişebilir; bu
-  çelişkilerin ölçülmesi yapılmamıştır. Doğal devamı: deneyi gerçek Tor relay üzerinde
-  Shadow ${cite(18)} simülatörü ile tekrarlamak.</li>
+  <li><b>Ground Truth = Spec — kısmen giderildi (Bölüm 4.12).</b> Gerçek tor
+  kaynak kodu (BSD, ${torStatic.source.files_scanned} dosya) statik taranmış,
+  ${torStatic.sites_count} <code>circuit_set_state</code> çağrı noktasından
+  ${torStatic.structural.impl_states_count}-durumlu implementation FSM çıkarılmıştır.
+  Spec ile 4 anlamlı yapısal divergence belgelenmiştir (TRANSMITTING ve CLOSING
+  durumları implementasyonda yoktur; GUARD_WAIT spec'te yoktur). Runtime trace
+  (Shadow) hâlâ kapsam dışıdır.</li>
   <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1).</b> Spec narrative'inden
   bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
   ${(dext.oracleIndependent.agreement * 100).toFixed(2)}% uyum bulunmuş;
