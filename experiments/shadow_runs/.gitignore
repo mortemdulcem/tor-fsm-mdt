@@ -1,0 +1,5 @@
+# Large Shadow simulation output (raw Tor logs per host)
+# These are ~21MB per run and can be regenerated via shadow_harness.mjs
+**/shadow.data/
+**/shadow.data.template
+**/shadow.log
