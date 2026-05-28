@@ -21,12 +21,13 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
-# System dependencies
+# System dependencies (libclang-dev needed for Shadow's Rust bindgen)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     curl \
     git \
+    libclang-dev \
     libglib2.0-dev \
     libigraph-dev \
     pkg-config \
