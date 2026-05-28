@@ -616,6 +616,7 @@ function generateShadowYaml(seed) {
   lines.push(`      environment: { OPENBLAS_NUM_THREADS: "1" }`);
   lines.push(`      args: ../../../conf/tgen.client.graphml.xml`);
   lines.push(`      start_time: 600`);
+  lines.push(`      expected_final_state: running`);
 
   for (const c of torClients) {
     lines.push(`  ${c}:`);
@@ -630,6 +631,7 @@ function generateShadowYaml(seed) {
     lines.push(`      environment: { OPENBLAS_NUM_THREADS: "1" }`);
     lines.push(`      args: ../../../conf/tgen.torclient.graphml.xml`);
     lines.push(`      start_time: 1500`);
+    lines.push(`      expected_final_state: running`);
   }
 
   return lines.join("\n");
