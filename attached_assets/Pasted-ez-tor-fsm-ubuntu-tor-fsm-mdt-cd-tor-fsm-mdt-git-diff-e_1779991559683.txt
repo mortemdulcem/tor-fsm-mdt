@@ -1,0 +1,83 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt && git diff experiments/shadow_results.json | head -80
+diff --git a/experiments/shadow_results.json b/experiments/shadow_results.json
+index f4c25cf..7a1a8a0 100644
+--- a/experiments/shadow_results.json
++++ b/experiments/shadow_results.json
+@@ -2,7 +2,7 @@
+   "metadata": {
+     "shadow_version": "3.3.0",
+     "tor_version": "Tor version 0.4.6.10.",
+-    "run_date": "2026-05-17T16:47:19.132Z",
++    "run_date": "2026-05-28T17:52:49.360Z",
+     "seeds": [
+       42,
+       137,
+@@ -31,7 +31,7 @@
+     {
+       "seed": 42,
+       "scenario": "benign",
+-      "wallTime": "4.4",
++      "wallTime": "7.5",
+       "circuitCount": 75,
+       "rawEventCount": 687,
+       "injectedCount": 0,
+@@ -127,7 +127,7 @@
+     {
+       "seed": 137,
+       "scenario": "benign",
+-      "wallTime": "4.6",
++      "wallTime": "9.0",
+       "circuitCount": 73,
+       "rawEventCount": 667,
+       "injectedCount": 0,
+@@ -222,7 +222,7 @@
+     {
+       "seed": 2718,
+       "scenario": "benign",
+-      "wallTime": "4.5",
++      "wallTime": "8.8",
+       "circuitCount": 74,
+       "rawEventCount": 677,
+       "injectedCount": 0,
+@@ -317,7 +317,7 @@
+     {
+       "seed": 42,
+       "scenario": "replay_attack",
+-      "wallTime": "4.5",
++      "wallTime": "7.0",
+       "circuitCount": 75,
+       "rawEventCount": 687,
+       "injectedCount": 102,
+@@ -418,7 +418,7 @@
+     {
+       "seed": 137,
+       "scenario": "replay_attack",
+-      "wallTime": "4.8",
++      "wallTime": "8.6",
+       "circuitCount": 73,
+       "rawEventCount": 667,
+       "injectedCount": 96,
+@@ -519,7 +519,7 @@
+     {
+       "seed": 2718,
+       "scenario": "replay_attack",
+-      "wallTime": "4.4",
++      "wallTime": "8.5",
+       "circuitCount": 74,
+       "rawEventCount": 677,
+       "injectedCount": 99,
+@@ -620,7 +620,7 @@
+     {
+       "seed": 42,
+       "scenario": "circuit_bypass",
+-      "wallTime": "4.5",
++      "wallTime": "9.2",
+       "circuitCount": 75,
+       "rawEventCount": 687,
+       "injectedCount": 150,
+@@ -722,7 +722,7 @@
+     {
+       "seed": 137,
+       "scenario": "circuit_bypass",
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+
