@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+
+  fsm-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verify FSM single source of truth
+        run: |
+          # All FSM consumers must import from server/fsm.ts
+          IMPORTERS=$(grep -rl "VALID\|VALID_2HOP\|VALID_3HOP\|classifyInvalid" \
+            --include="*.mjs" --include="*.ts" --include="*.tsx" \
+            experiments/ server/ shared/ 2>/dev/null || true)
+          echo "Files referencing FSM:"
+          echo "$IMPORTERS"
+          for f in $IMPORTERS; do
+            # Skip the FSM source file itself and test files
+            case "$f" in
+              server/fsm.ts|server/fsm.test.ts) continue ;;
+            esac
+            if ! grep -q 'from.*["\x27].*server/fsm' "$f" && \
+               ! grep -q 'from.*["\x27].*\.\.\/server\/fsm' "$f" && \
+               ! grep -q 'from.*["\x27]\.\./fsm' "$f"; then
+              echo "ERROR: $f references FSM symbols but does not import from server/fsm.ts"
+              exit 1
+            fi
+          done
+          echo "All FSM consumers import from the single source of truth."

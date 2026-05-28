@@ -1,0 +1,28 @@
+DataDirectory .
+BandwidthRate 1024000
+BandwidthBurst 1024000
+DirServer 4uthority bridge v3ident=BA3FDA7CE3B41FBF9BB3615BE6ACD28D883E694B orport=9111 100.0.0.1:9112 A52C A5B5 6C64 D864 F6AE 43E5 6F29 ACBD 5706 DDA1
+DirServer da2 v3ident=E8FF2BF29DCF2FCE038B3B99FCA386C4E9AAEAEB orport=9111 100.0.0.2:9112 EC8F E927 195E A8F1 1E42 7E29 6A61 B71E 1FE3 5BEA
+DirServer da3 v3ident=E5DD3795781D61D2364489F5AB17EE6B33FE9A4A orport=9111 100.0.0.3:9112 02CA 04F5 FDBD 8D04 9315 561B 8E6B 85DE ECFB 468F
+TestingTorNetwork 1
+ServerDNSResolvConfFile ../../../conf/shadowresolv.conf
+ServerDNSTestAddresses 4uthority
+ServerDNSAllowBrokenConfig 1
+ServerDNSDetectHijacking 0
+AssumeReachable 1
+AuthDirTestReachability 0
+NumCPUs 1
+Log info stdout
+LogTimeGranularity 1
+HeartbeatPeriod 1
+SafeLogging 0
+ContactInfo https://github.com/shadow/shadow-plugin-tor/issues
+DisableDebuggerAttachment 0
+PathBiasUseThreshold 10000
+PathBiasCircThreshold 10000
+DoSCircuitCreationEnabled 0
+DoSConnectionEnabled 0
+DoSRefuseSingleHopClientRendezvous 0
+CircuitPriorityHalflife 30
+ControlPort 9051
+LearnCircuitBuildTimeout 0

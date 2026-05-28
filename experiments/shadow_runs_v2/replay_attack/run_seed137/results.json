@@ -1,0 +1,101 @@
+{
+  "seed": 137,
+  "scenario": "replay_attack",
+  "wallTime": "4.8",
+  "circuitCount": 73,
+  "rawEventCount": 667,
+  "injectedCount": 96,
+  "fsmResult": {
+    "validCount": 504,
+    "invalidCount": 259,
+    "circuitCount": 73
+  },
+  "metrics": {
+    "scenario": "replay_attack",
+    "totalEvents": 763,
+    "circuitCount": 73,
+    "validTransitions": 504,
+    "totalViolations": 259,
+    "injectedAttacks": 96,
+    "detectedAttacks": 96,
+    "tp": 96,
+    "fp": 163,
+    "fn": 0,
+    "tn": 504,
+    "precision": 0.37065637065637064,
+    "recall": 1,
+    "f1": 0.5408450704225353,
+    "fpr": 0.24437781109445278,
+    "violationBreakdown": {
+      "CIRCUIT_HIJACK": 156,
+      "HANDSHAKE_SKIP": 84,
+      "REPLAY_ATTACK": 4,
+      "GHOST_CIRCUIT": 4,
+      "PREMATURE_DATA": 11
+    },
+    "attackBreakdown": {
+      "HANDSHAKE_SKIP": 84,
+      "CIRCUIT_HIJACK": 12
+    }
+  },
+  "sampleCircuit": [
+    {
+      "cid": "4uthority_circ1",
+      "eventCount": 6,
+      "validCount": 6,
+      "invalidCount": 0,
+      "finalState": "CIRCUIT_READY"
+    },
+    {
+      "cid": "4uthority_circ2",
+      "eventCount": 8,
+      "validCount": 6,
+      "invalidCount": 2,
+      "finalState": "CIRCUIT_READY"
+    },
+    {
+      "cid": "4uthority_circ3",
+      "eventCount": 8,
+      "validCount": 6,
+      "invalidCount": 2,
+      "finalState": "CIRCUIT_READY"
+    }
+  ],
+  "sampleViolations": [
+    {
+      "from": "CIRCUIT_READY",
+      "event": "SEND_EXTEND",
+      "type": "CIRCUIT_HIJACK",
+      "severity": "CRITICAL",
+      "injected": false
+    },
+    {
+      "from": "CIRCUIT_READY",
+      "event": "RECV_EXTENDED",
+      "type": "CIRCUIT_HIJACK",
+      "severity": "CRITICAL",
+      "injected": false
+    },
+    {
+      "from": "CIRCUIT_READY",
+      "event": "SEND_EXTEND",
+      "type": "CIRCUIT_HIJACK",
+      "severity": "CRITICAL",
+      "injected": false
+    },
+    {
+      "from": "CIRCUIT_READY",
+      "event": "RECV_EXTENDED",
+      "type": "CIRCUIT_HIJACK",
+      "severity": "CRITICAL",
+      "injected": false
+    },
+    {
+      "from": "CIRCUIT_READY",
+      "event": "SEND_EXTEND",
+      "type": "CIRCUIT_HIJACK",
+      "severity": "CRITICAL",
+      "injected": false
+    }
+  ]
+}

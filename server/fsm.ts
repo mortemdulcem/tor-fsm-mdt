@@ -17,8 +17,8 @@ export type Event = (typeof EVENTS)[number];
 
 export const k = (s: State, e: Event) => `${s}|${e}`;
 
-// Spec-conforming valid transitions (25 entries).
-export const VALID: Record<string, State> = {
+// 2-hop spec-conforming valid transitions (25 entries) -- original model.
+export const VALID_2HOP: Record<string, State> = {
   [k("IDLE", "CONNECT")]: "CONNECTING",
 
   [k("CONNECTING", "TLS_OK")]: "TLS_HANDSHAKE",
@@ -54,10 +54,28 @@ export const VALID: Record<string, State> = {
   [k("ERROR", "CIRCUIT_CLOSED")]: "CLOSED",
 };
 
+// 3-hop spec-conforming valid transitions (27 entries).
+// Extends the 2-hop model by allowing SEND_EXTEND/RECV_EXTENDED from
+// CIRCUIT_READY, modeling Tor's default 3-hop circuit construction.
+// This removes the structural false positive where the 3rd hop's
+// SEND_EXTEND from CIRCUIT_READY was misclassified as CIRCUIT_HIJACK.
+export const VALID_3HOP: Record<string, State> = {
+  ...VALID_2HOP,
+  [k("CIRCUIT_READY", "SEND_EXTEND")]: "CIRCUIT_BUILDING",
+  [k("CIRCUIT_READY", "RECV_EXTENDED")]: "CIRCUIT_READY",
+};
+
+// Default: 3-hop model (primary for v2 analysis).
+export const VALID = VALID_3HOP;
+
 export const validKeys = Object.keys(VALID);
 export const totalDomain = STATES.length * EVENTS.length; // 130
-export const totalValid = validKeys.length;               // 25
-export const totalInvalid = totalDomain - totalValid;     // 105
+export const totalValid = validKeys.length;               // 27
+export const totalInvalid = totalDomain - totalValid;     // 103
+
+export const validKeys2Hop = Object.keys(VALID_2HOP);
+export const totalValid2Hop = validKeys2Hop.length;               // 25
+export const totalInvalid2Hop = totalDomain - totalValid2Hop;     // 105
 
 // Programmatic attack classifier covers every (state, event) NOT in VALID.
 // Returns { type, severity, description }.

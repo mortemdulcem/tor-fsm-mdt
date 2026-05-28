@@ -1,0 +1,2080 @@
+{
+  "metadata": {
+    "shadow_version": "3.3.0",
+    "tor_version": "Tor version 0.4.6.10.",
+    "run_date": "2026-05-28T11:48:05.708Z",
+    "seeds": [
+      42,
+      137,
+      2718
+    ],
+    "scenarios": [
+      "benign",
+      "replay_attack",
+      "circuit_bypass",
+      "ghost_circuit",
+      "handshake_skip",
+      "premature_data",
+      "create_flood"
+    ],
+    "simulated_time": "30 min",
+    "repetitions": 3,
+    "network_topology": {
+      "authorities": 3,
+      "relays": 30,
+      "exit_relays": 10,
+      "guard_middle_relays": 20,
+      "clients": 8
+    },
+    "fsm_models": {
+      "2hop": {
+        "valid_transitions": 25
+      },
+      "3hop": {
+        "valid_transitions": 27
+      }
+    }
+  },
+  "runs": [
+    {
+      "seed": 42,
+      "scenario": "benign",
+      "fsmModel": "2hop",
+      "circuitCount": 382,
+      "rawEventCount": 3552,
+      "injectedCount": 0,
+      "fsmResult": {
+        "validCount": 2628,
+        "invalidCount": 924,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "benign",
+        "totalEvents": 3552,
+        "circuitCount": 382,
+        "validTransitions": 2628,
+        "structuralViolations": 924,
+        "tp": 0,
+        "fp": 924,
+        "fn": 0,
+        "tn": 2628,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": 0.26013513513513514,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 745,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "PREMATURE_DATA": 105,
+          "CREATE_FLOOD": 6
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "benign",
+      "fsmModel": "2hop",
+      "circuitCount": 388,
+      "rawEventCount": 3620,
+      "injectedCount": 0,
+      "fsmResult": {
+        "validCount": 2644,
+        "invalidCount": 976,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "benign",
+        "totalEvents": 3620,
+        "circuitCount": 388,
+        "validTransitions": 2644,
+        "structuralViolations": 976,
+        "tp": 0,
+        "fp": 976,
+        "fn": 0,
+        "tn": 2644,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": 0.2696132596685083,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 775,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "HANDSHAKE_SKIP": 2,
+          "CREATE_FLOOD": 7,
+          "PREMATURE_DATA": 114
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "benign",
+      "fsmModel": "2hop",
+      "circuitCount": 385,
+      "rawEventCount": 3582,
+      "injectedCount": 0,
+      "fsmResult": {
+        "validCount": 2649,
+        "invalidCount": 933,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "benign",
+        "totalEvents": 3582,
+        "circuitCount": 385,
+        "validTransitions": 2649,
+        "structuralViolations": 933,
+        "tp": 0,
+        "fp": 933,
+        "fn": 0,
+        "tn": 2649,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": 0.26046901172529313,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 748,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CREATE_FLOOD": 9,
+          "HANDSHAKE_SKIP": 8,
+          "PREMATURE_DATA": 102
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "benign",
+      "fsmModel": "3hop",
+      "circuitCount": 382,
+      "rawEventCount": 3552,
+      "injectedCount": 0,
+      "fsmResult": {
+        "validCount": 3370,
+        "invalidCount": 182,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "benign",
+        "totalEvents": 3552,
+        "circuitCount": 382,
+        "validTransitions": 3370,
+        "structuralViolations": 182,
+        "tp": 0,
+        "fp": 182,
+        "fn": 0,
+        "tn": 3370,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": 0.051238738738738736,
+        "violationBreakdown": {
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "CIRCUIT_HIJACK": 3,
+          "PREMATURE_DATA": 105,
+          "CREATE_FLOOD": 6
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "benign",
+      "fsmModel": "3hop",
+      "circuitCount": 388,
+      "rawEventCount": 3620,
+      "injectedCount": 0,
+      "fsmResult": {
+        "validCount": 3418,
+        "invalidCount": 202,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "benign",
+        "totalEvents": 3620,
+        "circuitCount": 388,
+        "validTransitions": 3418,
+        "structuralViolations": 202,
+        "tp": 0,
+        "fp": 202,
+        "fn": 0,
+        "tn": 3418,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": 0.05580110497237569,
+        "violationBreakdown": {
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "HANDSHAKE_SKIP": 2,
+          "CIRCUIT_HIJACK": 1,
+          "CREATE_FLOOD": 7,
+          "PREMATURE_DATA": 114
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "benign",
+      "fsmModel": "3hop",
+      "circuitCount": 385,
+      "rawEventCount": 3582,
+      "injectedCount": 0,
+      "fsmResult": {
+        "validCount": 3395,
+        "invalidCount": 187,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "benign",
+        "totalEvents": 3582,
+        "circuitCount": 385,
+        "validTransitions": 3395,
+        "structuralViolations": 187,
+        "tp": 0,
+        "fp": 187,
+        "fn": 0,
+        "tn": 3395,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": 0.05220547180346175,
+        "violationBreakdown": {
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CREATE_FLOOD": 9,
+          "CIRCUIT_HIJACK": 2,
+          "HANDSHAKE_SKIP": 8,
+          "PREMATURE_DATA": 102
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "replay_attack",
+      "fsmModel": "2hop",
+      "circuitCount": 382,
+      "rawEventCount": 4053,
+      "injectedCount": 501,
+      "fsmResult": {
+        "validCount": 2637,
+        "invalidCount": 1416,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "replay_attack",
+        "totalEvents": 4053,
+        "circuitCount": 382,
+        "validTransitions": 2637,
+        "totalViolations": 1416,
+        "injectedAttacks": 501,
+        "detectedAttacks": 492,
+        "tp": 492,
+        "fp": 924,
+        "fn": 9,
+        "tn": 2637,
+        "precision": 0.3474576271186441,
+        "recall": 0.9820359281437125,
+        "f1": 0.5133020344287951,
+        "fpr": 0.2594776748104465,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 814,
+          "HANDSHAKE_SKIP": 399,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "CREATE_FLOOD": 30,
+          "PREMATURE_DATA": 105
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 399,
+          "CIRCUIT_HIJACK": 69,
+          "CREATE_FLOOD": 24
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "replay_attack",
+      "fsmModel": "2hop",
+      "circuitCount": 388,
+      "rawEventCount": 4145,
+      "injectedCount": 525,
+      "fsmResult": {
+        "validCount": 2652,
+        "invalidCount": 1493,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "replay_attack",
+        "totalEvents": 4145,
+        "circuitCount": 388,
+        "validTransitions": 2652,
+        "totalViolations": 1493,
+        "injectedAttacks": 525,
+        "detectedAttacks": 517,
+        "tp": 517,
+        "fp": 976,
+        "fn": 8,
+        "tn": 2652,
+        "precision": 0.3462826523777629,
+        "recall": 0.9847619047619047,
+        "f1": 0.512388503468781,
+        "fpr": 0.269018743109151,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 856,
+          "HANDSHAKE_SKIP": 410,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "CREATE_FLOOD": 35,
+          "PREMATURE_DATA": 114
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 408,
+          "CIRCUIT_HIJACK": 81,
+          "CREATE_FLOOD": 28
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "replay_attack",
+      "fsmModel": "2hop",
+      "circuitCount": 385,
+      "rawEventCount": 4095,
+      "injectedCount": 513,
+      "fsmResult": {
+        "validCount": 2660,
+        "invalidCount": 1435,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "replay_attack",
+        "totalEvents": 4095,
+        "circuitCount": 385,
+        "validTransitions": 2660,
+        "totalViolations": 1435,
+        "injectedAttacks": 513,
+        "detectedAttacks": 502,
+        "tp": 502,
+        "fp": 933,
+        "fn": 11,
+        "tn": 2660,
+        "precision": 0.34982578397212544,
+        "recall": 0.9785575048732943,
+        "f1": 0.5154004106776181,
+        "fpr": 0.25967158363484555,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 808,
+          "HANDSHAKE_SKIP": 422,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CREATE_FLOOD": 37,
+          "PREMATURE_DATA": 102
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 414,
+          "CIRCUIT_HIJACK": 60,
+          "CREATE_FLOOD": 28
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "replay_attack",
+      "fsmModel": "3hop",
+      "circuitCount": 382,
+      "rawEventCount": 4053,
+      "injectedCount": 501,
+      "fsmResult": {
+        "validCount": 3379,
+        "invalidCount": 674,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "replay_attack",
+        "totalEvents": 4053,
+        "circuitCount": 382,
+        "validTransitions": 3379,
+        "totalViolations": 674,
+        "injectedAttacks": 501,
+        "detectedAttacks": 492,
+        "tp": 492,
+        "fp": 182,
+        "fn": 9,
+        "tn": 3379,
+        "precision": 0.7299703264094956,
+        "recall": 0.9820359281437125,
+        "f1": 0.8374468085106384,
+        "fpr": 0.05110923897781522,
+        "violationBreakdown": {
+          "HANDSHAKE_SKIP": 399,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "CIRCUIT_HIJACK": 72,
+          "CREATE_FLOOD": 30,
+          "PREMATURE_DATA": 105
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 399,
+          "CIRCUIT_HIJACK": 69,
+          "CREATE_FLOOD": 24
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "replay_attack",
+      "fsmModel": "3hop",
+      "circuitCount": 388,
+      "rawEventCount": 4145,
+      "injectedCount": 525,
+      "fsmResult": {
+        "validCount": 3426,
+        "invalidCount": 719,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "replay_attack",
+        "totalEvents": 4145,
+        "circuitCount": 388,
+        "validTransitions": 3426,
+        "totalViolations": 719,
+        "injectedAttacks": 525,
+        "detectedAttacks": 517,
+        "tp": 517,
+        "fp": 202,
+        "fn": 8,
+        "tn": 3426,
+        "precision": 0.7190542420027817,
+        "recall": 0.9847619047619047,
+        "f1": 0.8311897106109325,
+        "fpr": 0.05567805953693495,
+        "violationBreakdown": {
+          "HANDSHAKE_SKIP": 410,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "CIRCUIT_HIJACK": 82,
+          "CREATE_FLOOD": 35,
+          "PREMATURE_DATA": 114
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 408,
+          "CIRCUIT_HIJACK": 81,
+          "CREATE_FLOOD": 28
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "replay_attack",
+      "fsmModel": "3hop",
+      "circuitCount": 385,
+      "rawEventCount": 4095,
+      "injectedCount": 513,
+      "fsmResult": {
+        "validCount": 3406,
+        "invalidCount": 689,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "replay_attack",
+        "totalEvents": 4095,
+        "circuitCount": 385,
+        "validTransitions": 3406,
+        "totalViolations": 689,
+        "injectedAttacks": 513,
+        "detectedAttacks": 502,
+        "tp": 502,
+        "fp": 187,
+        "fn": 11,
+        "tn": 3406,
+        "precision": 0.7285921625544267,
+        "recall": 0.9785575048732943,
+        "f1": 0.8352745424292846,
+        "fpr": 0.0520456443083774,
+        "violationBreakdown": {
+          "HANDSHAKE_SKIP": 422,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CIRCUIT_HIJACK": 62,
+          "CREATE_FLOOD": 37,
+          "PREMATURE_DATA": 102
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 414,
+          "CIRCUIT_HIJACK": 60,
+          "CREATE_FLOOD": 28
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "circuit_bypass",
+      "fsmModel": "2hop",
+      "circuitCount": 382,
+      "rawEventCount": 4316,
+      "injectedCount": 764,
+      "fsmResult": {
+        "validCount": 2628,
+        "invalidCount": 1688,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "circuit_bypass",
+        "totalEvents": 4316,
+        "circuitCount": 382,
+        "validTransitions": 2628,
+        "totalViolations": 1688,
+        "injectedAttacks": 764,
+        "detectedAttacks": 764,
+        "tp": 764,
+        "fp": 924,
+        "fn": 0,
+        "tn": 2628,
+        "precision": 0.45260663507109006,
+        "recall": 1,
+        "f1": 0.6231647634584013,
+        "fpr": 0.26013513513513514,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 382,
+          "HANDSHAKE_SKIP": 382,
+          "CIRCUIT_HIJACK": 745,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "PREMATURE_DATA": 105,
+          "CREATE_FLOOD": 6
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 382,
+          "HANDSHAKE_SKIP": 382
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "circuit_bypass",
+      "fsmModel": "2hop",
+      "circuitCount": 388,
+      "rawEventCount": 4396,
+      "injectedCount": 776,
+      "fsmResult": {
+        "validCount": 2644,
+        "invalidCount": 1752,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "circuit_bypass",
+        "totalEvents": 4396,
+        "circuitCount": 388,
+        "validTransitions": 2644,
+        "totalViolations": 1752,
+        "injectedAttacks": 776,
+        "detectedAttacks": 776,
+        "tp": 776,
+        "fp": 976,
+        "fn": 0,
+        "tn": 2644,
+        "precision": 0.4429223744292237,
+        "recall": 1,
+        "f1": 0.6139240506329114,
+        "fpr": 0.2696132596685083,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 388,
+          "HANDSHAKE_SKIP": 390,
+          "CIRCUIT_HIJACK": 775,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "CREATE_FLOOD": 7,
+          "PREMATURE_DATA": 114
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 388,
+          "HANDSHAKE_SKIP": 388
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "circuit_bypass",
+      "fsmModel": "2hop",
+      "circuitCount": 385,
+      "rawEventCount": 4352,
+      "injectedCount": 770,
+      "fsmResult": {
+        "validCount": 2649,
+        "invalidCount": 1703,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "circuit_bypass",
+        "totalEvents": 4352,
+        "circuitCount": 385,
+        "validTransitions": 2649,
+        "totalViolations": 1703,
+        "injectedAttacks": 770,
+        "detectedAttacks": 770,
+        "tp": 770,
+        "fp": 933,
+        "fn": 0,
+        "tn": 2649,
+        "precision": 0.4521432765707575,
+        "recall": 1,
+        "f1": 0.6227254346947029,
+        "fpr": 0.26046901172529313,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 385,
+          "HANDSHAKE_SKIP": 393,
+          "CIRCUIT_HIJACK": 748,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CREATE_FLOOD": 9,
+          "PREMATURE_DATA": 102
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 385,
+          "HANDSHAKE_SKIP": 385
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "circuit_bypass",
+      "fsmModel": "3hop",
+      "circuitCount": 382,
+      "rawEventCount": 4316,
+      "injectedCount": 764,
+      "fsmResult": {
+        "validCount": 3370,
+        "invalidCount": 946,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "circuit_bypass",
+        "totalEvents": 4316,
+        "circuitCount": 382,
+        "validTransitions": 3370,
+        "totalViolations": 946,
+        "injectedAttacks": 764,
+        "detectedAttacks": 764,
+        "tp": 764,
+        "fp": 182,
+        "fn": 0,
+        "tn": 3370,
+        "precision": 0.8076109936575053,
+        "recall": 1,
+        "f1": 0.8935672514619883,
+        "fpr": 0.051238738738738736,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 382,
+          "HANDSHAKE_SKIP": 382,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "CIRCUIT_HIJACK": 3,
+          "PREMATURE_DATA": 105,
+          "CREATE_FLOOD": 6
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 382,
+          "HANDSHAKE_SKIP": 382
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "circuit_bypass",
+      "fsmModel": "3hop",
+      "circuitCount": 388,
+      "rawEventCount": 4396,
+      "injectedCount": 776,
+      "fsmResult": {
+        "validCount": 3418,
+        "invalidCount": 978,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "circuit_bypass",
+        "totalEvents": 4396,
+        "circuitCount": 388,
+        "validTransitions": 3418,
+        "totalViolations": 978,
+        "injectedAttacks": 776,
+        "detectedAttacks": 776,
+        "tp": 776,
+        "fp": 202,
+        "fn": 0,
+        "tn": 3418,
+        "precision": 0.7934560327198364,
+        "recall": 1,
+        "f1": 0.8848346636259977,
+        "fpr": 0.05580110497237569,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 388,
+          "HANDSHAKE_SKIP": 390,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "CIRCUIT_HIJACK": 1,
+          "CREATE_FLOOD": 7,
+          "PREMATURE_DATA": 114
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 388,
+          "HANDSHAKE_SKIP": 388
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "circuit_bypass",
+      "fsmModel": "3hop",
+      "circuitCount": 385,
+      "rawEventCount": 4352,
+      "injectedCount": 770,
+      "fsmResult": {
+        "validCount": 3395,
+        "invalidCount": 957,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "circuit_bypass",
+        "totalEvents": 4352,
+        "circuitCount": 385,
+        "validTransitions": 3395,
+        "totalViolations": 957,
+        "injectedAttacks": 770,
+        "detectedAttacks": 770,
+        "tp": 770,
+        "fp": 187,
+        "fn": 0,
+        "tn": 3395,
+        "precision": 0.8045977011494253,
+        "recall": 1,
+        "f1": 0.8917197452229298,
+        "fpr": 0.05220547180346175,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 385,
+          "HANDSHAKE_SKIP": 393,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CREATE_FLOOD": 9,
+          "CIRCUIT_HIJACK": 2,
+          "PREMATURE_DATA": 102
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 385,
+          "HANDSHAKE_SKIP": 385
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "ghost_circuit",
+      "fsmModel": "2hop",
+      "circuitCount": 382,
+      "rawEventCount": 3886,
+      "injectedCount": 334,
+      "fsmResult": {
+        "validCount": 2628,
+        "invalidCount": 1258,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "ghost_circuit",
+        "totalEvents": 3886,
+        "circuitCount": 382,
+        "validTransitions": 2628,
+        "totalViolations": 1258,
+        "injectedAttacks": 334,
+        "detectedAttacks": 334,
+        "tp": 334,
+        "fp": 924,
+        "fn": 0,
+        "tn": 2628,
+        "precision": 0.2655007949125596,
+        "recall": 1,
+        "f1": 0.41959798994974873,
+        "fpr": 0.26013513513513514,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 745,
+          "CIRCUIT_BYPASS": 266,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "PREMATURE_DATA": 155,
+          "HANDSHAKE_SKIP": 18,
+          "CREATE_FLOOD": 6
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 266,
+          "PREMATURE_DATA": 50,
+          "HANDSHAKE_SKIP": 18
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "ghost_circuit",
+      "fsmModel": "2hop",
+      "circuitCount": 388,
+      "rawEventCount": 3970,
+      "injectedCount": 350,
+      "fsmResult": {
+        "validCount": 2644,
+        "invalidCount": 1326,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "ghost_circuit",
+        "totalEvents": 3970,
+        "circuitCount": 388,
+        "validTransitions": 2644,
+        "totalViolations": 1326,
+        "injectedAttacks": 350,
+        "detectedAttacks": 350,
+        "tp": 350,
+        "fp": 976,
+        "fn": 0,
+        "tn": 2644,
+        "precision": 0.26395173453996984,
+        "recall": 1,
+        "f1": 0.41766109785202865,
+        "fpr": 0.2696132596685083,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 775,
+          "CIRCUIT_BYPASS": 272,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "PREMATURE_DATA": 176,
+          "HANDSHAKE_SKIP": 18,
+          "CREATE_FLOOD": 7
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 272,
+          "PREMATURE_DATA": 62,
+          "HANDSHAKE_SKIP": 16
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "ghost_circuit",
+      "fsmModel": "2hop",
+      "circuitCount": 385,
+      "rawEventCount": 3924,
+      "injectedCount": 342,
+      "fsmResult": {
+        "validCount": 2649,
+        "invalidCount": 1275,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "ghost_circuit",
+        "totalEvents": 3924,
+        "circuitCount": 385,
+        "validTransitions": 2649,
+        "totalViolations": 1275,
+        "injectedAttacks": 342,
+        "detectedAttacks": 342,
+        "tp": 342,
+        "fp": 933,
+        "fn": 0,
+        "tn": 2649,
+        "precision": 0.26823529411764707,
+        "recall": 1,
+        "f1": 0.4230055658627087,
+        "fpr": 0.26046901172529313,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 748,
+          "CIRCUIT_BYPASS": 276,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "PREMATURE_DATA": 146,
+          "HANDSHAKE_SKIP": 30,
+          "CREATE_FLOOD": 9
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 276,
+          "PREMATURE_DATA": 44,
+          "HANDSHAKE_SKIP": 22
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "ghost_circuit",
+      "fsmModel": "3hop",
+      "circuitCount": 382,
+      "rawEventCount": 3886,
+      "injectedCount": 334,
+      "fsmResult": {
+        "validCount": 3370,
+        "invalidCount": 516,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "ghost_circuit",
+        "totalEvents": 3886,
+        "circuitCount": 382,
+        "validTransitions": 3370,
+        "totalViolations": 516,
+        "injectedAttacks": 334,
+        "detectedAttacks": 334,
+        "tp": 334,
+        "fp": 182,
+        "fn": 0,
+        "tn": 3370,
+        "precision": 0.6472868217054264,
+        "recall": 1,
+        "f1": 0.7858823529411765,
+        "fpr": 0.051238738738738736,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 266,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "PREMATURE_DATA": 155,
+          "HANDSHAKE_SKIP": 18,
+          "CIRCUIT_HIJACK": 3,
+          "CREATE_FLOOD": 6
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 266,
+          "PREMATURE_DATA": 50,
+          "HANDSHAKE_SKIP": 18
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "ghost_circuit",
+      "fsmModel": "3hop",
+      "circuitCount": 388,
+      "rawEventCount": 3970,
+      "injectedCount": 350,
+      "fsmResult": {
+        "validCount": 3418,
+        "invalidCount": 552,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "ghost_circuit",
+        "totalEvents": 3970,
+        "circuitCount": 388,
+        "validTransitions": 3418,
+        "totalViolations": 552,
+        "injectedAttacks": 350,
+        "detectedAttacks": 350,
+        "tp": 350,
+        "fp": 202,
+        "fn": 0,
+        "tn": 3418,
+        "precision": 0.6340579710144928,
+        "recall": 1,
+        "f1": 0.7760532150776054,
+        "fpr": 0.05580110497237569,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 272,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "PREMATURE_DATA": 176,
+          "HANDSHAKE_SKIP": 18,
+          "CIRCUIT_HIJACK": 1,
+          "CREATE_FLOOD": 7
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 272,
+          "PREMATURE_DATA": 62,
+          "HANDSHAKE_SKIP": 16
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "ghost_circuit",
+      "fsmModel": "3hop",
+      "circuitCount": 385,
+      "rawEventCount": 3924,
+      "injectedCount": 342,
+      "fsmResult": {
+        "validCount": 3395,
+        "invalidCount": 529,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "ghost_circuit",
+        "totalEvents": 3924,
+        "circuitCount": 385,
+        "validTransitions": 3395,
+        "totalViolations": 529,
+        "injectedAttacks": 342,
+        "detectedAttacks": 342,
+        "tp": 342,
+        "fp": 187,
+        "fn": 0,
+        "tn": 3395,
+        "precision": 0.6465028355387523,
+        "recall": 1,
+        "f1": 0.7853042479908151,
+        "fpr": 0.05220547180346175,
+        "violationBreakdown": {
+          "CIRCUIT_BYPASS": 276,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "PREMATURE_DATA": 146,
+          "HANDSHAKE_SKIP": 30,
+          "CREATE_FLOOD": 9,
+          "CIRCUIT_HIJACK": 2
+        },
+        "attackBreakdown": {
+          "CIRCUIT_BYPASS": 276,
+          "PREMATURE_DATA": 44,
+          "HANDSHAKE_SKIP": 22
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "handshake_skip",
+      "fsmModel": "2hop",
+      "circuitCount": 382,
+      "rawEventCount": 3934,
+      "injectedCount": 382,
+      "fsmResult": {
+        "validCount": 2628,
+        "invalidCount": 1306,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "handshake_skip",
+        "totalEvents": 3934,
+        "circuitCount": 382,
+        "validTransitions": 2628,
+        "totalViolations": 1306,
+        "injectedAttacks": 382,
+        "detectedAttacks": 382,
+        "tp": 382,
+        "fp": 924,
+        "fn": 0,
+        "tn": 2628,
+        "precision": 0.29249617151607965,
+        "recall": 1,
+        "f1": 0.45260663507109006,
+        "fpr": 0.26013513513513514,
+        "violationBreakdown": {
+          "HANDSHAKE_SKIP": 382,
+          "CIRCUIT_HIJACK": 745,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "PREMATURE_DATA": 105,
+          "CREATE_FLOOD": 6
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 382
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "handshake_skip",
+      "fsmModel": "2hop",
+      "circuitCount": 388,
+      "rawEventCount": 4008,
+      "injectedCount": 388,
+      "fsmResult": {
+        "validCount": 2644,
+        "invalidCount": 1364,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "handshake_skip",
+        "totalEvents": 4008,
+        "circuitCount": 388,
+        "validTransitions": 2644,
+        "totalViolations": 1364,
+        "injectedAttacks": 388,
+        "detectedAttacks": 388,
+        "tp": 388,
+        "fp": 976,
+        "fn": 0,
+        "tn": 2644,
+        "precision": 0.2844574780058651,
+        "recall": 1,
+        "f1": 0.4429223744292238,
+        "fpr": 0.2696132596685083,
+        "violationBreakdown": {
+          "HANDSHAKE_SKIP": 390,
+          "CIRCUIT_HIJACK": 775,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "CREATE_FLOOD": 7,
+          "PREMATURE_DATA": 114
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 388
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "handshake_skip",
+      "fsmModel": "2hop",
+      "circuitCount": 385,
+      "rawEventCount": 3967,
+      "injectedCount": 385,
+      "fsmResult": {
+        "validCount": 2649,
+        "invalidCount": 1318,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "handshake_skip",
+        "totalEvents": 3967,
+        "circuitCount": 385,
+        "validTransitions": 2649,
+        "totalViolations": 1318,
+        "injectedAttacks": 385,
+        "detectedAttacks": 385,
+        "tp": 385,
+        "fp": 933,
+        "fn": 0,
+        "tn": 2649,
+        "precision": 0.2921092564491654,
+        "recall": 1,
+        "f1": 0.4521432765707575,
+        "fpr": 0.26046901172529313,
+        "violationBreakdown": {
+          "HANDSHAKE_SKIP": 393,
+          "CIRCUIT_HIJACK": 748,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CREATE_FLOOD": 9,
+          "PREMATURE_DATA": 102
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 385
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "handshake_skip",
+      "fsmModel": "3hop",
+      "circuitCount": 382,
+      "rawEventCount": 3934,
+      "injectedCount": 382,
+      "fsmResult": {
+        "validCount": 3370,
+        "invalidCount": 564,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "handshake_skip",
+        "totalEvents": 3934,
+        "circuitCount": 382,
+        "validTransitions": 3370,
+        "totalViolations": 564,
+        "injectedAttacks": 382,
+        "detectedAttacks": 382,
+        "tp": 382,
+        "fp": 182,
+        "fn": 0,
+        "tn": 3370,
+        "precision": 0.6773049645390071,
+        "recall": 1,
+        "f1": 0.8076109936575052,
+        "fpr": 0.051238738738738736,
+        "violationBreakdown": {
+          "HANDSHAKE_SKIP": 382,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "CIRCUIT_HIJACK": 3,
+          "PREMATURE_DATA": 105,
+          "CREATE_FLOOD": 6
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 382
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "handshake_skip",
+      "fsmModel": "3hop",
+      "circuitCount": 388,
+      "rawEventCount": 4008,
+      "injectedCount": 388,
+      "fsmResult": {
+        "validCount": 3418,
+        "invalidCount": 590,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "handshake_skip",
+        "totalEvents": 4008,
+        "circuitCount": 388,
+        "validTransitions": 3418,
+        "totalViolations": 590,
+        "injectedAttacks": 388,
+        "detectedAttacks": 388,
+        "tp": 388,
+        "fp": 202,
+        "fn": 0,
+        "tn": 3418,
+        "precision": 0.6576271186440678,
+        "recall": 1,
+        "f1": 0.7934560327198364,
+        "fpr": 0.05580110497237569,
+        "violationBreakdown": {
+          "HANDSHAKE_SKIP": 390,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "CIRCUIT_HIJACK": 1,
+          "CREATE_FLOOD": 7,
+          "PREMATURE_DATA": 114
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 388
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "handshake_skip",
+      "fsmModel": "3hop",
+      "circuitCount": 385,
+      "rawEventCount": 3967,
+      "injectedCount": 385,
+      "fsmResult": {
+        "validCount": 3395,
+        "invalidCount": 572,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "handshake_skip",
+        "totalEvents": 3967,
+        "circuitCount": 385,
+        "validTransitions": 3395,
+        "totalViolations": 572,
+        "injectedAttacks": 385,
+        "detectedAttacks": 385,
+        "tp": 385,
+        "fp": 187,
+        "fn": 0,
+        "tn": 3395,
+        "precision": 0.6730769230769231,
+        "recall": 1,
+        "f1": 0.8045977011494253,
+        "fpr": 0.05220547180346175,
+        "violationBreakdown": {
+          "HANDSHAKE_SKIP": 393,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CREATE_FLOOD": 9,
+          "CIRCUIT_HIJACK": 2,
+          "PREMATURE_DATA": 102
+        },
+        "attackBreakdown": {
+          "HANDSHAKE_SKIP": 385
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "premature_data",
+      "fsmModel": "2hop",
+      "circuitCount": 382,
+      "rawEventCount": 3923,
+      "injectedCount": 371,
+      "fsmResult": {
+        "validCount": 2628,
+        "invalidCount": 1295,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "premature_data",
+        "totalEvents": 3923,
+        "circuitCount": 382,
+        "validTransitions": 2628,
+        "totalViolations": 1295,
+        "injectedAttacks": 371,
+        "detectedAttacks": 371,
+        "tp": 371,
+        "fp": 924,
+        "fn": 0,
+        "tn": 2628,
+        "precision": 0.2864864864864865,
+        "recall": 1,
+        "f1": 0.44537815126050423,
+        "fpr": 0.26013513513513514,
+        "violationBreakdown": {
+          "PREMATURE_DATA": 476,
+          "CIRCUIT_HIJACK": 745,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "CREATE_FLOOD": 6
+        },
+        "attackBreakdown": {
+          "PREMATURE_DATA": 371
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "premature_data",
+      "fsmModel": "2hop",
+      "circuitCount": 388,
+      "rawEventCount": 3994,
+      "injectedCount": 374,
+      "fsmResult": {
+        "validCount": 2644,
+        "invalidCount": 1350,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "premature_data",
+        "totalEvents": 3994,
+        "circuitCount": 388,
+        "validTransitions": 2644,
+        "totalViolations": 1350,
+        "injectedAttacks": 374,
+        "detectedAttacks": 374,
+        "tp": 374,
+        "fp": 976,
+        "fn": 0,
+        "tn": 2644,
+        "precision": 0.277037037037037,
+        "recall": 1,
+        "f1": 0.43387470997679817,
+        "fpr": 0.2696132596685083,
+        "violationBreakdown": {
+          "PREMATURE_DATA": 488,
+          "CIRCUIT_HIJACK": 775,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "HANDSHAKE_SKIP": 2,
+          "CREATE_FLOOD": 7
+        },
+        "attackBreakdown": {
+          "PREMATURE_DATA": 374
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "premature_data",
+      "fsmModel": "2hop",
+      "circuitCount": 385,
+      "rawEventCount": 3954,
+      "injectedCount": 372,
+      "fsmResult": {
+        "validCount": 2649,
+        "invalidCount": 1305,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "premature_data",
+        "totalEvents": 3954,
+        "circuitCount": 385,
+        "validTransitions": 2649,
+        "totalViolations": 1305,
+        "injectedAttacks": 372,
+        "detectedAttacks": 372,
+        "tp": 372,
+        "fp": 933,
+        "fn": 0,
+        "tn": 2649,
+        "precision": 0.2850574712643678,
+        "recall": 1,
+        "f1": 0.443649373881932,
+        "fpr": 0.26046901172529313,
+        "violationBreakdown": {
+          "PREMATURE_DATA": 473,
+          "CIRCUIT_HIJACK": 748,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CREATE_FLOOD": 9,
+          "HANDSHAKE_SKIP": 8,
+          "CIRCUIT_BYPASS": 1
+        },
+        "attackBreakdown": {
+          "PREMATURE_DATA": 371,
+          "CIRCUIT_BYPASS": 1
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "premature_data",
+      "fsmModel": "3hop",
+      "circuitCount": 382,
+      "rawEventCount": 3923,
+      "injectedCount": 371,
+      "fsmResult": {
+        "validCount": 3370,
+        "invalidCount": 553,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "premature_data",
+        "totalEvents": 3923,
+        "circuitCount": 382,
+        "validTransitions": 3370,
+        "totalViolations": 553,
+        "injectedAttacks": 371,
+        "detectedAttacks": 371,
+        "tp": 371,
+        "fp": 182,
+        "fn": 0,
+        "tn": 3370,
+        "precision": 0.6708860759493671,
+        "recall": 1,
+        "f1": 0.8030303030303031,
+        "fpr": 0.051238738738738736,
+        "violationBreakdown": {
+          "PREMATURE_DATA": 476,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "CIRCUIT_HIJACK": 3,
+          "CREATE_FLOOD": 6
+        },
+        "attackBreakdown": {
+          "PREMATURE_DATA": 371
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "premature_data",
+      "fsmModel": "3hop",
+      "circuitCount": 388,
+      "rawEventCount": 3994,
+      "injectedCount": 374,
+      "fsmResult": {
+        "validCount": 3418,
+        "invalidCount": 576,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "premature_data",
+        "totalEvents": 3994,
+        "circuitCount": 388,
+        "validTransitions": 3418,
+        "totalViolations": 576,
+        "injectedAttacks": 374,
+        "detectedAttacks": 374,
+        "tp": 374,
+        "fp": 202,
+        "fn": 0,
+        "tn": 3418,
+        "precision": 0.6493055555555556,
+        "recall": 1,
+        "f1": 0.7873684210526316,
+        "fpr": 0.05580110497237569,
+        "violationBreakdown": {
+          "PREMATURE_DATA": 488,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "HANDSHAKE_SKIP": 2,
+          "CIRCUIT_HIJACK": 1,
+          "CREATE_FLOOD": 7
+        },
+        "attackBreakdown": {
+          "PREMATURE_DATA": 374
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "premature_data",
+      "fsmModel": "3hop",
+      "circuitCount": 385,
+      "rawEventCount": 3954,
+      "injectedCount": 372,
+      "fsmResult": {
+        "validCount": 3395,
+        "invalidCount": 559,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "premature_data",
+        "totalEvents": 3954,
+        "circuitCount": 385,
+        "validTransitions": 3395,
+        "totalViolations": 559,
+        "injectedAttacks": 372,
+        "detectedAttacks": 372,
+        "tp": 372,
+        "fp": 187,
+        "fn": 0,
+        "tn": 3395,
+        "precision": 0.6654740608228981,
+        "recall": 1,
+        "f1": 0.7991407089151451,
+        "fpr": 0.05220547180346175,
+        "violationBreakdown": {
+          "PREMATURE_DATA": 473,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CREATE_FLOOD": 9,
+          "CIRCUIT_HIJACK": 2,
+          "HANDSHAKE_SKIP": 8,
+          "CIRCUIT_BYPASS": 1
+        },
+        "attackBreakdown": {
+          "PREMATURE_DATA": 371,
+          "CIRCUIT_BYPASS": 1
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "create_flood",
+      "fsmModel": "2hop",
+      "circuitCount": 382,
+      "rawEventCount": 5417,
+      "injectedCount": 1865,
+      "fsmResult": {
+        "validCount": 2628,
+        "invalidCount": 2789,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "create_flood",
+        "totalEvents": 5417,
+        "circuitCount": 382,
+        "validTransitions": 2628,
+        "totalViolations": 2789,
+        "injectedAttacks": 1865,
+        "detectedAttacks": 1865,
+        "tp": 1865,
+        "fp": 924,
+        "fn": 0,
+        "tn": 2628,
+        "precision": 0.6686984582287558,
+        "recall": 1,
+        "f1": 0.8014611087236786,
+        "fpr": 0.26013513513513514,
+        "violationBreakdown": {
+          "CREATE_FLOOD": 1871,
+          "CIRCUIT_HIJACK": 745,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "PREMATURE_DATA": 105
+        },
+        "attackBreakdown": {
+          "CREATE_FLOOD": 1865
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "create_flood",
+      "fsmModel": "2hop",
+      "circuitCount": 388,
+      "rawEventCount": 5520,
+      "injectedCount": 1900,
+      "fsmResult": {
+        "validCount": 2644,
+        "invalidCount": 2876,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "create_flood",
+        "totalEvents": 5520,
+        "circuitCount": 388,
+        "validTransitions": 2644,
+        "totalViolations": 2876,
+        "injectedAttacks": 1900,
+        "detectedAttacks": 1900,
+        "tp": 1900,
+        "fp": 976,
+        "fn": 0,
+        "tn": 2644,
+        "precision": 0.6606397774687065,
+        "recall": 1,
+        "f1": 0.795644891122278,
+        "fpr": 0.2696132596685083,
+        "violationBreakdown": {
+          "CREATE_FLOOD": 1907,
+          "CIRCUIT_HIJACK": 775,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "HANDSHAKE_SKIP": 2,
+          "PREMATURE_DATA": 114
+        },
+        "attackBreakdown": {
+          "CREATE_FLOOD": 1900
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "create_flood",
+      "fsmModel": "2hop",
+      "circuitCount": 385,
+      "rawEventCount": 5452,
+      "injectedCount": 1870,
+      "fsmResult": {
+        "validCount": 2649,
+        "invalidCount": 2803,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "create_flood",
+        "totalEvents": 5452,
+        "circuitCount": 385,
+        "validTransitions": 2649,
+        "totalViolations": 2803,
+        "injectedAttacks": 1870,
+        "detectedAttacks": 1870,
+        "tp": 1870,
+        "fp": 933,
+        "fn": 0,
+        "tn": 2649,
+        "precision": 0.6671423474848377,
+        "recall": 1,
+        "f1": 0.8003423924673657,
+        "fpr": 0.26046901172529313,
+        "violationBreakdown": {
+          "CREATE_FLOOD": 1874,
+          "CIRCUIT_HIJACK": 748,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "HANDSHAKE_SKIP": 13,
+          "PREMATURE_DATA": 102
+        },
+        "attackBreakdown": {
+          "CREATE_FLOOD": 1865,
+          "HANDSHAKE_SKIP": 5
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "scenario": "create_flood",
+      "fsmModel": "3hop",
+      "circuitCount": 382,
+      "rawEventCount": 5417,
+      "injectedCount": 1865,
+      "fsmResult": {
+        "validCount": 3370,
+        "invalidCount": 2047,
+        "circuitCount": 382
+      },
+      "metrics": {
+        "scenario": "create_flood",
+        "totalEvents": 5417,
+        "circuitCount": 382,
+        "validTransitions": 3370,
+        "totalViolations": 2047,
+        "injectedAttacks": 1865,
+        "detectedAttacks": 1865,
+        "tp": 1865,
+        "fp": 182,
+        "fn": 0,
+        "tn": 3370,
+        "precision": 0.9110893991206643,
+        "recall": 1,
+        "f1": 0.9534764826175869,
+        "fpr": 0.051238738738738736,
+        "violationBreakdown": {
+          "CREATE_FLOOD": 1871,
+          "REPLAY_ATTACK": 34,
+          "GHOST_CIRCUIT": 34,
+          "CIRCUIT_HIJACK": 3,
+          "PREMATURE_DATA": 105
+        },
+        "attackBreakdown": {
+          "CREATE_FLOOD": 1865
+        }
+      }
+    },
+    {
+      "seed": 137,
+      "scenario": "create_flood",
+      "fsmModel": "3hop",
+      "circuitCount": 388,
+      "rawEventCount": 5520,
+      "injectedCount": 1900,
+      "fsmResult": {
+        "validCount": 3418,
+        "invalidCount": 2102,
+        "circuitCount": 388
+      },
+      "metrics": {
+        "scenario": "create_flood",
+        "totalEvents": 5520,
+        "circuitCount": 388,
+        "validTransitions": 3418,
+        "totalViolations": 2102,
+        "injectedAttacks": 1900,
+        "detectedAttacks": 1900,
+        "tp": 1900,
+        "fp": 202,
+        "fn": 0,
+        "tn": 3418,
+        "precision": 0.9039010466222646,
+        "recall": 1,
+        "f1": 0.9495252373813093,
+        "fpr": 0.05580110497237569,
+        "violationBreakdown": {
+          "CREATE_FLOOD": 1907,
+          "REPLAY_ATTACK": 39,
+          "GHOST_CIRCUIT": 39,
+          "HANDSHAKE_SKIP": 2,
+          "CIRCUIT_HIJACK": 1,
+          "PREMATURE_DATA": 114
+        },
+        "attackBreakdown": {
+          "CREATE_FLOOD": 1900
+        }
+      }
+    },
+    {
+      "seed": 2718,
+      "scenario": "create_flood",
+      "fsmModel": "3hop",
+      "circuitCount": 385,
+      "rawEventCount": 5452,
+      "injectedCount": 1870,
+      "fsmResult": {
+        "validCount": 3395,
+        "invalidCount": 2057,
+        "circuitCount": 385
+      },
+      "metrics": {
+        "scenario": "create_flood",
+        "totalEvents": 5452,
+        "circuitCount": 385,
+        "validTransitions": 3395,
+        "totalViolations": 2057,
+        "injectedAttacks": 1870,
+        "detectedAttacks": 1870,
+        "tp": 1870,
+        "fp": 187,
+        "fn": 0,
+        "tn": 3395,
+        "precision": 0.9090909090909091,
+        "recall": 1,
+        "f1": 0.9523809523809523,
+        "fpr": 0.05220547180346175,
+        "violationBreakdown": {
+          "CREATE_FLOOD": 1874,
+          "REPLAY_ATTACK": 33,
+          "GHOST_CIRCUIT": 33,
+          "CIRCUIT_HIJACK": 2,
+          "HANDSHAKE_SKIP": 13,
+          "PREMATURE_DATA": 102
+        },
+        "attackBreakdown": {
+          "CREATE_FLOOD": 1865,
+          "HANDSHAKE_SKIP": 5
+        }
+      }
+    }
+  ],
+  "perCell": {
+    "v2_2hop_benign": {
+      "scenario": "benign",
+      "fsmModel": "2hop",
+      "runsCompleted": 3,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "fpr": {
+        "mean": 0.2634058021763122,
+        "sd": 0.004391451148343417
+      },
+      "avgCircuits": 385,
+      "avgEvents": 3584.6666666666665
+    },
+    "v2_3hop_benign": {
+      "scenario": "benign",
+      "fsmModel": "3hop",
+      "runsCompleted": 3,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "fpr": {
+        "mean": 0.053081771838192064,
+        "sd": 0.0019629438310199503
+      },
+      "avgCircuits": 385,
+      "avgEvents": 3584.6666666666665
+    },
+    "v2_2hop_replay_attack": {
+      "scenario": "replay_attack",
+      "fsmModel": "2hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.3478553544895108,
+        "sd": 0.0014735638590154863
+      },
+      "recall": {
+        "mean": 0.9817851125929705,
+        "sd": 0.0025391371007775867
+      },
+      "f1": {
+        "mean": 0.513696982858398,
+        "sd": 0.0012609214765918052
+      },
+      "fpr": {
+        "mean": 0.26272266718481435,
+        "sd": 0.004452701741025995
+      },
+      "avgCircuits": 385,
+      "avgEvents": 4097.666666666667
+    },
+    "v2_3hop_replay_attack": {
+      "scenario": "replay_attack",
+      "fsmModel": "3hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.725872243655568,
+        "sd": 0.004853774737658801
+      },
+      "recall": {
+        "mean": 0.9817851125929705,
+        "sd": 0.0025391371007775867
+      },
+      "f1": {
+        "mean": 0.8346370205169519,
+        "sd": 0.0025939216350478753
+      },
+      "fpr": {
+        "mean": 0.052944314274375855,
+        "sd": 0.0019704882823299626
+      },
+      "avgCircuits": 385,
+      "avgEvents": 4097.666666666667
+    },
+    "v2_2hop_circuit_bypass": {
+      "scenario": "circuit_bypass",
+      "fsmModel": "2hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.44922409535702373,
+        "sd": 0.004460003009256256
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0
+      },
+      "f1": {
+        "mean": 0.6199380829286719,
+        "sd": 0.00425634356237764
+      },
+      "fpr": {
+        "mean": 0.2634058021763122,
+        "sd": 0.004391451148343417
+      },
+      "avgCircuits": 385,
+      "avgEvents": 4354.666666666667
+    },
+    "v2_3hop_circuit_bypass": {
+      "scenario": "circuit_bypass",
+      "fsmModel": "3hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.8018882425089223,
+        "sd": 0.006088054116063688
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0
+      },
+      "f1": {
+        "mean": 0.8900405534369719,
+        "sd": 0.003757595540488107
+      },
+      "fpr": {
+        "mean": 0.053081771838192064,
+        "sd": 0.0019629438310199503
+      },
+      "avgCircuits": 385,
+      "avgEvents": 4354.666666666667
+    },
+    "v2_2hop_ghost_circuit": {
+      "scenario": "ghost_circuit",
+      "fsmModel": "2hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.2658959411900588,
+        "sd": 0.0017709368705751398
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0
+      },
+      "f1": {
+        "mean": 0.42008821788816203,
+        "sd": 0.0022092347322087698
+      },
+      "fpr": {
+        "mean": 0.2634058021763122,
+        "sd": 0.004391451148343417
+      },
+      "avgCircuits": 385,
+      "avgEvents": 3926.6666666666665
+    },
+    "v2_3hop_ghost_circuit": {
+      "scenario": "ghost_circuit",
+      "fsmModel": "3hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.6426158760862238,
+        "sd": 0.0060598109425929565
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0
+      },
+      "f1": {
+        "mean": 0.782413272003199,
+        "sd": 0.004503427909641089
+      },
+      "fpr": {
+        "mean": 0.053081771838192064,
+        "sd": 0.0019629438310199503
+      },
+      "avgCircuits": 385,
+      "avgEvents": 3926.6666666666665
+    },
+    "v2_2hop_handshake_skip": {
+      "scenario": "handshake_skip",
+      "fsmModel": "2hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.2896876353237034,
+        "sd": 0.003701651432739556
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0
+      },
+      "f1": {
+        "mean": 0.44922409535702384,
+        "sd": 0.00446000300925623
+      },
+      "fpr": {
+        "mean": 0.2634058021763122,
+        "sd": 0.004391451148343417
+      },
+      "avgCircuits": 385,
+      "avgEvents": 3969.6666666666665
+    },
+    "v2_3hop_handshake_skip": {
+      "scenario": "handshake_skip",
+      "fsmModel": "3hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.6693363354199994,
+        "sd": 0.008457675085608872
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0
+      },
+      "f1": {
+        "mean": 0.8018882425089223,
+        "sd": 0.006088054116063653
+      },
+      "fpr": {
+        "mean": 0.053081771838192064,
+        "sd": 0.0019629438310199503
+      },
+      "avgCircuits": 385,
+      "avgEvents": 3969.6666666666665
+    },
+    "v2_2hop_premature_data": {
+      "scenario": "premature_data",
+      "fsmModel": "2hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.28286033159596374,
+        "sd": 0.004158813193390729
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0
+      },
+      "f1": {
+        "mean": 0.44096741170641146,
+        "sd": 0.005064713297256508
+      },
+      "fpr": {
+        "mean": 0.2634058021763122,
+        "sd": 0.004391451148343417
+      },
+      "avgCircuits": 385,
+      "avgEvents": 3957
+    },
+    "v2_3hop_premature_data": {
+      "scenario": "premature_data",
+      "fsmModel": "3hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.6618885641092737,
+        "sd": 0.00916775345543599
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0
+      },
+      "f1": {
+        "mean": 0.7965131443326933,
+        "sd": 0.006658413649753931
+      },
+      "fpr": {
+        "mean": 0.053081771838192064,
+        "sd": 0.0019629438310199503
+      },
+      "avgCircuits": 385,
+      "avgEvents": 3957
+    },
+    "v2_2hop_create_flood": {
+      "scenario": "create_flood",
+      "fsmModel": "2hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.6654935277274333,
+        "sd": 0.003490419157484533
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0
+      },
+      "f1": {
+        "mean": 0.7991494641044409,
+        "sd": 0.00251984197335384
+      },
+      "fpr": {
+        "mean": 0.2634058021763122,
+        "sd": 0.004391451148343417
+      },
+      "avgCircuits": 385,
+      "avgEvents": 5463
+    },
+    "v2_3hop_create_flood": {
+      "scenario": "create_flood",
+      "fsmModel": "3hop",
+      "runsCompleted": 3,
+      "precision": {
+        "mean": 0.9080271182779459,
+        "sd": 0.0030295039286568634
+      },
+      "recall": {
+        "mean": 1,
+        "sd": 0
+      },
+      "f1": {
+        "mean": 0.9517942241266161,
+        "sd": 0.0016655874364377176
+      },
+      "fpr": {
+        "mean": 0.053081771838192064,
+        "sd": 0.0019629438310199503
+      },
+      "avgCircuits": 385,
+      "avgEvents": 5463
+    }
+  }
+}

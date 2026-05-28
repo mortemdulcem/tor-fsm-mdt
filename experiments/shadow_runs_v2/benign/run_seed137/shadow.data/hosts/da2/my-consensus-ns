@@ -1,0 +1,233 @@
+network-status-version 3
+vote-status consensus
+consensus-method 31
+valid-after 2000-01-01 00:30:00
+fresh-until 2000-01-01 00:35:00
+valid-until 2000-01-01 00:45:00
+voting-delay 20 20
+client-versions 
+server-versions 
+known-flags Authority Exit Fast Guard HSDir NoEdConsensus Running Stable StaleDesc Sybil V2Dir Valid
+recommended-client-protocols Cons=2 Desc=2 DirCache=2 HSDir=2 HSIntro=4 HSRend=2 Link=4-5 Microdesc=2 Relay=2
+recommended-relay-protocols Cons=2 Desc=2 DirCache=2 HSDir=2 HSIntro=4 HSRend=2 Link=4-5 LinkAuth=3 Microdesc=2 Relay=2
+required-client-protocols Cons=2 Desc=2 Link=4 Microdesc=2 Relay=2
+required-relay-protocols Cons=2 Desc=2 DirCache=2 HSDir=2 HSIntro=4 HSRend=2 Link=4-5 LinkAuth=3 Microdesc=2 Relay=2
+params cc_alg=2
+dir-source 4uthority BA3FDA7CE3B41FBF9BB3615BE6ACD28D883E694B 100.0.0.1 100.0.0.1 9112 9111
+contact https://github.com/shadow/shadow-plugin-tor/issues
+vote-digest 095FC5457ED08366911B491B36005DF588F9BFB5
+dir-source da3 E5DD3795781D61D2364489F5AB17EE6B33FE9A4A 100.0.0.3 100.0.0.3 9112 9111
+contact https://github.com/shadow/shadow-plugin-tor/issues
+vote-digest 8775F3353540D381E6F7B0E1745CED6D7A6C9DF0
+dir-source da2 E8FF2BF29DCF2FCE038B3B99FCA386C4E9AAEAEB 100.0.0.2 100.0.0.2 9112 9111
+contact https://github.com/shadow/shadow-plugin-tor/issues
+vote-digest 2B53AA6F57C97536C1316BCB44D704A06718A551
+r da3 AsoE9f29jQSTFVYbjmuF3uz7Ro8 +JoRNxMycqAEfBSyAgi4BfWa+98 2000-01-01 00:15:02 100.0.0.3 9111 9112
+s Authority Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r exit1 CpsbIH/ROm8Rf5XK+jWO7iI08Zo J5jZXX4NVKQD/U4/5VMKZXdLV1w 2000-01-01 00:25:32 11.0.0.2 9111 0
+s Exit Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=1024
+p accept 1-65535
+r exit3 Es5yf5gRE3wdfu6FPmXuAlBNScQ AvrCkzvL+YKlNdL9QKA1OePPYaA 2000-01-01 00:09:03 11.0.0.5 9111 0
+s Exit Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p accept 1-65535
+r relay16 IPbIHfT4lLb/qc1x7QX0hKAR7Nc OqNo5a47tKZjewKmwfkkiJDKtoA 2000-01-01 00:09:02 11.0.0.20 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r exit4 L40rVmBM8Khf6JKgPsLe2PfZCVQ ENExNfxOYnlu3kBI6y2wjJOSqGQ 2000-01-01 00:04:03 11.0.0.6 9111 0
+s Exit Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p accept 1-65535
+r relay5 N1JLpNFU4wsW8bO4y81oSk6aScM vfFCAfsiHlm2IzyEp8FpAeZaLgQ 2000-01-01 00:08:03 11.0.0.28 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay3 O66sjiTIe05TZISDe2eWZIepMhQ dGv2k7d+9M2/qBTBd4ToJtLQxMs 2000-01-01 00:03:32 11.0.0.26 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=1024
+p reject 1-65535
+r exit7 PIV8w2cbNJIR+W/vcEpf5cAPJug c3LM4+QQOiNPtxZa2onVojjJYns 2000-01-01 00:04:34 11.0.0.9 9111 0
+s Exit Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p accept 1-65535
+r relay1 P7C9eCfHYP5/ndgQ/LEDItY6tM8 k18uZZkDbwdOGz0p+1gSUU5xv/k 2000-01-01 00:03:31 11.0.0.13 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=1024
+p reject 1-65535
+r relay6 RM4d09Ir80YRt6wn6SQEMDjl7d8 2o2pDCgZqvmtfwFGGv7RG8MvlwU 2000-01-01 00:05:03 11.0.0.29 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay20 SVdcfIboRmWnkYquTK2zSE7vLMY 67yJx5/f/WL3XzmwI6wJr0A+qgA 2000-01-01 00:06:03 11.0.0.25 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r exit6 S0DNckee+Yn2RR9y3qYUMZjevy4 8RStAZvFbuHv9BIJSA5U36NBaK0 2000-01-01 00:09:04 11.0.0.8 9111 0
+s Exit Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p accept 1-65535
+r exit2 Trs4XICiyl1nHhbxxyL7+18XaJE onpAN3/4kTp5SRNWxg30+OyH5eU 2000-01-01 00:25:32 11.0.0.4 9111 0
+s Exit Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=1024
+p accept 1-65535
+r relay14 b5D20pYoq0tzXYMgTkDg7auzYQg UV07rtUI4bP6nwPeGXt6bXpjunw 2000-01-01 00:26:03 11.0.0.18 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay4 cHNSXWp7l+RwjOi3ErryEEmnIWg Zz2YZ6PAOUOLr/GvehUkqIT6nbE 2000-01-01 00:03:32 11.0.0.27 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=1024
+p reject 1-65535
+r relay8 cYS4s2BsnQraJtf/WLtXKC55QIM cGxPnhDFFrKhVtJyGhwcCKeUswQ 2000-01-01 00:25:53 11.0.0.31 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay15 gS49ULZ85HTuIIysBIS8N/tVoQQ E7VFbl1R5+6uFux1YyYAzCYDtuM 2000-01-01 00:26:03 11.0.0.19 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r exit8 ge4q1xLK5nc8jeSXhq1Rj6onM04 3eWs81/pEqJJY8C92Oy3W2170E0 2000-01-01 00:06:03 11.0.0.10 9111 0
+s Exit Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p accept 1-65535
+r exit9 nJO3jRtPK0Dsdr9YOk0G2nsRDEk CdcykFCPmNTSbSulxE/bJjJT35w 2000-01-01 00:05:03 11.0.0.11 9111 0
+s Exit Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p accept 1-65535
+r relay11 nL97XUD8+qTZ96827Gb9D+jpCxA xnOyRKfY6OifFh/talMyIa6UOm0 2000-01-01 00:05:53 11.0.0.15 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r exit10 oey32v8sCKEN+RZ+559scwdfCeI D+tgfV5aR92S4uViSsJzmLFFVAI 2000-01-01 00:06:02 11.0.0.3 9111 0
+s Exit Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p accept 1-65535
+r 4uthority pSyltWxk2GT2rkPlbymsvVcG3aE fOORarL26FX2jAoE7lE0GPgQvew 2000-01-01 00:03:34 100.0.0.1 9111 9112
+s Authority Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=1024
+p reject 1-65535
+r relay9 rjr7DRyMlBbPDNgrQ0ZahacSvhU JdunHzmjGnEd+Exlu0tALSacLF4 2000-01-01 00:06:03 11.0.0.32 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay10 rnOW8bQllpfo3MLL1IIU8iq5nDU BtesRGgoxhti1WvTEkq7UWNIkN8 2000-01-01 00:03:41 11.0.0.14 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay13 txLNs1jFTKBIhj+Y4FDA+vzb5Lk xPIZ+Pc8fZUSLp37HXWlTTCHAlY 2000-01-01 00:04:28 11.0.0.17 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay7 yWNVaZIEQmDCJ2P/P/MKwmFZJTU 2jqEwPzPPqaSkYlIC+96E9pVAJs 2000-01-01 00:09:02 11.0.0.30 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay18 y+Gt77Tze6IV0EzWPAb1FA/uLs4 IIAn8Pg74S2joCDd37Rm9hbE4nU 2000-01-01 00:04:03 11.0.0.22 9111 0
+s Guard Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay12 1DukOr+ISOMo7B++IF5cuoT9VgI Jvuh8lGfmBhRlwGFn2ZIss2NZzY 2000-01-01 00:07:03 11.0.0.16 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay17 4HGxHFrsrQLQsHjn8UDHiG9NL9U NXWIBpyTiYPwr/4Wz+boy4VA/dI 2000-01-01 00:08:03 11.0.0.21 9111 0
+s Guard Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r da2 7I/pJxleqPEeQn4pamG3Hh/jW+o 5AbmMcptWjXC9W6BmW8aIZizSKc 2000-01-01 00:15:02 100.0.0.2 9111 9112
+s Authority Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r exit5 +Xc8HvVYhUcJfSKFF9x36E77+5c B2LjFYYk7BLZXCvqbMFwie21Ajs 2000-01-01 00:05:05 11.0.0.7 9111 0
+s Exit Fast HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p accept 1-65535
+r relay19 +erjg62RJoFWrduvPcph/PF4Os0 /5CdH2u40mD0Vv6G5phSN6EVgws 2000-01-01 00:04:03 11.0.0.23 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=20 Unmeasured=1
+p reject 1-65535
+r relay2 /xlyBAmfoOUH+kbUH+2X0zN7S6o yCGJaYHk7aZtu9FnJ3RhebNru9E 2000-01-01 00:03:31 11.0.0.24 9111 0
+s Fast Guard HSDir Running Stable V2Dir Valid
+v Tor 0.4.6.10
+pr Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3
+w Bandwidth=1024
+p reject 1-65535
+directory-footer
+bandwidth-weights Wbd=0 Wbe=0 Wbg=3794 Wbm=10000 Wdb=10000 Web=10000 Wed=10000 Wee=10000 Weg=10000 Wem=10000 Wgb=10000 Wgd=0 Wgg=6206 Wgm=6206 Wmb=10000 Wmd=0 Wme=0 Wmg=3794 Wmm=10000
+directory-signature E8FF2BF29DCF2FCE038B3B99FCA386C4E9AAEAEB 9E1D5DE09153433665FA4FA8CA99167519F03CC4
+-----BEGIN SIGNATURE-----
+X0+p/0y5YBJNAO6R2dzBs+SmFXdcuE7cGRAqB52kq7lVwq+UVt73Pu2CsaXtxN+W
+pkeK7uwRqnibmqhVA/56hXPqiJQhAdwC76hl6pAjTKHXjRrLqimyAG2KDV8UGZQa
+PbNK41G82piKHEY0Cbftsj6T6hiimQ19farRTLNRs4Za3WUMlkToi7JByog17j9J
+4RPehmXShpCXwPuwsAnEarPzwYvPMGpxkzSpK5xvyNs1VhAQ+Q9xbaDdlA6/V854
+3N8fDUXX3+5pZpT2KqlqfXGDVC75+fTTQDffq3t+boRZzmlYnUqW8kvAMZ99177P
+1CQvhihCM2E9SMHWEle8mg==
+-----END SIGNATURE-----

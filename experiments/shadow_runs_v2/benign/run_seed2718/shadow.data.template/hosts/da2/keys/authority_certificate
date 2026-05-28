@@ -1,0 +1,34 @@
+dir-key-certificate-version 3
+fingerprint E8FF2BF29DCF2FCE038B3B99FCA386C4E9AAEAEB
+dir-key-published 2026-05-28 11:41:18
+dir-key-expires 2027-05-28 11:41:18
+dir-identity-key
+-----BEGIN RSA PUBLIC KEY-----
+MIGJAoGBANn0rkmD8OTPvWi6e+bQyrGg8qFd87fApzw2ER7ed7WGht166C2t2lm4
+/9KabywosrcPsbKRVVQQqBNOIr7NOKn+bhSZ6PdiYu9IwkC6EPab3AuV/hDlAbEk
+fFBFRVkvtxPmXJK4pI/mBftu7V6bEVJUu8fre52To0+ZMwWpOTMJAgMBAAE=
+-----END RSA PUBLIC KEY-----
+dir-signing-key
+-----BEGIN RSA PUBLIC KEY-----
+MIIBCgKCAQEAo/0LcQWtr2KDy9azhV4qKihqxAnCPNXrFzMmZA5N6oNve08/OzA+
++dYCFMZmM5BA2wHiTaRez6tBxySRC8PfnXkhUKbjUkBM4MnfhtEvwBOvLsiuBKa/
+CN7GexbQGVXq467Z0Rfjf+IjsO0DOlwBjoxc2tFKWuEb+prXI3NKM/ilhAFeILP4
+aTxRvoumCtO2ATAzdpRGXM9EHLhDgkFU/Roh/iDboNGli5Sx192rWXLUpTv6L3WM
+cXHdWynin77Uamo5V/0OcSEOK9KwJRl0WBHiuWbEqY1vK2PZATYeIlySeMBZjQrB
+zzZYCQ9kqkRLvctdiXohvlgpcZkD3RxdBwIDAQAB
+-----END RSA PUBLIC KEY-----
+dir-key-crosscert
+-----BEGIN ID SIGNATURE-----
+fx62WwtoLl9ubmTWN6YHzKDDC8aCHS+XJ5LBjsJln1kk586gMznQ6VHNA7QNx6EW
+8COmiqOug9zzVEsoB0dl4dLg5LmWBrNut0e+GEddqM8J8GdlzYhs8avpAbRb8/D0
+fb2/n35aNFsu0DG+/lY2iyL5Xah2R6oZCHJiWSBKFrgWVKQYVmnne2y3AUYCbSjt
+I18x+u1XjCGqD+VbmqfmMkbv3v0f03IB0hhswK4jTslAkl9+M7lPtcCO7390OPr5
+MVy9AjjJuJWTDwXrM05C71w9LSWRCGuZbU8hpreauVdpdIduf4gJwKYGplqTho9m
+7eEKYTkrUcPRHEPpgSchrQ==
+-----END ID SIGNATURE-----
+dir-key-certification
+-----BEGIN SIGNATURE-----
+JvsJdn/jj1Qxw6KvW7v7EMVqAEm1Vx/UBrGRsEoJa02mP0dlrwb/sWLyLDqp3Uik
+e0Yt0K8pBGRDfU0xoBQVM/Ozj1RXPpiVqVFlgp7OWk9Dpqcnsmr0WlxarVlQE68h
+jilHH43hNoCfd6wON7oivMxeqKZpZ//sHe9kSGF1uOQ=
+-----END SIGNATURE-----

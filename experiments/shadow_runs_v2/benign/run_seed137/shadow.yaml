@@ -1,0 +1,404 @@
+general:
+  seed: 137
+  stop_time: 30 min
+network:
+  graph:
+    type: gml
+    inline: |
+      graph [
+        directed 0
+        node [
+          id 0
+          host_bandwidth_down "1 Gbit"
+          host_bandwidth_up "1 Gbit"
+        ]
+        edge [
+          source 0
+          target 0
+          latency "50 ms"
+          jitter "0 ms"
+          packet_loss 0.0
+        ]
+      ]
+hosts:
+  fileserver:
+    network_node_id: 0
+    processes:
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.server.graphml.xml
+      start_time: 1
+      expected_final_state: running
+  4uthority:
+    network_node_id: 0
+    ip_addr: 100.0.0.1
+    processes:
+    - path: tor
+      args: --Address 4uthority --Nickname 4uthority
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 1
+      expected_final_state: running
+  da2:
+    network_node_id: 0
+    ip_addr: 100.0.0.2
+    processes:
+    - path: tor
+      args: --Address da2 --Nickname da2
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 1
+      expected_final_state: running
+  da3:
+    network_node_id: 0
+    ip_addr: 100.0.0.3
+    processes:
+    - path: tor
+      args: --Address da3 --Nickname da3
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 1
+      expected_final_state: running
+  relay1:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay1 --Nickname relay1
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay2:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay2 --Nickname relay2
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay3:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay3 --Nickname relay3
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay4:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay4 --Nickname relay4
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay5:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay5 --Nickname relay5
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay6:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay6 --Nickname relay6
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay7:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay7 --Nickname relay7
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay8:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay8 --Nickname relay8
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay9:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay9 --Nickname relay9
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay10:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay10 --Nickname relay10
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay11:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay11 --Nickname relay11
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay12:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay12 --Nickname relay12
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay13:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay13 --Nickname relay13
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay14:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay14 --Nickname relay14
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay15:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay15 --Nickname relay15
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay16:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay16 --Nickname relay16
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay17:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay17 --Nickname relay17
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay18:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay18 --Nickname relay18
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay19:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay19 --Nickname relay19
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay20:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay20 --Nickname relay20
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit1:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit1 --Nickname exit1
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit2:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit2 --Nickname exit2
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit3:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit3 --Nickname exit3
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit4:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit4 --Nickname exit4
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit5:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit5 --Nickname exit5
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit6:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit6 --Nickname exit6
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit7:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit7 --Nickname exit7
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit8:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit8 --Nickname exit8
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit9:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit9 --Nickname exit9
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit10:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit10 --Nickname exit10
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  torflowauthority:
+    network_node_id: 0
+    processes: []
+  client:
+    network_node_id: 0
+    processes:
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.client.graphml.xml
+      start_time: 600
+  torclient:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address torclient --Nickname torclient
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+      start_time: 1500
+  torclient2:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address torclient2 --Nickname torclient2
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+      start_time: 1500
+  torclient3:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address torclient3 --Nickname torclient3
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+      start_time: 1500
+  torclient4:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address torclient4 --Nickname torclient4
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+      start_time: 1500
+  torclient5:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address torclient5 --Nickname torclient5
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+      start_time: 1500
+  torclient6:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address torclient6 --Nickname torclient6
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+      start_time: 1500
+  torclient7:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address torclient7 --Nickname torclient7
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+      start_time: 1500
+  torclient8:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address torclient8 --Nickname torclient8
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+      start_time: 1500
