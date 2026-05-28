@@ -9,22 +9,28 @@ export const sd = (xs) => Math.sqrt(variance(xs));
 
 // Welch's t-test (does not assume equal variances). Returns {t, df, p_two_tailed}.
 export function welchT(xs, ys) {
-  const m1 = mean(xs), m2 = mean(ys);
-  const v1 = variance(xs), v2 = variance(ys);
-  const n1 = xs.length, n2 = ys.length;
+  const m1 = mean(xs),
+    m2 = mean(ys);
+  const v1 = variance(xs),
+    v2 = variance(ys);
+  const n1 = xs.length,
+    n2 = ys.length;
   const seSq = v1 / n1 + v2 / n2;
   if (seSq === 0) return { t: 0, df: n1 + n2 - 2, p: 1 };
   const t = (m1 - m2) / Math.sqrt(seSq);
   // Welch–Satterthwaite df
-  const df = (seSq ** 2) / ((v1 / n1) ** 2 / (n1 - 1) + (v2 / n2) ** 2 / (n2 - 1));
+  const df =
+    seSq ** 2 / ((v1 / n1) ** 2 / (n1 - 1) + (v2 / n2) ** 2 / (n2 - 1));
   const p = 2 * (1 - studentTCDF(Math.abs(t), df));
   return { t, df, p };
 }
 
 // Cohen's d (pooled SD, classical formulation).
 export function cohensD(xs, ys) {
-  const v1 = variance(xs), v2 = variance(ys);
-  const n1 = xs.length, n2 = ys.length;
+  const v1 = variance(xs),
+    v2 = variance(ys);
+  const n1 = xs.length,
+    n2 = ys.length;
   const sp = Math.sqrt(((n1 - 1) * v1 + (n2 - 1) * v2) / (n1 + n2 - 2));
   if (sp === 0) return mean(xs) === mean(ys) ? 0 : Infinity;
   return (mean(xs) - mean(ys)) / sp;
@@ -33,7 +39,8 @@ export function cohensD(xs, ys) {
 // Mann-Whitney U test, normal approximation with tie correction.
 // Returns {U, z, p_two_tailed}.
 export function mannWhitneyU(xs, ys) {
-  const n1 = xs.length, n2 = ys.length;
+  const n1 = xs.length,
+    n2 = ys.length;
   const all = xs.map((v) => ({ v, g: 1 })).concat(ys.map((v) => ({ v, g: 2 })));
   all.sort((a, b) => a.v - b.v);
   // assign ranks (average for ties)
@@ -70,7 +77,13 @@ export function normalCDF(x) {
   const sign = x < 0 ? -1 : 1;
   const ax = Math.abs(x) / Math.SQRT2;
   const t = 1 / (1 + 0.3275911 * ax);
-  const y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-ax * ax);
+  const y =
+    1 -
+    ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) *
+      t +
+      0.254829592) *
+      t *
+      Math.exp(-ax * ax);
   return 0.5 * (1 + sign * y);
 }
 
@@ -91,20 +104,28 @@ export function regIncompleteBeta(a, b, x) {
   const front = Math.exp(Math.log(x) * a + Math.log(1 - x) * b - lnBeta) / a;
   // Lentz's algorithm
   const fpmin = 1e-30;
-  let c = 1, d = 1 - ((a + b) * x) / (a + 1);
+  let c = 1,
+    d = 1 - ((a + b) * x) / (a + 1);
   if (Math.abs(d) < fpmin) d = fpmin;
   d = 1 / d;
   let h = d;
   for (let m = 1; m <= 200; m++) {
     const m2 = 2 * m;
     let aa = (m * (b - m) * x) / ((a + m2 - 1) * (a + m2));
-    d = 1 + aa * d; if (Math.abs(d) < fpmin) d = fpmin;
-    c = 1 + aa / c; if (Math.abs(c) < fpmin) c = fpmin;
-    d = 1 / d; h *= d * c;
+    d = 1 + aa * d;
+    if (Math.abs(d) < fpmin) d = fpmin;
+    c = 1 + aa / c;
+    if (Math.abs(c) < fpmin) c = fpmin;
+    d = 1 / d;
+    h *= d * c;
     aa = (-(a + m) * (a + b + m) * x) / ((a + m2) * (a + m2 + 1));
-    d = 1 + aa * d; if (Math.abs(d) < fpmin) d = fpmin;
-    c = 1 + aa / c; if (Math.abs(c) < fpmin) c = fpmin;
-    d = 1 / d; const del = d * c; h *= del;
+    d = 1 + aa * d;
+    if (Math.abs(d) < fpmin) d = fpmin;
+    c = 1 + aa / c;
+    if (Math.abs(c) < fpmin) c = fpmin;
+    d = 1 / d;
+    const del = d * c;
+    h *= del;
     if (Math.abs(del - 1) < 3e-7) break;
   }
   return front * h;
@@ -113,21 +134,28 @@ export function regIncompleteBeta(a, b, x) {
 // log-Gamma via Lanczos approximation (g=7, 9 coefficients).
 export function lnGamma(z) {
   const g = 7;
-  const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
-    -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
-  if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - lnGamma(1 - z);
+  const c = [
+    0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+    771.32342877765313, -176.61502916214059, 12.507343278686905,
+    -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7,
+  ];
+  if (z < 0.5)
+    return Math.log(Math.PI / Math.sin(Math.PI * z)) - lnGamma(1 - z);
   z -= 1;
   let x = c[0];
   for (let i = 1; i < g + 2; i++) x += c[i] / (z + i);
   const t = z + g + 0.5;
-  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+  return (
+    0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x)
+  );
 }
 
 // Shapiro-Wilk style: Lilliefors-corrected K-S vs normal as a lightweight normality probe.
 // Returns {D, criticalAt05, normal}. K-S statistic against fitted normal.
 export function ksNormality(xs) {
   const n = xs.length;
-  const m = mean(xs), s = sd(xs);
+  const m = mean(xs),
+    s = sd(xs);
   if (s === 0) return { D: 0, criticalAt05: 0, normal: true };
   const sorted = [...xs].sort((a, b) => a - b);
   let D = 0;

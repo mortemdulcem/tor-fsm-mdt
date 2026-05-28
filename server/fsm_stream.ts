@@ -3,13 +3,24 @@
 // Bu modül devre FSM'inden ayrı bir alt-protokoldür (stream lifecycle).
 
 export const STREAM_STATES = [
-  "STREAM_NEW", "BEGIN_SENT", "CONNECTED", "OPEN",
-  "END_SENT", "CLOSED", "ERROR",
+  "STREAM_NEW",
+  "BEGIN_SENT",
+  "CONNECTED",
+  "OPEN",
+  "END_SENT",
+  "CLOSED",
+  "ERROR",
 ] as const;
 
 export const STREAM_EVENTS = [
-  "SEND_BEGIN", "RECV_CONNECTED", "SEND_DATA", "RECV_DATA",
-  "SEND_END", "RECV_END", "RECV_REASON", "TIMEOUT",
+  "SEND_BEGIN",
+  "RECV_CONNECTED",
+  "SEND_DATA",
+  "RECV_DATA",
+  "SEND_END",
+  "RECV_END",
+  "RECV_REASON",
+  "TIMEOUT",
 ] as const;
 
 export type StreamState = (typeof STREAM_STATES)[number];
@@ -45,8 +56,8 @@ export const STREAM_VALID: Record<string, StreamState> = {
 
 export const streamValidKeys = Object.keys(STREAM_VALID);
 export const streamDomain = STREAM_STATES.length * STREAM_EVENTS.length; // 7×8 = 56
-export const streamValidCount = streamValidKeys.length;                  // 17
-export const streamInvalidCount = streamDomain - streamValidCount;       // 39
+export const streamValidCount = streamValidKeys.length; // 17
+export const streamInvalidCount = streamDomain - streamValidCount; // 39
 
 // Stream-specific attack vector classifier. Same deterministic principle as
 // circuit classifyInvalid: every (s, e) ∉ dom(δ) maps to a (type, severity).

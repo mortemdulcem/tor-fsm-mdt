@@ -2,14 +2,32 @@
 // δ : Q × Σ → Q  where only listed (state, event) pairs are valid.
 
 export const STATES = [
-  "IDLE", "CONNECTING", "TLS_HANDSHAKE", "CREATE_SENT", "CIRCUIT_BUILDING",
-  "CIRCUIT_READY", "TRANSMITTING", "CLOSING", "CLOSED", "ERROR",
+  "IDLE",
+  "CONNECTING",
+  "TLS_HANDSHAKE",
+  "CREATE_SENT",
+  "CIRCUIT_BUILDING",
+  "CIRCUIT_READY",
+  "TRANSMITTING",
+  "CLOSING",
+  "CLOSED",
+  "ERROR",
 ] as const;
 
 export const EVENTS = [
-  "CONNECT", "TLS_OK", "TLS_FAIL", "SEND_CREATE", "RECV_CREATED",
-  "SEND_EXTEND", "RECV_EXTENDED", "SEND_RELAY_DATA", "RECV_RELAY_DATA",
-  "SEND_DESTROY", "RECV_DESTROY", "CIRCUIT_CLOSED", "TIMEOUT",
+  "CONNECT",
+  "TLS_OK",
+  "TLS_FAIL",
+  "SEND_CREATE",
+  "RECV_CREATED",
+  "SEND_EXTEND",
+  "RECV_EXTENDED",
+  "SEND_RELAY_DATA",
+  "RECV_RELAY_DATA",
+  "SEND_DESTROY",
+  "RECV_DESTROY",
+  "CIRCUIT_CLOSED",
+  "TIMEOUT",
 ] as const;
 
 export type State = (typeof STATES)[number];
@@ -70,19 +88,23 @@ export const VALID = VALID_3HOP;
 
 export const validKeys = Object.keys(VALID);
 export const totalDomain = STATES.length * EVENTS.length; // 130
-export const totalValid = validKeys.length;               // 27
-export const totalInvalid = totalDomain - totalValid;     // 103
+export const totalValid = validKeys.length; // 27
+export const totalInvalid = totalDomain - totalValid; // 103
 
 export const validKeys2Hop = Object.keys(VALID_2HOP);
-export const totalValid2Hop = validKeys2Hop.length;               // 25
-export const totalInvalid2Hop = totalDomain - totalValid2Hop;     // 105
+export const totalValid2Hop = validKeys2Hop.length; // 25
+export const totalInvalid2Hop = totalDomain - totalValid2Hop; // 105
 
 // Programmatic attack classifier covers every (state, event) NOT in VALID.
 // Returns { type, severity, description }.
 export function classifyInvalid(
   state: State,
   event: Event,
-): { type: string; severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"; description: string } {
+): {
+  type: string;
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  description: string;
+} {
   const dataEvent = event === "SEND_RELAY_DATA" || event === "RECV_RELAY_DATA";
   const createEvent = event === "SEND_CREATE" || event === "RECV_CREATED";
   const extendEvent = event === "SEND_EXTEND" || event === "RECV_EXTENDED";
@@ -92,131 +114,222 @@ export function classifyInvalid(
   // 1) Data flow before circuit ready
   if (dataEvent) {
     if (state === "IDLE" || state === "CONNECTING") {
-      return { type: "CIRCUIT_BYPASS", severity: "CRITICAL",
-        description: `Data ${event === "SEND_RELAY_DATA" ? "send" : "recv"} attempted from ${state} without any circuit setup` };
+      return {
+        type: "CIRCUIT_BYPASS",
+        severity: "CRITICAL",
+        description: `Data ${event === "SEND_RELAY_DATA" ? "send" : "recv"} attempted from ${state} without any circuit setup`,
+      };
     }
     if (state === "TLS_HANDSHAKE") {
-      return { type: "HANDSHAKE_SKIP", severity: "HIGH",
-        description: "Data attempted while TLS handshake still in progress" };
+      return {
+        type: "HANDSHAKE_SKIP",
+        severity: "HIGH",
+        description: "Data attempted while TLS handshake still in progress",
+      };
     }
     if (state === "CREATE_SENT" || state === "CIRCUIT_BUILDING") {
-      return { type: "PREMATURE_DATA", severity: "HIGH",
-        description: `Data attempted before circuit reached READY (in ${state})` };
+      return {
+        type: "PREMATURE_DATA",
+        severity: "HIGH",
+        description: `Data attempted before circuit reached READY (in ${state})`,
+      };
     }
     if (state === "CLOSING") {
-      return { type: "PREMATURE_DATA", severity: "MEDIUM",
-        description: "Data attempted on a closing circuit" };
+      return {
+        type: "PREMATURE_DATA",
+        severity: "MEDIUM",
+        description: "Data attempted on a closing circuit",
+      };
     }
     if (state === "CLOSED") {
       return event === "RECV_RELAY_DATA"
-        ? { type: "GHOST_CIRCUIT", severity: "HIGH",
-            description: "Receiving data on a closed circuit (ghost)" }
-        : { type: "REPLAY_ATTACK", severity: "CRITICAL",
-            description: "Sending data on a closed circuit (replay)" };
+        ? {
+            type: "GHOST_CIRCUIT",
+            severity: "HIGH",
+            description: "Receiving data on a closed circuit (ghost)",
+          }
+        : {
+            type: "REPLAY_ATTACK",
+            severity: "CRITICAL",
+            description: "Sending data on a closed circuit (replay)",
+          };
     }
     if (state === "ERROR") {
-      return { type: "GHOST_CIRCUIT", severity: "HIGH",
-        description: "Data activity on a circuit in ERROR state" };
+      return {
+        type: "GHOST_CIRCUIT",
+        severity: "HIGH",
+        description: "Data activity on a circuit in ERROR state",
+      };
     }
   }
 
   // 2) CREATE / CREATED flow
   if (createEvent) {
     if (state === "CREATE_SENT") {
-      return { type: "CREATE_FLOOD", severity: "MEDIUM",
-        description: "Repeated CREATE while previous CREATE not yet acknowledged" };
+      return {
+        type: "CREATE_FLOOD",
+        severity: "MEDIUM",
+        description:
+          "Repeated CREATE while previous CREATE not yet acknowledged",
+      };
     }
     if (state === "IDLE" && event === "RECV_CREATED") {
-      return { type: "GHOST_CIRCUIT", severity: "HIGH",
-        description: "RECV_CREATED for a circuit that was never initiated" };
+      return {
+        type: "GHOST_CIRCUIT",
+        severity: "HIGH",
+        description: "RECV_CREATED for a circuit that was never initiated",
+      };
     }
     if (state === "IDLE" && event === "SEND_CREATE") {
-      return { type: "HANDSHAKE_SKIP", severity: "HIGH",
-        description: "SEND_CREATE before TLS established" };
+      return {
+        type: "HANDSHAKE_SKIP",
+        severity: "HIGH",
+        description: "SEND_CREATE before TLS established",
+      };
     }
     if (state === "CONNECTING") {
-      return { type: "HANDSHAKE_SKIP", severity: "HIGH",
-        description: "CREATE attempted before TLS_OK" };
+      return {
+        type: "HANDSHAKE_SKIP",
+        severity: "HIGH",
+        description: "CREATE attempted before TLS_OK",
+      };
     }
-    if (state === "CIRCUIT_BUILDING" || state === "CIRCUIT_READY" || state === "TRANSMITTING") {
-      return { type: "CIRCUIT_HIJACK", severity: "CRITICAL",
-        description: `CREATE on an active circuit (${state}) — hijack signature` };
+    if (
+      state === "CIRCUIT_BUILDING" ||
+      state === "CIRCUIT_READY" ||
+      state === "TRANSMITTING"
+    ) {
+      return {
+        type: "CIRCUIT_HIJACK",
+        severity: "CRITICAL",
+        description: `CREATE on an active circuit (${state}) — hijack signature`,
+      };
     }
     if (state === "CLOSING") {
-      return { type: "REPLAY_ATTACK", severity: "HIGH",
-        description: "CREATE issued on a closing circuit" };
+      return {
+        type: "REPLAY_ATTACK",
+        severity: "HIGH",
+        description: "CREATE issued on a closing circuit",
+      };
     }
     if (dead) {
-      return { type: "REPLAY_ATTACK", severity: "HIGH",
-        description: `CREATE replayed on a ${state} circuit` };
+      return {
+        type: "REPLAY_ATTACK",
+        severity: "HIGH",
+        description: `CREATE replayed on a ${state} circuit`,
+      };
     }
   }
 
   // 3) EXTEND / EXTENDED flow
   if (extendEvent) {
     if (state === "CIRCUIT_READY" || state === "TRANSMITTING") {
-      return { type: "CIRCUIT_HIJACK", severity: "CRITICAL",
-        description: `EXTEND on an active circuit (${state}) — hop injection` };
+      return {
+        type: "CIRCUIT_HIJACK",
+        severity: "CRITICAL",
+        description: `EXTEND on an active circuit (${state}) — hop injection`,
+      };
     }
     if (dead) {
-      return { type: "REPLAY_ATTACK", severity: "HIGH",
-        description: `EXTEND replayed on a ${state} circuit` };
+      return {
+        type: "REPLAY_ATTACK",
+        severity: "HIGH",
+        description: `EXTEND replayed on a ${state} circuit`,
+      };
     }
-    if (state === "IDLE" || state === "CONNECTING" || state === "TLS_HANDSHAKE" || state === "CREATE_SENT") {
-      return { type: "HANDSHAKE_SKIP", severity: "MEDIUM",
-        description: `EXTEND before circuit fully built (in ${state})` };
+    if (
+      state === "IDLE" ||
+      state === "CONNECTING" ||
+      state === "TLS_HANDSHAKE" ||
+      state === "CREATE_SENT"
+    ) {
+      return {
+        type: "HANDSHAKE_SKIP",
+        severity: "MEDIUM",
+        description: `EXTEND before circuit fully built (in ${state})`,
+      };
     }
     if (state === "CLOSING") {
-      return { type: "REPLAY_ATTACK", severity: "MEDIUM",
-        description: "EXTEND on a closing circuit" };
+      return {
+        type: "REPLAY_ATTACK",
+        severity: "MEDIUM",
+        description: "EXTEND on a closing circuit",
+      };
     }
   }
 
   // 4) DESTROY out of place
   if (destroyEvent) {
     if (dead || state === "CLOSING") {
-      return { type: "GHOST_CIRCUIT", severity: "MEDIUM",
-        description: `DESTROY on already-${state.toLowerCase()} circuit` };
+      return {
+        type: "GHOST_CIRCUIT",
+        severity: "MEDIUM",
+        description: `DESTROY on already-${state.toLowerCase()} circuit`,
+      };
     }
-    return { type: "REPLAY_ATTACK", severity: "MEDIUM",
-      description: `DESTROY before circuit READY (in ${state})` };
+    return {
+      type: "REPLAY_ATTACK",
+      severity: "MEDIUM",
+      description: `DESTROY before circuit READY (in ${state})`,
+    };
   }
 
   // 5) CONNECT in non-IDLE
   if (event === "CONNECT" && state !== "IDLE") {
     if (dead) {
-      return { type: "REPLAY_ATTACK", severity: "MEDIUM",
-        description: "CONNECT replayed on a terminated circuit" };
+      return {
+        type: "REPLAY_ATTACK",
+        severity: "MEDIUM",
+        description: "CONNECT replayed on a terminated circuit",
+      };
     }
-    return { type: "CREATE_FLOOD", severity: "LOW",
-      description: `Re-CONNECT in active state ${state}` };
+    return {
+      type: "CREATE_FLOOD",
+      severity: "LOW",
+      description: `Re-CONNECT in active state ${state}`,
+    };
   }
 
   // 6) TLS_OK out of place
   if (event === "TLS_OK" && state !== "CONNECTING") {
-    return { type: "GHOST_CIRCUIT", severity: "MEDIUM",
-      description: `TLS_OK arrived in ${state}, no handshake in flight` };
+    return {
+      type: "GHOST_CIRCUIT",
+      severity: "MEDIUM",
+      description: `TLS_OK arrived in ${state}, no handshake in flight`,
+    };
   }
 
   // 7) TLS_FAIL out of place
   if (event === "TLS_FAIL") {
-    return { type: "GHOST_CIRCUIT", severity: "LOW",
-      description: `TLS_FAIL in ${state} (no TLS session)` };
+    return {
+      type: "GHOST_CIRCUIT",
+      severity: "LOW",
+      description: `TLS_FAIL in ${state} (no TLS session)`,
+    };
   }
 
   // 8) CIRCUIT_CLOSED out of place
   if (event === "CIRCUIT_CLOSED") {
-    return { type: "GHOST_CIRCUIT", severity: "LOW",
-      description: `CIRCUIT_CLOSED in ${state} without prior CLOSING/ERROR` };
+    return {
+      type: "GHOST_CIRCUIT",
+      severity: "LOW",
+      description: `CIRCUIT_CLOSED in ${state} without prior CLOSING/ERROR`,
+    };
   }
 
   // 9) TIMEOUT out of place
   if (event === "TIMEOUT") {
-    return { type: "GHOST_CIRCUIT", severity: "LOW",
-      description: `TIMEOUT in non-active state ${state}` };
+    return {
+      type: "GHOST_CIRCUIT",
+      severity: "LOW",
+      description: `TIMEOUT in non-active state ${state}`,
+    };
   }
 
   // Fallback
-  return { type: "INVALID_TRANSITION", severity: "LOW",
-    description: `Undefined transition (${state} × ${event})` };
+  return {
+    type: "INVALID_TRANSITION",
+    severity: "LOW",
+    description: `Undefined transition (${state} × ${event})`,
+  };
 }

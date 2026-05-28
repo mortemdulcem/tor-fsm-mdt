@@ -6,9 +6,18 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const v1 = JSON.parse(await fs.readFile(path.resolve(__dirname, "shadow_results_v1.json"), "utf8"));
-const v2 = JSON.parse(await fs.readFile(path.resolve(__dirname, "shadow_results_v2.json"), "utf8"));
-const fourCell = JSON.parse(await fs.readFile(path.resolve(__dirname, "shadow_results_4cell.json"), "utf8"));
+const v1 = JSON.parse(
+  await fs.readFile(path.resolve(__dirname, "shadow_results_v1.json"), "utf8"),
+);
+const v2 = JSON.parse(
+  await fs.readFile(path.resolve(__dirname, "shadow_results_v2.json"), "utf8"),
+);
+const fourCell = JSON.parse(
+  await fs.readFile(
+    path.resolve(__dirname, "shadow_results_4cell.json"),
+    "utf8",
+  ),
+);
 
 const merged = {
   v1: {

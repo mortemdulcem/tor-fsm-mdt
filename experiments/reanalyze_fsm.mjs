@@ -6,7 +6,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  STATES, EVENTS, VALID_2HOP, VALID_3HOP, k, classifyInvalid,
+  STATES,
+  EVENTS,
+  VALID_2HOP,
+  VALID_3HOP,
+  k,
+  classifyInvalid,
 } from "../server/fsm.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -31,8 +36,11 @@ function runFsmOnCircuit(events, validTable) {
     } else {
       const classification = classifyInvalid(state, ev.event);
       violations.push({
-        from: state, event: ev.event, classification,
-        timestamp: ev.timestamp, injected: ev.injected || false,
+        from: state,
+        event: ev.event,
+        classification,
+        timestamp: ev.timestamp,
+        injected: ev.injected || false,
         attackType: ev.attackType || null,
       });
       invalidCount++;
@@ -77,12 +85,18 @@ function injectReplayAttack(circuitMap) {
   for (const [cid, events] of Object.entries(circuitMap)) {
     const newEvents = [...events];
     for (let i = newEvents.length - 1; i >= 0; i--) {
-      if (newEvents[i].event === "CIRCUIT_CLOSED" || newEvents[i].event === "SEND_DESTROY") {
+      if (
+        newEvents[i].event === "CIRCUIT_CLOSED" ||
+        newEvents[i].event === "SEND_DESTROY"
+      ) {
         const ts = newEvents[i].timestamp;
         for (let j = 0; j < 3; j++) {
           newEvents.splice(i + 1, 0, {
-            event: "SEND_CREATE", timestamp: ts, host: newEvents[i].host,
-            injected: true, attackType: "REPLAY_ATTACK",
+            event: "SEND_CREATE",
+            timestamp: ts,
+            host: newEvents[i].host,
+            injected: true,
+            attackType: "REPLAY_ATTACK",
           });
           injectedCount++;
         }
@@ -103,14 +117,22 @@ function injectCircuitBypass(circuitMap) {
     const newEvents = [...events];
     for (let i = 0; i < newEvents.length; i++) {
       if (newEvents[i].event === "CONNECT") {
-        newEvents.splice(i + 1, 0,
+        newEvents.splice(
+          i + 1,
+          0,
           {
-            event: "SEND_RELAY_DATA", timestamp: newEvents[i].timestamp,
-            host: newEvents[i].host, injected: true, attackType: "CIRCUIT_BYPASS",
+            event: "SEND_RELAY_DATA",
+            timestamp: newEvents[i].timestamp,
+            host: newEvents[i].host,
+            injected: true,
+            attackType: "CIRCUIT_BYPASS",
           },
           {
-            event: "SEND_CREATE", timestamp: newEvents[i].timestamp,
-            host: newEvents[i].host, injected: true, attackType: "HANDSHAKE_SKIP",
+            event: "SEND_CREATE",
+            timestamp: newEvents[i].timestamp,
+            host: newEvents[i].host,
+            injected: true,
+            attackType: "HANDSHAKE_SKIP",
           },
         );
         injectedCount += 2;
@@ -137,10 +159,18 @@ function computeMetrics(fsmResult, scenario, injectedCount) {
       circuitCount: fsmResult.circuitCount,
       validTransitions: fsmResult.validCount,
       structuralViolations: fsmResult.invalidCount,
-      tp: 0, fp: fsmResult.invalidCount, fn: 0, tn: fsmResult.validCount,
-      precision: null, recall: null, f1: null,
-      fpr: fsmResult.validCount + fsmResult.invalidCount > 0
-        ? fsmResult.invalidCount / (fsmResult.invalidCount + fsmResult.validCount) : 0,
+      tp: 0,
+      fp: fsmResult.invalidCount,
+      fn: 0,
+      tn: fsmResult.validCount,
+      precision: null,
+      recall: null,
+      f1: null,
+      fpr:
+        fsmResult.validCount + fsmResult.invalidCount > 0
+          ? fsmResult.invalidCount /
+            (fsmResult.invalidCount + fsmResult.validCount)
+          : 0,
       violationBreakdown: breakdownViolations(fsmResult.violations),
     };
   }
@@ -155,18 +185,28 @@ function computeMetrics(fsmResult, scenario, injectedCount) {
 
   const precision = tp + fp > 0 ? tp / (tp + fp) : null;
   const recall = tp + fn > 0 ? tp / (tp + fn) : null;
-  const f1 = precision !== null && recall !== null && (precision + recall) > 0
-    ? 2 * precision * recall / (precision + recall) : null;
+  const f1 =
+    precision !== null && recall !== null && precision + recall > 0
+      ? (2 * precision * recall) / (precision + recall)
+      : null;
   const fpr = fp + tn > 0 ? fp / (fp + tn) : 0;
 
   return {
-    scenario, totalEvents, circuitCount: fsmResult.circuitCount,
+    scenario,
+    totalEvents,
+    circuitCount: fsmResult.circuitCount,
     validTransitions: fsmResult.validCount,
     totalViolations: fsmResult.invalidCount,
     injectedAttacks: injectedCount,
     detectedAttacks: tp,
-    tp, fp, fn, tn,
-    precision, recall, f1, fpr,
+    tp,
+    fp,
+    fn,
+    tn,
+    precision,
+    recall,
+    f1,
+    fpr,
     violationBreakdown: breakdownViolations(fsmResult.violations),
     attackBreakdown: breakdownViolations(attackViolations),
   };
@@ -214,7 +254,8 @@ async function main() {
   const results = {
     metadata: {
       analysis_date: new Date().toISOString(),
-      description: "Re-analysis of v1 and v2 Shadow event logs under both 2-hop and 3-hop FSMs",
+      description:
+        "Re-analysis of v1 and v2 Shadow event logs under both 2-hop and 3-hop FSMs",
       v1_topology: { authorities: 1, relays: 6, clients: 2 },
       v2_topology: { authorities: 1, relays: 11, clients: 5 },
       fsm_2hop_transitions: Object.keys(VALID_2HOP).length,
@@ -236,7 +277,13 @@ async function main() {
 
         for (const seed of seeds) {
           const dir = version === "v1" ? "shadow_runs_v1" : "shadow_runs_v2";
-          const jsonlPath = path.resolve(__dirname, dir, scenario, `run_seed${seed}`, "events.jsonl");
+          const jsonlPath = path.resolve(
+            __dirname,
+            dir,
+            scenario,
+            `run_seed${seed}`,
+            "events.jsonl",
+          );
 
           let circuitMap;
           try {
@@ -266,11 +313,21 @@ async function main() {
 
         if (scenarioRuns.length > 0) {
           const avg = (a) => a.reduce((x, y) => x + y, 0) / a.length;
-          const sd = (a) => { const m = avg(a); return Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length); };
-          const stat = (arr) => arr.length > 0 ? { mean: avg(arr), sd: sd(arr) } : null;
+          const sd = (a) => {
+            const m = avg(a);
+            return Math.sqrt(
+              a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length,
+            );
+          };
+          const stat = (arr) =>
+            arr.length > 0 ? { mean: avg(arr), sd: sd(arr) } : null;
 
-          const ps = scenarioRuns.map((r) => r.precision).filter((v) => v !== null);
-          const rs = scenarioRuns.map((r) => r.recall).filter((v) => v !== null);
+          const ps = scenarioRuns
+            .map((r) => r.precision)
+            .filter((v) => v !== null);
+          const rs = scenarioRuns
+            .map((r) => r.recall)
+            .filter((v) => v !== null);
           const f1s = scenarioRuns.map((r) => r.f1).filter((v) => v !== null);
           const fprs = scenarioRuns.map((r) => r.fpr);
 
@@ -285,8 +342,11 @@ async function main() {
             runs: scenarioRuns,
           };
 
-          const fmt = (x) => x ? `${x.mean.toFixed(4)} +/- ${x.sd.toFixed(4)}` : "N/A";
-          console.log(`  ${scenario}: P=${fmt(cellResults[scenario].precision)} R=${fmt(cellResults[scenario].recall)} F1=${fmt(cellResults[scenario].f1)} FPR=${fmt(cellResults[scenario].fpr)}`);
+          const fmt = (x) =>
+            x ? `${x.mean.toFixed(4)} +/- ${x.sd.toFixed(4)}` : "N/A";
+          console.log(
+            `  ${scenario}: P=${fmt(cellResults[scenario].precision)} R=${fmt(cellResults[scenario].recall)} F1=${fmt(cellResults[scenario].f1)} FPR=${fmt(cellResults[scenario].fpr)}`,
+          );
         }
       }
 
@@ -296,14 +356,24 @@ async function main() {
 
   // Print summary table
   console.log("\n\n=== 4-CELL COMPARISON TABLE ===\n");
-  console.log("Cell               | Scenario         | Precision       | Recall          | F1              | FPR");
-  console.log("-------------------|------------------|-----------------|-----------------|-----------------|----------------");
+  console.log(
+    "Cell               | Scenario         | Precision       | Recall          | F1              | FPR",
+  );
+  console.log(
+    "-------------------|------------------|-----------------|-----------------|-----------------|----------------",
+  );
   for (const cell of ["v1_2hop", "v1_3hop", "v2_2hop", "v2_3hop"]) {
     for (const s of scenarios) {
       const d = results.cells[cell]?.[s];
-      if (!d) { console.log(`${cell.padEnd(19)}| ${s.padEnd(17)}| NO DATA`); continue; }
-      const fmt = (x) => x ? `${x.mean.toFixed(4)} +/- ${x.sd.toFixed(4)}` : "N/A            ";
-      console.log(`${cell.padEnd(19)}| ${s.padEnd(17)}| ${fmt(d.precision)} | ${fmt(d.recall)} | ${fmt(d.f1)} | ${fmt(d.fpr)}`);
+      if (!d) {
+        console.log(`${cell.padEnd(19)}| ${s.padEnd(17)}| NO DATA`);
+        continue;
+      }
+      const fmt = (x) =>
+        x ? `${x.mean.toFixed(4)} +/- ${x.sd.toFixed(4)}` : "N/A            ";
+      console.log(
+        `${cell.padEnd(19)}| ${s.padEnd(17)}| ${fmt(d.precision)} | ${fmt(d.recall)} | ${fmt(d.f1)} | ${fmt(d.fpr)}`,
+      );
     }
   }
 

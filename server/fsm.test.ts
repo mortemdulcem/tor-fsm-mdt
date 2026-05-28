@@ -1,9 +1,17 @@
 import { describe, it, expect } from "vitest";
 import {
-  STATES, EVENTS, VALID, VALID_2HOP, VALID_3HOP,
-  k, classifyInvalid, totalDomain,
-  validKeys, validKeys2Hop,
-  type State, type Event,
+  STATES,
+  EVENTS,
+  VALID,
+  VALID_2HOP,
+  VALID_3HOP,
+  k,
+  classifyInvalid,
+  totalDomain,
+  validKeys,
+  validKeys2Hop,
+  type State,
+  type Event,
 } from "./fsm.ts";
 
 describe("FSM state/event definitions", () => {
@@ -35,7 +43,9 @@ describe("2-hop FSM (VALID_2HOP)", () => {
   });
 
   it("CIRCUIT_BUILDING + RECV_EXTENDED -> CIRCUIT_READY", () => {
-    expect(VALID_2HOP[k("CIRCUIT_BUILDING", "RECV_EXTENDED")]).toBe("CIRCUIT_READY");
+    expect(VALID_2HOP[k("CIRCUIT_BUILDING", "RECV_EXTENDED")]).toBe(
+      "CIRCUIT_READY",
+    );
   });
 
   it("does NOT allow CIRCUIT_READY + SEND_EXTEND", () => {
@@ -76,11 +86,15 @@ describe("3-hop FSM (VALID_3HOP)", () => {
   });
 
   it("adds CIRCUIT_READY + SEND_EXTEND -> CIRCUIT_BUILDING", () => {
-    expect(VALID_3HOP[k("CIRCUIT_READY", "SEND_EXTEND")]).toBe("CIRCUIT_BUILDING");
+    expect(VALID_3HOP[k("CIRCUIT_READY", "SEND_EXTEND")]).toBe(
+      "CIRCUIT_BUILDING",
+    );
   });
 
   it("adds CIRCUIT_READY + RECV_EXTENDED -> CIRCUIT_READY", () => {
-    expect(VALID_3HOP[k("CIRCUIT_READY", "RECV_EXTENDED")]).toBe("CIRCUIT_READY");
+    expect(VALID_3HOP[k("CIRCUIT_READY", "RECV_EXTENDED")]).toBe(
+      "CIRCUIT_READY",
+    );
   });
 
   it("3-hop circuit lifecycle is valid", () => {
@@ -303,7 +317,9 @@ describe("2-hop vs 3-hop structural FP resolution", () => {
   });
 
   it("3rd hop SEND_EXTEND is valid under 3-hop", () => {
-    expect(VALID_3HOP[k("CIRCUIT_READY", "SEND_EXTEND")]).toBe("CIRCUIT_BUILDING");
+    expect(VALID_3HOP[k("CIRCUIT_READY", "SEND_EXTEND")]).toBe(
+      "CIRCUIT_BUILDING",
+    );
   });
 
   it("attack from TRANSMITTING is still detected under 3-hop", () => {

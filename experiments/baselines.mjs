@@ -1,13 +1,21 @@
 // Three test-generation algorithms operating on the Tor FSM.
 // All execute in-memory (no DB), return per-trial metrics. Fully deterministic given a seed.
 
-import { STATES, EVENTS, VALID, validKeys, totalValid, totalInvalid, k } from "../server/fsm.ts";
+import {
+  STATES,
+  EVENTS,
+  VALID,
+  validKeys,
+  totalValid,
+  totalInvalid,
+  k,
+} from "../server/fsm.ts";
 
 // Mulberry32 — small fast deterministic PRNG so trials are reproducible.
 export function mulberry32(seed) {
   let a = seed >>> 0;
   return function () {
-    a = (a + 0x6D2B79F5) >>> 0;
+    a = (a + 0x6d2b79f5) >>> 0;
     let t = a;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
@@ -78,7 +86,9 @@ export function runB2(seed) {
   let s = "IDLE";
   while (m.events < BUDGET) {
     const validHere = EVENTS.filter((e) => VALID[k(s, e)] !== undefined);
-    const unvisitedValid = validHere.filter((e) => !m.visited.has(VALID[k(s, e)]));
+    const unvisitedValid = validHere.filter(
+      (e) => !m.visited.has(VALID[k(s, e)]),
+    );
     const invalidHere = EVENTS.filter((e) => VALID[k(s, e)] === undefined);
 
     let e;
@@ -149,9 +159,10 @@ export function runB3(seed) {
   }
   // Negative phase
   const invalidPairs = [];
-  for (const s of STATES) for (const e of EVENTS) {
-    if (VALID[k(s, e)] === undefined) invalidPairs.push([s, e]);
-  }
+  for (const s of STATES)
+    for (const e of EVENTS) {
+      if (VALID[k(s, e)] === undefined) invalidPairs.push([s, e]);
+    }
   for (const [src, evt] of shuffle(invalidPairs, rand)) {
     if (m.events >= BUDGET) break;
     if (m.detectedInvalid.has(k(src, evt))) continue;
