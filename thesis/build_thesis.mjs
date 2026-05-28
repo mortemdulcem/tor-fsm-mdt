@@ -1620,7 +1620,7 @@ await fs.writeFile(htmlPath, html, "utf8");
 console.log("[1/2] HTML yazıldı.");
 
 const browser = await puppeteer.launch({
-  executablePath: execSync("which chromium").toString().trim(),
+  executablePath: process.env.CHROME_BIN || "/opt/.devin/chrome/chrome/linux-133.0.6943.126/chrome-linux64/chrome",
   headless: "new",
   args: ["--no-sandbox", "--disable-setuid-sandbox"],
 });

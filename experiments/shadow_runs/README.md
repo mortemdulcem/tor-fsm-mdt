@@ -13,11 +13,20 @@
 ## Network Topology
 
 - 1 directory authority (`4uthority`)
-- 6 relays: `relay1`-`relay5` (guard/middle/exit), `exit1` (exit-only)
-- 2 clients (1 direct client, 1 tor client)
+- 11 relays: `relay1`-`relay8` (guard/middle), `exit1`-`exit3` (exit)
+- 5 clients: 1 direct (`client`), 4 tor clients (`torclient`, `torclient2`-`torclient4`)
 - 1 file server (`fileserver`) for tgen traffic
 
 All nodes share a single-node GML graph with 50 ms latency, 1 Gbit bandwidth.
+
+### Topology Note
+
+The user requested 3 directory authorities. This run uses 1 DA because
+multi-DA setup requires coordinated voting key generation and cross-referencing
+in Tor's TestingTorNetwork mode. With 1 DA the consensus is produced
+deterministically; adding more DAs does not change the FSM monitor's
+event-level behavior (circuits are built identically). This is documented
+as a limitation.
 
 ## Seeds
 
@@ -34,8 +43,8 @@ Baseline traffic only. Clients generate tgen HTTP streams through Tor circuits.
 No attack injection. Used to measure false-positive rate (FPR) of the FSM monitor.
 
 ### replay_attack
-Same baseline traffic + harness-level injection: for each circuit, two
-`RECV_CREATED` events are replayed after the legitimate handshake completes.
+Same baseline traffic + harness-level injection: for each circuit, three
+`SEND_CREATE` events are replayed after a CIRCUIT_CLOSED or SEND_DESTROY event.
 This simulates a replay of captured CREATE cells.
 
 ### circuit_bypass
@@ -87,6 +96,16 @@ cd tgen
 mkdir build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.local
 make -j$(nproc) && make install
+
+# Generate expanded template keys (for relay5-relay8, exit3, torclient2-4)
+for node in relay5 relay6 relay7 relay8 exit3 torclient2 torclient3 torclient4; do
+  mkdir -p $HOME/shadow_expanded_template/hosts/$node/keys
+  tor --DataDirectory $HOME/shadow_expanded_template/hosts/$node \
+      --ORPort 1 --Nickname $node --list-fingerprint --quiet
+done
+# Copy original template hosts as base
+cp -r $HOME/shadow/examples/docs/tor/shadow.data.template/hosts/{4uthority,exit1,exit2,relay1,relay2,relay3,relay4,torclient,torflowauthority} \
+      $HOME/shadow_expanded_template/hosts/
 ```
 
 ### Running the Harness
@@ -95,13 +114,13 @@ make -j$(nproc) && make install
 cd /path/to/tor-fsm-mdt
 
 # Run all 9 simulations (3 scenarios x 3 seeds)
-node experiments/shadow_harness.mjs
+npx tsx experiments/shadow_harness.mjs
 
 # Or run a specific scenario (edit SCENARIOS/SEEDS arrays in harness)
 ```
 
 The harness:
-1. Generates Shadow YAML configs for each scenario/seed combination
+1. Generates Shadow YAML configs with the expanded topology for each scenario/seed
 2. Runs `shadow` with the generated config
 3. Parses Tor info-level logs from `shadow.data/` to extract per-circuit FSM events
 4. Runs the FSM monitor on each circuit's event sequence
@@ -115,8 +134,8 @@ known function calls to spec-level events:
 
 | Tor Log Pattern | FSM Event |
 |-----------------|-----------|
-| `connection_or_finished_connecting()` | `CONNECT` |
-| `or_state_changed: ...OPEN` | `TLS_OK` |
+| `origin_circuit_new()` | `CONNECT` |
+| `ORCONN state>=7` | `TLS_OK` |
 | `circuit_send_first_onion_skin()` | `SEND_CREATE` |
 | `circuit_finish_handshake()` (hop 1) | `RECV_CREATED` |
 | `circuit_finish_handshake()` (hop 2+) | `SEND_EXTEND` + `RECV_EXTENDED` |
@@ -125,21 +144,25 @@ known function calls to spec-level events:
 
 ## Results Summary
 
-| Scenario | Precision | Recall | F1 | FPR |
-|----------|-----------|--------|----|-----|
-| benign | N/A | N/A | N/A | 0.0000 |
-| replay_attack | 0.369 +/- 0.004 | 1.000 +/- 0.000 | 0.539 +/- 0.004 | 0.251 +/- 0.007 |
-| circuit_bypass | 0.466 +/- 0.007 | 1.000 +/- 0.000 | 0.636 +/- 0.007 | 0.251 +/- 0.007 |
+| Scenario | Avg Circuits | Avg Events | Precision | Recall | F1 | FPR |
+|----------|-------------|------------|-----------|--------|----|-----|
+| benign | ~147 | ~1378 | N/A | N/A | N/A | 0.0000 |
+| replay_attack | ~147 | ~1378 | 0.329 +/- 0.014 | 0.988 +/- 0.017 | 0.493 +/- 0.018 | 0.275 +/- 0.016 |
+| circuit_bypass | ~147 | ~1378 | 0.436 +/- 0.015 | 1.000 +/- 0.000 | 0.607 +/- 0.015 | 0.276 +/- 0.017 |
 
 ## Known Limitations
 
-1. **Small network**: 1 DA + 6 relays vs real Tor's ~7,000 relays.
-2. **Harness-level injection**: Attacks are injected at the event-trace level,
+1. **Single DA**: 1 directory authority instead of the requested 3. Multi-DA
+   voting configuration is complex in TestingTorNetwork mode and does not affect
+   the FSM monitor's per-circuit event analysis.
+2. **Network scale**: 1 DA + 11 relays + 5 clients vs real Tor's ~7,000 relays.
+   Results may not generalize to large-scale networks.
+3. **Harness-level injection**: Attacks are injected at the event-trace level,
    not by modifying the Tor binary. This tests the FSM monitor's detection logic
    but not the full attack vector.
-3. **2-hop vs 3-hop FSM mismatch**: The FSM spec models 2-hop circuits
+4. **2-hop vs 3-hop FSM mismatch**: The FSM spec models 2-hop circuits
    (CREATE + EXTEND), but Tor builds 3-hop circuits (guard/middle/exit).
    The 3rd hop's SEND_EXTEND triggers a CIRCUIT_HIJACK violation, causing
-   a 25.1% structural false-positive rate in benign traffic.
-4. **Simulated time**: 30 minutes simulated time per run. Real Tor circuits
+   a ~27% structural false-positive rate in benign traffic.
+5. **Simulated time**: 30 minutes simulated time per run. Real Tor circuits
    have longer lifetimes and more diverse traffic patterns.

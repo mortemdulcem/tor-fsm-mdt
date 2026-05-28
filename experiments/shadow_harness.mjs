@@ -343,21 +343,106 @@ function breakdownViolations(violations) {
 // ---------------------------------------------------------------------------
 
 const SHADOW_EXAMPLE_DIR = "/home/ubuntu/shadow/examples/docs/tor";
+const EXPANDED_TEMPLATE_DIR = process.env.HOME + "/shadow_expanded_template";
+const EXPANDED_CONF_DIR = process.env.HOME + "/shadow_expanded_conf";
 const SHADOW_BIN = process.env.HOME + "/.local/bin/shadow";
 const RESULTS_DIR = path.resolve(__dirname, "shadow_runs");
+
+const GUARD_RELAYS = ["relay1", "relay2", "relay3", "relay4", "relay5", "relay6", "relay7", "relay8"];
+const EXIT_RELAYS = ["exit1", "exit2", "exit3"];
+const ALL_RELAYS = [...GUARD_RELAYS, ...EXIT_RELAYS];
+const TOR_CLIENTS = ["torclient", "torclient2", "torclient3", "torclient4"];
+
+function generateShadowYaml(seed) {
+  const relayBlocks = ALL_RELAYS.map((r) => `  ${r}:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address ${r} --Nickname ${r}
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running`).join("\n");
+
+  const clientBlocks = TOR_CLIENTS.map((c) => `  ${c}:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address ${c} --Nickname ${c}
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+      start_time: 1500`).join("\n");
+
+  return `general:
+  seed: ${seed}
+  stop_time: 30 min
+network:
+  graph:
+    type: gml
+    inline: |
+      graph [
+        directed 0
+        node [
+          id 0
+          host_bandwidth_down "1 Gbit"
+          host_bandwidth_up "1 Gbit"
+        ]
+        edge [
+          source 0
+          target 0
+          latency "50 ms"
+          jitter "0 ms"
+          packet_loss 0.0
+        ]
+      ]
+hosts:
+  fileserver:
+    network_node_id: 0
+    processes:
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.server.graphml.xml
+      start_time: 1
+      expected_final_state: running
+  4uthority:
+    network_node_id: 0
+    ip_addr: 100.0.0.1
+    processes:
+    - path: tor
+      args: --Address 4uthority --Nickname 4uthority
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 1
+      expected_final_state: running
+${relayBlocks}
+  client:
+    network_node_id: 0
+    processes:
+    - path: tgen
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.client.graphml.xml
+      start_time: 600
+${clientBlocks}
+`;
+}
 
 async function runShadowSimulation(seed, label) {
   const runDir = path.join(RESULTS_DIR, label, `run_seed${seed}`);
   await fs.mkdir(runDir, { recursive: true });
 
-  const srcDir = SHADOW_EXAMPLE_DIR;
-  execSync(`cp -r ${srcDir}/shadow.yaml ${runDir}/`, { stdio: "pipe" });
-  execSync(`cp -r ${srcDir}/conf ${runDir}/`, { stdio: "pipe" });
-  execSync(`cp -r ${srcDir}/shadow.data.template ${runDir}/`, { stdio: "pipe" });
+  // Use expanded template and conf if available, fall back to original
+  const useExpanded = await fs.access(EXPANDED_TEMPLATE_DIR).then(() => true).catch(() => false);
+  const templateSrc = useExpanded ? EXPANDED_TEMPLATE_DIR : SHADOW_EXAMPLE_DIR + "/shadow.data.template";
+  const confSrc = useExpanded && await fs.access(EXPANDED_CONF_DIR).then(() => true).catch(() => false)
+    ? EXPANDED_CONF_DIR : SHADOW_EXAMPLE_DIR + "/conf";
 
-  let yaml = await fs.readFile(path.join(runDir, "shadow.yaml"), "utf8");
-  yaml = yaml.replace("general:", `general:\n  seed: ${seed}`);
-  await fs.writeFile(path.join(runDir, "shadow.yaml"), yaml);
+  execSync(`cp -r ${confSrc} ${runDir}/conf`, { stdio: "pipe" });
+  execSync(`cp -r ${templateSrc} ${runDir}/shadow.data.template`, { stdio: "pipe" });
+
+  // Generate shadow.yaml with expanded topology
+  await fs.writeFile(path.join(runDir, "shadow.yaml"), generateShadowYaml(seed));
 
   console.log(`  Running Shadow simulation: ${label} seed=${seed} ...`);
   const t0 = Date.now();
@@ -435,9 +520,11 @@ async function main() {
       repetitions: SEEDS.length,
       network_topology: {
         authorities: 1,
-        relays: 6,
-        clients: 2,
-        note: "Shadow example topology: 1 DA, 4 non-exit relays, 2 exit relays, 1 direct client, 1 tor client",
+        relays: ALL_RELAYS.length,
+        guard_relays: GUARD_RELAYS.length,
+        exit_relays: EXIT_RELAYS.length,
+        clients: TOR_CLIENTS.length + 1,
+        note: `Expanded topology: 1 DA, ${GUARD_RELAYS.length} guard/middle relays, ${EXIT_RELAYS.length} exit relays, 1 direct client, ${TOR_CLIENTS.length} tor clients`,
       },
       fsm_spec: {
         states: STATES.length,
