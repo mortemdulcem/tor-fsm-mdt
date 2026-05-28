@@ -1,0 +1,44 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt
+ln -sfn ~/tor-fsm-mdt/experiments/topology/generated      ~/shadow_v2_template
+ln -sfn ~/tor-fsm-mdt/experiments/topology/generated/conf ~/shadow_v2_conf
+ls -la ~/shadow_v2_template ~/shadow_v2_conf
+npx tsx experiments/shadow_harness_v2.mjs 2>&1 | tail -80
+lrwxrwxrwx 1 tez tez 57 May 28 21:08 /home/tez/shadow_v2_conf -> /home/tez/tor-fsm-mdt/experiments/topology/generated/conf
+lrwxrwxrwx 1 tez tez 52 May 28 21:08 /home/tez/shadow_v2_template -> /home/tez/tor-fsm-mdt/experiments/topology/generated
+=== Shadow + Tor v2 Harness (Expanded Topology) ===
+
+--- Phase 1: Running benign Shadow simulations ---
+  Running Shadow simulation: benign seed=42 ...
+  FAILED after 0.1s: Command failed: cd "/home/tez/tor-fsm-mdt/experiments/shadow_runs_v2/benign/run_seed42" && rm -rf shadow.data/ && /home/tez/.local/bin/shadow --template-directory shadow.data.template shadow.yaml > sh
+  FATAL: benign seed=42 failed. Aborting.
+  Running Shadow simulation: benign seed=137 ...
+  FAILED after 0.1s: Command failed: cd "/home/tez/tor-fsm-mdt/experiments/shadow_runs_v2/benign/run_seed137" && rm -rf shadow.data/ && /home/tez/.local/bin/shadow --template-directory shadow.data.template shadow.yaml > s
+  FATAL: benign seed=137 failed. Aborting.
+  Running Shadow simulation: benign seed=2718 ...
+  FAILED after 0.1s: Command failed: cd "/home/tez/tor-fsm-mdt/experiments/shadow_runs_v2/benign/run_seed2718" && rm -rf shadow.data/ && /home/tez/.local/bin/shadow --template-directory shadow.data.template shadow.yaml > 
+  FATAL: benign seed=2718 failed. Aborting.
+
+--- Phase 2: Analyzing all scenarios x FSM models ---
+
+Results written to: /home/tez/tor-fsm-mdt/experiments/shadow_results_v2.json
+
+=== V2 RESULTS SUMMARY ===
+
+FSM    | Scenario         | Precision       | Recall          | F1              | FPR
+-------|------------------|-----------------|-----------------|-----------------|----------------
+2hop   | benign           | NO DATA
+2hop   | replay_attack    | NO DATA
+2hop   | circuit_bypass   | NO DATA
+2hop   | ghost_circuit    | NO DATA
+2hop   | handshake_skip   | NO DATA
+2hop   | premature_data   | NO DATA
+2hop   | create_flood     | NO DATA
+3hop   | benign           | NO DATA
+3hop   | replay_attack    | NO DATA
+3hop   | circuit_bypass   | NO DATA
+3hop   | ghost_circuit    | NO DATA
+3hop   | handshake_skip   | NO DATA
+3hop   | premature_data   | NO DATA
+3hop   | create_flood     | NO DATA
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+
