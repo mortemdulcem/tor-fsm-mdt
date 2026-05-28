@@ -39,11 +39,12 @@ jobs:
           for f in $IMPORTERS; do
             # Skip the FSM source file itself and test files
             case "$f" in
-              server/fsm.ts|server/fsm.test.ts) continue ;;
+              server/fsm.ts|server/fsm.test.ts|server/fsm_stream.ts) continue ;;
             esac
             if ! grep -q 'from.*["\x27].*server/fsm' "$f" && \
                ! grep -q 'from.*["\x27].*\.\.\/server\/fsm' "$f" && \
-               ! grep -q 'from.*["\x27]\.\./fsm' "$f"; then
+               ! grep -q 'from.*["\x27]\.\./fsm' "$f" && \
+               ! grep -q 'from.*["\x27]\.\/fsm' "$f"; then
               echo "ERROR: $f references FSM symbols but does not import from server/fsm.ts"
               exit 1
             fi

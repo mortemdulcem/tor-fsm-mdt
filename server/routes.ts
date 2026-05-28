@@ -36,7 +36,7 @@ async function runRandomSimulation(testRunId: number, count: number) {
       }
     }
 
-    const next = VALID[k(currentState, nextEvent)];
+    const next: State | undefined = VALID[k(currentState, nextEvent)];
     const isValid = !!next;
 
     await storage.createTransition({
