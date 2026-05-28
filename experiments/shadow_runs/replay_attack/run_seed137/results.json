@@ -1,41 +1,41 @@
 {
   "seed": 137,
   "scenario": "replay_attack",
-  "wallTime": "4.8",
-  "circuitCount": 73,
-  "rawEventCount": 667,
-  "injectedCount": 96,
+  "wallTime": "9.4",
+  "circuitCount": 145,
+  "rawEventCount": 1358,
+  "injectedCount": 183,
   "fsmResult": {
-    "validCount": 504,
-    "invalidCount": 259,
-    "circuitCount": 73
+    "validCount": 996,
+    "invalidCount": 545,
+    "circuitCount": 145
   },
   "metrics": {
     "scenario": "replay_attack",
-    "totalEvents": 763,
-    "circuitCount": 73,
-    "validTransitions": 504,
-    "totalViolations": 259,
-    "injectedAttacks": 96,
-    "detectedAttacks": 96,
-    "tp": 96,
-    "fp": 163,
+    "totalEvents": 1541,
+    "circuitCount": 145,
+    "validTransitions": 996,
+    "totalViolations": 545,
+    "injectedAttacks": 183,
+    "detectedAttacks": 183,
+    "tp": 183,
+    "fp": 362,
     "fn": 0,
-    "tn": 504,
-    "precision": 0.37065637065637064,
+    "tn": 996,
+    "precision": 0.3357798165137615,
     "recall": 1,
-    "f1": 0.5408450704225353,
-    "fpr": 0.24437781109445278,
+    "f1": 0.5027472527472527,
+    "fpr": 0.2665684830633284,
     "violationBreakdown": {
-      "CIRCUIT_HIJACK": 156,
-      "HANDSHAKE_SKIP": 84,
-      "REPLAY_ATTACK": 4,
-      "GHOST_CIRCUIT": 4,
-      "PREMATURE_DATA": 11
+      "CIRCUIT_HIJACK": 312,
+      "HANDSHAKE_SKIP": 147,
+      "PREMATURE_DATA": 62,
+      "REPLAY_ATTACK": 12,
+      "GHOST_CIRCUIT": 12
     },
     "attackBreakdown": {
-      "HANDSHAKE_SKIP": 84,
-      "CIRCUIT_HIJACK": 12
+      "HANDSHAKE_SKIP": 147,
+      "CIRCUIT_HIJACK": 36
     }
   },
   "sampleCircuit": [

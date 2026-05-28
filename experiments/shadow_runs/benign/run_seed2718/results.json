@@ -1,57 +1,58 @@
 {
   "seed": 2718,
   "scenario": "benign",
-  "wallTime": "4.5",
-  "circuitCount": 74,
-  "rawEventCount": 677,
+  "wallTime": "9.4",
+  "circuitCount": 146,
+  "rawEventCount": 1369,
   "injectedCount": 0,
   "fsmResult": {
-    "validCount": 510,
-    "invalidCount": 167,
-    "circuitCount": 74
+    "validCount": 1011,
+    "invalidCount": 358,
+    "circuitCount": 146
   },
   "metrics": {
     "scenario": "benign",
-    "totalEvents": 677,
-    "circuitCount": 74,
-    "validTransitions": 510,
-    "structuralViolations": 167,
+    "totalEvents": 1369,
+    "circuitCount": 146,
+    "validTransitions": 1011,
+    "structuralViolations": 358,
     "tp": 0,
     "fp": 0,
     "fn": 0,
-    "tn": 510,
+    "tn": 1011,
     "precision": null,
     "recall": null,
     "f1": null,
     "fpr": 0,
-    "violationRate": 0.2466765140324963,
+    "violationRate": 0.26150474799123447,
     "violationBreakdown": {
-      "CIRCUIT_HIJACK": 148,
-      "REPLAY_ATTACK": 4,
-      "GHOST_CIRCUIT": 4,
-      "PREMATURE_DATA": 11
+      "CIRCUIT_HIJACK": 280,
+      "REPLAY_ATTACK": 13,
+      "GHOST_CIRCUIT": 13,
+      "HANDSHAKE_SKIP": 2,
+      "PREMATURE_DATA": 50
     }
   },
   "sampleCircuit": [
     {
       "cid": "4uthority_circ1",
-      "eventCount": 6,
-      "validCount": 6,
+      "eventCount": 4,
+      "validCount": 4,
       "invalidCount": 0,
-      "finalState": "CIRCUIT_READY"
+      "finalState": "CIRCUIT_BUILDING"
     },
     {
       "cid": "4uthority_circ2",
-      "eventCount": 6,
+      "eventCount": 10,
       "validCount": 6,
-      "invalidCount": 0,
+      "invalidCount": 4,
       "finalState": "CIRCUIT_READY"
     },
     {
       "cid": "4uthority_circ3",
-      "eventCount": 10,
+      "eventCount": 8,
       "validCount": 6,
-      "invalidCount": 4,
+      "invalidCount": 2,
       "finalState": "CIRCUIT_READY"
     }
   ],

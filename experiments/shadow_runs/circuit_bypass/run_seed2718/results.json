@@ -1,64 +1,64 @@
 {
   "seed": 2718,
   "scenario": "circuit_bypass",
-  "wallTime": "4.5",
-  "circuitCount": 74,
-  "rawEventCount": 677,
-  "injectedCount": 148,
+  "wallTime": "8.9",
+  "circuitCount": 146,
+  "rawEventCount": 1369,
+  "injectedCount": 292,
   "fsmResult": {
-    "validCount": 510,
-    "invalidCount": 315,
-    "circuitCount": 74
+    "validCount": 1011,
+    "invalidCount": 650,
+    "circuitCount": 146
   },
   "metrics": {
     "scenario": "circuit_bypass",
-    "totalEvents": 825,
-    "circuitCount": 74,
-    "validTransitions": 510,
-    "totalViolations": 315,
-    "injectedAttacks": 148,
-    "detectedAttacks": 148,
-    "tp": 148,
-    "fp": 167,
+    "totalEvents": 1661,
+    "circuitCount": 146,
+    "validTransitions": 1011,
+    "totalViolations": 650,
+    "injectedAttacks": 292,
+    "detectedAttacks": 292,
+    "tp": 292,
+    "fp": 358,
     "fn": 0,
-    "tn": 510,
-    "precision": 0.46984126984126984,
+    "tn": 1011,
+    "precision": 0.4492307692307692,
     "recall": 1,
-    "f1": 0.6393088552915767,
-    "fpr": 0.2466765140324963,
+    "f1": 0.6199575371549894,
+    "fpr": 0.26150474799123447,
     "violationBreakdown": {
-      "CIRCUIT_BYPASS": 74,
-      "HANDSHAKE_SKIP": 74,
-      "CIRCUIT_HIJACK": 148,
-      "REPLAY_ATTACK": 4,
-      "GHOST_CIRCUIT": 4,
-      "PREMATURE_DATA": 11
+      "CIRCUIT_BYPASS": 146,
+      "HANDSHAKE_SKIP": 148,
+      "CIRCUIT_HIJACK": 280,
+      "REPLAY_ATTACK": 13,
+      "GHOST_CIRCUIT": 13,
+      "PREMATURE_DATA": 50
     },
     "attackBreakdown": {
-      "CIRCUIT_BYPASS": 74,
-      "HANDSHAKE_SKIP": 74
+      "CIRCUIT_BYPASS": 146,
+      "HANDSHAKE_SKIP": 146
     }
   },
   "sampleCircuit": [
     {
       "cid": "4uthority_circ1",
-      "eventCount": 8,
-      "validCount": 6,
+      "eventCount": 6,
+      "validCount": 4,
       "invalidCount": 2,
-      "finalState": "CIRCUIT_READY"
+      "finalState": "CIRCUIT_BUILDING"
     },
     {
       "cid": "4uthority_circ2",
-      "eventCount": 8,
+      "eventCount": 12,
       "validCount": 6,
-      "invalidCount": 2,
+      "invalidCount": 6,
       "finalState": "CIRCUIT_READY"
     },
     {
       "cid": "4uthority_circ3",
-      "eventCount": 12,
+      "eventCount": 10,
       "validCount": 6,
-      "invalidCount": 6,
+      "invalidCount": 4,
       "finalState": "CIRCUIT_READY"
     }
   ],
@@ -92,11 +92,11 @@
       "injected": true
     },
     {
-      "from": "CONNECTING",
-      "event": "SEND_RELAY_DATA",
-      "type": "CIRCUIT_BYPASS",
+      "from": "CIRCUIT_READY",
+      "event": "SEND_EXTEND",
+      "type": "CIRCUIT_HIJACK",
       "severity": "CRITICAL",
-      "injected": true
+      "injected": false
     }
   ]
 }

@@ -1,63 +1,65 @@
 {
   "seed": 2718,
   "scenario": "replay_attack",
-  "wallTime": "4.4",
-  "circuitCount": 74,
-  "rawEventCount": 677,
-  "injectedCount": 99,
+  "wallTime": "9.0",
+  "circuitCount": 146,
+  "rawEventCount": 1369,
+  "injectedCount": 186,
   "fsmResult": {
-    "validCount": 510,
-    "invalidCount": 266,
-    "circuitCount": 74
+    "validCount": 1011,
+    "invalidCount": 544,
+    "circuitCount": 146
   },
   "metrics": {
     "scenario": "replay_attack",
-    "totalEvents": 776,
-    "circuitCount": 74,
-    "validTransitions": 510,
-    "totalViolations": 266,
-    "injectedAttacks": 99,
-    "detectedAttacks": 99,
-    "tp": 99,
-    "fp": 167,
+    "totalEvents": 1555,
+    "circuitCount": 146,
+    "validTransitions": 1011,
+    "totalViolations": 544,
+    "injectedAttacks": 186,
+    "detectedAttacks": 186,
+    "tp": 186,
+    "fp": 358,
     "fn": 0,
-    "tn": 510,
-    "precision": 0.37218045112781956,
+    "tn": 1011,
+    "precision": 0.34191176470588236,
     "recall": 1,
-    "f1": 0.5424657534246575,
-    "fpr": 0.2466765140324963,
+    "f1": 0.5095890410958904,
+    "fpr": 0.26150474799123447,
     "violationBreakdown": {
-      "CIRCUIT_HIJACK": 160,
-      "HANDSHAKE_SKIP": 87,
-      "REPLAY_ATTACK": 4,
-      "GHOST_CIRCUIT": 4,
-      "PREMATURE_DATA": 11
+      "CIRCUIT_HIJACK": 316,
+      "HANDSHAKE_SKIP": 149,
+      "REPLAY_ATTACK": 13,
+      "GHOST_CIRCUIT": 13,
+      "CREATE_FLOOD": 3,
+      "PREMATURE_DATA": 50
     },
     "attackBreakdown": {
-      "HANDSHAKE_SKIP": 87,
-      "CIRCUIT_HIJACK": 12
+      "HANDSHAKE_SKIP": 147,
+      "CREATE_FLOOD": 3,
+      "CIRCUIT_HIJACK": 36
     }
   },
   "sampleCircuit": [
     {
       "cid": "4uthority_circ1",
-      "eventCount": 6,
-      "validCount": 6,
+      "eventCount": 4,
+      "validCount": 4,
       "invalidCount": 0,
-      "finalState": "CIRCUIT_READY"
+      "finalState": "CIRCUIT_BUILDING"
     },
     {
       "cid": "4uthority_circ2",
-      "eventCount": 6,
+      "eventCount": 10,
       "validCount": 6,
-      "invalidCount": 0,
+      "invalidCount": 4,
       "finalState": "CIRCUIT_READY"
     },
     {
       "cid": "4uthority_circ3",
-      "eventCount": 10,
+      "eventCount": 8,
       "validCount": 6,
-      "invalidCount": 4,
+      "invalidCount": 2,
       "finalState": "CIRCUIT_READY"
     }
   ],
