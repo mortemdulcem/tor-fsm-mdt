@@ -522,8 +522,14 @@ function breakdownViolations(violations) {
 // Shadow runner
 // ---------------------------------------------------------------------------
 
-const V2_TEMPLATE_DIR = "/home/ubuntu/shadow_v2_template";
-const V2_CONF_DIR = "/home/ubuntu/shadow_v2_conf";
+// Template/conf directories: use env vars if set, otherwise fall back to
+// the committed topology in the repo (experiments/topology/generated).
+const V2_TEMPLATE_DIR =
+  process.env.SHADOW_V2_TEMPLATE ||
+  path.resolve(__dirname, "topology/generated");
+const V2_CONF_DIR =
+  process.env.SHADOW_V2_CONF ||
+  path.resolve(__dirname, "topology/generated/conf");
 
 function generateShadowYaml(seed) {
   const guardRelays = Array.from({ length: 20 }, (_, i) => `relay${i + 1}`);
@@ -633,11 +639,11 @@ async function runShadowSimulation(seed, label) {
   const runDir = path.join(RESULTS_DIR, label, `run_seed${seed}`);
   await fs.mkdir(runDir, { recursive: true });
 
-  // Copy template and conf
-  execSync(`cp -r ${V2_TEMPLATE_DIR} ${runDir}/shadow.data.template`, {
-    stdio: "pipe",
-  });
-  execSync(`cp -r ${V2_CONF_DIR} ${runDir}/conf`, { stdio: "pipe" });
+  // Copy template and conf (clean first to avoid nested dirs on re-run)
+  execSync(
+    `rm -rf ${runDir}/shadow.data.template ${runDir}/conf && cp -rL ${V2_TEMPLATE_DIR} ${runDir}/shadow.data.template && cp -rL ${V2_CONF_DIR} ${runDir}/conf`,
+    { stdio: "pipe" },
+  );
 
   // Write shadow.yaml
   const yaml = generateShadowYaml(seed);
