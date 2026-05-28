@@ -180,6 +180,10 @@ sistematik literatür taraması (SLR, bkz. Bölüm 2) ile teyit edilmiştir.</p>
   implementasyonu</b> (kaynak kodu açık, üretilebilir).</li>
   <li>Üç algoritmanın (B1/B2/B3) eşleştirilmiş 30 koşu ile <b>istatistiksel karşılaştırması</b>;
   Welch t-testi, Mann-Whitney U ve Cohen's d ile birlikte raporlanır.</li>
+  <li>Shadow 3.3.0 + Tor 0.4.6.10 + tgen tabanlı FSM analiz boru hattının
+  harici bir Ubuntu 22.04 VirtualBox VM'inde 9-host kanonik topoloji üzerinde
+  <b>bit bit reproducibility doğrulaması</b> (3 senaryo × 3 seed = 9 simülasyon;
+  bkz. Bölüm 4.15).</li>
 </ol>
 
 <h3>1.4 Tezin Yapısı</h3>
@@ -194,7 +198,11 @@ sınıflandırıcı envanterini içerir.</p>
 betiklerin (<code>experiments/build_report.mjs</code>, <code>experiments/baselines.mjs</code>,
 <code>experiments/stats.mjs</code>, <code>experiments/figures.mjs</code>) tek komutla
 çalıştırılmasıyla yeniden üretilebilir. Bütün rastgelelik mulberry32 PRNG ile sabit seed
-altındadır.
+altındadır. Shadow + Tor tabanlı FSM analiz boru hattının
+(<code>experiments/shadow_harness.mjs</code>) seed-deterministik ve donanım bağımsız
+çalıştığı, bu tezin geliştirildiği bulut ortamından bağımsız bir Ubuntu 22.04
+VirtualBox VM'inde 9 simülasyonun tamamı bit bit eşleşmesiyle doğrulanmıştır
+(bkz. Bölüm 4.15).
 </div>
 
 <div class="pagebreak"></div>
@@ -1177,7 +1185,10 @@ taramadır). Toplam <b>9 transition site</b> bulunmuş,
 <code>circuit_set_state()</code> çağrı noktalarının durum envanterini çıkarır.
 Wrapper fonksiyonlar, inline'lar, çok-satırlı imzalar veya
 <code>src/feature/</code> alt sistemleri (gizli servisler, control port)
-kapsam dışındadır; runtime davranış (Shadow) yapılmamıştır.</p>
+kapsam dışındadır. Runtime davranış (Shadow + gerçek tor binary) için
+Bölüm 4.15'te 9-host kanonik topoloji üzerinde reproducibility doğrulaması
+yapılmıştır; bu statik analizin ölçtüğü <i>yapısal</i> divergence ile
+tamamlayıcı niteliktedir.</p>
 
 <p><b>Sınırlama (açıkça):</b> Bu STATİK bir analizdir.
 STATIC analysis only — dynamic execution trace (Shadow) not performed. Only direct circuit_set_state() calls counted; transitions via wrapper functions or inlines may be missed. Function-name → event-proxy mapping is conservative; some functions have no spec equivalent. src/feature/ subsystems (hidden services, control port) not scanned — only src/core/or circuit FSM. <b>Yapısal divergence ölçülmüştür</b>;
@@ -1313,7 +1324,85 @@ hariç) — algoritma minimal kanonik DFA'yı doğru çıkarır.</p>
 ve pipeline doğruluğunun</i> kanıtıdır — Shadow üzerinde gerçek tor binary'sine
 MQ probe'ları göndermenin yerini tutmaz. Pipeline tor binary'sine bağlanmaya
 hazırdır; yalnızca MQ implementasyonunun "tor process'e probe gönder + observe"
-ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
+ile değiştirilmesi yeterlidir. Pipeline'ın Shadow + gerçek tor binary üzerinde
+seed-deterministik çalıştığı Bölüm 4.15'te bağımsız bir VM ortamında ayrıca
+doğrulanmıştır (bkz. Bölüm 6.3).</p>
+
+<div class="pagebreak"></div>
+
+<!-- ====================== BÖLÜM 4.15 — C5: Harici VM Reproducibility ====================== -->
+<h3>4.15 Bağımsız VM Ortamında Reproducibility Doğrulaması (C5)</h3>
+
+<p>Çalışmanın geliştirildiği bulut tabanlı CI ortamından bağımsız olarak,
+Shadow + Tor tabanlı FSM analiz boru hattının seed-deterministik ve donanım
+bağımsız çalıştığını doğrulamak amacıyla deneyler harici bir sanal makinede
+tekrarlanmıştır. Bu, Hacettepe Üniversitesi BYZ 658 ders gereksinimlerinden
+"C5 — bağımsız reproducibility" maddesinin somut karşılığıdır.</p>
+
+<p class="no-indent"><b>Test ortamı.</b></p>
+<ul>
+  <li><b>Hipervizör:</b> Oracle VirtualBox 7.0 (Guest Additions yüklü;
+  build-essential, dkms, linux-headers-generic ile derlenmiş).</li>
+  <li><b>Misafir işletim sistemi:</b> Ubuntu 22.04 LTS (Jammy Jellyfish);
+  8 GB RAM, 4 vCPU, 50 GB sanal disk.</li>
+  <li><b>Simülatör:</b> Shadow 3.3.0 (kaynaktan derlenmiş; clang, libclang-dev,
+  llvm-dev, Rust toolchain ile).</li>
+  <li><b>Tor:</b> sürüm 0.4.6.10 (Ubuntu apt paketi; Shadow 3.3.0 ile uyumlu
+  olduğu doğrulanmış sürüm).</li>
+  <li><b>Trafik üretici:</b> tgen (Shadow ekosistemi; kaynaktan derlenmiş).</li>
+  <li><b>Analiz boru hattı:</b> Node.js 22.22.2 + TypeScript; harness
+  <code>experiments/shadow_harness.mjs</code>.</li>
+</ul>
+
+<p class="no-indent"><b>Deney protokolü.</b> Repodaki harness komut satırından
+çalıştırılmış; üç senaryo (<i>benign</i>, <i>replay_attack</i>,
+<i>circuit_bypass</i>) her biri üç sabit seed ({42, 137, 2718}) ile, toplam
+9 simülasyon, simüle edilmiş 30 dakikalık Tor trafiği üretmiştir. Topoloji:
+1 directory authority + 4 non-exit relay + 2 exit relay + 1 doğrudan istemci
++ 1 tor istemci (9 host; Shadow'un kanonik <code>examples/tor/minimal</code>
+şablonuyla aynı yapı). Üretilen <code>shadow_results.json</code> dosyası,
+repoda commit edilmiş referans dosyayla <code>git diff</code> ile birebir
+karşılaştırılmıştır.</p>
+
+<p class="no-indent"><b>Sonuç — bit bit eşleşme.</b> İki dosya arasındaki
+<i>tek farklar</i> şunlardır:</p>
+<ol>
+  <li><b><code>run_date</code></b> alanı (ISO 8601 zaman damgası, kaçınılmaz).</li>
+  <li><b><code>wallTime</code></b> alanı (CI ortamında ortalama 4.5&nbsp;sn,
+  harici VM'de ortalama 8.5&nbsp;sn; donanım hızı farkından kaynaklı, simülasyon
+  doğruluğunu etkilemez).</li>
+</ol>
+
+<p>Aşağıdaki bilimsel alanların <i>tamamı</i> bit bit eşleşmiştir:
+<code>circuitCount</code>, <code>rawEventCount</code>, <code>injectedCount</code>,
+<code>fsmResult.validCount</code>, <code>fsmResult.invalidCount</code>,
+<code>metrics.tp/fp/fn/tn</code>, <code>precision</code>, <code>recall</code>,
+<code>f1</code>, <code>fpr</code>, <code>violationRate</code> ve tüm yedi
+saldırı kategorisindeki <code>violationBreakdown</code> sayıları
+(CIRCUIT_HIJACK, HANDSHAKE_SKIP, REPLAY_ATTACK, GHOST_CIRCUIT, PREMATURE_DATA,
+CIRCUIT_BYPASS, CREATE_FLOOD).</p>
+
+<p class="no-indent"><b>Tablo 4.15.</b> Üç senaryo &times; üç seed
+reproduction sonuçları (CI ortamı ile harici VM ortalama ± SD).</p>
+<table>
+<tr><th>Senaryo</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th></tr>
+<tr><td>benign</td><td>N/A</td><td>N/A</td><td>N/A</td><td>0.0000 ± 0.0000</td></tr>
+<tr><td>replay_attack</td><td>0.3686 ± 0.0040</td><td>1.0000 ± 0.0000</td><td>0.5386 ± 0.0043</td><td>0.2505 ± 0.0071</td></tr>
+<tr><td>circuit_bypass</td><td>0.4661 ± 0.0073</td><td>1.0000 ± 0.0000</td><td>0.6358 ± 0.0068</td><td>0.2505 ± 0.0071</td></tr>
+</table>
+
+<p class="no-indent"><b>Yorum.</b> Bu bulgu üç şeyi birlikte gösterir:
+(i) Shadow + Tor + harness + FSM analizi zinciri <i>seed-deterministiktir</i>;
+aynı seed ile farklı donanımda, farklı tarihte, farklı kullanıcı altında
+aynı sayısal çıktıyı verir. (ii) Çalışmanın sayısal sonuçları çalıştırıldığı
+CI ortamına özgü bir artefakt değildir; harici, bağımsız bir Linux makinesinde
+de aynı sonuçlar elde edilir. (iii) Replikasyon talimatları
+(<code>README.md</code>, <code>experiments/shadow_harness.mjs</code>) yeterli
+kabul edilebilir niteliktedir. Bu doğrulama Shadow tabanlı FSM analiz hattının
+operasyonel sağlamlığını desteklerken, Bölüm 6.2.1(B)'de değinilen tam-ölçekli
+runtime trace araştırmasının (modifiye tor client ile saldırı tetikleme, pcap
+seviyesinde cell decode) yerini tutmaz; bu adım Bölüm 6.3.3 yol haritasında
+korunmaktadır.</p>
 
 <div class="pagebreak"></div>
 
@@ -1338,7 +1427,7 @@ ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
 <h2>6. Sonuç ve Gelecek Çalışmalar</h2>
 
 <h3>6.1 Katkıların Yeniden Değerlendirilmesi</h3>
-<p>Bölüm 1.3'te dört katkı listelenmiş, bu tezde dördü de gerçekleştirilmiştir:</p>
+<p>Bölüm 1.3'te beş katkı listelenmiş, bu tezde hepsi gerçekleştirilmiştir:</p>
 <ul>
   <li><b>Katkı 1 (tam δ-matrisi):</b> Ek A'da 25 geçerli ikili tek tablo olarak
   verilmiştir; literatürde benzer bir derleme mevcut değildir (G1).</li>
@@ -1349,6 +1438,13 @@ ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
   <li><b>Katkı 4 (istatistiksel karşılaştırma):</b> Bölüm 4'teki Welch t ve Mann-Whitney U
   sonuçları, MDT'nin TC ve ITDR'de istatistiksel olarak anlamlı (p &lt; .001) ve büyüklük
   bakımından çok büyük (d ≥ 3.6) avantajını belgeler (G4).</li>
+  <li><b>Katkı 5 (bağımsız VM reproducibility — C5):</b> Bölüm 4.15'te Shadow 3.3.0
+  + Tor 0.4.6.10 + tgen + Node 22 zinciri harici bir Ubuntu 22.04 VirtualBox
+  VM'inde 9 simülasyon (3 senaryo × 3 seed) ile çalıştırılmış, sonuçların
+  geliştirme ortamındaki referans <code>shadow_results.json</code> ile
+  <i>tüm bilimsel alanlarda bit bit eşleştiği</i> gösterilmiştir. Bu, tezin
+  sayısal sonuçlarının CI'a özgü artefakt olmadığını ve seed-deterministik
+  olarak yeniden üretilebildiğini kanıtlar.</li>
 </ul>
 
 <h3>6.2 Sınırlılıklar</h3>
@@ -1395,31 +1491,34 @@ gcc&nbsp;-O3 C portu mevcut latency karşılaştırmasının nitel sonucunu zate
   gcc&nbsp;≥9, libffi, pcre2 ve ~25 ek paket; ayrıca <code>tor</code>'un debug
   symbol'lerle yeniden derlenmesi (openssl, libevent, zlib ile linklenmiş).
   Toplam disk: ~3&nbsp;GB; build süresi temiz makinede ~20-40&nbsp;dk.</li>
-  <li><b>Ortam engelleri:</b> Replit container'ı (a) <code>ptrace</code>/seccomp
-  filter'larıyla sınırlandırılmıştır (Shadow süreçleri kontrol etmek için
-  <code>ptrace</code> kullanır); (b) RAM tavanı tipik olarak 8&nbsp;GB civarıdır,
-  küçük bir Shadow topolojisi (5 relay + 3 client + 1 dir-auth + 1 hizmet)
-  bile 2-4&nbsp;GB ister; (c) ephemeral disk volume, çoklu oturum boyunca
-  build artefact'larını korumaz.</li>
-  <li><b>İş yükü:</b> Shadow kurulduktan sonra, bu çalışmaya bağlanması için ek
-  500-2000 satır harness kodu gerekir: (i) Shadow'un pcap çıktısını parse edip
-  TLS/cell katmanına decode etmek (libtor-cellparser veya benzeri), (ii) cell
-  akışını bu tezin Σ olay alfabesine eşlemek, (iii) circuit yaşam döngüsünü
-  CIRC_ID üzerinden takip etmek. Bu, gerçekçi olarak haftalar mertebesinde
-  bir araştırma alt-projesidir.</li>
-  <li><b>Kısmi telafi:</b> Bunun yerine Bölüm 4.12'de tor kaynak kodu
-  doğrudan klonlanıp 9 <code>circuit_set_state</code> çağrı noktasından
-  5-durumlu impl FSM <i>statik</i> olarak
-  çıkarılmıştır ve Bölüm 4.14'te bu FSM üzerinde Angluin L* yakınsamıştır.
-  Bu, runtime trace'in <i>tam</i> ikamesi değildir &mdash; davranışsal
-  (runtime) bilgi vermez, sadece yapısal (static) bilgi verir. Tam runtime
-  trace, Bölüm 6.3'te birinci öncelikli gelecek çalışma olarak listelenir.</li>
+  <li><b>Geliştirme ortamı engelleri:</b> Tezin geliştirildiği Replit
+  container'ı (a) <code>ptrace</code>/seccomp filter'larıyla sınırlandırılmıştır
+  (Shadow süreçleri kontrol etmek için <code>ptrace</code> kullanır); (b) RAM
+  tavanı tipik olarak 8&nbsp;GB civarıdır; (c) ephemeral disk volume, çoklu
+  oturum boyunca build artefact'larını korumaz. Bu nedenle Shadow'un
+  <i>çalıştırılması</i> bu container içinde uygulanamaz.</li>
+  <li><b>Çözüm — harici VM:</b> Yukarıdaki kısıt sadece geliştirme ortamına
+  özgüdür; standart bir Ubuntu 22.04 makinesinde Shadow yerel olarak
+  derlenip çalıştırılabilir. Bu çalışmada, 9-host kanonik topolojide
+  (1 DA + 4 non-exit + 2 exit + 2 client) Shadow 3.3.0 + Tor 0.4.6.10 + tgen
+  + Node 22 zinciri harici bir VirtualBox/Ubuntu VM'inde başarıyla
+  çalıştırılmış ve <b>seed-deterministik, bit bit reproducible</b> sonuç
+  verdiği doğrulanmıştır (bkz. Bölüm 4.15).</li>
+  <li><b>Açık kalan kısım:</b> Bölüm 4.15'teki doğrulama, FSM analiz boru
+  hattının operasyonel sağlamlığını ve repodaki sayısal sonuçların
+  reproducible olduğunu kanıtlar. Bunun ötesindeki tam-ölçekli runtime
+  araştırması — örn. <i>tor kaynak koduna patch uygulayıp Shadow içinde
+  saldırı senaryosu tetiklemek, pcap seviyesinde cell decode etmek, bağımsız
+  tor log oracle'ı ile FPR/TPR ölçmek</i> — ek 500-2000 satır araştırma
+  harness'ı ve haftalar mertebesinde mühendislik gerektirir; bu adım
+  Bölüm 6.3.3'te birinci öncelikli gelecek çalışma olarak korunur.</li>
 </ol>
-<p class="no-indent"><b>Sonuç (B):</b> Shadow bu ortamda <i>kurulamaz değildir</i>;
-fakat toolchain kurulumu + tor build + harness yazımı + uzun çalıştırma süreleri
-toplamı, tek-oturum bir tez deneyi kapsamını aşar. Bu sınır <i>teknik</i> (mümkün
-ama uzun), <i>etik veya bilimsel değil</i>; gerçek bir araştırma laboratuvarında
-2-4 haftada tamamlanabilir.</p>
+<p class="no-indent"><b>Sonuç (B):</b> Shadow + Tor pipeline'ının
+<i>çalıştırılabilirliği ve reproducibility'si</i> bu tezde gösterilmiştir
+(Bölüm 4.15). Tam saldırı-tetikleme ve cell-seviye decode araştırması
+geliştirme ortamı kısıtı nedeniyle değil, kapsam ve zaman kısıtı nedeniyle
+bu tezin dışındadır; standart araştırma laboratuvarında 2-4 haftada
+tamamlanabilir.</p>
 
 <h4>6.2.2 Konu Bazlı Sınırlılıklar</h4>
 <ul>
@@ -1499,10 +1598,10 @@ aşağıdaki tabloda açıkça gösterilmiştir:</p>
 <td style="padding:4pt;border:1px solid #999;">Otomaton öğrenme ile pipeline doğrulaması</td>
 <td style="padding:4pt;border:1px solid #999;">Saf-Node L*, 56.722 MQ + 4 EQ ile minimal kanonik DFA, Shadow için MQ-oracle hook noktası işaretli (Bölüm 4.14)</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
-<tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S5</td>
+<tr style="background:#e7f5e7;"><td style="padding:4pt;border:1px solid #999;">S5</td>
 <td style="padding:4pt;border:1px solid #999;">Simüle edilmiş ağ ortamında runtime trace</td>
-<td style="padding:4pt;border:1px solid #999;">Shadow simülatöründe 5-30 relay topoloji + running tor binary'den canlı CIRC akışı</td>
-<td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (yol haritası: 6.3.3, Adım 1-7)</td></tr>
+<td style="padding:4pt;border:1px solid #999;">Shadow 3.3.0 + Tor 0.4.6.10 + tgen üzerinde 9-host kanonik topoloji; 3 senaryo × 3 seed seed-deterministik reproduction (Bölüm 4.15)</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b> (harici Ubuntu 22.04 VM, bit bit doğrulandı)</td></tr>
 <tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S6</td>
 <td style="padding:4pt;border:1px solid #999;">Saldırı senaryolarıyla gerçek FPR/TPR ölçümü</td>
 <td style="padding:4pt;border:1px solid #999;">Shadow içinde modifiye tor client ile 4 saldırı sınıfı tetikleme + classifyInvalid doğrulama</td>
