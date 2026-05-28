@@ -1,0 +1,28 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cat ~/tor-fsm-mdt/experiments/shadow_runs_v2/benign/run_seed42/shadow.log 2>/dev/null | grep -iE "source path|copy|file" | head -20
+ls -laR ~/shadow_v2_template_clean/hosts/4uthority/
+00:00:00.005890 [28456:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export]     1: Failed to copy template directory '/home/tez/tor-fsm-mdt/experiments/shadow_runs_v2/benign/run_seed42/shadow.data.template' to '/home/tez/tor-fsm-mdt/experiments/shadow_runs_v2/benign/run_seed42/shadow.data'
+Error:     1: Failed to copy template directory '/home/tez/tor-fsm-mdt/experiments/shadow_runs_v2/benign/run_seed42/shadow.data.template' to '/home/tez/tor-fsm-mdt/experiments/shadow_runs_v2/benign/run_seed42/shadow.data'
+00:00:00.006215 [28456:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export]     2: the source path is neither a regular file nor a symlink to a regular file
+Error:     2: the source path is neither a regular file nor a symlink to a regular file
+**   the source path is neither a regular file nor a symlink to a regular file
+/home/tez/shadow_v2_template_clean/hosts/4uthority/:
+toplam 20
+drwxrwxr-x  3 tez tez 4096 May 28 21:12 .
+drwxrwxr-x 43 tez tez 4096 May 28 21:12 ..
+-rw-rw-r--  1 tez tez   49 May 28 21:12 fingerprint
+drwxrwxr-x  2 tez tez 4096 May 28 21:12 keys
+-rw-rw-r--  1 tez tez    0 May 28 21:12 torrc
+-rw-rw-r--  1 tez tez  122 May 28 21:12 torrc-defaults
+
+/home/tez/shadow_v2_template_clean/hosts/4uthority/keys:
+toplam 32
+drwxrwxr-x 2 tez tez 4096 May 28 21:12 .
+drwxrwxr-x 3 tez tez 4096 May 28 21:12 ..
+-rw-rw-r-- 1 tez tez 2260 May 28 21:12 authority_certificate
+-rw-rw-r-- 1 tez tez 2565 May 28 21:12 authority_identity_key
+-rw-rw-r-- 1 tez tez 1675 May 28 21:12 authority_signing_key
+-rw-rw-r-- 1 tez tez  916 May 28 21:12 secret_id_key
+-rw-rw-r-- 1 tez tez  916 May 28 21:12 secret_onion_key
+-rw-rw-r-- 1 tez tez   64 May 28 21:12 secret_onion_key_ntor
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+
