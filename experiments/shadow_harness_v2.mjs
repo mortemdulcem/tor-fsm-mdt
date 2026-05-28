@@ -662,6 +662,15 @@ async function runShadowSimulation(seed, label) {
   } catch (err) {
     const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
     console.log(`  FAILED after ${elapsed}s: ${err.message?.slice(0, 200)}`);
+    // Print last 20 lines of shadow.log for diagnostics
+    try {
+      const logPath = path.join(runDir, "shadow.log");
+      const logContent = await fs.readFile(logPath, "utf-8");
+      const lastLines = logContent.split("\n").slice(-20).join("\n");
+      console.log(`  --- shadow.log tail ---\n${lastLines}\n  --- end ---`);
+    } catch (_) {
+      console.log("  (no shadow.log found)");
+    }
     await fs.writeFile(
       path.join(runDir, "error.txt"),
       err.message || "unknown error",
