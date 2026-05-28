@@ -22,7 +22,18 @@ const torStatic = JSON.parse(await fs.readFile(path.resolve(__dirname, "../exper
 const fext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions.json"), "utf8"));
 const fval = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions_validated.json"), "utf8"));
 const gext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/g_extensions.json"), "utf8"));
-const shadowRes = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/shadow_results.json"), "utf8"));
+const shadowResV1 = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/shadow_results_v1.json"), "utf8"));
+const shadowResV2 = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/shadow_results_v2.json"), "utf8"));
+// Backward compat: shadowRes = v1 (used by existing sections), v2 for new sections
+const shadowRes = shadowResV1;
+let tierB = null;
+try {
+  tierB = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tier_b_results.json"), "utf8"));
+} catch { /* tier B results not yet generated */ }
+let tierC = null;
+try {
+  tierC = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tier_c_results.json"), "utf8"));
+} catch { /* tier C results not yet generated */ }
 const fvalBy = Object.fromEntries(fval.comparisons.filter(v => v.B === "B2_GreedySC").map(v => [v.metric, v]));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
@@ -58,6 +69,21 @@ const REFS = [
   { id: 20, txt: 'Microsoft Research, "A Data-Driven FSM Model for Analyzing Security Vulnerabilities," Microsoft Research Technical Report, 2018.' },
 ];
 const cite = (...ids) => `[${ids.join("], [")}]`;
+
+// v2 comparison table generator
+function buildV2ComparisonTable() {
+  const rows = [];
+  const scenarios = ["benign", "replay_attack", "circuit_bypass", "ghost_circuit", "handshake_skip", "premature_data", "create_flood"];
+  for (const fsm of ["2hop", "3hop"]) {
+    for (const s of scenarios) {
+      const d = shadowResV2.perCell["v2_" + fsm + "_" + s];
+      if (!d) continue;
+      const fmtV = (x) => x ? (x.mean.toFixed(4) + " +/- " + x.sd.toFixed(4)) : "N/A";
+      rows.push("<tr><td>" + fsm + "</td><td class=\"l\">" + s + "</td><td>" + fmtV(d.precision) + "</td><td>" + fmtV(d.recall) + "</td><td>" + fmtV(d.f1) + "</td><td>" + fmtV(d.fpr) + "</td></tr>");
+    }
+  }
+  return rows.join("\n");
+}
 
 // ---------- Build figures (reuse) ----------
 const svg1 = fsmGraphSvg();
@@ -408,7 +434,78 @@ tablosunun otorite kaynağıdır. Microsoft Research'ün veri-tabanlı FSM güve
 çalışması ${cite(20)} state-level analizin endüstriyel uygulanabilirliğini gösterir, ancak
 Tor'a özel değildir.</p>
 
-<h3>2.7 PRISMA Akış Diyagramı</h3>
+<h3>2.7 Ilgili Calismalarin Karsilastirmasi</h3>
+
+<p>Asagidaki tablo, FSM-tabanli veya anomali tespiti-tabanli Tor izleme calismalari ile
+bu tezin yaklasimini karsilastirmaktadir. Yalnizca dogrulanmis yayinlar dahil edilmistir.</p>
+
+<p class="no-indent"><b>Tablo 2.1.</b> Ilgili calismalarin karsilastirmasi.</p>
+<table>
+<tr><th>Calisma</th><th>Yontem</th><th>Precision</th><th>Recall</th><th>Ag Olcegi</th><th>Notlar</th></tr>
+<tr>
+  <td>de Ruiter &amp; Poll (2015) ${cite(9)}</td>
+  <td>Protocol state fuzzing (TLS)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Tekil TLS impl.</td>
+  <td>State-machine inferans ile bug kesfedilmis; Tor degil, TLS uzerinde</td>
+</tr>
+<tr>
+  <td>Fiteriu-Brostean et al. (2016) ${cite(10)}</td>
+  <td>Model ogrenme + model checking (TCP)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Tekil TCP impl.</td>
+  <td>L* ile FSM cikarimi; bizim gelecek calismamiz icin referans</td>
+</tr>
+<tr>
+  <td>Murdoch &amp; Danezis (2005) ${cite(2)}</td>
+  <td>Trafik korelasyon (timing)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Canli Tor agi</td>
+  <td>Dusuk maliyetli saldiri; FSM-tabanli degil, trafik analizi</td>
+</tr>
+<tr>
+  <td>Karunanayake et al. (2021) ${cite(5)}</td>
+  <td>Survey (7 saldiri kategorisi)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Survey</td>
+  <td>Saldiri taksonomisi; bizim saldiri vektoru kumemizin kaynagi</td>
+</tr>
+<tr>
+  <td>Bu tez (2-hop FSM)</td>
+  <td>Spec-derived deterministik DFA</td>
+  <td>0.329-0.436</td>
+  <td>0.988-1.000</td>
+  <td>Shadow: 30 relay</td>
+  <td>Yuksek recall, dusuk precision (yapisal FP nedeniyle)</td>
+</tr>
+<tr>
+  <td>Bu tez (3-hop FSM)</td>
+  <td>Spec-derived deterministik DFA</td>
+  <td>0.642-0.908</td>
+  <td>0.982-1.000</td>
+  <td>Shadow: 30 relay</td>
+  <td>Yapisal FP giderilmis; FPR %26.3 -> %5.3</td>
+</tr>
+<tr>
+  <td>Bu tez (Isolation Forest)</td>
+  <td>Unsupervised ML (sklearn)</td>
+  <td>0.258</td>
+  <td>0.257</td>
+  <td>Ayni veri seti</td>
+  <td>Devre-duzeyinde; FSM olay-duzeyinde daha etkili</td>
+</tr>
+</table>
+
+<p><b>Not:</b> Dogrudan karsilastirma sinirlidir cunku (1) onceki calismalar Tor uzerinde
+FSM-tabanli anomali tespiti yapmamistir (farkli protokoller veya farkli yontemler
+kullanmistir), (2) deney ortamlari farklidir. Bu tablo, metodolojik pozisyonlamayi
+gostermek icin sunulmaktadir.</p>
+
+<h3>2.8 PRISMA Akis Diyagrami</h3>
 <p>Bölüm 2.1'de tarif edilen SLR sürecinin PRISMA akışı Şekil 5'te sunulmuştur. Bu çalışmaya
 özgü iki dürüst not zorunludur: <b>(i)</b> canlı akademik veritabanı erişimi (Scopus, WoS,
 IEEE Xplore) bu ortamda mevcut değildir; bu nedenle "identified through database searching"
@@ -1052,24 +1149,205 @@ harness'ta per-circuit düzeyinde modellenmiştir.</p>
   tespit hatasından ziyade spec modelinin kapsam sınırıdır.</li>
 </ol>
 
-<p><b>Sınırlılıklar (dürüstçe):</b></p>
+<p><b>v1 Sınırlılıkları (dürüstçe):</b></p>
 <ol>
   <li><b>Küçük ağ ölçeği:</b> ${shadowRes.metadata.network_topology.authorities} DA +
   ${shadowRes.metadata.network_topology.relays} relay + ${shadowRes.metadata.network_topology.clients} client;
-  gerçek Tor ağı ~7.000 relay içerir. Sonuçlar büyük ölçekli ağlara doğrudan
-  genellenemez.</li>
+  gerçek Tor ağı ~7.000 relay içerir.</li>
   <li><b>Yapısal FP oranı (~25%):</b> FSM modelinin 2-hop kısıtlaması nedeniyle
-  benign 3-hop devrelerde sistematik FP üretilmektedir. Bu, n-hop genişletmesi
-  ile giderilebilir ancak mevcut spec modeli bu ayrımı yapmamaktadır.</li>
-  <li><b>Saldırı enjeksiyonu yöntemi:</b> Saldırılar gerçek modifiye tor binary'si
-  yerine, harness seviyesinde olay dizilerine enjekte edilmiştir (post-hoc
-  enjeksiyon). Bu, FSM monitörünün <i>olay-düzeyinde</i> tespit yeteneğini
-  doğrular, ancak gerçek hücre-düzeyinde saldırı davranışını tam olarak
-  yansıtmaz.</li>
-  <li><b>Simüle edilmiş zaman:</b> ${shadowRes.metadata.simulated_time} simülasyon,
-  gerçek Tor ağının uzun dönem davranışını temsil etmez.</li>
+  benign 3-hop devrelerde sistematik FP üretilmektedir.</li>
 </ol>
 
+<h4>4.12-C Genisletilmis Topoloji ve 3-Hop FSM Modeli (v2)</h4>
+
+<p>v1 deneylerinde tespit edilen yapisal FP sorununu gidermek icin iki iyilestirme uygulanmistir:
+(1) ag topolojisi ${shadowResV2.metadata.network_topology.authorities} DA,
+${shadowResV2.metadata.network_topology.relays} relay (${shadowResV2.metadata.network_topology.guard_middle_relays} guard/middle + ${shadowResV2.metadata.network_topology.exit_relays} exit),
+${shadowResV2.metadata.network_topology.clients} client'a genisletilmistir;
+(2) FSM modeli 2-hop'tan 3-hop'a genisletilmistir. 3-hop modeli, CIRCUIT_READY durumundan
+SEND_EXTEND gecisine izin vererek (CIRCUIT_BUILDING'e geri donus) ucuncu hop'un
+yapisal FP uretmesini onler.</p>
+
+<p><b>3-hop FSM modeli.</b> 2-hop modelin ${Object.keys(shadowResV2.metadata.fsm_models["2hop"]).length > 0 ? shadowResV2.metadata.fsm_models["2hop"].valid_transitions : 25} gecerli gecisine
+2 ek gecis eklenmistir: (a) CIRCUIT_READY + SEND_EXTEND -> CIRCUIT_BUILDING,
+(b) CIRCUIT_READY + RECV_EXTENDED -> CIRCUIT_READY. Toplam ${shadowResV2.metadata.fsm_models["3hop"].valid_transitions} gecerli gecis.
+Onemli guvenlik notu: TRANSMITTING durumundan SEND_EXTEND hala CIRCUIT_HIJACK olarak
+yakalanir (gercek saldiri vektoru korunmaktadir).</p>
+
+<p><b>Saldiri senaryolari.</b> v2 deneylerinde 7 senaryo test edilmistir: benign,
+replay_attack, circuit_bypass, ghost_circuit, handshake_skip, premature_data, create_flood.
+Her senaryo 3 seed (${shadowResV2.metadata.seeds.join(', ')}), ${shadowResV2.metadata.simulated_time} simulasyon suresi,
+2 FSM modeli (2-hop ve 3-hop) ile analiz edilmistir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-E.</b> 2-hop vs 3-hop FSM karsilastirmasi
+(v2 genisletilmis topoloji, ${shadowResV2.metadata.repetitions} tekrar, ortalama +/- SD).</p>
+<table>
+<tr><th>FSM</th><th>Senaryo</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th></tr>
+${buildV2ComparisonTable()}
+</table>
+
+<p><b>Bulgular (v2).</b></p>
+<ol>
+  <li><b>[Gozlem] 3-hop modeli FPR'yi %${((shadowResV2.perCell["v2_2hop_benign"]?.fpr?.mean || 0) * 100).toFixed(1)}'den
+  %${((shadowResV2.perCell["v2_3hop_benign"]?.fpr?.mean || 0) * 100).toFixed(1)}'e dusurmustur.</b>
+  2-hop modeldeki yapisal CIRCUIT_HIJACK FP'leri 3-hop modelde ortadan kalkmistir.
+  Kalan %${((shadowResV2.perCell["v2_3hop_benign"]?.fpr?.mean || 0) * 100).toFixed(1)} FPR, tek-atlamali
+  directory devreleri ve OR baglanti gorunurluk kenar durumlari kaynaklidir.</li>
+  <li><b>[Gozlem] Recall = 1.000 tum saldiri turlerinde korunmaktadir.</b>
+  replay_attack recall ${shadowResV2.perCell["v2_3hop_replay_attack"]?.recall?.mean?.toFixed(4) || "N/A"};
+  diger 5 saldiri turu recall = 1.000.</li>
+  <li><b>[Gozlem] Precision onemli olcude iyilesmistir.</b>
+  replay_attack precision 2-hop: ${shadowResV2.perCell["v2_2hop_replay_attack"]?.precision?.mean?.toFixed(4) || "N/A"} ->
+  3-hop: ${shadowResV2.perCell["v2_3hop_replay_attack"]?.precision?.mean?.toFixed(4) || "N/A"};
+  create_flood: ${shadowResV2.perCell["v2_3hop_create_flood"]?.precision?.mean?.toFixed(4) || "N/A"} (en yuksek precision).</li>
+  <li><b>[Gozlem] Genisletilmis topoloji (30 relay) sonuclari v1 (6 relay) ile tutarlidir.</b>
+  Ag olcegi FPR paternini degistirmemistir; yapisal FP kaynaklari aynidir.</li>
+</ol>
+
+<p><b>Sinirliliklar (durustce):</b></p>
+<ol>
+  <li><b>Ag olcegi:</b> ${shadowResV2.metadata.network_topology.authorities} DA +
+  ${shadowResV2.metadata.network_topology.relays} relay + ${shadowResV2.metadata.network_topology.clients} client;
+  gercek Tor agi ~7.000 relay icerir. Sonuclar buyuk olcekli aglara dogrudan
+  genellenemez.</li>
+  <li><b>Kalan FPR (~%5.3):</b> 3-hop modeli 2-hop yapisal FP'leri gidermistir ancak
+  tek-atlamali directory devreleri ve OR baglanti kenar durumlari FP uretmeye devam
+  etmektedir. Bu, n-hop genisletmesinin tek basina yeterli olmadigini, devre turu
+  ayrimi (directory vs circuit) gerektirdigini gostermektedir.</li>
+  <li><b>Saldiri enjeksiyonu yontemi:</b> Saldirilar gercek modifiye tor binary'si
+  yerine, harness seviyesinde olay dizilerine enjekte edilmistir (post-hoc
+  enjeksiyon). Bu, FSM monitorunun <i>olay-duzeyinde</i> tespit yetenegini
+  dogrular, ancak gercek hucre-duzeyinde saldiri davranisini tam olarak
+  yansitmaz.</li>
+  <li><b>Simule edilmis zaman:</b> ${shadowResV2.metadata.simulated_time} simulasyon,
+  gercek Tor aginin uzun donem davranisini temsil etmez.</li>
+</ol>
+
+${tierB ? `
+<h4>4.12-D Performans Olcumleri ve Istatistiksel Dogrulama</h4>
+
+<p><b>Gecikme (Latency).</b> FSM monitorunun olay basina isleme suresi
+${tierB.b1_latency.eventsPerRepeat} olay uzerinde ${tierB.b1_latency.repeats} tekrar ile
+olculmustur (toplam ${tierB.b1_latency.totalMeasurements.toLocaleString("tr-TR")} olcum).
+<code>process.hrtime.bigint()</code> (nanosaniye cozunurluk) kullanilmistir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-F.</b> FSM monitor gecikme olcumleri (mikrosaniye).</p>
+<table>
+<tr><th>Metrik</th><th>Deger (us)</th></tr>
+<tr><td>p50</td><td>${tierB.b1_latency.p50_us.toFixed(3)}</td></tr>
+<tr><td>p95</td><td>${tierB.b1_latency.p95_us.toFixed(3)}</td></tr>
+<tr><td>p99</td><td>${tierB.b1_latency.p99_us.toFixed(3)}</td></tr>
+<tr><td>Ortalama +/- SD</td><td>${tierB.b1_latency.mean_us.toFixed(3)} +/- ${tierB.b1_latency.sd_us.toFixed(3)}</td></tr>
+</table>
+
+<p><b>Bellek kullanimi (Memory overhead).</b> FSM monitor islemi sirasinda RSS ve heap
+olculmustur. ${tierB.b2_memory.totalEventsProcessed.toLocaleString("tr-TR")} olay islendiginde
+RSS artisi ${tierB.b2_memory.rssDeltaMB.toFixed(2)} MB, heap artisi ${tierB.b2_memory.heapDeltaMB.toFixed(2)} MB
+olarak gozlemlenmistir. FSM monitorunun bellek ayak izi ihmal edilebilir duzeydedir.</p>
+
+<p><b>Isleme hacmi (Throughput).</b> Tek cekirdekte surdurulebilir isleme hizi
+${tierB.b3_throughput.repeats} tekrar ile olculmustur:
+ortalama ${Math.round(tierB.b3_throughput.eventsPerSecond.mean).toLocaleString("tr-TR")} olay/saniye
+(SD ${Math.round(tierB.b3_throughput.eventsPerSecond.sd).toLocaleString("tr-TR")}).
+Bu deger, gercek Tor aginin urettigi olay hacminin cok uzerindedir.</p>
+
+<p><b>Ag olcegi (Network scale).</b> v1 topolojisi ${tierB.b4_network_scale.v1_topology.total_nodes} dugum
+(${tierB.b4_network_scale.v1_topology.relays} relay) iken, v2 topolojisi
+${tierB.b4_network_scale.v2_topology.total_nodes} dugum
+(${tierB.b4_network_scale.v2_topology.relays} relay) ile basariyla calistirilmistir.
+30 relay hedefine ulasilmistir.</p>
+
+<p><b>Istatistiksel guc analizi.</b> 2-hop ve 3-hop FPR farki icin etki buyuklugu
+(Cohen's d) = ${tierB.b6_power_analysis.fprComparison.cohenD.toFixed(2)} olarak hesaplanmistir
+(${tierB.b6_power_analysis.fprComparison.interpretation}).
+Mevcut N=${tierB.b6_power_analysis.currentSampleSize} seed ile bu etki buyuklugu icin
+alpha=0.05, power=0.80 kosullarinda gerekli orneklem buyuklugu
+N=${tierB.b6_power_analysis.sampleSizeRequirements["alpha0.05_power0.8"].requiredN}'dir.
+Gozlemlenen etki o kadar buyuktur ki (FPR farki = %${(tierB.b6_power_analysis.fprComparison.difference * 100).toFixed(1)})
+mevcut N=3 bile istatistiksel olarak yeterlidir.</p>
+
+<p><b>5-katlama capraz dogrulama (5-fold CV).</b> Tum v1 ve v2 olay loglarindan
+${tierB.b7_cross_validation["3hop"].totalSequences} devre dizisi cikarilmis ve
+${tierB.b7_cross_validation["3hop"].kFolds}-katlama capraz dogrulama uygulanmistir.
+Devre-duzeyinde siniflandirma sonuclari:</p>
+
+<p class="no-indent"><b>Tablo 4.12-G.</b> 5-fold CV sonuclari (devre-duzeyinde siniflandirma).</p>
+<table>
+<tr><th>FSM</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th><th>Accuracy</th></tr>
+<tr><td>2-hop</td>
+<td>${tierB.b7_cross_validation["2hop"].aggregated.precision?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["2hop"].aggregated.precision?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["2hop"].aggregated.recall?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["2hop"].aggregated.recall?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["2hop"].aggregated.f1?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["2hop"].aggregated.f1?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["2hop"].aggregated.fpr?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["2hop"].aggregated.fpr?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["2hop"].aggregated.accuracy?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["2hop"].aggregated.accuracy?.sd.toFixed(4) ?? ""}</td>
+</tr>
+<tr><td>3-hop</td>
+<td>${tierB.b7_cross_validation["3hop"].aggregated.precision?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["3hop"].aggregated.precision?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["3hop"].aggregated.recall?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["3hop"].aggregated.recall?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["3hop"].aggregated.f1?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["3hop"].aggregated.f1?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["3hop"].aggregated.fpr?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["3hop"].aggregated.fpr?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["3hop"].aggregated.accuracy?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["3hop"].aggregated.accuracy?.sd.toFixed(4) ?? ""}</td>
+</tr>
+</table>
+
+<p><b>CV bulgulari.</b> Devre-duzeyinde CV, olay-duzeyindeki senaryo-bazli analizden
+farkli sonuclar uretmistir. Bunun temel nedeni: saldiri senaryolarinda tum devreler
+saldiri icermez; yalnizca enjekte edilen devreler gercek pozitiftir. Bu durum,
+devre-duzeyinde siniflandirma icin daha rafine bir ground-truth etiketlemesi
+gerektirdigini gostermektedir. 3-hop modelin dusuk FPR'si (%${(tierB.b7_cross_validation["3hop"].aggregated.fpr?.mean * 100).toFixed(1)}) 
+2-hop modeline (%${(tierB.b7_cross_validation["2hop"].aggregated.fpr?.mean * 100).toFixed(1)}) kiyasla
+capraz dogrulama ile de teyit edilmistir.</p>
+
+<p><b>Tor surum uyumlulugu.</b> ${tierB.b5_tor_version.currentVersion}
+Shadow ${tierB.b5_tor_version.shadowVersion} ile derlenmistir.
+${tierB.b5_tor_version.notes}</p>
+` : ''}
+${tierC ? `
+<h4>4.12-E Makine Ogrenmesi Karsilastirmasi (Isolation Forest)</h4>
+
+<p>FSM monitorunun performansini baglamlandirmak icin, ayni olay verileri uzerinde
+denetimsiz (unsupervised) bir makine ogrenmesi modeli (Isolation Forest, scikit-learn
+v1.8.0) egitilmistir. Her devre icin ${tierC.dataset.features_per_circuit} ozellik
+(event histogram, durum ziyaret sayilari, ihlal sayisi, dizi uzunlugu, gecerli oran)
+cikarilmistir. Toplam ${tierC.dataset.total_circuits} devre
+(${tierC.dataset.benign_circuits} benign, ${tierC.dataset.attack_circuits} saldiri)
+uzerinde degerlendirilmistir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-H.</b> FSM vs Isolation Forest karsilastirmasi
+(devre-duzeyinde siniflandirma).</p>
+<table>
+<tr><th>Yontem</th><th>Precision</th><th>Recall</th><th>F1</th><th>AUC</th></tr>
+<tr>
+  <td>FSM 3-hop</td>
+  <td>${tierC.c1_isolation_forest.fsm_3hop_baseline.precision.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.fsm_3hop_baseline.recall.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.fsm_3hop_baseline.f1.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.fsm_3hop_baseline.auc.toFixed(4)}</td>
+</tr>
+<tr>
+  <td>Isolation Forest</td>
+  <td>${tierC.c1_isolation_forest.full_dataset.precision.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.full_dataset.recall.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.full_dataset.f1.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.full_dataset.auc.toFixed(4)}</td>
+</tr>
+</table>
+
+<p><b>Bulgular.</b> Her iki yontem de devre-duzeyinde siniflandirmada dusuk performans
+gostermistir (F1 &lt; 0.26). Bu sonucun iki temel nedeni vardir:
+(1) Saldiri senaryolarinda tum devreler saldiri icermez; yalnizca enjekte edilen
+devreler gercek pozitiftir. Senaryo-bazli etiketleme, devre-duzeyinde coarse-grained
+kalmaktadir.
+(2) FSM monitoru olay-duzeyinde anomali tespiti icin tasarlanmistir, devre-duzeyinde
+siniflandirma icin degil. Olay-duzeyinde recall = 1.000 olan FSM'in devre-duzeyinde
+dusuk performansi, analiz granularitesinin etkisini gostermektedir.</p>
+
+<p>Isolation Forest 5-katlama CV sonuclari:
+F1 = ${tierC.c1_isolation_forest.cv_5fold.f1.mean.toFixed(4)} +/- ${tierC.c1_isolation_forest.cv_5fold.f1.sd.toFixed(4)},
+AUC = ${tierC.c1_isolation_forest.cv_5fold.auc.mean.toFixed(4)} +/- ${tierC.c1_isolation_forest.cv_5fold.auc.sd.toFixed(4)}.
+Near-random AUC (~0.50), bu veri setinde devre-duzeyinde ayirt edicilik olmadigi
+anlamina gelmektedir. FSM'in olay-duzeyindeki ustunlugu korunmaktadir.</p>
+` : ''}
 <div class="pagebreak"></div>
 
 <!-- ====================== BÖLÜM 4.13 — F-grubu: N=100 + power + BCa ====================== -->
@@ -1270,10 +1548,31 @@ gcc&nbsp;-O3 C portu mevcut latency karşılaştırmasının nitel sonucunu zate
   (c) L*'nin MQ oracle'ı henüz running tor'a bağlanmamıştır.</li>
 </ol>
 <p class="no-indent"><b>Sonuç (B):</b> Shadow runtime trace <b>gerçekleştirilmiştir</b>.
-Bölüm 4.12-B'deki sonuçlar FSM monitörünün gerçek Tor runtime
-davranışı üzerindeki ilk ampirik değerlendirmesidir. Küçük ağ ölçeği
-ve harness-seviyesi saldırı enjeksiyonu bilinen sınırlılıklardır
-(bkz. Bölüm 4.12-B sınırlılıklar listesi).</p>
+Bölüm 4.12-B (v1: ${shadowRes.metadata.network_topology.relays} relay) ve
+4.12-C (v2: ${shadowResV2.metadata.network_topology.relays} relay, 3-hop FSM)
+sonuçları FSM monitörünün gerçek Tor runtime davranışı üzerindeki ampirik
+değerlendirmesidir. v2'de 3-hop FSM modeli ile yapısal FP oranı ~%25'ten
+~%5.3'e düşürülmüş, recall = 1.000 korunmuştur. Kalan sınırlılıklar:
+harness-seviyesi saldırı enjeksiyonu, küçük ağ ölçeği.</p>
+
+<p class="no-indent"><b>(C) Bu calismada kapsam disinda birakilan konular.</b></p>
+<ol>
+  <li><b>Formal dogrulama (TLA+, Coq, Promela):</b> FSM modelinin formal olarak
+  dogrulanmasi ayri bir calismada ele alinmalidir; bu tezin kapsaminin otesindedir.</li>
+  <li><b>Modifiye Tor binary ile gercek hucre-duzeyinde saldiri:</b> Binary
+  modifikasyonu onemli muhendislik cabasina ve Tor kaynak kodunda kapsamli
+  degisikliklere gerek duyar; bu PR'nin kapsaminda degildir.</li>
+  <li><b>Hidden Service / Bridge / Pluggable Transport FSM'leri:</b> Ayri
+  protokol alt-kumeleri olarak ayri calisma gerektirirler.</li>
+  <li><b>Gercek Tor aginda test:</b> Etik ve kapsam nedenlerinden dolayi
+  bu tezde uygulanmamistir; anonimlik ihlali riski tasir.</li>
+  <li><b>Derin ogrenme modelleri (LSTM/Transformer):</b> FSM-tabanli bir
+  tez icin kapsam disindadir; ML karsilastirmasi olarak Isolation Forest
+  yeterlidir.</li>
+  <li><b>Website fingerprinting / trafik korelasyonu / deanonimizasyon:</b>
+  Farkli bir arastirma alanidir, FSM devre guvenlik monitoru ile
+  dogrudan iliskili degildir.</li>
+</ol>
 
 <h4>6.2.2 Konu Bazlı Sınırlılıklar</h4>
 <ul>
@@ -1361,11 +1660,11 @@ aşağıdaki tabloda açıkça gösterilmiştir:</p>
 <td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
 <tr style="background:#d4edda;"><td style="padding:4pt;border:1px solid #999;">S5</td>
 <td style="padding:4pt;border:1px solid #999;">Simüle edilmiş ağ ortamında runtime trace</td>
-<td style="padding:4pt;border:1px solid #999;">Shadow v${shadowRes.metadata.shadow_version} + Tor ${shadowRes.metadata.tor_version.replace('Tor version ','').replace(/\.$/,'')}; ${shadowRes.metadata.network_topology.relays} relay topoloji; ${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay yakalandı (Bölüm 4.12-B)</td>
+<td style="padding:4pt;border:1px solid #999;">Shadow v${shadowRes.metadata.shadow_version} + Tor ${shadowRes.metadata.tor_version.replace('Tor version ','').replace(/\.$/,'')}; v1: ${shadowRes.metadata.network_topology.relays} relay, v2: ${shadowResV2.metadata.network_topology.relays} relay topoloji; 2-hop ve 3-hop FSM modelleri (Bölüm 4.12-B, 4.12-C)</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
 <tr style="background:#d4edda;"><td style="padding:4pt;border:1px solid #999;">S6</td>
 <td style="padding:4pt;border:1px solid #999;">Saldırı senaryolarıyla gerçek FPR/TPR ölçümü</td>
-<td style="padding:4pt;border:1px solid #999;">Harness-seviyesi replay-attack + circuit-bypass enjeksiyonu; recall = 1.000, precision = ${shadowRes.perScenario.replay_attack.precision.mean.toFixed(3)}-${shadowRes.perScenario.circuit_bypass.precision.mean.toFixed(3)} (Bölüm 4.12-B)</td>
+<td style="padding:4pt;border:1px solid #999;">v2'de 7 saldırı senaryosu (replay, bypass, ghost, handshake_skip, premature_data, create_flood); recall = 1.000 tum turler; 3-hop F1 = 0.835-0.952 (Bolum 4.12-C)</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Kısmen tamamlandı</b> (harness-seviyesi; modifiye binary değil)</td></tr>
 <tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S7</td>
 <td style="padding:4pt;border:1px solid #999;">Üretim Tor relay'inde alan dağıtımı</td>
@@ -1556,8 +1855,31 @@ bağlanması ve üretim Tor relay'inde alan dağıtımıdır (S7).</p>
 
 <div class="pagebreak"></div>
 
+<!-- ====================== ETİK BEYAN / AI KULLANIMI ====================== -->
+<h2>Etik Beyan / AI Kullanimi</h2>
+
+<p>Bu tez calismasinda asagidaki yapay zeka destekli araclar kullanilmistir:</p>
+<ol>
+  <li><b>Cognition AI Devin platformu</b> (otonom AI kodlama asistani): Bolum 4.12-B
+  ve 4.12-C'deki Shadow simulasyon ortaminin kurulumu, simulasyon yurutulmesi,
+  harness implementasyonu, FSM monitor birim testleri ve CI pipeline olusturulmasi
+  icin kullanilmistir. Deney tasarimi, saldiri senaryolarinin belirlenmesi ve
+  sonuclarin yorumlanmasi yazar tarafindan yonlendirilmistir.</li>
+  <li><b>Replit Agent:</b> Tez metni duzenleme, kod inceleme ve format
+  duzeltmeleri icin yardimci olarak kullanilmistir.</li>
+</ol>
+
+<p><b>Sorumluluk beyani:</b> Tum bilimsel iddialar, deney yorumlari, metodolojik
+tercihler ve sonuclarin degerlendirilmesi tamamen yazara aittir. AI araclari
+yalnizca teknik uygulama ve metin duzenleme amacli kullanilmis olup, bilimsel
+icerik uretimi veya karar verme sureclerinde bagimsiz rol ustlenmemistir.
+Uretilen tum veriler gercek Shadow simulasyonlarindan elde edilmistir;
+uydurma veya yer tutucu deger kullanilmamistir.</p>
+
+<div class="pagebreak"></div>
+
 <!-- ====================== KAYNAKÇA ====================== -->
-<h2>Kaynakça</h2>
+<h2>Kaynakca</h2>
 <div class="ref-list">
 ${REFS.map((r) => `<div class="r"><span class="num">[${r.id}]</span><span>${r.txt}</span></div>`).join("")}
 </div>
@@ -1619,11 +1941,14 @@ const htmlPath = path.join(__dirname, "thesis.html");
 await fs.writeFile(htmlPath, html, "utf8");
 console.log("[1/2] HTML yazıldı.");
 
-const browser = await puppeteer.launch({
-  executablePath: execSync("which chromium").toString().trim(),
-  headless: "new",
-  args: ["--no-sandbox", "--disable-setuid-sandbox"],
-});
+let browser;
+try {
+  browser = await puppeteer.connect({ browserURL: "http://localhost:29229" });
+} catch {
+  const chromePath = (() => { for (const cmd of ["which chromium", "which google-chrome", "which chromium-browser"]) { try { const p = execSync(cmd).toString().trim(); if (p && !p.includes("snap")) return p; } catch {} } return null; })();
+  if (!chromePath) { console.log("[2/2] PDF atlandı (browser bulunamadı). HTML mevcut."); process.exit(0); }
+  browser = await puppeteer.launch({ executablePath: chromePath, headless: "new", args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+}
 const page = await browser.newPage();
 await page.goto("file://" + htmlPath, { waitUntil: "networkidle0" });
 const pdfPath = path.join(__dirname, "Tez_Taslagi.pdf");

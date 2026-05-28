@@ -7,7 +7,9 @@ const W = 720;
 
 // Figure 1: FSM directed graph. Circular layout for 10 states, 25 edges from VALID.
 export function fsmGraphSvg() {
-  const cx = 360, cy = 300, R = 220;
+  const cx = 360,
+    cy = 300,
+    R = 220;
   const n = STATES.length;
   const pos = {};
   STATES.forEach((s, i) => {
@@ -42,19 +44,26 @@ export function fsmGraphSvg() {
   // edges
   for (const [id, evs] of grouped) {
     const [from, to] = id.split(">>");
-    const a = pos[from], b = pos[to];
+    const a = pos[from],
+      b = pos[to];
     if (from === to) {
       // self-loop
       svg += `<path d="M ${a.x + 24} ${a.y - 8} c 30 -30, 60 -30, 30 0" stroke="#a55" fill="none" marker-end="url(#arrSelf)"/>`;
       svg += `<text x="${a.x + 38}" y="${a.y - 26}" fill="#a55">${evs.join(",")}</text>`;
     } else {
-      const dx = b.x - a.x, dy = b.y - a.y, len = Math.sqrt(dx * dx + dy * dy);
-      const ux = dx / len, uy = dy / len;
+      const dx = b.x - a.x,
+        dy = b.y - a.y,
+        len = Math.sqrt(dx * dx + dy * dy);
+      const ux = dx / len,
+        uy = dy / len;
       // node radius offset = 22
-      const x1 = a.x + ux * 22, y1 = a.y + uy * 22;
-      const x2 = b.x - ux * 22, y2 = b.y - uy * 22;
+      const x1 = a.x + ux * 22,
+        y1 = a.y + uy * 22;
+      const x2 = b.x - ux * 22,
+        y2 = b.y - uy * 22;
       // slight perpendicular curve for legibility
-      const mx = (x1 + x2) / 2 - uy * 16, my = (y1 + y2) / 2 + ux * 16;
+      const mx = (x1 + x2) / 2 - uy * 16,
+        my = (y1 + y2) / 2 + ux * 16;
       svg += `<path d="M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/>`;
       svg += `<text x="${mx}" y="${my}" fill="#234" text-anchor="middle">${evs.join(",")}</text>`;
     }
@@ -62,7 +71,12 @@ export function fsmGraphSvg() {
   // nodes
   for (const s of STATES) {
     const p = pos[s];
-    const fill = s === "IDLE" ? "#cfe9d6" : (s === "CLOSED" || s === "ERROR") ? "#f1d4d4" : "#dde7f4";
+    const fill =
+      s === "IDLE"
+        ? "#cfe9d6"
+        : s === "CLOSED" || s === "ERROR"
+          ? "#f1d4d4"
+          : "#dde7f4";
     svg += `<circle cx="${p.x}" cy="${p.y}" r="22" fill="${fill}" stroke="#234" stroke-width="1"/>`;
     svg += `<text x="${p.x}" y="${p.y + 3}" text-anchor="middle" font-size="8" font-weight="bold">${s}</text>`;
   }
@@ -73,19 +87,27 @@ export function fsmGraphSvg() {
 
 // Figure 2: State × Event matrix coloured by validity / attack severity.
 export function attackHeatmapSvg() {
-  const cellW = 46, cellH = 28;
-  const offX = 130, offY = 60;
+  const cellW = 46,
+    cellH = 28;
+  const offX = 130,
+    offY = 60;
   const totalW = offX + EVENTS.length * cellW + 20;
   const totalH = offY + STATES.length * cellH + 60;
 
-  const sevColor = { LOW: "#fde68a", MEDIUM: "#fcb464", HIGH: "#f37b6b", CRITICAL: "#c43d3d" };
+  const sevColor = {
+    LOW: "#fde68a",
+    MEDIUM: "#fcb464",
+    HIGH: "#f37b6b",
+    CRITICAL: "#c43d3d",
+  };
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalW} ${totalH}" font-family="Helvetica,Arial,sans-serif" font-size="8">`;
   svg += `<text x="${totalW / 2}" y="20" text-anchor="middle" font-size="13" font-weight="bold">Şekil 2: δ-domeni matrisi (yeşil=geçerli, kırmızı tonları=invalid)</text>`;
   svg += `<text x="${totalW / 2}" y="38" text-anchor="middle" font-size="9" fill="#555">Hücre etiketi: invalid'lerde saldırı sınıfı kısaltması; geçerli hücrede hedef durum</text>`;
 
   // event headers (rotated)
   EVENTS.forEach((e, i) => {
-    const x = offX + i * cellW + cellW / 2, y = offY - 6;
+    const x = offX + i * cellW + cellW / 2,
+      y = offY - 6;
     svg += `<text x="${x}" y="${y}" text-anchor="end" transform="rotate(-50 ${x} ${y})" font-size="8">${e}</text>`;
   });
   // state row labels
@@ -95,11 +117,14 @@ export function attackHeatmapSvg() {
   // cells
   STATES.forEach((s, j) => {
     EVENTS.forEach((e, i) => {
-      const x = offX + i * cellW, y = offY + j * cellH;
+      const x = offX + i * cellW,
+        y = offY + j * cellH;
       const valid = VALID[k(s, e)];
       const fill = valid ? "#bce5c8" : sevColor[classifyInvalid(s, e).severity];
       svg += `<rect x="${x}" y="${y}" width="${cellW - 1}" height="${cellH - 1}" fill="${fill}" stroke="#fff"/>`;
-      const label = valid ? valid.slice(0, 6) : abbrevAttack(classifyInvalid(s, e).type);
+      const label = valid
+        ? valid.slice(0, 6)
+        : abbrevAttack(classifyInvalid(s, e).type);
       svg += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 3}" text-anchor="middle" font-size="7">${label}</text>`;
     });
   });
@@ -108,8 +133,11 @@ export function attackHeatmapSvg() {
   const legendY = offY + STATES.length * cellH + 18;
   let lx = offX;
   const legend = [
-    ["Valid", "#bce5c8"], ["LOW", sevColor.LOW], ["MEDIUM", sevColor.MEDIUM],
-    ["HIGH", sevColor.HIGH], ["CRITICAL", sevColor.CRITICAL],
+    ["Valid", "#bce5c8"],
+    ["LOW", sevColor.LOW],
+    ["MEDIUM", sevColor.MEDIUM],
+    ["HIGH", sevColor.HIGH],
+    ["CRITICAL", sevColor.CRITICAL],
   ];
   legend.forEach(([lbl, c]) => {
     svg += `<rect x="${lx}" y="${legendY}" width="16" height="10" fill="${c}" stroke="#888"/>`;
@@ -120,9 +148,18 @@ export function attackHeatmapSvg() {
   return svg;
 }
 function abbrevAttack(t) {
-  return ({ CIRCUIT_BYPASS: "BYPS", REPLAY_ATTACK: "REPL", GHOST_CIRCUIT: "GHST",
-    HANDSHAKE_SKIP: "HSKP", PREMATURE_DATA: "PDAT", CIRCUIT_HIJACK: "HIJK",
-    CREATE_FLOOD: "CFLD", INVALID_TRANSITION: "INV" })[t] || t.slice(0, 4);
+  return (
+    {
+      CIRCUIT_BYPASS: "BYPS",
+      REPLAY_ATTACK: "REPL",
+      GHOST_CIRCUIT: "GHST",
+      HANDSHAKE_SKIP: "HSKP",
+      PREMATURE_DATA: "PDAT",
+      CIRCUIT_HIJACK: "HIJK",
+      CREATE_FLOOD: "CFLD",
+      INVALID_TRANSITION: "INV",
+    }[t] || t.slice(0, 4)
+  );
 }
 
 // Figure 3: Bar chart comparing mean SC / TC / ITDR across algorithms with SD whiskers.
@@ -130,10 +167,21 @@ export function metricBarChart(stats) {
   // stats = { B1_Random: {sc: {mean,sd}, tc:{...}, itdr:{...}}, B2:..., B3:... }
   const algos = Object.keys(stats);
   const metrics = ["sc", "tc", "itdr"];
-  const labels = { sc: "State Coverage", tc: "Transition Coverage", itdr: "ITDR" };
-  const colors = { B1_Random: "#9aa6b8", B2_GreedySC: "#3b82c4", B3_MDT: "#1d8b5d" };
+  const labels = {
+    sc: "State Coverage",
+    tc: "Transition Coverage",
+    itdr: "ITDR",
+  };
+  const colors = {
+    B1_Random: "#9aa6b8",
+    B2_GreedySC: "#3b82c4",
+    B3_MDT: "#1d8b5d",
+  };
 
-  const left = 60, top = 50, plotW = 600, plotH = 280;
+  const left = 60,
+    top = 50,
+    plotW = 600,
+    plotH = 280;
   const groupW = plotW / metrics.length;
   const barW = (groupW - 30) / algos.length;
 
@@ -143,14 +191,15 @@ export function metricBarChart(stats) {
   for (let i = 0; i <= 10; i++) {
     const y = top + plotH - (i / 10) * plotH;
     svg += `<line x1="${left}" y1="${y}" x2="${left + plotW}" y2="${y}" stroke="#eee"/>`;
-    svg += `<text x="${left - 6}" y="${y + 3}" text-anchor="end" font-size="8">${(i * 10)}%</text>`;
+    svg += `<text x="${left - 6}" y="${y + 3}" text-anchor="end" font-size="8">${i * 10}%</text>`;
   }
   // bars
   metrics.forEach((mk, mi) => {
     const gx = left + mi * groupW + 15;
     svg += `<text x="${gx + (groupW - 30) / 2}" y="${top + plotH + 16}" text-anchor="middle" font-size="10" font-weight="bold">${labels[mk]}</text>`;
     algos.forEach((a, ai) => {
-      const m = stats[a][mk].mean, s = stats[a][mk].sd;
+      const m = stats[a][mk].mean,
+        s = stats[a][mk].sd;
       const h = m * plotH;
       const x = gx + ai * barW;
       const y = top + plotH - h;
@@ -178,9 +227,17 @@ export function severitySplitSvg(severityCounts) {
   // severityCounts = { B1_Random: {LOW,MEDIUM,HIGH,CRITICAL}, ... } (mean per trial)
   const algos = Object.keys(severityCounts);
   const sevs = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
-  const colors = { LOW: "#fde68a", MEDIUM: "#fcb464", HIGH: "#f37b6b", CRITICAL: "#c43d3d" };
+  const colors = {
+    LOW: "#fde68a",
+    MEDIUM: "#fcb464",
+    HIGH: "#f37b6b",
+    CRITICAL: "#c43d3d",
+  };
 
-  const left = 100, top = 50, plotW = 540, plotH = 240;
+  const left = 100,
+    top = 50,
+    plotW = 540,
+    plotH = 240;
   const barH = plotH / algos.length - 16;
 
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} 360" font-family="Helvetica,Arial,sans-serif" font-size="10">`;
@@ -193,7 +250,8 @@ export function severitySplitSvg(severityCounts) {
     sevs.forEach((s) => {
       const w = (severityCounts[a][s] / total) * plotW;
       svg += `<rect x="${x}" y="${y}" width="${w}" height="${barH}" fill="${colors[s]}"/>`;
-      if (w > 28) svg += `<text x="${x + w / 2}" y="${y + barH / 2 + 3}" text-anchor="middle" font-size="9">${severityCounts[a][s].toFixed(1)}</text>`;
+      if (w > 28)
+        svg += `<text x="${x + w / 2}" y="${y + barH / 2 + 3}" text-anchor="middle" font-size="9">${severityCounts[a][s].toFixed(1)}</text>`;
       x += w;
     });
     svg += `<text x="${left + plotW + 8}" y="${y + barH / 2 + 3}" font-size="9" fill="#555">Σ=${total.toFixed(1)}</text>`;

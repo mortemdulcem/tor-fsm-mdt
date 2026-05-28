@@ -5,8 +5,17 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 import {
-  STATES, EVENTS, VALID, validKeys, totalDomain, totalValid, totalInvalid,
-  classifyInvalid, type State, type Event, k,
+  STATES,
+  EVENTS,
+  VALID,
+  validKeys,
+  totalDomain,
+  totalValid,
+  totalInvalid,
+  classifyInvalid,
+  type State,
+  type Event,
+  k,
 } from "./fsm";
 
 // --- Legacy random simulator (preserved for "Initialize Sandbox Run" button) ---
@@ -19,13 +28,15 @@ async function runRandomSimulation(testRunId: number, count: number) {
 
     // 70% bias toward a valid next event from current state
     if (Math.random() > 0.3) {
-      const candidates = EVENTS.filter((e) => VALID[k(currentState, e)] !== undefined);
+      const candidates = EVENTS.filter(
+        (e) => VALID[k(currentState, e)] !== undefined,
+      );
       if (candidates.length > 0) {
         nextEvent = candidates[Math.floor(Math.random() * candidates.length)];
       }
     }
 
-    const next = VALID[k(currentState, nextEvent)];
+    const next: State | undefined = VALID[k(currentState, nextEvent)];
     const isValid = !!next;
 
     await storage.createTransition({
@@ -58,7 +69,9 @@ async function runRandomSimulation(testRunId: number, count: number) {
 // BFS in the δ-graph to find the shortest event sequence from IDLE to a target state.
 function findPathTo(target: State): Event[] | null {
   if (target === "IDLE") return [];
-  const queue: Array<{ state: State; path: Event[] }> = [{ state: "IDLE", path: [] }];
+  const queue: Array<{ state: State; path: Event[] }> = [
+    { state: "IDLE", path: [] },
+  ];
   const seen = new Set<State>(["IDLE"]);
   while (queue.length) {
     const { state, path } = queue.shift()!;
@@ -191,7 +204,8 @@ async function computeMetricsForRun(testRunId: number): Promise<MdtMetrics> {
       if (isValidInSpec) coveredValid.add(key);
       else falsePositives++; // marked valid but spec says invalid
     } else {
-      if (isValidInSpec) falsePositives++; // marked invalid but spec says valid
+      if (isValidInSpec)
+        falsePositives++; // marked invalid but spec says valid
       else detectedInvalid.add(key);
     }
   }
@@ -211,7 +225,10 @@ async function computeMetricsForRun(testRunId: number): Promise<MdtMetrics> {
   };
 }
 
-export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
+export async function registerRoutes(
+  httpServer: Server,
+  app: Express,
+): Promise<Server> {
   app.get(api.testRuns.list.path, async (_req, res) => {
     const runs = await storage.getTestRuns();
     res.json(runs);
@@ -223,7 +240,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       const run = await storage.createTestRun(input);
       res.status(201).json(run);
     } catch (err) {
-      if (err instanceof z.ZodError) return res.status(400).json({ message: err.errors[0].message });
+      if (err instanceof z.ZodError)
+        return res.status(400).json({ message: err.errors[0].message });
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -235,11 +253,15 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   app.get(api.transitions.list.path, async (req, res) => {
-    res.json(await storage.getTransitionsByTestRun(Number(req.params.testRunId)));
+    res.json(
+      await storage.getTransitionsByTestRun(Number(req.params.testRunId)),
+    );
   });
 
   app.get(api.violations.list.path, async (req, res) => {
-    res.json(await storage.getViolationsByTestRun(Number(req.params.testRunId)));
+    res.json(
+      await storage.getViolationsByTestRun(Number(req.params.testRunId)),
+    );
   });
 
   app.get(api.violations.listAll.path, async (_req, res) => {
@@ -250,7 +272,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     try {
       const input = api.fsm.simulate.input.parse(req.body);
       const testRun = await storage.getTestRun(input.testRunId);
-      if (!testRun) return res.status(404).json({ message: "Test run not found" });
+      if (!testRun)
+        return res.status(404).json({ message: "Test run not found" });
 
       storage.updateTestRunStatus(input.testRunId, "running").then(() => {
         runRandomSimulation(input.testRunId, input.count)
@@ -262,7 +285,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       });
       res.json({ message: "Simulation started" });
     } catch (err) {
-      if (err instanceof z.ZodError) return res.status(400).json({ message: err.errors[0].message });
+      if (err instanceof z.ZodError)
+        return res.status(400).json({ message: err.errors[0].message });
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -287,7 +311,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     try {
       const input = z.object({ testRunId: z.number() }).parse(req.body);
       const testRun = await storage.getTestRun(input.testRunId);
-      if (!testRun) return res.status(404).json({ message: "Test run not found" });
+      if (!testRun)
+        return res.status(404).json({ message: "Test run not found" });
 
       await storage.updateTestRunStatus(input.testRunId, "running");
       try {
@@ -300,7 +325,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         res.status(500).json({ message: "MDT execution failed" });
       }
     } catch (err) {
-      if (err instanceof z.ZodError) return res.status(400).json({ message: err.errors[0].message });
+      if (err instanceof z.ZodError)
+        return res.status(400).json({ message: err.errors[0].message });
       res.status(500).json({ message: "Internal server error" });
     }
   });

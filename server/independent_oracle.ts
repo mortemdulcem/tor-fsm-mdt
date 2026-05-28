@@ -11,7 +11,11 @@ import { STATES, EVENTS, type State, type Event } from "./fsm.ts";
 
 // Her invariant: (s, e) çiftinin "izinli" olup olmadığına karar verir.
 // Spec referansı: tor-spec.txt — bölüm numaraları yorum olarak.
-const INVARIANTS: { name: string; spec: string; allows: (s: State, e: Event) => boolean }[] = [
+const INVARIANTS: {
+  name: string;
+  spec: string;
+  allows: (s: State, e: Event) => boolean;
+}[] = [
   {
     name: "I1_CONNECT_ONLY_IDLE",
     spec: "§2: A TLS connection is initiated only when the OP has no existing connection.",
@@ -20,7 +24,10 @@ const INVARIANTS: { name: string; spec: string; allows: (s: State, e: Event) => 
   {
     name: "I2_TLS_AFTER_CONNECT",
     spec: "§2: TLS handshake events occur only on an active in-progress connection.",
-    allows: (s, e) => (e !== "TLS_OK" && e !== "TLS_FAIL") || s === "CONNECTING" || (e === "TLS_FAIL" && s === "TLS_HANDSHAKE"),
+    allows: (s, e) =>
+      (e !== "TLS_OK" && e !== "TLS_FAIL") ||
+      s === "CONNECTING" ||
+      (e === "TLS_FAIL" && s === "TLS_HANDSHAKE"),
   },
   {
     name: "I3_CREATE_AFTER_TLS",
@@ -35,22 +42,31 @@ const INVARIANTS: { name: string; spec: string; allows: (s: State, e: Event) => 
   {
     name: "I5_EXTEND_DURING_BUILD",
     spec: "§5.2: EXTEND/EXTENDED only during multi-hop circuit construction (CIRCUIT_BUILDING).",
-    allows: (s, e) => (e !== "SEND_EXTEND" && e !== "RECV_EXTENDED") || s === "CIRCUIT_BUILDING",
+    allows: (s, e) =>
+      (e !== "SEND_EXTEND" && e !== "RECV_EXTENDED") ||
+      s === "CIRCUIT_BUILDING",
   },
   {
     name: "I6_DATA_AFTER_READY",
     spec: "§6.1: RELAY_DATA cells require an established circuit (CIRCUIT_READY or TRANSMITTING).",
-    allows: (s, e) => (e !== "SEND_RELAY_DATA" && e !== "RECV_RELAY_DATA") || s === "CIRCUIT_READY" || s === "TRANSMITTING",
+    allows: (s, e) =>
+      (e !== "SEND_RELAY_DATA" && e !== "RECV_RELAY_DATA") ||
+      s === "CIRCUIT_READY" ||
+      s === "TRANSMITTING",
   },
   {
     name: "I7_DESTROY_ON_LIVE_CIRC",
     spec: "§5.4: DESTROY tears down an existing circuit (CIRCUIT_READY or TRANSMITTING).",
-    allows: (s, e) => (e !== "SEND_DESTROY" && e !== "RECV_DESTROY") || s === "CIRCUIT_READY" || s === "TRANSMITTING",
+    allows: (s, e) =>
+      (e !== "SEND_DESTROY" && e !== "RECV_DESTROY") ||
+      s === "CIRCUIT_READY" ||
+      s === "TRANSMITTING",
   },
   {
     name: "I8_CLOSED_AFTER_TEARDOWN",
     spec: "§5.4: CIRCUIT_CLOSED notification only after CLOSING or ERROR.",
-    allows: (s, e) => e !== "CIRCUIT_CLOSED" || s === "CLOSING" || s === "ERROR",
+    allows: (s, e) =>
+      e !== "CIRCUIT_CLOSED" || s === "CLOSING" || s === "ERROR",
   },
   {
     name: "I9_TIMEOUT_NOT_TERMINAL",
@@ -68,4 +84,7 @@ export function oracleAllows(s: State, e: Event): boolean {
   return true;
 }
 
-export const ORACLE_INVARIANTS = INVARIANTS.map((i) => ({ name: i.name, spec: i.spec }));
+export const ORACLE_INVARIANTS = INVARIANTS.map((i) => ({
+  name: i.name,
+  spec: i.spec,
+}));

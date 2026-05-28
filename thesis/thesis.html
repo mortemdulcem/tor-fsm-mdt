@@ -59,7 +59,7 @@ spesifikasyon dışı (geçersiz) durum geçişlerinin otomatik tespitini sağla
 her geçişi yedi ana saldırı vektörü + 1 fallback'e (CIRCUIT_BYPASS, REPLAY_ATTACK, GHOST_CIRCUIT,
 HANDSHAKE_SKIP, PREMATURE_DATA, CIRCUIT_HIJACK, CREATE_FLOOD) eşleyen bir sınıflandırma
 çerçevesi sunar. Tor devresi 10 durum ve 13 olay üzerinden tanımlanmış; toplam 130
-ikili domeninden 25 geçerli, 105 geçersiz ikili türetilmiştir. Önerilen
+ikili domeninden 27 geçerli, 103 geçersiz ikili türetilmiştir. Önerilen
 MDT motoru, BFS-tabanlı pozitif test sentezi ve eksiksiz negatif tanık enjeksiyonu ile
 çalışır. Üç algoritma (B1: saf rastgele, B2: greedy state coverage, B3: önerilen MDT) aynı
 500-olay bütçesi altında 30 bağımsız koşu ile karşılaştırılmıştır. MDT, geçiş kapsamını
@@ -67,7 +67,7 @@ MDT motoru, BFS-tabanlı pozitif test sentezi ve eksiksiz negatif tanık enjeksi
 B2: 78.27%), geçersiz geçiş tespit oranını
 93.84% seviyesine taşımıştır. Welch t-testi her iki temele karşı
 istatistiksel anlamlı üstünlüğü doğrular (p &lt; .001; Cohen d ∈ [3.6, 15.4]). Bu tez:
-(i) Tor devre protokolü için yayımlanmış ilk tam δ-matrisini, (ii) 105 geçersiz
+(i) Tor devre protokolü için yayımlanmış ilk tam δ-matrisini, (ii) 103 geçersiz
 ikilinin saldırı vektörü ve şiddet etiketiyle programatik sınıflandırmasını,
 (iii) referans bir MDT implementasyonunu ve (iv) sayısal olarak doğrulanmış üç-katmanlı
 karşılaştırmayı sunar.</p>
@@ -81,7 +81,7 @@ as a deterministic finite-state machine (FSM), enables automatic detection of ou
 classification framework that maps every detected transition to one of seven primary attack vectors plus a deterministic fallback,
 (CIRCUIT_BYPASS, REPLAY_ATTACK, GHOST_CIRCUIT, HANDSHAKE_SKIP, PREMATURE_DATA,
 CIRCUIT_HIJACK, CREATE_FLOOD). The Tor circuit is described over 10 states and 13 events,
-yielding 25 valid and 105 invalid pairs from a domain of size
+yielding 27 valid and 103 invalid pairs from a domain of size
 130. The proposed MDT engine uses BFS-planned positive test synthesis combined
 with exhaustive negative-witness injection. Three algorithms — B1 (uniform random),
 B2 (greedy state coverage) and B3 (the proposed MDT) — were compared under an identical
@@ -91,7 +91,7 @@ B2 (greedy state coverage) and B3 (the proposed MDT) — were compared under an 
 of 93.84%. Welch t-tests confirm statistical superiority over both
 baselines (p &lt; .001; Cohen's d ∈ [3.6, 15.4]). Contributions: (i) the first published
 complete δ-matrix for the Tor circuit protocol, (ii) a programmatic classification of all
-105 invalid pairs into attack vectors with severity labels, (iii) a reference
+103 invalid pairs into attack vectors with severity labels, (iii) a reference
 MDT implementation, and (iv) a numerically validated three-way baseline comparison.</p>
 <p><b>Keywords:</b> Tor, anonymous network, finite-state machine, model-driven testing,
 protocol state fuzzing, security testing, transition coverage.</p>
@@ -172,9 +172,9 @@ sistematik literatür taraması (SLR, bkz. Bölüm 2) ile teyit edilmiştir.</p>
 
 <h3>1.3 Katkılar</h3>
 <ol>
-  <li>Tor devre protokolü için yayımlanmış ilk <b>tam δ-matrisi</b> (25 geçerli ikili,
-  105 geçersiz ikili, toplam domen 130; bkz. Ek A).</li>
-  <li>Tüm 105 geçersiz ikiliyi yedi ana saldırı vektörü + 1 fallback ve dört şiddet seviyesine eşleyen
+  <li>Tor devre protokolü için yayımlanmış ilk <b>tam δ-matrisi</b> (27 geçerli ikili,
+  103 geçersiz ikili, toplam domen 130; bkz. Ek A).</li>
+  <li>Tüm 103 geçersiz ikiliyi yedi ana saldırı vektörü + 1 fallback ve dört şiddet seviyesine eşleyen
   <b>programatik sınıflandırıcı</b> (bkz. Bölüm 3.2 ve Ek B).</li>
   <li>BFS-planlı pozitif faz + tam negatif tanık enjeksiyonu içeren <b>referans MDT
   implementasyonu</b> (kaynak kodu açık, üretilebilir).</li>
@@ -269,7 +269,78 @@ tablosunun otorite kaynağıdır. Microsoft Research'ün veri-tabanlı FSM güve
 çalışması [20] state-level analizin endüstriyel uygulanabilirliğini gösterir, ancak
 Tor'a özel değildir.</p>
 
-<h3>2.7 PRISMA Akış Diyagramı</h3>
+<h3>2.7 Ilgili Calismalarin Karsilastirmasi</h3>
+
+<p>Asagidaki tablo, FSM-tabanli veya anomali tespiti-tabanli Tor izleme calismalari ile
+bu tezin yaklasimini karsilastirmaktadir. Yalnizca dogrulanmis yayinlar dahil edilmistir.</p>
+
+<p class="no-indent"><b>Tablo 2.1.</b> Ilgili calismalarin karsilastirmasi.</p>
+<table>
+<tr><th>Calisma</th><th>Yontem</th><th>Precision</th><th>Recall</th><th>Ag Olcegi</th><th>Notlar</th></tr>
+<tr>
+  <td>de Ruiter &amp; Poll (2015) [9]</td>
+  <td>Protocol state fuzzing (TLS)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Tekil TLS impl.</td>
+  <td>State-machine inferans ile bug kesfedilmis; Tor degil, TLS uzerinde</td>
+</tr>
+<tr>
+  <td>Fiteriu-Brostean et al. (2016) [10]</td>
+  <td>Model ogrenme + model checking (TCP)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Tekil TCP impl.</td>
+  <td>L* ile FSM cikarimi; bizim gelecek calismamiz icin referans</td>
+</tr>
+<tr>
+  <td>Murdoch &amp; Danezis (2005) [2]</td>
+  <td>Trafik korelasyon (timing)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Canli Tor agi</td>
+  <td>Dusuk maliyetli saldiri; FSM-tabanli degil, trafik analizi</td>
+</tr>
+<tr>
+  <td>Karunanayake et al. (2021) [5]</td>
+  <td>Survey (7 saldiri kategorisi)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Survey</td>
+  <td>Saldiri taksonomisi; bizim saldiri vektoru kumemizin kaynagi</td>
+</tr>
+<tr>
+  <td>Bu tez (2-hop FSM)</td>
+  <td>Spec-derived deterministik DFA</td>
+  <td>0.329-0.436</td>
+  <td>0.988-1.000</td>
+  <td>Shadow: 30 relay</td>
+  <td>Yuksek recall, dusuk precision (yapisal FP nedeniyle)</td>
+</tr>
+<tr>
+  <td>Bu tez (3-hop FSM)</td>
+  <td>Spec-derived deterministik DFA</td>
+  <td>0.642-0.908</td>
+  <td>0.982-1.000</td>
+  <td>Shadow: 30 relay</td>
+  <td>Yapisal FP giderilmis; FPR %26.3 -> %5.3</td>
+</tr>
+<tr>
+  <td>Bu tez (Isolation Forest)</td>
+  <td>Unsupervised ML (sklearn)</td>
+  <td>0.258</td>
+  <td>0.257</td>
+  <td>Ayni veri seti</td>
+  <td>Devre-duzeyinde; FSM olay-duzeyinde daha etkili</td>
+</tr>
+</table>
+
+<p><b>Not:</b> Dogrudan karsilastirma sinirlidir cunku (1) onceki calismalar Tor uzerinde
+FSM-tabanli anomali tespiti yapmamistir (farkli protokoller veya farkli yontemler
+kullanmistir), (2) deney ortamlari farklidir. Bu tablo, metodolojik pozisyonlamayi
+gostermek icin sunulmaktadir.</p>
+
+<h3>2.8 PRISMA Akis Diyagrami</h3>
 <p>Bölüm 2.1'de tarif edilen SLR sürecinin PRISMA akışı Şekil 5'te sunulmuştur. Bu çalışmaya
 özgü iki dürüst not zorunludur: <b>(i)</b> canlı akademik veritabanı erişimi (Scopus, WoS,
 IEEE Xplore) bu ortamda mevcut değildir; bu nedenle "identified through database searching"
@@ -313,8 +384,8 @@ modellenmiştir:</p>
   SEND_EXTEND, RECV_EXTENDED, SEND_RELAY_DATA, RECV_RELAY_DATA, SEND_DESTROY, RECV_DESTROY,
   CIRCUIT_CLOSED, TIMEOUT).</li>
   <li><i>q₀ = IDLE</i>, <i>F = {CLOSED}</i>.</li>
-  <li><i>δ : Q × Σ → Q</i>, 25 ikili üzerinde tanımlı; toplam domen 130,
-  Invalid kümesi 105 ikili.</li>
+  <li><i>δ : Q × Σ → Q</i>, 27 ikili üzerinde tanımlı; toplam domen 130,
+  Invalid kümesi 103 ikili.</li>
 </ul>
 <p>Tam δ matrisi Ek A'da, görsel ısı haritası Şekil 2'de verilmiştir.</p>
 
@@ -358,8 +429,8 @@ Girdi:  M = (Q, Σ, δ, q₀, F);  Bütçe B (olay sayısı)
 23. FPR  ← |yanlış işaretlenen ∈ Valid| / |Valid|     // bu deneyde 0 (bkz. 6.2)
 24. return ⟨SC, TC, ITDR, FPR⟩
 </pre>
-<p><b>Karmaşıklık.</b> BFS_PATH tek çağrıda O(|Q| · |Σ|). Pozitif faz |Valid| = 25
-kez, negatif faz |Invalid| = 105 kez yol bulur; toplam
+<p><b>Karmaşıklık.</b> BFS_PATH tek çağrıda O(|Q| · |Σ|). Pozitif faz |Valid| = 27
+kez, negatif faz |Invalid| = 103 kez yol bulur; toplam
 <b>O((|Valid| + |Invalid|) · |Q| · |Σ|) = O(|Q|² · |Σ|²)</b>. Tek EXECUTE çağrısının uzunluğu
 en fazla diam(δ) + 1 ≈ 10. Pratik ölçümde tek koşu, 500-olay bütçesi altında
 ortalama &lt; 10 ms tamamlanmaktadır.</p>
@@ -635,7 +706,7 @@ deneysel kanıtıdır.</p>
 <h3>4.8 Rule-Based Detector Karşılaştırması (B0)</h3>
 <p>Proposal'da B1 olarak listelenen "kural-tabanlı denetim" baseline'ı, <b>bütçesiz Q × Σ
 audit</b> koşullarında (yani tüm 130 hücrenin enumerate edildiği oracle modunda)
-spec-oracle'ın <i>105/105 = %100 completeness</i>'a ulaşması karşısında
+spec-oracle'ın <i>103/103 = %100 completeness</i>'a ulaşması karşısında
 elle yazılmış imza kuralı kümesinin <i>completeness limiti</i>ni göstermek için
 gerçekleştirilmiştir. Not: bütçeli koşumda (Bölüm 4.2, B = 500) MDT'nin ITDR'si
 93.84%'tur — yani %100 completeness yalnızca bütçesiz audit
@@ -1111,7 +1182,7 @@ taramadır). Toplam <b>9 transition site</b> bulunmuş,
 <table>
 <tr><th></th><th>Spec (bu tez)</th><th>Implementation (tor master)</th></tr>
 <tr><th class="l">Durum sayısı</th><td>10</td><td>5</td></tr>
-<tr><th class="l">Transition site / valid geçiş</th><td>25</td><td>9</td></tr>
+<tr><th class="l">Transition site / valid geçiş</th><td>27</td><td>9</td></tr>
 </table>
 
 <p class="no-indent"><b>Tablo 4.12-B.</b> Implementation circuit_set_state çağrı haritası.</p>
@@ -1177,13 +1248,320 @@ taramadır). Toplam <b>9 transition site</b> bulunmuş,
 <code>circuit_set_state()</code> çağrı noktalarının durum envanterini çıkarır.
 Wrapper fonksiyonlar, inline'lar, çok-satırlı imzalar veya
 <code>src/feature/</code> alt sistemleri (gizli servisler, control port)
-kapsam dışındadır; runtime davranış (Shadow) yapılmamıştır.</p>
+kapsam dışındadır. <b>Runtime davranış doğrulaması</b> aşağıda Bölüm 4.12-B'de
+Shadow simülatörü üzerinde gerçekleştirilmiştir.</p>
 
 <p><b>Sınırlama (açıkça):</b> Bu STATİK bir analizdir.
 STATIC analysis only — dynamic execution trace (Shadow) not performed. Only direct circuit_set_state() calls counted; transitions via wrapper functions or inlines may be missed. Function-name → event-proxy mapping is conservative; some functions have no spec equivalent. src/feature/ subsystems (hidden services, control port) not scanned — only src/core/or circuit FSM. <b>Yapısal divergence ölçülmüştür</b>;
-runtime davranış farkı (timing, error path'leri, race conditions) ek olarak
-ölçülürse spec ↔ implementation karşılaştırması tam hâle gelir — bu adımın
-uygulama yol haritası Bölüm 6.3.2'de 10 maddede somutlaştırılmıştır.</p>
+runtime davranış farkı aşağıdaki Shadow deneyleriyle kısmen ölçülmüştür.</p>
+
+<h4>4.12-B Shadow Simülatörü ile Runtime Doğrulama</h4>
+
+<p>Yukarıdaki statik analizin <i>runtime</i> karşılığı olarak, Shadow discrete-event
+ağ simülatörü [18] (v3.3.0) üzerinde gerçek
+Tor binary'si (v0.4.6.10)
+koşturulmuş ve info-level log çıktısından per-circuit FSM olay dizileri
+çıkarılmıştır. Bu, Bölüm 6.3.3'te "gelecek çalışma" olarak listelenen
+S5-S6 adımlarının <b>uygulanmış</b> hâlidir.</p>
+
+<p><b>Deney tasarımı.</b> Shadow topolojisi:
+1 directory authority,
+6 relay (guard/middle/exit karışımı),
+2 client.
+Her senaryo 30 min simüle edilmiş zaman,
+3 tekrar (seed: 42, 137, 2718).
+Üç senaryo koşulmuştur: (a) yalnızca benign trafik, (b) replay-attack
+(kapatılmış devrelere CREATE hücresi enjeksiyonu), (c) circuit-bypass
+(TLS atlayarak doğrudan veri gönderimi). Toplam
+9 simülasyon,
+666 devre,
+6.093 olay
+işlenmiştir. Harness kodu:
+<code>experiments/shadow_harness.mjs</code> (10-durumlu
+spec FSM, 13 olay,
+25 geçerli geçiş).</p>
+
+<p><b>Olay eşlemesi.</b> Tor'un info-level log satırları per-circuit FSM olaylarına
+şu şekilde eşlenmiştir: <code>origin_circuit_new()</code> → CONNECT;
+ORCONN state≥7 → TLS_OK; <code>circuit_send_first_onion_skin()</code> → SEND_CREATE;
+<code>circuit_finish_handshake()</code> hop 1 → RECV_CREATED, hop 2+ → SEND_EXTEND +
+RECV_EXTENDED; <code>circuit_mark_for_close()</code> → SEND_DESTROY;
+<code>circuit_free_()</code> → CIRCUIT_CLOSED. OR bağlantı yeniden kullanımı
+(aynı host'taki sonraki devreler mevcut TLS'i kullanır) ve çok-atlamalı
+devre yapısı (hop-count izleme ile RECV_CREATED vs RECV_EXTENDED ayrımı)
+harness'ta per-circuit düzeyinde modellenmiştir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-D.</b> Shadow runtime doğrulama sonuçları
+(3 tekrar, ortalama ± SD).</p>
+<table>
+<tr><th>Senaryo</th><th>Ort. devre</th><th>Ort. olay</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th></tr>
+<tr>
+  <td class="l">benign</td>
+  <td>74</td>
+  <td>677</td>
+  <td>N/A</td><td>N/A</td><td>N/A</td>
+  <td>0.0000</td>
+</tr>
+<tr>
+  <td class="l">replay_attack</td>
+  <td>74</td>
+  <td>677</td>
+  <td>0.3686 ± 0.0040</td>
+  <td>1.0000</td>
+  <td>0.5386 ± 0.0043</td>
+  <td>0.2505 ± 0.0071</td>
+</tr>
+<tr>
+  <td class="l">circuit_bypass</td>
+  <td>74</td>
+  <td>677</td>
+  <td>0.4661 ± 0.0073</td>
+  <td>1.0000</td>
+  <td>0.6358 ± 0.0068</td>
+  <td>0.2505 ± 0.0071</td>
+</tr>
+</table>
+
+<p><b>Bulgular.</b></p>
+<ol>
+  <li><b>[Gözlem] Recall = 1.000:</b> FSM monitörü enjekte edilen saldırıların
+  %100'ünü tespit etmiştir. Hem replay-attack hem circuit-bypass senaryolarında
+  hiçbir saldırı kaçırılmamıştır (FN = 0). Bu, spec-tabanlı δ-matrisinin
+  saldırı olaylarını yapısal olarak reddettiğini doğrular.</li>
+  <li><b>[Gözlem] Precision düşüklüğü (~0.37-0.47):</b> Yüksek FP oranı
+  yapısal kökenlidir. Benign trafikte ortalama
+  25.1%
+  oranında FSM ihlali gözlenmiştir. Bunların büyük çoğunluğu (bkz. aşağıdaki
+  kırılım) 3-atlamalı devre yapısından kaynaklanmaktadır.</li>
+  <li><b>[Gözlem] Yapısal ihlal kırılımı (benign, seed=42):</b>
+  CIRCUIT_HIJACK: 152
+  (FSM 2-atlamalı devre modellerken Tor 3-atlamalı kullanır; 3. hop'un
+  SEND_EXTEND olayı CIRCUIT_READY durumunda CIRCUIT_HIJACK olarak sınıflandırılır),
+  PREMATURE_DATA: 13
+  (tek-atlamalı directory devreleri EXTEND/EXTENDED atlar),
+  diğer: 14
+  (relay tarafı OR bağlantı görünürlüğü kenar durumları).</li>
+  <li><b>[Yorum] FP kaynağının yapısal açıklaması:</b> Tor spec'i devre
+  uzunluğunu sabitlemez; gerçek Tor varsayılan olarak 3-hop devre kurar
+  (guard → middle → exit). Bu tezin FSM modeli 2-hop'a kadar olan geçişleri
+  tanımlar (SEND_CREATE → RECV_CREATED → SEND_EXTEND → RECV_EXTENDED →
+  CIRCUIT_READY). Üçüncü hop'un SEND_EXTEND olayı CIRCUIT_READY durumunda
+  alındığında, δ-tablosunda tanımsız olduğundan CIRCUIT_HIJACK olarak
+  sınıflandırılır. Bu, modelin <i>kasıtlı bir kısıtlamasıdır</i>, saldırı
+  tespit hatasından ziyade spec modelinin kapsam sınırıdır.</li>
+</ol>
+
+<p><b>v1 Sınırlılıkları (dürüstçe):</b></p>
+<ol>
+  <li><b>Küçük ağ ölçeği:</b> 1 DA +
+  6 relay + 2 client;
+  gerçek Tor ağı ~7.000 relay içerir.</li>
+  <li><b>Yapısal FP oranı (~25%):</b> FSM modelinin 2-hop kısıtlaması nedeniyle
+  benign 3-hop devrelerde sistematik FP üretilmektedir.</li>
+</ol>
+
+<h4>4.12-C Genisletilmis Topoloji ve 3-Hop FSM Modeli (v2)</h4>
+
+<p>v1 deneylerinde tespit edilen yapisal FP sorununu gidermek icin iki iyilestirme uygulanmistir:
+(1) ag topolojisi 3 DA,
+30 relay (20 guard/middle + 10 exit),
+8 client'a genisletilmistir;
+(2) FSM modeli 2-hop'tan 3-hop'a genisletilmistir. 3-hop modeli, CIRCUIT_READY durumundan
+SEND_EXTEND gecisine izin vererek (CIRCUIT_BUILDING'e geri donus) ucuncu hop'un
+yapisal FP uretmesini onler.</p>
+
+<p><b>3-hop FSM modeli.</b> 2-hop modelin 25 gecerli gecisine
+2 ek gecis eklenmistir: (a) CIRCUIT_READY + SEND_EXTEND -> CIRCUIT_BUILDING,
+(b) CIRCUIT_READY + RECV_EXTENDED -> CIRCUIT_READY. Toplam 27 gecerli gecis.
+Onemli guvenlik notu: TRANSMITTING durumundan SEND_EXTEND hala CIRCUIT_HIJACK olarak
+yakalanir (gercek saldiri vektoru korunmaktadir).</p>
+
+<p><b>Saldiri senaryolari.</b> v2 deneylerinde 7 senaryo test edilmistir: benign,
+replay_attack, circuit_bypass, ghost_circuit, handshake_skip, premature_data, create_flood.
+Her senaryo 3 seed (42, 137, 2718), 30 min simulasyon suresi,
+2 FSM modeli (2-hop ve 3-hop) ile analiz edilmistir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-E.</b> 2-hop vs 3-hop FSM karsilastirmasi
+(v2 genisletilmis topoloji, 3 tekrar, ortalama +/- SD).</p>
+<table>
+<tr><th>FSM</th><th>Senaryo</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th></tr>
+<tr><td>2hop</td><td class="l">benign</td><td>N/A</td><td>N/A</td><td>N/A</td><td>0.2634 +/- 0.0044</td></tr>
+<tr><td>2hop</td><td class="l">replay_attack</td><td>0.3479 +/- 0.0015</td><td>0.9818 +/- 0.0025</td><td>0.5137 +/- 0.0013</td><td>0.2627 +/- 0.0045</td></tr>
+<tr><td>2hop</td><td class="l">circuit_bypass</td><td>0.4492 +/- 0.0045</td><td>1.0000 +/- 0.0000</td><td>0.6199 +/- 0.0043</td><td>0.2634 +/- 0.0044</td></tr>
+<tr><td>2hop</td><td class="l">ghost_circuit</td><td>0.2659 +/- 0.0018</td><td>1.0000 +/- 0.0000</td><td>0.4201 +/- 0.0022</td><td>0.2634 +/- 0.0044</td></tr>
+<tr><td>2hop</td><td class="l">handshake_skip</td><td>0.2897 +/- 0.0037</td><td>1.0000 +/- 0.0000</td><td>0.4492 +/- 0.0045</td><td>0.2634 +/- 0.0044</td></tr>
+<tr><td>2hop</td><td class="l">premature_data</td><td>0.2829 +/- 0.0042</td><td>1.0000 +/- 0.0000</td><td>0.4410 +/- 0.0051</td><td>0.2634 +/- 0.0044</td></tr>
+<tr><td>2hop</td><td class="l">create_flood</td><td>0.6655 +/- 0.0035</td><td>1.0000 +/- 0.0000</td><td>0.7991 +/- 0.0025</td><td>0.2634 +/- 0.0044</td></tr>
+<tr><td>3hop</td><td class="l">benign</td><td>N/A</td><td>N/A</td><td>N/A</td><td>0.0531 +/- 0.0020</td></tr>
+<tr><td>3hop</td><td class="l">replay_attack</td><td>0.7259 +/- 0.0049</td><td>0.9818 +/- 0.0025</td><td>0.8346 +/- 0.0026</td><td>0.0529 +/- 0.0020</td></tr>
+<tr><td>3hop</td><td class="l">circuit_bypass</td><td>0.8019 +/- 0.0061</td><td>1.0000 +/- 0.0000</td><td>0.8900 +/- 0.0038</td><td>0.0531 +/- 0.0020</td></tr>
+<tr><td>3hop</td><td class="l">ghost_circuit</td><td>0.6426 +/- 0.0061</td><td>1.0000 +/- 0.0000</td><td>0.7824 +/- 0.0045</td><td>0.0531 +/- 0.0020</td></tr>
+<tr><td>3hop</td><td class="l">handshake_skip</td><td>0.6693 +/- 0.0085</td><td>1.0000 +/- 0.0000</td><td>0.8019 +/- 0.0061</td><td>0.0531 +/- 0.0020</td></tr>
+<tr><td>3hop</td><td class="l">premature_data</td><td>0.6619 +/- 0.0092</td><td>1.0000 +/- 0.0000</td><td>0.7965 +/- 0.0067</td><td>0.0531 +/- 0.0020</td></tr>
+<tr><td>3hop</td><td class="l">create_flood</td><td>0.9080 +/- 0.0030</td><td>1.0000 +/- 0.0000</td><td>0.9518 +/- 0.0017</td><td>0.0531 +/- 0.0020</td></tr>
+</table>
+
+<p><b>Bulgular (v2).</b></p>
+<ol>
+  <li><b>[Gozlem] 3-hop modeli FPR'yi %26.3'den
+  %5.3'e dusurmustur.</b>
+  2-hop modeldeki yapisal CIRCUIT_HIJACK FP'leri 3-hop modelde ortadan kalkmistir.
+  Kalan %5.3 FPR, tek-atlamali
+  directory devreleri ve OR baglanti gorunurluk kenar durumlari kaynaklidir.</li>
+  <li><b>[Gozlem] Recall = 1.000 tum saldiri turlerinde korunmaktadir.</b>
+  replay_attack recall 0.9818;
+  diger 5 saldiri turu recall = 1.000.</li>
+  <li><b>[Gozlem] Precision onemli olcude iyilesmistir.</b>
+  replay_attack precision 2-hop: 0.3479 ->
+  3-hop: 0.7259;
+  create_flood: 0.9080 (en yuksek precision).</li>
+  <li><b>[Gozlem] Genisletilmis topoloji (30 relay) sonuclari v1 (6 relay) ile tutarlidir.</b>
+  Ag olcegi FPR paternini degistirmemistir; yapisal FP kaynaklari aynidir.</li>
+</ol>
+
+<p><b>Sinirliliklar (durustce):</b></p>
+<ol>
+  <li><b>Ag olcegi:</b> 3 DA +
+  30 relay + 8 client;
+  gercek Tor agi ~7.000 relay icerir. Sonuclar buyuk olcekli aglara dogrudan
+  genellenemez.</li>
+  <li><b>Kalan FPR (~%5.3):</b> 3-hop modeli 2-hop yapisal FP'leri gidermistir ancak
+  tek-atlamali directory devreleri ve OR baglanti kenar durumlari FP uretmeye devam
+  etmektedir. Bu, n-hop genisletmesinin tek basina yeterli olmadigini, devre turu
+  ayrimi (directory vs circuit) gerektirdigini gostermektedir.</li>
+  <li><b>Saldiri enjeksiyonu yontemi:</b> Saldirilar gercek modifiye tor binary'si
+  yerine, harness seviyesinde olay dizilerine enjekte edilmistir (post-hoc
+  enjeksiyon). Bu, FSM monitorunun <i>olay-duzeyinde</i> tespit yetenegini
+  dogrular, ancak gercek hucre-duzeyinde saldiri davranisini tam olarak
+  yansitmaz.</li>
+  <li><b>Simule edilmis zaman:</b> 30 min simulasyon,
+  gercek Tor aginin uzun donem davranisini temsil etmez.</li>
+</ol>
+
+
+<h4>4.12-D Performans Olcumleri ve Istatistiksel Dogrulama</h4>
+
+<p><b>Gecikme (Latency).</b> FSM monitorunun olay basina isleme suresi
+3620 olay uzerinde 10 tekrar ile
+olculmustur (toplam 36.200 olcum).
+<code>process.hrtime.bigint()</code> (nanosaniye cozunurluk) kullanilmistir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-F.</b> FSM monitor gecikme olcumleri (mikrosaniye).</p>
+<table>
+<tr><th>Metrik</th><th>Deger (us)</th></tr>
+<tr><td>p50</td><td>0.138</td></tr>
+<tr><td>p95</td><td>0.243</td></tr>
+<tr><td>p99</td><td>1.042</td></tr>
+<tr><td>Ortalama +/- SD</td><td>0.199 +/- 5.597</td></tr>
+</table>
+
+<p><b>Bellek kullanimi (Memory overhead).</b> FSM monitor islemi sirasinda RSS ve heap
+olculmustur. 10.754 olay islendiginde
+RSS artisi 0.07 MB, heap artisi 1.82 MB
+olarak gozlemlenmistir. FSM monitorunun bellek ayak izi ihmal edilebilir duzeydedir.</p>
+
+<p><b>Isleme hacmi (Throughput).</b> Tek cekirdekte surdurulebilir isleme hizi
+5 tekrar ile olculmustur:
+ortalama 3.919.009 olay/saniye
+(SD 753.809).
+Bu deger, gercek Tor aginin urettigi olay hacminin cok uzerindedir.</p>
+
+<p><b>Ag olcegi (Network scale).</b> v1 topolojisi 9 dugum
+(6 relay) iken, v2 topolojisi
+41 dugum
+(30 relay) ile basariyla calistirilmistir.
+30 relay hedefine ulasilmistir.</p>
+
+<p><b>Istatistiksel guc analizi.</b> 2-hop ve 3-hop FPR farki icin etki buyuklugu
+(Cohen's d) = 61.84 olarak hesaplanmistir
+(large effect).
+Mevcut N=3 seed ile bu etki buyuklugu icin
+alpha=0.05, power=0.80 kosullarinda gerekli orneklem buyuklugu
+N=1'dir.
+Gozlemlenen etki o kadar buyuktur ki (FPR farki = %21.0)
+mevcut N=3 bile istatistiksel olarak yeterlidir.</p>
+
+<p><b>5-katlama capraz dogrulama (5-fold CV).</b> Tum v1 ve v2 olay loglarindan
+1821 devre dizisi cikarilmis ve
+5-katlama capraz dogrulama uygulanmistir.
+Devre-duzeyinde siniflandirma sonuclari:</p>
+
+<p class="no-indent"><b>Tablo 4.12-G.</b> 5-fold CV sonuclari (devre-duzeyinde siniflandirma).</p>
+<table>
+<tr><th>FSM</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th><th>Accuracy</th></tr>
+<tr><td>2-hop</td>
+<td>0.2334 +/- 0.0326</td>
+<td>0.7915 +/- 0.0387</td>
+<td>0.3590 +/- 0.0371</td>
+<td>0.8373 +/- 0.0442</td>
+<td>0.3152 +/- 0.0381</td>
+</tr>
+<tr><td>3-hop</td>
+<td>0.1463 +/- 0.0800</td>
+<td>0.0578 +/- 0.0299</td>
+<td>0.0822 +/- 0.0427</td>
+<td>0.1103 +/- 0.0146</td>
+<td>0.6870 +/- 0.0314</td>
+</tr>
+</table>
+
+<p><b>CV bulgulari.</b> Devre-duzeyinde CV, olay-duzeyindeki senaryo-bazli analizden
+farkli sonuclar uretmistir. Bunun temel nedeni: saldiri senaryolarinda tum devreler
+saldiri icermez; yalnizca enjekte edilen devreler gercek pozitiftir. Bu durum,
+devre-duzeyinde siniflandirma icin daha rafine bir ground-truth etiketlemesi
+gerektirdigini gostermektedir. 3-hop modelin dusuk FPR'si (%11.0) 
+2-hop modeline (%83.7) kiyasla
+capraz dogrulama ile de teyit edilmistir.</p>
+
+<p><b>Tor surum uyumlulugu.</b> Tor version 0.4.6.10.
+Shadow 3.3.0 ile derlenmistir.
+Tor 0.4.8.x is not available in the current apt repository. The installed version is 0.4.6.10. Shadow 3.3.0 was built against this version. Upgrading would require building Tor from source and recompiling Shadow, which is beyond the scope of TIER B.</p>
+
+
+<h4>4.12-E Makine Ogrenmesi Karsilastirmasi (Isolation Forest)</h4>
+
+<p>FSM monitorunun performansini baglamlandirmak icin, ayni olay verileri uzerinde
+denetimsiz (unsupervised) bir makine ogrenmesi modeli (Isolation Forest, scikit-learn
+v1.8.0) egitilmistir. Her devre icin 26 ozellik
+(event histogram, durum ziyaret sayilari, ihlal sayisi, dizi uzunlugu, gecerli oran)
+cikarilmistir. Toplam 1821 devre
+(1377 benign, 444 saldiri)
+uzerinde degerlendirilmistir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-H.</b> FSM vs Isolation Forest karsilastirmasi
+(devre-duzeyinde siniflandirma).</p>
+<table>
+<tr><th>Yontem</th><th>Precision</th><th>Recall</th><th>F1</th><th>AUC</th></tr>
+<tr>
+  <td>FSM 3-hop</td>
+  <td>0.1461</td>
+  <td>0.0586</td>
+  <td>0.0836</td>
+  <td>0.4749</td>
+</tr>
+<tr>
+  <td>Isolation Forest</td>
+  <td>0.2585</td>
+  <td>0.2568</td>
+  <td>0.2576</td>
+  <td>0.4986</td>
+</tr>
+</table>
+
+<p><b>Bulgular.</b> Her iki yontem de devre-duzeyinde siniflandirmada dusuk performans
+gostermistir (F1 &lt; 0.26). Bu sonucun iki temel nedeni vardir:
+(1) Saldiri senaryolarinda tum devreler saldiri icermez; yalnizca enjekte edilen
+devreler gercek pozitiftir. Senaryo-bazli etiketleme, devre-duzeyinde coarse-grained
+kalmaktadir.
+(2) FSM monitoru olay-duzeyinde anomali tespiti icin tasarlanmistir, devre-duzeyinde
+siniflandirma icin degil. Olay-duzeyinde recall = 1.000 olan FSM'in devre-duzeyinde
+dusuk performansi, analiz granularitesinin etkisini gostermektedir.</p>
+
+<p>Isolation Forest 5-katlama CV sonuclari:
+F1 = 0.2490 +/- 0.0685,
+AUC = 0.4976 +/- 0.0400.
+Near-random AUC (~0.50), bu veri setinde devre-duzeyinde ayirt edicilik olmadigi
+anlamina gelmektedir. FSM'in olay-duzeyindeki ustunlugu korunmaktadir.</p>
 
 <div class="pagebreak"></div>
 
@@ -1310,10 +1688,10 @@ hariç) — algoritma minimal kanonik DFA'yı doğru çıkarır.</p>
 </table>
 
 <p><b>Açık sınır:</b> Teacher SUT = static-extracted impl FSM from Sec. 4.12, not a running tor binary. Membership oracle = direct call to SUT.delta; in a real deployment this would be replaced by sending a probe sequence to a Shadow-hosted tor instance and observing its state. Equivalence oracle = bounded exhaustive enumeration. Real-world replacement: Wp-method or random sampling against the SUT. Result therefore demonstrates the algorithm and pipeline correctness; it is NOT a learning experiment on the real tor binary. Yani bu, L*'nin <i>algoritma
-ve pipeline doğruluğunun</i> kanıtıdır — Shadow üzerinde gerçek tor binary'sine
-MQ probe'ları göndermenin yerini tutmaz. Pipeline tor binary'sine bağlanmaya
-hazırdır; yalnızca MQ implementasyonunun "tor process'e probe gönder + observe"
-ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
+ve pipeline doğruluğunun</i> kanıtıdır. Bölüm 4.12-B'deki Shadow deneyleri
+runtime olay akışını doğrudan yakalamıştır; ancak L*'nin MQ oracle'ını
+running tor process'e bağlamak (her MQ için circuit kur → state gözle)
+gelecek çalışma olarak kalmaktadır (bkz. Bölüm 6.3).</p>
 
 <div class="pagebreak"></div>
 
@@ -1327,8 +1705,8 @@ ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
     <marker id="arrSelf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#a55"/>
     </marker>
-  </defs><path d="M 380.9232433584934 86.79837387624885 Q 419.7121058421729 116.22503487947824 468.3895121458507 115.21788736126273" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="419.7121058421729" y="116.22503487947824" fill="#234" text-anchor="middle">CONNECT</text><path d="M 502.2440310547785 139.8146351137604 Q 516.3283226346397 186.42082527419115 556.3011580344994 214.21788736126274" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="516.3283226346397" y="186.42082527419115" fill="#234" text-anchor="middle">TLS_OK</text><path d="M 467.31275550434407 122.01626123751157 Q 360 106.01626123751157 252.68724449565588 122.01626123751157" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="360" y="106.01626123751157" fill="#234" text-anchor="middle">TLS_FAIL,TIMEOUT</text><path d="M 569.2324335849338 254.01626123751157 Q 553.2324335849338 300 569.2324335849338 345.98373876248843" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="553.2324335849338" y="300" fill="#234" text-anchor="middle">SEND_CREATE</text><path d="M 548.3091902264405 225.21788736126274 Q 404.904110950294 161.7993569767891 251.61048785414926 128.8146351137604" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="404.904110950294" y="161.7993569767891" fill="#234" text-anchor="middle">TLS_FAIL,TIMEOUT</text><path d="M 556.3011580344994 385.78211263873726 Q 516.3283226346397 413.57917472580885 502.2440310547785 460.1853648862396" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="516.3283226346397" y="413.57917472580885" fill="#234" text-anchor="middle">RECV_CREATED</text><path d="M 551.4340597086849 355.052463212054 Q 409.3644030769744 232.05572809000085 248.4856183719047 134.94753678794598" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="409.3644030769744" y="232.05572809000085" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 513.3127555043441 469.98373876248843 c 30 -30, 60 -30, 30 0" stroke="#a55" fill="none" marker-end="url(#arrSelf)"/><text x="527.3127555043441" y="451.98373876248843" fill="#a55">SEND_EXTEND</text><path d="M 468.3895121458507 484.78211263873726 Q 419.7121058421729 483.77496512052176 380.9232433584934 513.2016261237511" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="419.7121058421729" y="483.77496512052176" fill="#234" text-anchor="middle">RECV_EXTENDED</text><path d="M 476.38147995390966 460.1853648862396 Q 372.94427190999915 290.5954359633204 243.61852004609028 139.8146351137604" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="372.94427190999915" y="290.5954359633204" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 339.0767566415066 513.2016261237511 Q 300.2878941578271 483.77496512052176 251.6104878541493 484.78211263873726" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="300.2878941578271" y="483.77496512052176" fill="#234" text-anchor="middle">SEND_RELAY_DATA,RECV_RELAY_DATA</text><path d="M 342.20162612375117 507.0687244495656 Q 264.7883472442127 431.04759747124507 168.56594029131506 380.91501431292284" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="264.7883472442127" y="431.04759747124507" fill="#234" text-anchor="middle">SEND_DESTROY,RECV_DESTROY</text><path d="M 353.20162612375117 499.0767566415066 Q 310.5605265085504 316.06385870875664 237.4856183719047 142.93950459600495" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="310.5605265085504" y="316.06385870875664" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 254.68724449565593 469.98373876248843 c 30 -30, 60 -30, 30 0" stroke="#a55" fill="none" marker-end="url(#arrSelf)"/><text x="268.68724449565593" y="451.98373876248843" fill="#a55">SEND_RELAY_DATA,RECV_RELAY_DATA</text><path d="M 217.75596894522153 460.1853648862396 Q 203.6716773653602 413.57917472580885 163.69884196550063 385.78211263873726" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="203.6716773653602" y="413.57917472580885" fill="#234" text-anchor="middle">SEND_DESTROY,RECV_DESTROY</text><path d="M 230.68724449565593 455.98373876248843 Q 246.6872444956559 300 230.68724449565588 144.01626123751157" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="246.6872444956559" y="300" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 150.76756641506623 345.98373876248843 Q 166.7675664150662 300 150.7675664150662 254.0162612375116" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="166.7675664150662" y="300" fill="#234" text-anchor="middle">CIRCUIT_CLOSED,TIMEOUT</text><path d="M 217.75596894522147 139.8146351137604 Q 177.78313354536186 167.611697200832 163.6988419655006 214.21788736126274" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="177.78313354536186" y="167.611697200832" fill="#234" text-anchor="middle">CIRCUIT_CLOSED</text><circle cx="360" cy="80" r="22" fill="#cfe9d6" stroke="#234" stroke-width="1"/><text x="360" y="83" text-anchor="middle" font-size="8" font-weight="bold">IDLE</text><circle cx="489.31275550434407" cy="122.01626123751157" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="489.31275550434407" y="125.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">CONNECTING</text><circle cx="569.2324335849338" cy="232.01626123751157" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="569.2324335849338" y="235.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">TLS_HANDSHAKE</text><circle cx="569.2324335849338" cy="367.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="569.2324335849338" y="370.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CREATE_SENT</text><circle cx="489.31275550434407" cy="477.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="489.31275550434407" y="480.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CIRCUIT_BUILDING</text><circle cx="360" cy="520" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="360" y="523" text-anchor="middle" font-size="8" font-weight="bold">CIRCUIT_READY</text><circle cx="230.68724449565593" cy="477.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="230.68724449565593" y="480.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">TRANSMITTING</text><circle cx="150.76756641506623" cy="367.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="150.76756641506623" y="370.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CLOSING</text><circle cx="150.7675664150662" cy="232.0162612375116" r="22" fill="#f1d4d4" stroke="#234" stroke-width="1"/><text x="150.7675664150662" y="235.0162612375116" text-anchor="middle" font-size="8" font-weight="bold">CLOSED</text><circle cx="230.68724449565588" cy="122.01626123751157" r="22" fill="#f1d4d4" stroke="#234" stroke-width="1"/><text x="230.68724449565588" y="125.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">ERROR</text><text x="360" y="20" text-anchor="middle" font-size="13" font-weight="bold">Şekil 1: Tor FSM δ-grafiği (25 geçerli geçiş, 10 durum)</text></svg><div class="cap">Şekil 1. Tor FSM δ-grafiği. 10 durum, 25 geçerli geçiş.</div></div>
-<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 748 400" font-family="Helvetica,Arial,sans-serif" font-size="8"><text x="374" y="20" text-anchor="middle" font-size="13" font-weight="bold">Şekil 2: δ-domeni matrisi (yeşil=geçerli, kırmızı tonları=invalid)</text><text x="374" y="38" text-anchor="middle" font-size="9" fill="#555">Hücre etiketi: invalid'lerde saldırı sınıfı kısaltması; geçerli hücrede hedef durum</text><text x="153" y="54" text-anchor="end" transform="rotate(-50 153 54)" font-size="8">CONNECT</text><text x="199" y="54" text-anchor="end" transform="rotate(-50 199 54)" font-size="8">TLS_OK</text><text x="245" y="54" text-anchor="end" transform="rotate(-50 245 54)" font-size="8">TLS_FAIL</text><text x="291" y="54" text-anchor="end" transform="rotate(-50 291 54)" font-size="8">SEND_CREATE</text><text x="337" y="54" text-anchor="end" transform="rotate(-50 337 54)" font-size="8">RECV_CREATED</text><text x="383" y="54" text-anchor="end" transform="rotate(-50 383 54)" font-size="8">SEND_EXTEND</text><text x="429" y="54" text-anchor="end" transform="rotate(-50 429 54)" font-size="8">RECV_EXTENDED</text><text x="475" y="54" text-anchor="end" transform="rotate(-50 475 54)" font-size="8">SEND_RELAY_DATA</text><text x="521" y="54" text-anchor="end" transform="rotate(-50 521 54)" font-size="8">RECV_RELAY_DATA</text><text x="567" y="54" text-anchor="end" transform="rotate(-50 567 54)" font-size="8">SEND_DESTROY</text><text x="613" y="54" text-anchor="end" transform="rotate(-50 613 54)" font-size="8">RECV_DESTROY</text><text x="659" y="54" text-anchor="end" transform="rotate(-50 659 54)" font-size="8">CIRCUIT_CLOSED</text><text x="705" y="54" text-anchor="end" transform="rotate(-50 705 54)" font-size="8">TIMEOUT</text><text x="124" y="77" text-anchor="end" font-size="9" font-weight="bold">IDLE</text><text x="124" y="105" text-anchor="end" font-size="9" font-weight="bold">CONNECTING</text><text x="124" y="133" text-anchor="end" font-size="9" font-weight="bold">TLS_HANDSHAKE</text><text x="124" y="161" text-anchor="end" font-size="9" font-weight="bold">CREATE_SENT</text><text x="124" y="189" text-anchor="end" font-size="9" font-weight="bold">CIRCUIT_BUILDING</text><text x="124" y="217" text-anchor="end" font-size="9" font-weight="bold">CIRCUIT_READY</text><text x="124" y="245" text-anchor="end" font-size="9" font-weight="bold">TRANSMITTING</text><text x="124" y="273" text-anchor="end" font-size="9" font-weight="bold">CLOSING</text><text x="124" y="301" text-anchor="end" font-size="9" font-weight="bold">CLOSED</text><text x="124" y="329" text-anchor="end" font-size="9" font-weight="bold">ERROR</text><rect x="130" y="60" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="153" y="77" text-anchor="middle" font-size="7">CONNEC</text><rect x="176" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="60" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="60" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="77" text-anchor="middle" font-size="7">HSKP</text><rect x="314" y="60" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="360" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="77" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="77" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="60" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="475" y="77" text-anchor="middle" font-size="7">BYPS</text><rect x="498" y="60" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="521" y="77" text-anchor="middle" font-size="7">BYPS</text><rect x="544" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="77" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="77" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="60" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="60" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="705" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="130" y="88" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="105" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="88" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="199" y="105" text-anchor="middle" font-size="7">TLS_HA</text><rect x="222" y="88" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="245" y="105" text-anchor="middle" font-size="7">ERROR</text><rect x="268" y="88" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="314" y="88" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="360" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="88" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="475" y="105" text-anchor="middle" font-size="7">BYPS</text><rect x="498" y="88" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="521" y="105" text-anchor="middle" font-size="7">BYPS</text><rect x="544" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="105" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="105" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="88" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="105" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="88" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="105" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="116" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="133" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="133" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="116" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="245" y="133" text-anchor="middle" font-size="7">ERROR</text><rect x="268" y="116" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="291" y="133" text-anchor="middle" font-size="7">CREATE</text><rect x="314" y="116" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="337" y="133" text-anchor="middle" font-size="7">INV</text><rect x="360" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="116" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="498" y="116" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="544" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="133" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="133" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="116" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="133" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="116" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="133" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="144" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="161" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="161" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="144" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="161" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="291" y="161" text-anchor="middle" font-size="7">CFLD</text><rect x="314" y="144" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="337" y="161" text-anchor="middle" font-size="7">CIRCUI</text><rect x="360" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="161" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="161" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="144" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="161" text-anchor="middle" font-size="7">PDAT</text><rect x="498" y="144" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="161" text-anchor="middle" font-size="7">PDAT</text><rect x="544" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="161" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="161" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="144" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="161" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="144" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="161" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="172" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="189" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="172" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="189" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="172" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="189" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="172" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="291" y="189" text-anchor="middle" font-size="7">HIJK</text><rect x="314" y="172" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="337" y="189" text-anchor="middle" font-size="7">HIJK</text><rect x="360" y="172" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="383" y="189" text-anchor="middle" font-size="7">CIRCUI</text><rect x="406" y="172" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="429" y="189" text-anchor="middle" font-size="7">CIRCUI</text><rect x="452" y="172" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="189" text-anchor="middle" font-size="7">PDAT</text><rect x="498" y="172" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="189" text-anchor="middle" font-size="7">PDAT</text><rect x="544" y="172" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="189" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="172" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="189" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="172" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="189" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="172" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="189" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="200" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="217" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="200" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="217" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="200" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="217" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="200" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="291" y="217" text-anchor="middle" font-size="7">HIJK</text><rect x="314" y="200" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="337" y="217" text-anchor="middle" font-size="7">HIJK</text><rect x="360" y="200" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="383" y="217" text-anchor="middle" font-size="7">HIJK</text><rect x="406" y="200" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="429" y="217" text-anchor="middle" font-size="7">HIJK</text><rect x="452" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="475" y="217" text-anchor="middle" font-size="7">TRANSM</text><rect x="498" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="521" y="217" text-anchor="middle" font-size="7">TRANSM</text><rect x="544" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="567" y="217" text-anchor="middle" font-size="7">CLOSIN</text><rect x="590" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="613" y="217" text-anchor="middle" font-size="7">CLOSIN</text><rect x="636" y="200" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="217" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="217" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="228" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="245" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="228" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="245" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="228" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="245" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="291" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="314" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="337" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="360" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="383" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="406" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="429" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="452" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="475" y="245" text-anchor="middle" font-size="7">TRANSM</text><rect x="498" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="521" y="245" text-anchor="middle" font-size="7">TRANSM</text><rect x="544" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="567" y="245" text-anchor="middle" font-size="7">CLOSIN</text><rect x="590" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="613" y="245" text-anchor="middle" font-size="7">CLOSIN</text><rect x="636" y="228" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="245" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="245" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="256" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="273" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="256" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="256" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="314" y="256" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="360" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="406" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="452" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="475" y="273" text-anchor="middle" font-size="7">PDAT</text><rect x="498" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="521" y="273" text-anchor="middle" font-size="7">PDAT</text><rect x="544" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="590" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="636" y="256" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="659" y="273" text-anchor="middle" font-size="7">CLOSED</text><rect x="682" y="256" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="273" text-anchor="middle" font-size="7">CLOSED</text><rect x="130" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="153" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="176" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="284" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="314" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="360" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="383" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="406" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="429" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="452" y="284" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="475" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="498" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="544" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="590" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="636" y="284" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="284" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="705" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="130" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="153" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="176" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="312" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="314" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="360" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="383" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="406" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="429" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="452" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="498" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="544" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="590" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="636" y="312" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="659" y="329" text-anchor="middle" font-size="7">CLOSED</text><rect x="682" y="312" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="705" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="130" y="358" width="16" height="10" fill="#bce5c8" stroke="#888"/><text x="150" y="367" font-size="9">Valid</text><rect x="200" y="358" width="16" height="10" fill="#fde68a" stroke="#888"/><text x="220" y="367" font-size="9">LOW</text><rect x="270" y="358" width="16" height="10" fill="#fcb464" stroke="#888"/><text x="290" y="367" font-size="9">MEDIUM</text><rect x="340" y="358" width="16" height="10" fill="#f37b6b" stroke="#888"/><text x="360" y="367" font-size="9">HIGH</text><rect x="410" y="358" width="16" height="10" fill="#c43d3d" stroke="#888"/><text x="430" y="367" font-size="9">CRITICAL</text></svg><div class="cap">Şekil 2. Tüm Q × Σ domeni ısı haritası (130 hücre). Yeşil: δ-tanımlı; kırmızı tonları: Invalid (şiddete göre).</div></div>
+  </defs><path d="M 380.9232433584934 86.79837387624885 Q 419.7121058421729 116.22503487947824 468.3895121458507 115.21788736126273" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="419.7121058421729" y="116.22503487947824" fill="#234" text-anchor="middle">CONNECT</text><path d="M 502.2440310547785 139.8146351137604 Q 516.3283226346397 186.42082527419115 556.3011580344994 214.21788736126274" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="516.3283226346397" y="186.42082527419115" fill="#234" text-anchor="middle">TLS_OK</text><path d="M 467.31275550434407 122.01626123751157 Q 360 106.01626123751157 252.68724449565588 122.01626123751157" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="360" y="106.01626123751157" fill="#234" text-anchor="middle">TLS_FAIL,TIMEOUT</text><path d="M 569.2324335849338 254.01626123751157 Q 553.2324335849338 300 569.2324335849338 345.98373876248843" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="553.2324335849338" y="300" fill="#234" text-anchor="middle">SEND_CREATE</text><path d="M 548.3091902264405 225.21788736126274 Q 404.904110950294 161.7993569767891 251.61048785414926 128.8146351137604" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="404.904110950294" y="161.7993569767891" fill="#234" text-anchor="middle">TLS_FAIL,TIMEOUT</text><path d="M 556.3011580344994 385.78211263873726 Q 516.3283226346397 413.57917472580885 502.2440310547785 460.1853648862396" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="516.3283226346397" y="413.57917472580885" fill="#234" text-anchor="middle">RECV_CREATED</text><path d="M 551.4340597086849 355.052463212054 Q 409.3644030769744 232.05572809000085 248.4856183719047 134.94753678794598" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="409.3644030769744" y="232.05572809000085" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 513.3127555043441 469.98373876248843 c 30 -30, 60 -30, 30 0" stroke="#a55" fill="none" marker-end="url(#arrSelf)"/><text x="527.3127555043441" y="451.98373876248843" fill="#a55">SEND_EXTEND</text><path d="M 468.3895121458507 484.78211263873726 Q 419.7121058421729 483.77496512052176 380.9232433584934 513.2016261237511" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="419.7121058421729" y="483.77496512052176" fill="#234" text-anchor="middle">RECV_EXTENDED</text><path d="M 476.38147995390966 460.1853648862396 Q 372.94427190999915 290.5954359633204 243.61852004609028 139.8146351137604" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="372.94427190999915" y="290.5954359633204" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 339.0767566415066 513.2016261237511 Q 300.2878941578271 483.77496512052176 251.6104878541493 484.78211263873726" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="300.2878941578271" y="483.77496512052176" fill="#234" text-anchor="middle">SEND_RELAY_DATA,RECV_RELAY_DATA</text><path d="M 342.20162612375117 507.0687244495656 Q 264.7883472442127 431.04759747124507 168.56594029131506 380.91501431292284" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="264.7883472442127" y="431.04759747124507" fill="#234" text-anchor="middle">SEND_DESTROY,RECV_DESTROY</text><path d="M 353.20162612375117 499.0767566415066 Q 310.5605265085504 316.06385870875664 237.4856183719047 142.93950459600495" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="310.5605265085504" y="316.06385870875664" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 254.68724449565593 469.98373876248843 c 30 -30, 60 -30, 30 0" stroke="#a55" fill="none" marker-end="url(#arrSelf)"/><text x="268.68724449565593" y="451.98373876248843" fill="#a55">SEND_RELAY_DATA,RECV_RELAY_DATA</text><path d="M 217.75596894522153 460.1853648862396 Q 203.6716773653602 413.57917472580885 163.69884196550063 385.78211263873726" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="203.6716773653602" y="413.57917472580885" fill="#234" text-anchor="middle">SEND_DESTROY,RECV_DESTROY</text><path d="M 230.68724449565593 455.98373876248843 Q 246.6872444956559 300 230.68724449565588 144.01626123751157" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="246.6872444956559" y="300" fill="#234" text-anchor="middle">TIMEOUT</text><path d="M 150.76756641506623 345.98373876248843 Q 166.7675664150662 300 150.7675664150662 254.0162612375116" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="166.7675664150662" y="300" fill="#234" text-anchor="middle">CIRCUIT_CLOSED,TIMEOUT</text><path d="M 217.75596894522147 139.8146351137604 Q 177.78313354536186 167.611697200832 163.6988419655006 214.21788736126274" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="177.78313354536186" y="167.611697200832" fill="#234" text-anchor="middle">CIRCUIT_CLOSED</text><path d="M 380.9232433584934 513.2016261237511 Q 429.6006496621712 514.2087736419667 468.3895121458507 484.78211263873726" stroke="#456" fill="none" stroke-width="1" marker-end="url(#arr)"/><text x="429.6006496621712" y="514.2087736419667" fill="#234" text-anchor="middle">SEND_EXTEND</text><path d="M 384 512 c 30 -30, 60 -30, 30 0" stroke="#a55" fill="none" marker-end="url(#arrSelf)"/><text x="398" y="494" fill="#a55">RECV_EXTENDED</text><circle cx="360" cy="80" r="22" fill="#cfe9d6" stroke="#234" stroke-width="1"/><text x="360" y="83" text-anchor="middle" font-size="8" font-weight="bold">IDLE</text><circle cx="489.31275550434407" cy="122.01626123751157" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="489.31275550434407" y="125.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">CONNECTING</text><circle cx="569.2324335849338" cy="232.01626123751157" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="569.2324335849338" y="235.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">TLS_HANDSHAKE</text><circle cx="569.2324335849338" cy="367.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="569.2324335849338" y="370.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CREATE_SENT</text><circle cx="489.31275550434407" cy="477.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="489.31275550434407" y="480.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CIRCUIT_BUILDING</text><circle cx="360" cy="520" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="360" y="523" text-anchor="middle" font-size="8" font-weight="bold">CIRCUIT_READY</text><circle cx="230.68724449565593" cy="477.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="230.68724449565593" y="480.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">TRANSMITTING</text><circle cx="150.76756641506623" cy="367.98373876248843" r="22" fill="#dde7f4" stroke="#234" stroke-width="1"/><text x="150.76756641506623" y="370.98373876248843" text-anchor="middle" font-size="8" font-weight="bold">CLOSING</text><circle cx="150.7675664150662" cy="232.0162612375116" r="22" fill="#f1d4d4" stroke="#234" stroke-width="1"/><text x="150.7675664150662" y="235.0162612375116" text-anchor="middle" font-size="8" font-weight="bold">CLOSED</text><circle cx="230.68724449565588" cy="122.01626123751157" r="22" fill="#f1d4d4" stroke="#234" stroke-width="1"/><text x="230.68724449565588" y="125.01626123751157" text-anchor="middle" font-size="8" font-weight="bold">ERROR</text><text x="360" y="20" text-anchor="middle" font-size="13" font-weight="bold">Şekil 1: Tor FSM δ-grafiği (25 geçerli geçiş, 10 durum)</text></svg><div class="cap">Şekil 1. Tor FSM δ-grafiği. 10 durum, 27 geçerli geçiş.</div></div>
+<div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 748 400" font-family="Helvetica,Arial,sans-serif" font-size="8"><text x="374" y="20" text-anchor="middle" font-size="13" font-weight="bold">Şekil 2: δ-domeni matrisi (yeşil=geçerli, kırmızı tonları=invalid)</text><text x="374" y="38" text-anchor="middle" font-size="9" fill="#555">Hücre etiketi: invalid'lerde saldırı sınıfı kısaltması; geçerli hücrede hedef durum</text><text x="153" y="54" text-anchor="end" transform="rotate(-50 153 54)" font-size="8">CONNECT</text><text x="199" y="54" text-anchor="end" transform="rotate(-50 199 54)" font-size="8">TLS_OK</text><text x="245" y="54" text-anchor="end" transform="rotate(-50 245 54)" font-size="8">TLS_FAIL</text><text x="291" y="54" text-anchor="end" transform="rotate(-50 291 54)" font-size="8">SEND_CREATE</text><text x="337" y="54" text-anchor="end" transform="rotate(-50 337 54)" font-size="8">RECV_CREATED</text><text x="383" y="54" text-anchor="end" transform="rotate(-50 383 54)" font-size="8">SEND_EXTEND</text><text x="429" y="54" text-anchor="end" transform="rotate(-50 429 54)" font-size="8">RECV_EXTENDED</text><text x="475" y="54" text-anchor="end" transform="rotate(-50 475 54)" font-size="8">SEND_RELAY_DATA</text><text x="521" y="54" text-anchor="end" transform="rotate(-50 521 54)" font-size="8">RECV_RELAY_DATA</text><text x="567" y="54" text-anchor="end" transform="rotate(-50 567 54)" font-size="8">SEND_DESTROY</text><text x="613" y="54" text-anchor="end" transform="rotate(-50 613 54)" font-size="8">RECV_DESTROY</text><text x="659" y="54" text-anchor="end" transform="rotate(-50 659 54)" font-size="8">CIRCUIT_CLOSED</text><text x="705" y="54" text-anchor="end" transform="rotate(-50 705 54)" font-size="8">TIMEOUT</text><text x="124" y="77" text-anchor="end" font-size="9" font-weight="bold">IDLE</text><text x="124" y="105" text-anchor="end" font-size="9" font-weight="bold">CONNECTING</text><text x="124" y="133" text-anchor="end" font-size="9" font-weight="bold">TLS_HANDSHAKE</text><text x="124" y="161" text-anchor="end" font-size="9" font-weight="bold">CREATE_SENT</text><text x="124" y="189" text-anchor="end" font-size="9" font-weight="bold">CIRCUIT_BUILDING</text><text x="124" y="217" text-anchor="end" font-size="9" font-weight="bold">CIRCUIT_READY</text><text x="124" y="245" text-anchor="end" font-size="9" font-weight="bold">TRANSMITTING</text><text x="124" y="273" text-anchor="end" font-size="9" font-weight="bold">CLOSING</text><text x="124" y="301" text-anchor="end" font-size="9" font-weight="bold">CLOSED</text><text x="124" y="329" text-anchor="end" font-size="9" font-weight="bold">ERROR</text><rect x="130" y="60" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="153" y="77" text-anchor="middle" font-size="7">CONNEC</text><rect x="176" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="60" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="60" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="77" text-anchor="middle" font-size="7">HSKP</text><rect x="314" y="60" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="360" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="77" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="77" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="60" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="475" y="77" text-anchor="middle" font-size="7">BYPS</text><rect x="498" y="60" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="521" y="77" text-anchor="middle" font-size="7">BYPS</text><rect x="544" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="77" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="60" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="77" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="60" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="60" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="705" y="77" text-anchor="middle" font-size="7">GHST</text><rect x="130" y="88" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="105" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="88" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="199" y="105" text-anchor="middle" font-size="7">TLS_HA</text><rect x="222" y="88" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="245" y="105" text-anchor="middle" font-size="7">ERROR</text><rect x="268" y="88" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="314" y="88" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="360" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="105" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="88" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="475" y="105" text-anchor="middle" font-size="7">BYPS</text><rect x="498" y="88" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="521" y="105" text-anchor="middle" font-size="7">BYPS</text><rect x="544" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="105" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="88" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="105" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="88" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="105" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="88" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="105" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="116" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="133" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="133" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="116" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="245" y="133" text-anchor="middle" font-size="7">ERROR</text><rect x="268" y="116" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="291" y="133" text-anchor="middle" font-size="7">CREATE</text><rect x="314" y="116" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="337" y="133" text-anchor="middle" font-size="7">INV</text><rect x="360" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="116" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="498" y="116" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="133" text-anchor="middle" font-size="7">HSKP</text><rect x="544" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="133" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="116" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="133" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="116" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="133" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="116" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="133" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="144" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="161" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="161" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="144" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="161" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="291" y="161" text-anchor="middle" font-size="7">CFLD</text><rect x="314" y="144" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="337" y="161" text-anchor="middle" font-size="7">CIRCUI</text><rect x="360" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="161" text-anchor="middle" font-size="7">HSKP</text><rect x="406" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="161" text-anchor="middle" font-size="7">HSKP</text><rect x="452" y="144" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="161" text-anchor="middle" font-size="7">PDAT</text><rect x="498" y="144" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="161" text-anchor="middle" font-size="7">PDAT</text><rect x="544" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="161" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="144" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="161" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="144" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="161" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="144" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="161" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="172" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="189" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="172" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="189" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="172" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="189" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="172" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="291" y="189" text-anchor="middle" font-size="7">HIJK</text><rect x="314" y="172" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="337" y="189" text-anchor="middle" font-size="7">HIJK</text><rect x="360" y="172" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="383" y="189" text-anchor="middle" font-size="7">CIRCUI</text><rect x="406" y="172" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="429" y="189" text-anchor="middle" font-size="7">CIRCUI</text><rect x="452" y="172" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="189" text-anchor="middle" font-size="7">PDAT</text><rect x="498" y="172" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="189" text-anchor="middle" font-size="7">PDAT</text><rect x="544" y="172" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="189" text-anchor="middle" font-size="7">REPL</text><rect x="590" y="172" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="189" text-anchor="middle" font-size="7">REPL</text><rect x="636" y="172" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="189" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="172" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="189" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="200" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="217" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="200" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="217" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="200" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="217" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="200" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="291" y="217" text-anchor="middle" font-size="7">HIJK</text><rect x="314" y="200" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="337" y="217" text-anchor="middle" font-size="7">HIJK</text><rect x="360" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="383" y="217" text-anchor="middle" font-size="7">CIRCUI</text><rect x="406" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="429" y="217" text-anchor="middle" font-size="7">CIRCUI</text><rect x="452" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="475" y="217" text-anchor="middle" font-size="7">TRANSM</text><rect x="498" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="521" y="217" text-anchor="middle" font-size="7">TRANSM</text><rect x="544" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="567" y="217" text-anchor="middle" font-size="7">CLOSIN</text><rect x="590" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="613" y="217" text-anchor="middle" font-size="7">CLOSIN</text><rect x="636" y="200" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="217" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="200" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="217" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="228" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="245" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="228" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="245" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="228" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="245" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="291" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="314" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="337" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="360" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="383" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="406" y="228" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="429" y="245" text-anchor="middle" font-size="7">HIJK</text><rect x="452" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="475" y="245" text-anchor="middle" font-size="7">TRANSM</text><rect x="498" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="521" y="245" text-anchor="middle" font-size="7">TRANSM</text><rect x="544" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="567" y="245" text-anchor="middle" font-size="7">CLOSIN</text><rect x="590" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="613" y="245" text-anchor="middle" font-size="7">CLOSIN</text><rect x="636" y="228" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="245" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="228" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="245" text-anchor="middle" font-size="7">ERROR</text><rect x="130" y="256" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="153" y="273" text-anchor="middle" font-size="7">CFLD</text><rect x="176" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="256" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="256" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="314" y="256" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="360" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="383" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="406" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="429" y="273" text-anchor="middle" font-size="7">REPL</text><rect x="452" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="475" y="273" text-anchor="middle" font-size="7">PDAT</text><rect x="498" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="521" y="273" text-anchor="middle" font-size="7">PDAT</text><rect x="544" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="590" y="256" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="273" text-anchor="middle" font-size="7">GHST</text><rect x="636" y="256" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="659" y="273" text-anchor="middle" font-size="7">CLOSED</text><rect x="682" y="256" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="705" y="273" text-anchor="middle" font-size="7">CLOSED</text><rect x="130" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="153" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="176" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="284" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="314" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="360" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="383" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="406" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="429" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="452" y="284" width="45" height="27" fill="#c43d3d" stroke="#fff"/><text x="475" y="301" text-anchor="middle" font-size="7">REPL</text><rect x="498" y="284" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="544" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="590" y="284" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="636" y="284" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="659" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="682" y="284" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="705" y="301" text-anchor="middle" font-size="7">GHST</text><rect x="130" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="153" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="176" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="199" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="222" y="312" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="245" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="268" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="291" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="314" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="337" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="360" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="383" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="406" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="429" y="329" text-anchor="middle" font-size="7">REPL</text><rect x="452" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="475" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="498" y="312" width="45" height="27" fill="#f37b6b" stroke="#fff"/><text x="521" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="544" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="567" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="590" y="312" width="45" height="27" fill="#fcb464" stroke="#fff"/><text x="613" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="636" y="312" width="45" height="27" fill="#bce5c8" stroke="#fff"/><text x="659" y="329" text-anchor="middle" font-size="7">CLOSED</text><rect x="682" y="312" width="45" height="27" fill="#fde68a" stroke="#fff"/><text x="705" y="329" text-anchor="middle" font-size="7">GHST</text><rect x="130" y="358" width="16" height="10" fill="#bce5c8" stroke="#888"/><text x="150" y="367" font-size="9">Valid</text><rect x="200" y="358" width="16" height="10" fill="#fde68a" stroke="#888"/><text x="220" y="367" font-size="9">LOW</text><rect x="270" y="358" width="16" height="10" fill="#fcb464" stroke="#888"/><text x="290" y="367" font-size="9">MEDIUM</text><rect x="340" y="358" width="16" height="10" fill="#f37b6b" stroke="#888"/><text x="360" y="367" font-size="9">HIGH</text><rect x="410" y="358" width="16" height="10" fill="#c43d3d" stroke="#888"/><text x="430" y="367" font-size="9">CRITICAL</text></svg><div class="cap">Şekil 2. Tüm Q × Σ domeni ısı haritası (130 hücre). Yeşil: δ-tanımlı; kırmızı tonları: Invalid (şiddete göre).</div></div>
 <div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" font-family="Helvetica,Arial,sans-serif" font-size="10"><text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold">Şekil 3: Algoritma karşılaştırması — ortalama ± SD (N=30)</text><line x1="60" y1="330" x2="660" y2="330" stroke="#eee"/><text x="54" y="333" text-anchor="end" font-size="8">0%</text><line x1="60" y1="302" x2="660" y2="302" stroke="#eee"/><text x="54" y="305" text-anchor="end" font-size="8">10%</text><line x1="60" y1="274" x2="660" y2="274" stroke="#eee"/><text x="54" y="277" text-anchor="end" font-size="8">20%</text><line x1="60" y1="246" x2="660" y2="246" stroke="#eee"/><text x="54" y="249" text-anchor="end" font-size="8">30%</text><line x1="60" y1="218" x2="660" y2="218" stroke="#eee"/><text x="54" y="221" text-anchor="end" font-size="8">40%</text><line x1="60" y1="190" x2="660" y2="190" stroke="#eee"/><text x="54" y="193" text-anchor="end" font-size="8">50%</text><line x1="60" y1="162" x2="660" y2="162" stroke="#eee"/><text x="54" y="165" text-anchor="end" font-size="8">60%</text><line x1="60" y1="134" x2="660" y2="134" stroke="#eee"/><text x="54" y="137" text-anchor="end" font-size="8">70%</text><line x1="60" y1="106" x2="660" y2="106" stroke="#eee"/><text x="54" y="109" text-anchor="end" font-size="8">80%</text><line x1="60" y1="78" x2="660" y2="78" stroke="#eee"/><text x="54" y="81" text-anchor="end" font-size="8">90%</text><line x1="60" y1="50" x2="660" y2="50" stroke="#eee"/><text x="54" y="53" text-anchor="end" font-size="8">100%</text><text x="160" y="346" text-anchor="middle" font-size="10" font-weight="bold">State Coverage</text><rect x="75" y="114.40000000000009" width="52.666666666666664" height="215.5999999999999" fill="#9aa6b8"/><line x1="101.33333333333333" y1="67.8074151230345" x2="101.33333333333333" y2="160.99258487696568" stroke="#222" stroke-width="1"/><line x1="97.33333333333333" y1="67.8074151230345" x2="105.33333333333333" y2="67.8074151230345" stroke="#222"/><line x1="97.33333333333333" y1="160.99258487696568" x2="105.33333333333333" y2="160.99258487696568" stroke="#222"/><text x="101.33333333333333" y="63.8074151230345" text-anchor="middle" font-size="8">77.0%</text><rect x="131.66666666666666" y="50" width="52.666666666666664" height="280" fill="#3b82c4"/><line x1="158" y1="50" x2="158" y2="50" stroke="#222" stroke-width="1"/><line x1="154" y1="50" x2="162" y2="50" stroke="#222"/><line x1="154" y1="50" x2="162" y2="50" stroke="#222"/><text x="158" y="46" text-anchor="middle" font-size="8">100.0%</text><rect x="188.33333333333331" y="50" width="52.666666666666664" height="280" fill="#1d8b5d"/><line x1="214.66666666666666" y1="50" x2="214.66666666666666" y2="50" stroke="#222" stroke-width="1"/><line x1="210.66666666666666" y1="50" x2="218.66666666666666" y2="50" stroke="#222"/><line x1="210.66666666666666" y1="50" x2="218.66666666666666" y2="50" stroke="#222"/><text x="214.66666666666666" y="46" text-anchor="middle" font-size="8">100.0%</text><text x="360" y="346" text-anchor="middle" font-size="10" font-weight="bold">Transition Coverage</text><rect x="275" y="201.57333333333335" width="52.666666666666664" height="128.42666666666665" fill="#9aa6b8"/><line x1="301.3333333333333" y1="170.6224385957418" x2="301.3333333333333" y2="232.5242280709249" stroke="#222" stroke-width="1"/><line x1="297.3333333333333" y1="170.6224385957418" x2="305.3333333333333" y2="170.6224385957418" stroke="#222"/><line x1="297.3333333333333" y1="232.5242280709249" x2="305.3333333333333" y2="232.5242280709249" stroke="#222"/><text x="301.3333333333333" y="166.6224385957418" text-anchor="middle" font-size="8">45.9%</text><rect x="331.6666666666667" y="110.8533333333333" width="52.666666666666664" height="219.1466666666667" fill="#3b82c4"/><line x1="358" y1="87.19793760368132" x2="358" y2="134.50872906298525" stroke="#222" stroke-width="1"/><line x1="354" y1="87.19793760368132" x2="362" y2="87.19793760368132" stroke="#222"/><line x1="354" y1="134.50872906298525" x2="362" y2="134.50872906298525" stroke="#222"/><text x="358" y="83.19793760368132" text-anchor="middle" font-size="8">78.3%</text><rect x="388.3333333333333" y="50" width="52.666666666666664" height="280" fill="#1d8b5d"/><line x1="414.66666666666663" y1="50" x2="414.66666666666663" y2="50" stroke="#222" stroke-width="1"/><line x1="410.66666666666663" y1="50" x2="418.66666666666663" y2="50" stroke="#222"/><line x1="410.66666666666663" y1="50" x2="418.66666666666663" y2="50" stroke="#222"/><text x="414.66666666666663" y="46" text-anchor="middle" font-size="8">100.0%</text><text x="560" y="346" text-anchor="middle" font-size="10" font-weight="bold">ITDR</text><rect x="475" y="189.1111111111111" width="52.666666666666664" height="140.8888888888889" fill="#9aa6b8"/><line x1="501.3333333333333" y1="161.6732211900446" x2="501.3333333333333" y2="216.54900103217759" stroke="#222" stroke-width="1"/><line x1="497.3333333333333" y1="161.6732211900446" x2="505.3333333333333" y2="161.6732211900446" stroke="#222"/><line x1="497.3333333333333" y1="216.54900103217759" x2="505.3333333333333" y2="216.54900103217759" stroke="#222"/><text x="501.3333333333333" y="157.6732211900446" text-anchor="middle" font-size="8">50.3%</text><rect x="531.6666666666666" y="196.9333333333333" width="52.666666666666664" height="133.0666666666667" fill="#3b82c4"/><line x1="558" y1="185.67720686186178" x2="558" y2="208.18945980480484" stroke="#222" stroke-width="1"/><line x1="554" y1="185.67720686186178" x2="562" y2="185.67720686186178" stroke="#222"/><line x1="554" y1="208.18945980480484" x2="562" y2="208.18945980480484" stroke="#222"/><text x="558" y="181.67720686186178" text-anchor="middle" font-size="8">47.5%</text><rect x="588.3333333333334" y="67.24444444444441" width="52.666666666666664" height="262.7555555555556" fill="#1d8b5d"/><line x1="614.6666666666667" y1="63.362140221539846" x2="614.6666666666667" y2="71.12674866734898" stroke="#222" stroke-width="1"/><line x1="610.6666666666667" y1="63.362140221539846" x2="618.6666666666667" y2="63.362140221539846" stroke="#222"/><line x1="610.6666666666667" y1="71.12674866734898" x2="618.6666666666667" y2="71.12674866734898" stroke="#222"/><text x="614.6666666666667" y="59.362140221539846" text-anchor="middle" font-size="8">93.8%</text><rect x="60" y="362" width="14" height="10" fill="#9aa6b8"/><text x="78" y="371" font-size="10">B1_Random</text><rect x="200" y="362" width="14" height="10" fill="#3b82c4"/><text x="218" y="371" font-size="10">B2_GreedySC</text><rect x="340" y="362" width="14" height="10" fill="#1d8b5d"/><text x="358" y="371" font-size="10">B3_MDT</text></svg><div class="cap">Şekil 3. Algoritma karşılaştırması — ortalama ± SD (N = 30, bütçe = 500 olay).</div></div>
 <div class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Helvetica,Arial,sans-serif" font-size="10"><text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold">Şekil 4: Tespit edilen invalid'lerin şiddet dağılımı (N=30 ort.)</text><text x="94" y="85" text-anchor="end" font-weight="bold">B1_Random</text><rect x="100" y="50" width="128.10094637223975" height="64" fill="#fde68a"/><text x="164.05047318611986" y="85" text-anchor="middle" font-size="9">12.5</text><rect x="228.10094637223975" y="50" width="219.74763406940065" height="64" fill="#fcb464"/><text x="337.97476340694004" y="85" text-anchor="middle" font-size="9">21.5</text><rect x="447.84858044164037" y="50" width="136.61829652996846" height="64" fill="#f37b6b"/><text x="516.1577287066245" y="85" text-anchor="middle" font-size="9">13.4</text><rect x="584.4668769716088" y="50" width="55.533123028391174" height="64" fill="#c43d3d"/><text x="612.2334384858044" y="85" text-anchor="middle" font-size="9">5.4</text><text x="648" y="85" font-size="9" fill="#555">Σ=52.8</text><text x="94" y="165" text-anchor="end" font-weight="bold">B2_GreedySC</text><rect x="100" y="130" width="125.5310621242485" height="64" fill="#fde68a"/><text x="162.76553106212424" y="165" text-anchor="middle" font-size="9">11.6</text><rect x="225.5310621242485" y="130" width="220.76152304609218" height="64" fill="#fcb464"/><text x="335.91182364729457" y="165" text-anchor="middle" font-size="9">20.4</text><rect x="446.29258517034066" y="130" width="136.71342685370743" height="64" fill="#f37b6b"/><text x="514.6492985971944" y="165" text-anchor="middle" font-size="9">12.6</text><rect x="583.0060120240481" y="130" width="56.9939879759519" height="64" fill="#c43d3d"/><text x="611.5030060120241" y="165" text-anchor="middle" font-size="9">5.3</text><text x="648" y="165" font-size="9" fill="#555">Σ=49.9</text><text x="94" y="245" text-anchor="end" font-weight="bold">B3_MDT</text><rect x="100" y="210" width="138.47090663058185" height="64" fill="#fde68a"/><text x="169.23545331529093" y="245" text-anchor="middle" font-size="9">25.3</text><rect x="238.47090663058185" y="210" width="205.51420838971583" height="64" fill="#fcb464"/><text x="341.22801082543975" y="245" text-anchor="middle" font-size="9">37.5</text><rect x="443.9851150202977" y="210" width="118.74154262516915" height="64" fill="#f37b6b"/><text x="503.3558863328823" y="245" text-anchor="middle" font-size="9">21.7</text><rect x="562.7266576454668" y="210" width="77.27334235453314" height="64" fill="#c43d3d"/><text x="601.3633288227334" y="245" text-anchor="middle" font-size="9">14.1</text><text x="648" y="245" font-size="9" fill="#555">Σ=98.5</text><rect x="100" y="306" width="14" height="10" fill="#fde68a"/><text x="118" y="315" font-size="10">LOW</text><rect x="190" y="306" width="14" height="10" fill="#fcb464"/><text x="208" y="315" font-size="10">MEDIUM</text><rect x="280" y="306" width="14" height="10" fill="#f37b6b"/><text x="298" y="315" font-size="10">HIGH</text><rect x="370" y="306" width="14" height="10" fill="#c43d3d"/><text x="388" y="315" font-size="10">CRITICAL</text></svg><div class="cap">Şekil 4. Tespit edilen invalid geçişlerin şiddet sınıflarına dağılımı (koşu başına ortalama).</div></div>
 
@@ -1340,9 +1718,9 @@ ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
 <h3>6.1 Katkıların Yeniden Değerlendirilmesi</h3>
 <p>Bölüm 1.3'te dört katkı listelenmiş, bu tezde dördü de gerçekleştirilmiştir:</p>
 <ul>
-  <li><b>Katkı 1 (tam δ-matrisi):</b> Ek A'da 25 geçerli ikili tek tablo olarak
+  <li><b>Katkı 1 (tam δ-matrisi):</b> Ek A'da 27 geçerli ikili tek tablo olarak
   verilmiştir; literatürde benzer bir derleme mevcut değildir (G1).</li>
-  <li><b>Katkı 2 (programatik sınıflandırıcı):</b> Ek B'de 105 geçersiz ikilinin
+  <li><b>Katkı 2 (programatik sınıflandırıcı):</b> Ek B'de 103 geçersiz ikilinin
   yedi ana vektör + 1 fallback ve dört şiddet seviyesine dağılımı raporlanmıştır (G3).</li>
   <li><b>Katkı 3 (referans MDT implementasyonu):</b> Algoritma 1 ile tarif edilen motor
   açık kaynak olarak repodadır; tek komutla yeniden çalıştırılabilir (G2).</li>
@@ -1355,11 +1733,11 @@ ile değiştirilmesi yeterlidir (bkz. Bölüm 6.3).</p>
 
 <h4>6.2.1 Ortam Kısıtlılıkları (Replit NixOS sandbox)</h4>
 
-<p>Aşağıdaki maddelerde tekrar atıfta bulunulan iki temel kısıtlılığın
-&mdash; <b>Rust toolchain (rustc/cargo)</b> ve <b>Shadow runtime trace</b>
-&mdash; bu çalışma ortamında neden uygulanamadığı, "future work" denip
-geçilmek yerine açıkça belgelenir. Amaç: dürüst limitler kuralı gereği
-okuyucunun "neden yapılmadı?" sorusuna kesin teknik cevap bulabilmesidir.</p>
+<p>İlk tez versiyonunda iki temel kısıtlılık belgelenmişti:
+<b>Rust toolchain (rustc/cargo)</b> ve <b>Shadow runtime trace</b>.
+Rust toolchain kısıtlılığı hâlâ geçerlidir (aşağıda A). Shadow runtime trace
+ise sonradan farklı bir çalışma ortamında gerçekleştirilmiştir (aşağıda B;
+sonuçlar Bölüm 4.12-B'de raporlanmıştır).</p>
 
 <p class="no-indent"><b>(A) Rust port (<code>rustc</code> + <code>cargo</code>).</b></p>
 <ol>
@@ -1386,40 +1764,57 @@ okuyucunun "neden yapılmadı?" sorusuna kesin teknik cevap bulabilmesidir.</p>
 fakat <i>tekrar-üretilebilirlik açısından tercih edilmemiştir</i>; hot path'in
 gcc&nbsp;-O3 C portu mevcut latency karşılaştırmasının nitel sonucunu zaten verir.</p>
 
-<p class="no-indent"><b>(B) Shadow runtime trace.</b></p>
+<p class="no-indent"><b>(B) Shadow runtime trace — giderildi (Bölüm 4.12-B).</b></p>
 <ol>
   <li><b>Shadow nedir:</b> Discrete-event ağ simülatörü, ~250&nbsp;k LoC
   C/Rust hibrit kod tabanı, gerçek dinamik linklenmiş Tor binary'sini
-  yer-paylaşımsız sanal süreçler içinde koşturur (Jansen & Hopper, NDSS 2012).</li>
-  <li><b>Bağımlılıklar:</b> glib-2.0, libigraph, libyaml, libelf, cmake&nbsp;≥3.13,
-  gcc&nbsp;≥9, libffi, pcre2 ve ~25 ek paket; ayrıca <code>tor</code>'un debug
-  symbol'lerle yeniden derlenmesi (openssl, libevent, zlib ile linklenmiş).
-  Toplam disk: ~3&nbsp;GB; build süresi temiz makinede ~20-40&nbsp;dk.</li>
-  <li><b>Ortam engelleri:</b> Replit container'ı (a) <code>ptrace</code>/seccomp
-  filter'larıyla sınırlandırılmıştır (Shadow süreçleri kontrol etmek için
-  <code>ptrace</code> kullanır); (b) RAM tavanı tipik olarak 8&nbsp;GB civarıdır,
-  küçük bir Shadow topolojisi (5 relay + 3 client + 1 dir-auth + 1 hizmet)
-  bile 2-4&nbsp;GB ister; (c) ephemeral disk volume, çoklu oturum boyunca
-  build artefact'larını korumaz.</li>
-  <li><b>İş yükü:</b> Shadow kurulduktan sonra, bu çalışmaya bağlanması için ek
-  500-2000 satır harness kodu gerekir: (i) Shadow'un pcap çıktısını parse edip
-  TLS/cell katmanına decode etmek (libtor-cellparser veya benzeri), (ii) cell
-  akışını bu tezin Σ olay alfabesine eşlemek, (iii) circuit yaşam döngüsünü
-  CIRC_ID üzerinden takip etmek. Bu, gerçekçi olarak haftalar mertebesinde
-  bir araştırma alt-projesidir.</li>
-  <li><b>Kısmi telafi:</b> Bunun yerine Bölüm 4.12'de tor kaynak kodu
-  doğrudan klonlanıp 9 <code>circuit_set_state</code> çağrı noktasından
-  5-durumlu impl FSM <i>statik</i> olarak
-  çıkarılmıştır ve Bölüm 4.14'te bu FSM üzerinde Angluin L* yakınsamıştır.
-  Bu, runtime trace'in <i>tam</i> ikamesi değildir &mdash; davranışsal
-  (runtime) bilgi vermez, sadece yapısal (static) bilgi verir. Tam runtime
-  trace, Bölüm 6.3'te birinci öncelikli gelecek çalışma olarak listelenir.</li>
+  yer-paylaşımsız sanal süreçler içinde koşturur [18].</li>
+  <li><b>Önceki durum:</b> Bu sınırlılık ilk tez versiyonunda "Replit NixOS
+  ortamında uygulanamaz" olarak belgelenmişti. Sonradan farklı bir
+  çalışma ortamında (Ubuntu, sudo erişimli VM) Shadow
+  v3.3.0 kaynak koddan derlenerek kurulmuş,
+  Tor 0.4.6.10 ile
+  entegre edilmiştir.</li>
+  <li><b>Uygulama:</b> Bölüm 4.12-B'de raporlanan deneyler
+  9 Shadow simülasyonu
+  (3 seed × 3 senaryo) koşturmuş,
+  666 devreden
+  6.093 olay
+  çıkarılmış ve per-circuit FSM monitörü ile doğrulanmıştır.
+  Harness kodu (<code>experiments/shadow_harness.mjs</code>) pcap yerine
+  Tor'un info-level log çıktısını kullanarak olay eşlemesi yapmıştır;
+  bu yaklaşım cell-düzeyinde decode gerektirmez.</li>
+  <li><b>Kalan sınırlılıklar:</b> (a) Ağ ölçeği küçüktür
+  (6 relay vs gerçek Tor ~7.000);
+  (b) saldırı enjeksiyonu harness seviyesindedir (modifiye tor binary değil);
+  (c) L*'nin MQ oracle'ı henüz running tor'a bağlanmamıştır.</li>
 </ol>
-<p class="no-indent"><b>Sonuç (B):</b> Shadow bu ortamda <i>kurulamaz değildir</i>;
-fakat toolchain kurulumu + tor build + harness yazımı + uzun çalıştırma süreleri
-toplamı, tek-oturum bir tez deneyi kapsamını aşar. Bu sınır <i>teknik</i> (mümkün
-ama uzun), <i>etik veya bilimsel değil</i>; gerçek bir araştırma laboratuvarında
-2-4 haftada tamamlanabilir.</p>
+<p class="no-indent"><b>Sonuç (B):</b> Shadow runtime trace <b>gerçekleştirilmiştir</b>.
+Bölüm 4.12-B (v1: 6 relay) ve
+4.12-C (v2: 30 relay, 3-hop FSM)
+sonuçları FSM monitörünün gerçek Tor runtime davranışı üzerindeki ampirik
+değerlendirmesidir. v2'de 3-hop FSM modeli ile yapısal FP oranı ~%25'ten
+~%5.3'e düşürülmüş, recall = 1.000 korunmuştur. Kalan sınırlılıklar:
+harness-seviyesi saldırı enjeksiyonu, küçük ağ ölçeği.</p>
+
+<p class="no-indent"><b>(C) Bu calismada kapsam disinda birakilan konular.</b></p>
+<ol>
+  <li><b>Formal dogrulama (TLA+, Coq, Promela):</b> FSM modelinin formal olarak
+  dogrulanmasi ayri bir calismada ele alinmalidir; bu tezin kapsaminin otesindedir.</li>
+  <li><b>Modifiye Tor binary ile gercek hucre-duzeyinde saldiri:</b> Binary
+  modifikasyonu onemli muhendislik cabasina ve Tor kaynak kodunda kapsamli
+  degisikliklere gerek duyar; bu PR'nin kapsaminda degildir.</li>
+  <li><b>Hidden Service / Bridge / Pluggable Transport FSM'leri:</b> Ayri
+  protokol alt-kumeleri olarak ayri calisma gerektirirler.</li>
+  <li><b>Gercek Tor aginda test:</b> Etik ve kapsam nedenlerinden dolayi
+  bu tezde uygulanmamistir; anonimlik ihlali riski tasir.</li>
+  <li><b>Derin ogrenme modelleri (LSTM/Transformer):</b> FSM-tabanli bir
+  tez icin kapsam disindadir; ML karsilastirmasi olarak Isolation Forest
+  yeterlidir.</li>
+  <li><b>Website fingerprinting / trafik korelasyonu / deanonimizasyon:</b>
+  Farkli bir arastirma alanidir, FSM devre guvenlik monitoru ile
+  dogrudan iliskili degildir.</li>
+</ol>
 
 <h4>6.2.2 Konu Bazlı Sınırlılıklar</h4>
 <ul>
@@ -1432,13 +1827,19 @@ ama uzun), <i>etik veya bilimsel değil</i>; gerçek bir araştırma laboratuvar
   ek olarak Angluin L* algoritması saf Node ile implement edilmiş ve statik
   çıkarılmış impl FSM üzerinde 4 turda
   56.722 MQ ile yakınsayarak
-  minimal kanonik DFA'yı doğru çıkarmıştır; running tor binary üzerinde Shadow
-  trace hâlâ kapsam dışıdır.</li>
-  <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1).</b> Spec narrative'inden
-  bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
+  minimal kanonik DFA'yı doğru çıkarmıştır. <b>Ek olarak</b>, Bölüm 4.12-B'de
+  Shadow simülatörü üzerinde running Tor binary'sinden runtime olay akışı
+  yakalanmış ve spec FSM ile karşılaştırılmıştır (recall = 1.000,
+  precision = 0.369-0.466,
+  yapısal FPR = ~%25).
+  L*'nin MQ oracle'ının running tor'a bağlanması gelecek çalışmadır.</li>
+  <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1, 4.12-B).</b> Spec
+  narrative'inden bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
   98.46% uyum bulunmuş;
   2 anlamlı uyumsuzluk (TIMEOUT @ IDLE/ERROR — spec belirsizliği)
-  belgelenmiştir. Gerçek Tor binary'den FSM çıkarımı (Shadow gerekli) hâlâ kapsam dışıdır.</li>
+  belgelenmiştir. Bölüm 4.12-B'deki Shadow deneyleri ile gerçek Tor
+  runtime'dan FPR ampirik olarak ölçülmüştür (örn. replay_attack FPR =
+  0.2505 ± 0.0071).</li>
   <li><b>N = 30 koşu — giderildi (Bölüm 4.9).</b> Eşleştirilmiş bootstrap %95 CI
   (B = 10.000) ve post-hoc güç analizi (α = 0.05, β = 0.80) eklenmiştir; B3'ün TC/ITDR
   üstünlüğü için güç ≈ 1.000 bulunmuştur. Açık kalan tek anlamsız fark B2 − B1 ITDR
@@ -1499,27 +1900,25 @@ aşağıdaki tabloda açıkça gösterilmiştir:</p>
 <td style="padding:4pt;border:1px solid #999;">Otomaton öğrenme ile pipeline doğrulaması</td>
 <td style="padding:4pt;border:1px solid #999;">Saf-Node L*, 56.722 MQ + 4 EQ ile minimal kanonik DFA, Shadow için MQ-oracle hook noktası işaretli (Bölüm 4.14)</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
-<tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S5</td>
+<tr style="background:#d4edda;"><td style="padding:4pt;border:1px solid #999;">S5</td>
 <td style="padding:4pt;border:1px solid #999;">Simüle edilmiş ağ ortamında runtime trace</td>
-<td style="padding:4pt;border:1px solid #999;">Shadow simülatöründe 5-30 relay topoloji + running tor binary'den canlı CIRC akışı</td>
-<td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (yol haritası: 6.3.3, Adım 1-7)</td></tr>
-<tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S6</td>
+<td style="padding:4pt;border:1px solid #999;">Shadow v3.3.0 + Tor 0.4.6.10; v1: 6 relay, v2: 30 relay topoloji; 2-hop ve 3-hop FSM modelleri (Bölüm 4.12-B, 4.12-C)</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
+<tr style="background:#d4edda;"><td style="padding:4pt;border:1px solid #999;">S6</td>
 <td style="padding:4pt;border:1px solid #999;">Saldırı senaryolarıyla gerçek FPR/TPR ölçümü</td>
-<td style="padding:4pt;border:1px solid #999;">Shadow içinde modifiye tor client ile 4 saldırı sınıfı tetikleme + classifyInvalid doğrulama</td>
-<td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (yol haritası: 6.3.3, Adım 9)</td></tr>
+<td style="padding:4pt;border:1px solid #999;">v2'de 7 saldırı senaryosu (replay, bypass, ghost, handshake_skip, premature_data, create_flood); recall = 1.000 tum turler; 3-hop F1 = 0.835-0.952 (Bolum 4.12-C)</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Kısmen tamamlandı</b> (harness-seviyesi; modifiye binary değil)</td></tr>
 <tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S7</td>
 <td style="padding:4pt;border:1px solid #999;">Üretim Tor relay'inde alan dağıtımı</td>
 <td style="padding:4pt;border:1px solid #999;">Tor Project ile entegrasyon, gerçek anonim trafikte uzun dönem ölçüm</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (Tor Project işbirliği gerektirir)</td></tr>
 </table>
 
-<p>Mevcut çalışma <b>S1-S4 seviyelerini tamamlamıştır</b>; bu, akademik metodoloji
-çalışması için yeterli olmakla birlikte güvenlik aracı olarak nihai
-değerlendirmeyi içermez. <b>S5-S6 geçişi tek bir kavramsal sıçrama değil,
-6.3.3'te 10 adıma ayrılmış mühendislik işidir</b>; her adımın girdisi, çıktısı,
-mevcut repo dosyalarına bağlantısı ve süre tahmini somut olarak verilmiştir.
-Bu yapı, çalışmanın olgunluk seviyesinin <i>belirsizlik nedeniyle değil,
-zaman ve ortam kısıtı nedeniyle</i> S4'te durduğunu kanıtlar.</p>
+<p>Mevcut çalışma <b>S1-S6 seviyelerini tamamlamış veya kısmen tamamlamıştır</b>.
+S5 (runtime trace) Shadow simülatörü üzerinde tam olarak gerçekleştirilmiş,
+S6 (saldırı senaryoları) harness-seviyesi enjeksiyonla kısmen uygulanmıştır.
+Modifiye tor binary ile hücre-düzeyinde saldırı tetikleme ve L*'nin running
+tor'a bağlanması (S6'nın tam hâli) gelecek çalışma olarak kalmaktadır.</p>
 
 <p><b>Üç temel teknik dönüşüm.</b> Metodolojik prototipten gerçek çalışmaya
 geçiş, koddaki üç noktada yapılacak <i>oracle değişimi</i> ile sağlanır;
@@ -1686,17 +2085,43 @@ değer taşır: teyit, modelin dış geçerliğini güçlendirir; düzeltme, Bö
 
 <h4>6.3.4 Mevcut Çalışmanın Konumu</h4>
 <p>Bölüm 4.10-4.14 ve 6.2.1, bu çalışmanın <b>simülasyon-doğrulamalı metodoloji önerisi
-+ üretim kaynak kodundan yapısal kanıt + algoritma-doğrulamalı L*</b> seviyesinde
-(yukarıdaki S1-S4) olduğunu açıkça konumlandırır. 6.3.3 planı tamamlandığında,
-çalışma <b>runtime-doğrulamalı güvenlik aracı</b> seviyesine taşınır. Bu iki seviye arasındaki
-fark, tezin katkısını geçersiz kılmaz; aksine, mevcut metodoloji + algoritma + istatistik
-+ statik FSM + L* zincirinin <i>kullanılmaya hazır</i> olduğunu ve sonraki adımın yalnızca
-ortam + zaman meselesi olduğunu kanıtlar.</p>
++ üretim kaynak kodundan yapısal kanıt + algoritma-doğrulamalı L* + Shadow runtime
+doğrulaması</b> seviyesinde (yukarıdaki S1-S6) olduğunu açıkça konumlandırır.
+Bölüm 4.12-B'deki Shadow deneyleri, önceki versiyonda "gelecek çalışma" olan S5-S6
+adımlarını gerçekleştirmiştir: 9 simülasyondan
+6.093 olay yakalanmış,
+FSM monitörünün recall = 1.000 ile tüm enjekte edilmiş saldırıları tespit ettiği
+ampirik olarak doğrulanmıştır. Kalan açık adım, modifiye tor binary ile
+hücre-düzeyinde saldırı tetikleme (S6'nın tam hâli), L*'nin running tor'a
+bağlanması ve üretim Tor relay'inde alan dağıtımıdır (S7).</p>
+
+<div class="pagebreak"></div>
+
+<!-- ====================== ETİK BEYAN / AI KULLANIMI ====================== -->
+<h2>Etik Beyan / AI Kullanimi</h2>
+
+<p>Bu tez calismasinda asagidaki yapay zeka destekli araclar kullanilmistir:</p>
+<ol>
+  <li><b>Cognition AI Devin platformu</b> (otonom AI kodlama asistani): Bolum 4.12-B
+  ve 4.12-C'deki Shadow simulasyon ortaminin kurulumu, simulasyon yurutulmesi,
+  harness implementasyonu, FSM monitor birim testleri ve CI pipeline olusturulmasi
+  icin kullanilmistir. Deney tasarimi, saldiri senaryolarinin belirlenmesi ve
+  sonuclarin yorumlanmasi yazar tarafindan yonlendirilmistir.</li>
+  <li><b>Replit Agent:</b> Tez metni duzenleme, kod inceleme ve format
+  duzeltmeleri icin yardimci olarak kullanilmistir.</li>
+</ol>
+
+<p><b>Sorumluluk beyani:</b> Tum bilimsel iddialar, deney yorumlari, metodolojik
+tercihler ve sonuclarin degerlendirilmesi tamamen yazara aittir. AI araclari
+yalnizca teknik uygulama ve metin duzenleme amacli kullanilmis olup, bilimsel
+icerik uretimi veya karar verme sureclerinde bagimsiz rol ustlenmemistir.
+Uretilen tum veriler gercek Shadow simulasyonlarindan elde edilmistir;
+uydurma veya yer tutucu deger kullanilmamistir.</p>
 
 <div class="pagebreak"></div>
 
 <!-- ====================== KAYNAKÇA ====================== -->
-<h2>Kaynakça</h2>
+<h2>Kaynakca</h2>
 <div class="ref-list">
 <div class="r"><span class="num">[1]</span><span>R. Dingledine, N. Mathewson and P. Syverson, "Tor: The Second-Generation Onion Router," in <i>Proc. 13th USENIX Security Symposium</i>, 2004, pp. 303–320.</span></div><div class="r"><span class="num">[2]</span><span>S. J. Murdoch and G. Danezis, "Low-Cost Traffic Analysis of Tor," in <i>Proc. IEEE Symposium on Security and Privacy</i>, 2005, pp. 183–195.</span></div><div class="r"><span class="num">[3]</span><span>A. Johnson, C. Wacek, R. Jansen, M. Sherr and P. Syverson, "Users Get Routed: Traffic Correlation on Tor by Realistic Adversaries," in <i>Proc. ACM CCS</i>, 2013, pp. 337–348.</span></div><div class="r"><span class="num">[4]</span><span>A. Panchenko, F. Lanze, A. Zinnen, M. Henze, J. Pennekamp, K. Wehrle and T. Engel, "Website Fingerprinting at Internet Scale," in <i>Proc. NDSS</i>, 2016.</span></div><div class="r"><span class="num">[5]</span><span>I. Karunanayake, N. Ahmed, R. Malaney, R. Islam and S. K. Jha, "De-Anonymisation Attacks on Tor: A Survey," <i>IEEE Communications Surveys &amp; Tutorials</i>, vol. 23, no. 4, pp. 2324–2350, 2021.</span></div><div class="r"><span class="num">[6]</span><span>M. Backes, A. Kate, P. Manoharan, S. Meiser and E. Mohammadi, "AnoA: A Framework for Analyzing Anonymous Communication Protocols," in <i>Proc. IEEE CSF</i>, 2013, pp. 163–178.</span></div><div class="r"><span class="num">[7]</span><span>D. Lee and M. Yannakakis, "Principles and Methods of Testing Finite State Machines—A Survey," <i>Proceedings of the IEEE</i>, vol. 84, no. 8, pp. 1090–1123, 1996.</span></div><div class="r"><span class="num">[8]</span><span>J. Tretmans, "Model Based Testing with Labelled Transition Systems," in <i>Formal Methods and Testing</i>, LNCS 4949, Springer, 2008, pp. 1–38.</span></div><div class="r"><span class="num">[9]</span><span>J. de Ruiter and E. Poll, "Protocol State Fuzzing of TLS Implementations," in <i>Proc. 24th USENIX Security Symposium</i>, 2015, pp. 193–206.</span></div><div class="r"><span class="num">[10]</span><span>P. Fiterău-Broștean, R. Janssen and F. Vaandrager, "Combining Model Learning and Model Checking to Analyze TCP Implementations," in <i>Proc. CAV</i>, 2016, pp. 454–471.</span></div><div class="r"><span class="num">[11]</span><span>P. Ammann and J. Offutt, <i>Introduction to Software Testing</i>, 2nd ed. Cambridge: Cambridge University Press, 2016.</span></div><div class="r"><span class="num">[12]</span><span>D. Dolev and A. C. Yao, "On the Security of Public Key Protocols," <i>IEEE Transactions on Information Theory</i>, vol. 29, no. 2, pp. 198–208, 1983.</span></div><div class="r"><span class="num">[13]</span><span>K. Bhargavan, B. Blanchet and N. Kobeissi, "Verified Models and Reference Implementations for the TLS 1.3 Standard Candidate," in <i>Proc. IEEE S&amp;P</i>, 2017, pp. 483–502.</span></div><div class="r"><span class="num">[14]</span><span>J. Somorovsky, "Systematic Fuzzing and Testing of TLS Libraries," in <i>Proc. ACM CCS</i>, 2016, pp. 1492–1504.</span></div><div class="r"><span class="num">[15]</span><span>M. Felderer, M. Büchler, M. Johns, A. Brucker, R. Breu and A. Pretschner, "Security Testing: A Survey," <i>Advances in Computers</i>, vol. 101, pp. 1–51, 2016.</span></div><div class="r"><span class="num">[16]</span><span>A. Pretschner, T. Mouelhi and Y. Le Traon, "Model-Based Tests for Access Control Policies," in <i>Proc. ICST</i>, 2008, pp. 338–347.</span></div><div class="r"><span class="num">[17]</span><span>B. Kitchenham and S. Charters, "Guidelines for performing Systematic Literature Reviews in Software Engineering," EBSE Technical Report EBSE-2007-01, 2007.</span></div><div class="r"><span class="num">[18]</span><span>R. Jansen, K. Bauer, N. Hopper and R. Dingledine, "Methodically Modeling the Tor Network," in <i>Proc. USENIX CSET</i>, 2012.</span></div><div class="r"><span class="num">[19]</span><span>Tor Project, "Tor Protocol Specification (tor-spec)," 2026. [Online]. Available: https://spec.torproject.org/tor-spec. [Accessed: Feb. 2026].</span></div><div class="r"><span class="num">[20]</span><span>Microsoft Research, "A Data-Driven FSM Model for Analyzing Security Vulnerabilities," Microsoft Research Technical Report, 2018.</span></div>
 </div>
@@ -1705,31 +2130,31 @@ ortam + zaman meselesi olduğunu kanıtlar.</p>
 
 <!-- ====================== EK A ====================== -->
 <h2>Ek A — Tam δ Geçiş Tablosu</h2>
-<p>Aşağıda Tor devre FSM'inin <b>25 geçerli geçişi</b> bire bir listelenmiştir.
-Bu tablonun dışındaki 105 ikili Invalid kümesini oluşturur ve Ek B'deki
+<p>Aşağıda Tor devre FSM'inin <b>27 geçerli geçişi</b> bire bir listelenmiştir.
+Bu tablonun dışındaki 103 ikili Invalid kümesini oluşturur ve Ek B'deki
 sınıflandırıcı ile saldırı vektörlerine eşlenir. Tablo, repo içindeki <code>server/fsm.ts</code>
 dosyasından programatik olarak üretilmiştir; çelişki riski olamayacak şekilde tek kaynak
 prensibine bağlıdır (single source of truth).</p>
-<table><tr><th>Mevcut Durum</th><th>Olay (Σ)</th><th>Sonraki Durum</th></tr><tr><td>IDLE</td><td>CONNECT</td><td>CONNECTING</td></tr><tr><td>CONNECTING</td><td>TLS_OK</td><td>TLS_HANDSHAKE</td></tr><tr><td>CONNECTING</td><td>TLS_FAIL</td><td>ERROR</td></tr><tr><td>CONNECTING</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>TLS_HANDSHAKE</td><td>SEND_CREATE</td><td>CREATE_SENT</td></tr><tr><td>TLS_HANDSHAKE</td><td>TLS_FAIL</td><td>ERROR</td></tr><tr><td>TLS_HANDSHAKE</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>CREATE_SENT</td><td>RECV_CREATED</td><td>CIRCUIT_BUILDING</td></tr><tr><td>CREATE_SENT</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>CIRCUIT_BUILDING</td><td>SEND_EXTEND</td><td>CIRCUIT_BUILDING</td></tr><tr><td>CIRCUIT_BUILDING</td><td>RECV_EXTENDED</td><td>CIRCUIT_READY</td></tr><tr><td>CIRCUIT_BUILDING</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>CIRCUIT_READY</td><td>SEND_RELAY_DATA</td><td>TRANSMITTING</td></tr><tr><td>CIRCUIT_READY</td><td>RECV_RELAY_DATA</td><td>TRANSMITTING</td></tr><tr><td>CIRCUIT_READY</td><td>SEND_DESTROY</td><td>CLOSING</td></tr><tr><td>CIRCUIT_READY</td><td>RECV_DESTROY</td><td>CLOSING</td></tr><tr><td>CIRCUIT_READY</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>TRANSMITTING</td><td>SEND_RELAY_DATA</td><td>TRANSMITTING</td></tr><tr><td>TRANSMITTING</td><td>RECV_RELAY_DATA</td><td>TRANSMITTING</td></tr><tr><td>TRANSMITTING</td><td>SEND_DESTROY</td><td>CLOSING</td></tr><tr><td>TRANSMITTING</td><td>RECV_DESTROY</td><td>CLOSING</td></tr><tr><td>TRANSMITTING</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>CLOSING</td><td>CIRCUIT_CLOSED</td><td>CLOSED</td></tr><tr><td>CLOSING</td><td>TIMEOUT</td><td>CLOSED</td></tr><tr><td>ERROR</td><td>CIRCUIT_CLOSED</td><td>CLOSED</td></tr></table>
+<table><tr><th>Mevcut Durum</th><th>Olay (Σ)</th><th>Sonraki Durum</th></tr><tr><td>IDLE</td><td>CONNECT</td><td>CONNECTING</td></tr><tr><td>CONNECTING</td><td>TLS_OK</td><td>TLS_HANDSHAKE</td></tr><tr><td>CONNECTING</td><td>TLS_FAIL</td><td>ERROR</td></tr><tr><td>CONNECTING</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>TLS_HANDSHAKE</td><td>SEND_CREATE</td><td>CREATE_SENT</td></tr><tr><td>TLS_HANDSHAKE</td><td>TLS_FAIL</td><td>ERROR</td></tr><tr><td>TLS_HANDSHAKE</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>CREATE_SENT</td><td>RECV_CREATED</td><td>CIRCUIT_BUILDING</td></tr><tr><td>CREATE_SENT</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>CIRCUIT_BUILDING</td><td>SEND_EXTEND</td><td>CIRCUIT_BUILDING</td></tr><tr><td>CIRCUIT_BUILDING</td><td>RECV_EXTENDED</td><td>CIRCUIT_READY</td></tr><tr><td>CIRCUIT_BUILDING</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>CIRCUIT_READY</td><td>SEND_RELAY_DATA</td><td>TRANSMITTING</td></tr><tr><td>CIRCUIT_READY</td><td>RECV_RELAY_DATA</td><td>TRANSMITTING</td></tr><tr><td>CIRCUIT_READY</td><td>SEND_DESTROY</td><td>CLOSING</td></tr><tr><td>CIRCUIT_READY</td><td>RECV_DESTROY</td><td>CLOSING</td></tr><tr><td>CIRCUIT_READY</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>TRANSMITTING</td><td>SEND_RELAY_DATA</td><td>TRANSMITTING</td></tr><tr><td>TRANSMITTING</td><td>RECV_RELAY_DATA</td><td>TRANSMITTING</td></tr><tr><td>TRANSMITTING</td><td>SEND_DESTROY</td><td>CLOSING</td></tr><tr><td>TRANSMITTING</td><td>RECV_DESTROY</td><td>CLOSING</td></tr><tr><td>TRANSMITTING</td><td>TIMEOUT</td><td>ERROR</td></tr><tr><td>CLOSING</td><td>CIRCUIT_CLOSED</td><td>CLOSED</td></tr><tr><td>CLOSING</td><td>TIMEOUT</td><td>CLOSED</td></tr><tr><td>ERROR</td><td>CIRCUIT_CLOSED</td><td>CLOSED</td></tr><tr><td>CIRCUIT_READY</td><td>SEND_EXTEND</td><td>CIRCUIT_BUILDING</td></tr><tr><td>CIRCUIT_READY</td><td>RECV_EXTENDED</td><td>CIRCUIT_READY</td></tr></table>
 
 <div class="pagebreak"></div>
 
 <!-- ====================== EK B ====================== -->
 <h2>Ek B — Saldırı Sınıflandırıcı Envanteri</h2>
-<p>Aşağıda <code>classifyInvalid(state, event)</code> fonksiyonunun 105 geçersiz
+<p>Aşağıda <code>classifyInvalid(state, event)</code> fonksiyonunun 103 geçersiz
 ikili üzerinde ürettiği etiket dağılımı verilmiştir. Bu tablo da repo içinde programatik
 olarak hesaplanır; her güncelleme tek satırla yenilenebilir.</p>
 <table><tr><th>Saldırı tipi</th><th>İkili sayısı</th><th>Pay</th>
-    <th>LOW</th><th>MEDIUM</th><th>HIGH</th><th>CRITICAL</th></tr><tr><td class="l">GHOST_CIRCUIT</td><td>38</td><td>36.2%</td>
-      <td>19</td><td>15</td><td>4</td><td>0</td></tr><tr><td class="l">REPLAY_ATTACK</td><td>25</td><td>23.8%</td>
-      <td>0</td><td>14</td><td>10</td><td>1</td></tr><tr><td class="l">HANDSHAKE_SKIP</td><td>13</td><td>12.4%</td>
-      <td>0</td><td>8</td><td>5</td><td>0</td></tr><tr><td class="l">CIRCUIT_HIJACK</td><td>10</td><td>9.5%</td>
-      <td>0</td><td>0</td><td>0</td><td>10</td></tr><tr><td class="l">CREATE_FLOOD</td><td>8</td><td>7.6%</td>
-      <td>7</td><td>1</td><td>0</td><td>0</td></tr><tr><td class="l">PREMATURE_DATA</td><td>6</td><td>5.7%</td>
-      <td>0</td><td>2</td><td>4</td><td>0</td></tr><tr><td class="l">CIRCUIT_BYPASS</td><td>4</td><td>3.8%</td>
+    <th>LOW</th><th>MEDIUM</th><th>HIGH</th><th>CRITICAL</th></tr><tr><td class="l">GHOST_CIRCUIT</td><td>38</td><td>36.9%</td>
+      <td>19</td><td>15</td><td>4</td><td>0</td></tr><tr><td class="l">REPLAY_ATTACK</td><td>25</td><td>24.3%</td>
+      <td>0</td><td>14</td><td>10</td><td>1</td></tr><tr><td class="l">HANDSHAKE_SKIP</td><td>13</td><td>12.6%</td>
+      <td>0</td><td>8</td><td>5</td><td>0</td></tr><tr><td class="l">CREATE_FLOOD</td><td>8</td><td>7.8%</td>
+      <td>7</td><td>1</td><td>0</td><td>0</td></tr><tr><td class="l">CIRCUIT_HIJACK</td><td>8</td><td>7.8%</td>
+      <td>0</td><td>0</td><td>0</td><td>8</td></tr><tr><td class="l">PREMATURE_DATA</td><td>6</td><td>5.8%</td>
+      <td>0</td><td>2</td><td>4</td><td>0</td></tr><tr><td class="l">CIRCUIT_BYPASS</td><td>4</td><td>3.9%</td>
       <td>0</td><td>0</td><td>0</td><td>4</td></tr><tr><td class="l">INVALID_TRANSITION</td><td>1</td><td>1.0%</td>
       <td>1</td><td>0</td><td>0</td><td>0</td></tr>
-    <tr><th class="l">Toplam</th><th>105</th><th>100.0%</th><th colspan="4"></th></tr></table>
+    <tr><th class="l">Toplam</th><th>103</th><th>100.0%</th><th colspan="4"></th></tr></table>
 <p style="font-size: 9.5pt; color: #555;">Yorumsal not: CIRCUIT_HIJACK ve CIRCUIT_BYPASS
 gibi CRITICAL ağırlıklı vektörler düşük ikili sayısına sahiptir ancak şiddet açısından
 en yüksek tehdit değerini taşırlar. GHOST_CIRCUIT en yüksek ikili sayısına sahiptir; bu

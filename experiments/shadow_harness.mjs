@@ -61,7 +61,11 @@ function parseTorHostLog(logContent, hostName) {
         orconnEstablished = true;
         orconnPending = false;
         if (lastCircuitId && circuits[lastCircuitId]) {
-          circuits[lastCircuitId].push({ event: "TLS_OK", timestamp: ts, host: hostName });
+          circuits[lastCircuitId].push({
+            event: "TLS_OK",
+            timestamp: ts,
+            host: hostName,
+          });
         }
       }
       continue;
@@ -69,7 +73,11 @@ function parseTorHostLog(logContent, hostName) {
 
     if (/connection_or_connect_failed_tls/i.test(line)) {
       if (lastCircuitId && circuits[lastCircuitId]) {
-        circuits[lastCircuitId].push({ event: "TLS_FAIL", timestamp: ts, host: hostName });
+        circuits[lastCircuitId].push({
+          event: "TLS_FAIL",
+          timestamp: ts,
+          host: hostName,
+        });
       }
       orconnPending = false;
       continue;
@@ -79,7 +87,11 @@ function parseTorHostLog(logContent, hostName) {
       // Track which circuit sent CREATE — handshake completions belong to it
       buildingCircuitId = lastCircuitId;
       if (lastCircuitId && circuits[lastCircuitId]) {
-        circuits[lastCircuitId].push({ event: "SEND_CREATE", timestamp: ts, host: hostName });
+        circuits[lastCircuitId].push({
+          event: "SEND_CREATE",
+          timestamp: ts,
+          host: hostName,
+        });
       }
       continue;
     }
@@ -96,10 +108,22 @@ function parseTorHostLog(logContent, hostName) {
         const hop = (circuitHopCount[cid] || 0) + 1;
         circuitHopCount[cid] = hop;
         if (hop === 1) {
-          circuits[cid].push({ event: "RECV_CREATED", timestamp: ts, host: hostName });
+          circuits[cid].push({
+            event: "RECV_CREATED",
+            timestamp: ts,
+            host: hostName,
+          });
         } else {
-          circuits[cid].push({ event: "SEND_EXTEND", timestamp: ts, host: hostName });
-          circuits[cid].push({ event: "RECV_EXTENDED", timestamp: ts, host: hostName });
+          circuits[cid].push({
+            event: "SEND_EXTEND",
+            timestamp: ts,
+            host: hostName,
+          });
+          circuits[cid].push({
+            event: "RECV_EXTENDED",
+            timestamp: ts,
+            host: hostName,
+          });
         }
       }
       continue;
@@ -111,7 +135,11 @@ function parseTorHostLog(logContent, hostName) {
 
     if (/connection_ap_handshake_send_begin\(\)/.test(line)) {
       if (lastCircuitId && circuits[lastCircuitId]) {
-        circuits[lastCircuitId].push({ event: "SEND_RELAY_DATA", timestamp: ts, host: hostName });
+        circuits[lastCircuitId].push({
+          event: "SEND_RELAY_DATA",
+          timestamp: ts,
+          host: hostName,
+        });
       }
       continue;
     }
@@ -121,7 +149,11 @@ function parseTorHostLog(logContent, hostName) {
       const closeMatch = line.match(/\(id:\s*(\d+)\)/);
       const cid = closeMatch ? closeMatch[1] : lastCircuitId;
       if (cid && circuits[cid]) {
-        circuits[cid].push({ event: "SEND_DESTROY", timestamp: ts, host: hostName });
+        circuits[cid].push({
+          event: "SEND_DESTROY",
+          timestamp: ts,
+          host: hostName,
+        });
       }
       continue;
     }
@@ -131,14 +163,22 @@ function parseTorHostLog(logContent, hostName) {
       const freeMatch = line.match(/\(id:\s*(\d+)\)/);
       const cid = freeMatch ? freeMatch[1] : lastCircuitId;
       if (cid && circuits[cid]) {
-        circuits[cid].push({ event: "CIRCUIT_CLOSED", timestamp: ts, host: hostName });
+        circuits[cid].push({
+          event: "CIRCUIT_CLOSED",
+          timestamp: ts,
+          host: hostName,
+        });
       }
       continue;
     }
 
     if (/circuit_expire_building/i.test(line)) {
       if (lastCircuitId && circuits[lastCircuitId]) {
-        circuits[lastCircuitId].push({ event: "TIMEOUT", timestamp: ts, host: hostName });
+        circuits[lastCircuitId].push({
+          event: "TIMEOUT",
+          timestamp: ts,
+          host: hostName,
+        });
       }
       continue;
     }
@@ -164,21 +204,31 @@ function runFsmOnCircuit(events) {
 
     if (nextState !== undefined) {
       transitions.push({
-        from: state, event: ev.event, to: nextState,
-        isValid: true, timestamp: ev.timestamp,
+        from: state,
+        event: ev.event,
+        to: nextState,
+        isValid: true,
+        timestamp: ev.timestamp,
       });
       state = nextState;
       validCount++;
     } else {
       const classification = classifyInvalid(state, ev.event);
       violations.push({
-        from: state, event: ev.event, classification,
-        timestamp: ev.timestamp, injected: ev.injected || false,
+        from: state,
+        event: ev.event,
+        classification,
+        timestamp: ev.timestamp,
+        injected: ev.injected || false,
         attackType: ev.attackType || null,
       });
       transitions.push({
-        from: state, event: ev.event, to: state,
-        isValid: false, classification, timestamp: ev.timestamp,
+        from: state,
+        event: ev.event,
+        to: state,
+        isValid: false,
+        classification,
+        timestamp: ev.timestamp,
       });
       invalidCount++;
     }
@@ -188,7 +238,13 @@ function runFsmOnCircuit(events) {
     }
   }
 
-  return { transitions, violations, validCount, invalidCount, finalState: state };
+  return {
+    transitions,
+    violations,
+    validCount,
+    invalidCount,
+    finalState: state,
+  };
 }
 
 function runFsmOnAllCircuits(circuitMap) {
@@ -233,12 +289,18 @@ function injectReplayAttack(circuitMap) {
   for (const [cid, events] of Object.entries(circuitMap)) {
     const newEvents = [...events];
     for (let i = newEvents.length - 1; i >= 0; i--) {
-      if (newEvents[i].event === "CIRCUIT_CLOSED" || newEvents[i].event === "SEND_DESTROY") {
+      if (
+        newEvents[i].event === "CIRCUIT_CLOSED" ||
+        newEvents[i].event === "SEND_DESTROY"
+      ) {
         const ts = newEvents[i].timestamp;
         for (let j = 0; j < 3; j++) {
           newEvents.splice(i + 1, 0, {
-            event: "SEND_CREATE", timestamp: ts, host: newEvents[i].host,
-            injected: true, attackType: "REPLAY_ATTACK",
+            event: "SEND_CREATE",
+            timestamp: ts,
+            host: newEvents[i].host,
+            injected: true,
+            attackType: "REPLAY_ATTACK",
           });
           injectedCount++;
         }
@@ -259,14 +321,22 @@ function injectCircuitBypass(circuitMap) {
     const newEvents = [...events];
     for (let i = 0; i < newEvents.length; i++) {
       if (newEvents[i].event === "CONNECT") {
-        newEvents.splice(i + 1, 0,
+        newEvents.splice(
+          i + 1,
+          0,
           {
-            event: "SEND_RELAY_DATA", timestamp: newEvents[i].timestamp,
-            host: newEvents[i].host, injected: true, attackType: "CIRCUIT_BYPASS",
+            event: "SEND_RELAY_DATA",
+            timestamp: newEvents[i].timestamp,
+            host: newEvents[i].host,
+            injected: true,
+            attackType: "CIRCUIT_BYPASS",
           },
           {
-            event: "SEND_CREATE", timestamp: newEvents[i].timestamp,
-            host: newEvents[i].host, injected: true, attackType: "HANDSHAKE_SKIP",
+            event: "SEND_CREATE",
+            timestamp: newEvents[i].timestamp,
+            host: newEvents[i].host,
+            injected: true,
+            attackType: "HANDSHAKE_SKIP",
           },
         );
         injectedCount += 2;
@@ -293,8 +363,14 @@ function computeMetrics(fsmResult, scenario, injectedCount) {
       circuitCount: fsmResult.circuitCount,
       validTransitions: fsmResult.validCount,
       structuralViolations: fsmResult.invalidCount,
-      tp: 0, fp: 0, fn: 0, tn: fsmResult.validCount,
-      precision: null, recall: null, f1: null, fpr: 0,
+      tp: 0,
+      fp: 0,
+      fn: 0,
+      tn: fsmResult.validCount,
+      precision: null,
+      recall: null,
+      f1: null,
+      fpr: 0,
       violationRate: totalEvents > 0 ? fsmResult.invalidCount / totalEvents : 0,
       violationBreakdown: breakdownViolations(fsmResult.violations),
     };
@@ -310,8 +386,10 @@ function computeMetrics(fsmResult, scenario, injectedCount) {
 
   const precision = tp + fp > 0 ? tp / (tp + fp) : null;
   const recall = tp + fn > 0 ? tp / (tp + fn) : null;
-  const f1 = precision !== null && recall !== null && (precision + recall) > 0
-    ? 2 * precision * recall / (precision + recall) : null;
+  const f1 =
+    precision !== null && recall !== null && precision + recall > 0
+      ? (2 * precision * recall) / (precision + recall)
+      : null;
   const fpr = fp + tn > 0 ? fp / (fp + tn) : 0;
 
   return {
@@ -322,8 +400,14 @@ function computeMetrics(fsmResult, scenario, injectedCount) {
     totalViolations: fsmResult.invalidCount,
     injectedAttacks: injectedCount,
     detectedAttacks: tp,
-    tp, fp, fn, tn,
-    precision, recall, f1, fpr,
+    tp,
+    fp,
+    fn,
+    tn,
+    precision,
+    recall,
+    f1,
+    fpr,
     violationBreakdown: breakdownViolations(fsmResult.violations),
     attackBreakdown: breakdownViolations(attackViolations),
   };
@@ -353,7 +437,9 @@ async function runShadowSimulation(seed, label) {
   const srcDir = SHADOW_EXAMPLE_DIR;
   execSync(`cp -r ${srcDir}/shadow.yaml ${runDir}/`, { stdio: "pipe" });
   execSync(`cp -r ${srcDir}/conf ${runDir}/`, { stdio: "pipe" });
-  execSync(`cp -r ${srcDir}/shadow.data.template ${runDir}/`, { stdio: "pipe" });
+  execSync(`cp -r ${srcDir}/shadow.data.template ${runDir}/`, {
+    stdio: "pipe",
+  });
 
   let yaml = await fs.readFile(path.join(runDir, "shadow.yaml"), "utf8");
   yaml = yaml.replace("general:", `general:\n  seed: ${seed}`);
@@ -365,13 +451,21 @@ async function runShadowSimulation(seed, label) {
   try {
     execSync(
       `cd "${runDir}" && rm -rf shadow.data/ && ${SHADOW_BIN} --template-directory shadow.data.template shadow.yaml > shadow.log 2>&1`,
-      { stdio: "pipe", timeout: 300000, maxBuffer: 50 * 1024 * 1024 }
+      { stdio: "pipe", timeout: 300000, maxBuffer: 50 * 1024 * 1024 },
     );
   } catch (err) {
     const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
     console.log(`  FAILED after ${elapsed}s: ${err.message?.slice(0, 200)}`);
-    await fs.writeFile(path.join(runDir, "error.txt"), err.message || "unknown error");
-    return { success: false, error: err.message?.slice(0, 500), runDir, elapsed };
+    await fs.writeFile(
+      path.join(runDir, "error.txt"),
+      err.message || "unknown error",
+    );
+    return {
+      success: false,
+      error: err.message?.slice(0, 500),
+      runDir,
+      elapsed,
+    };
   }
 
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
@@ -427,7 +521,9 @@ async function main() {
   const allResults = {
     metadata: {
       shadow_version: "3.3.0",
-      tor_version: execSync("tor --version", { encoding: "utf8" }).trim().split("\n")[0],
+      tor_version: execSync("tor --version", { encoding: "utf8" })
+        .trim()
+        .split("\n")[0],
       run_date: new Date().toISOString(),
       seeds: SEEDS,
       scenarios: SCENARIOS,
@@ -464,8 +560,13 @@ async function main() {
 
       const circuitMap = await collectPerCircuitLogs(simResult.runDir);
       const circuitCount = Object.keys(circuitMap).length;
-      const totalEvents = Object.values(circuitMap).reduce((a, e) => a + e.length, 0);
-      console.log(`  Parsed ${totalEvents} events across ${circuitCount} circuits`);
+      const totalEvents = Object.values(circuitMap).reduce(
+        (a, e) => a + e.length,
+        0,
+      );
+      console.log(
+        `  Parsed ${totalEvents} events across ${circuitCount} circuits`,
+      );
 
       const jsonlPath = path.join(simResult.runDir, "events.jsonl");
       const jsonlLines = [];
@@ -492,13 +593,18 @@ async function main() {
       }
 
       const fsmResult = runFsmOnAllCircuits(traceCircuits);
-      console.log(`  FSM: ${fsmResult.validCount} valid, ${fsmResult.invalidCount} invalid across ${fsmResult.circuitCount} circuits`);
+      console.log(
+        `  FSM: ${fsmResult.validCount} valid, ${fsmResult.invalidCount} invalid across ${fsmResult.circuitCount} circuits`,
+      );
 
       const metrics = computeMetrics(fsmResult, scenario, injectedCount);
-      console.log(`  Metrics: P=${metrics.precision?.toFixed(4) ?? "N/A"} R=${metrics.recall?.toFixed(4) ?? "N/A"} F1=${metrics.f1?.toFixed(4) ?? "N/A"} FPR=${metrics.fpr?.toFixed(4)}`);
+      console.log(
+        `  Metrics: P=${metrics.precision?.toFixed(4) ?? "N/A"} R=${metrics.recall?.toFixed(4) ?? "N/A"} F1=${metrics.f1?.toFixed(4) ?? "N/A"} FPR=${metrics.fpr?.toFixed(4)}`,
+      );
 
       const runResult = {
-        seed, scenario,
+        seed,
+        scenario,
         wallTime: simResult.elapsed,
         circuitCount,
         rawEventCount: totalEvents,
@@ -509,10 +615,14 @@ async function main() {
           circuitCount: fsmResult.circuitCount,
         },
         metrics,
-        sampleCircuit: Object.entries(fsmResult.perCircuit).slice(0, 3).map(([cid, r]) => ({ cid, ...r })),
+        sampleCircuit: Object.entries(fsmResult.perCircuit)
+          .slice(0, 3)
+          .map(([cid, r]) => ({ cid, ...r })),
         sampleViolations: fsmResult.violations.slice(0, 5).map((v) => ({
-          from: v.from, event: v.event,
-          type: v.classification.type, severity: v.classification.severity,
+          from: v.from,
+          event: v.event,
+          type: v.classification.type,
+          severity: v.classification.severity,
           injected: v.injected,
         })),
       };
@@ -529,8 +639,12 @@ async function main() {
     const ok = scenarioRuns.filter((r) => r.metrics);
     if (ok.length > 0) {
       const avg = (a) => a.reduce((x, y) => x + y, 0) / a.length;
-      const sd = (a) => { const m = avg(a); return Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length); };
-      const stat = (arr) => arr.length > 0 ? { mean: avg(arr), sd: sd(arr), values: arr } : null;
+      const sd = (a) => {
+        const m = avg(a);
+        return Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length);
+      };
+      const stat = (arr) =>
+        arr.length > 0 ? { mean: avg(arr), sd: sd(arr), values: arr } : null;
 
       const ps = ok.map((r) => r.metrics.precision).filter((v) => v !== null);
       const rs = ok.map((r) => r.metrics.recall).filter((v) => v !== null);
@@ -553,20 +667,36 @@ async function main() {
   }
 
   console.log("\n\n=== RESULTS SUMMARY ===\n");
-  console.log("Scenario           | Precision       | Recall          | F1              | FPR");
-  console.log("-------------------|-----------------|-----------------|-----------------|----------------");
+  console.log(
+    "Scenario           | Precision       | Recall          | F1              | FPR",
+  );
+  console.log(
+    "-------------------|-----------------|-----------------|-----------------|----------------",
+  );
   for (const s of SCENARIOS) {
     const d = allResults.perScenario[s];
-    if (!d) { console.log(`${s.padEnd(19)}| NO DATA`); continue; }
-    const fmt = (x) => x ? `${x.mean.toFixed(4)} +/- ${x.sd.toFixed(4)}` : "N/A            ";
-    console.log(`${s.padEnd(19)}| ${fmt(d.precision)} | ${fmt(d.recall)} | ${fmt(d.f1)} | ${fmt(d.fpr)}`);
+    if (!d) {
+      console.log(`${s.padEnd(19)}| NO DATA`);
+      continue;
+    }
+    const fmt = (x) =>
+      x ? `${x.mean.toFixed(4)} +/- ${x.sd.toFixed(4)}` : "N/A            ";
+    console.log(
+      `${s.padEnd(19)}| ${fmt(d.precision)} | ${fmt(d.recall)} | ${fmt(d.f1)} | ${fmt(d.fpr)}`,
+    );
   }
 
   allResults.summary = {
     totalSimulations: allResults.runs.length,
     successfulSimulations: allResults.runs.filter((r) => r.metrics).length,
-    totalEventsProcessed: allResults.runs.reduce((a, r) => a + (r.rawEventCount || 0), 0),
-    totalCircuitsAnalyzed: allResults.runs.reduce((a, r) => a + (r.circuitCount || 0), 0),
+    totalEventsProcessed: allResults.runs.reduce(
+      (a, r) => a + (r.rawEventCount || 0),
+      0,
+    ),
+    totalCircuitsAnalyzed: allResults.runs.reduce(
+      (a, r) => a + (r.circuitCount || 0),
+      0,
+    ),
   };
 
   const outPath = path.resolve(__dirname, "shadow_results.json");

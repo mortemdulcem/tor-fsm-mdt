@@ -5,16 +5,52 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
-import { ALGORITHMS, N_TRIALS, EVENT_BUDGET, mulberry32 } from "./baselines.mjs";
-import { mean, sd, welchT, mannWhitneyU, cohensD, ksNormality } from "./stats.mjs";
-import { fsmGraphSvg, attackHeatmapSvg, metricBarChart, severitySplitSvg } from "./figures.mjs";
-import { STATES, EVENTS, VALID, validKeys, totalDomain, totalValid, totalInvalid, k, classifyInvalid } from "../server/fsm.ts";
+import {
+  ALGORITHMS,
+  N_TRIALS,
+  EVENT_BUDGET,
+  mulberry32,
+} from "./baselines.mjs";
+import {
+  mean,
+  sd,
+  welchT,
+  mannWhitneyU,
+  cohensD,
+  ksNormality,
+} from "./stats.mjs";
+import {
+  fsmGraphSvg,
+  attackHeatmapSvg,
+  metricBarChart,
+  severitySplitSvg,
+} from "./figures.mjs";
+import {
+  STATES,
+  EVENTS,
+  VALID,
+  validKeys,
+  totalDomain,
+  totalValid,
+  totalInvalid,
+  k,
+  classifyInvalid,
+} from "../server/fsm.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const puppeteer = (await import(path.resolve(__dirname, "../node_modules/puppeteer-core/lib/cjs/puppeteer/puppeteer-core.js"))).default;
+const puppeteer = (
+  await import(
+    path.resolve(
+      __dirname,
+      "../node_modules/puppeteer-core/lib/cjs/puppeteer/puppeteer-core.js",
+    )
+  )
+).default;
 
 // ---------- 1. Run experiments ----------
-console.log(`[1/5] N=${N_TRIALS} trials × 3 algorithms, budget=${EVENT_BUDGET} events/trial...`);
+console.log(
+  `[1/5] N=${N_TRIALS} trials × 3 algorithms, budget=${EVENT_BUDGET} events/trial...`,
+);
 const results = {}; // { B1_Random: [{...}, ...], ... }
 const severitySumPerAlgo = {}; // for Fig 4 — recomputed by re-running with severity tracking
 
@@ -65,61 +101,96 @@ function exec(name, seed) {
   const visited = new Set(["IDLE"]);
   const coveredValid = new Set();
   const detectedInvalid = new Set();
-  let s = "IDLE", events = 0;
+  let s = "IDLE",
+    events = 0;
   const stepImpl = (state, e) => {
     events++;
     const key = k(state, e);
     const next = VALID[key];
-    if (next !== undefined) { coveredValid.add(key); visited.add(next); return next; }
-    detectedInvalid.add(key); return state;
+    if (next !== undefined) {
+      coveredValid.add(key);
+      visited.add(next);
+      return next;
+    }
+    detectedInvalid.add(key);
+    return state;
   };
 
   if (name === "B1_Random") {
     while (events < EVENT_BUDGET) {
       const e = EVENTS[Math.floor(rand() * EVENTS.length)];
-      s = stepImpl(s, e); if (s === "CLOSED") s = "IDLE";
+      s = stepImpl(s, e);
+      if (s === "CLOSED") s = "IDLE";
     }
   } else if (name === "B2_GreedySC") {
     while (events < EVENT_BUDGET) {
       const validHere = EVENTS.filter((e) => VALID[k(s, e)] !== undefined);
-      const unvisitedValid = validHere.filter((e) => !visited.has(VALID[k(s, e)]));
+      const unvisitedValid = validHere.filter(
+        (e) => !visited.has(VALID[k(s, e)]),
+      );
       const invalidHere = EVENTS.filter((e) => VALID[k(s, e)] === undefined);
       let e;
-      if (unvisitedValid.length > 0) e = unvisitedValid[Math.floor(rand() * unvisitedValid.length)];
-      else if (validHere.length > 0 && rand() > 0.3) e = validHere[Math.floor(rand() * validHere.length)];
-      else if (invalidHere.length > 0) e = invalidHere[Math.floor(rand() * invalidHere.length)];
+      if (unvisitedValid.length > 0)
+        e = unvisitedValid[Math.floor(rand() * unvisitedValid.length)];
+      else if (validHere.length > 0 && rand() > 0.3)
+        e = validHere[Math.floor(rand() * validHere.length)];
+      else if (invalidHere.length > 0)
+        e = invalidHere[Math.floor(rand() * invalidHere.length)];
       else e = EVENTS[Math.floor(rand() * EVENTS.length)];
-      s = stepImpl(s, e); if (s === "CLOSED") s = "IDLE";
+      s = stepImpl(s, e);
+      if (s === "CLOSED") s = "IDLE";
     }
-  } else { // B3_MDT
+  } else {
+    // B3_MDT
     const findPath = (target) => {
       if (target === "IDLE") return [];
-      const q = [{ state: "IDLE", path: [] }]; const seen = new Set(["IDLE"]);
+      const q = [{ state: "IDLE", path: [] }];
+      const seen = new Set(["IDLE"]);
       while (q.length) {
         const { state, path } = q.shift();
         for (const e of EVENTS) {
-          const nx = VALID[k(state, e)]; if (!nx || seen.has(nx)) continue;
-          const np = [...path, e]; if (nx === target) return np;
-          seen.add(nx); q.push({ state: nx, path: np });
+          const nx = VALID[k(state, e)];
+          if (!nx || seen.has(nx)) continue;
+          const np = [...path, e];
+          if (nx === target) return np;
+          seen.add(nx);
+          q.push({ state: nx, path: np });
         }
       }
       return null;
     };
-    const shuf = (arr) => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-    const execSeq = (events_) => { let st = "IDLE"; for (const e of events_) { if (events >= EVENT_BUDGET) return; st = stepImpl(st, e); } };
+    const shuf = (arr) => {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    };
+    const execSeq = (events_) => {
+      let st = "IDLE";
+      for (const e of events_) {
+        if (events >= EVENT_BUDGET) return;
+        st = stepImpl(st, e);
+      }
+    };
     for (const vk of shuf(validKeys)) {
       if (events >= EVENT_BUDGET) break;
       if (coveredValid.has(vk)) continue;
       const [src, evt] = vk.split("|");
-      const p = findPath(src); if (p === null) continue;
+      const p = findPath(src);
+      if (p === null) continue;
       execSeq([...p, evt]);
     }
     const invalidPairs = [];
-    for (const ss of STATES) for (const ee of EVENTS) if (VALID[k(ss, ee)] === undefined) invalidPairs.push([ss, ee]);
+    for (const ss of STATES)
+      for (const ee of EVENTS)
+        if (VALID[k(ss, ee)] === undefined) invalidPairs.push([ss, ee]);
     for (const [src, evt] of shuf(invalidPairs)) {
       if (events >= EVENT_BUDGET) break;
       if (detectedInvalid.has(k(src, evt))) continue;
-      const p = findPath(src); if (p === null && src !== "IDLE") continue;
+      const p = findPath(src);
+      if (p === null && src !== "IDLE") continue;
       execSeq([...(p ?? []), evt]);
     }
   }
@@ -142,8 +213,13 @@ for (const name of Object.keys(ALGORITHMS)) {
 }
 
 // ---------- 3. Statistics ----------
-console.log("[3/5] İstatistik hesabı (Welch t, Mann-Whitney U, Cohen d, K-S normality)...");
-function summarize(rs, key) { const xs = rs.map((r) => r[key]); return { mean: mean(xs), sd: sd(xs), values: xs }; }
+console.log(
+  "[3/5] İstatistik hesabı (Welch t, Mann-Whitney U, Cohen d, K-S normality)...",
+);
+function summarize(rs, key) {
+  const xs = rs.map((r) => r[key]);
+  return { mean: mean(xs), sd: sd(xs), values: xs };
+}
 const stats = {};
 for (const name of Object.keys(results)) {
   stats[name] = {
@@ -160,12 +236,27 @@ const pairs = [
 const comparisons = [];
 for (const [a, b] of pairs) {
   for (const m of ["sc", "tc", "itdr"]) {
-    const xs = stats[a][m].values, ys = stats[b][m].values;
+    const xs = stats[a][m].values,
+      ys = stats[b][m].values;
     const w = welchT(xs, ys);
     const u = mannWhitneyU(xs, ys);
     const d = cohensD(xs, ys);
-    const ksA = ksNormality(xs), ksB = ksNormality(ys);
-    comparisons.push({ a, b, metric: m, t: w.t, df: w.df, pT: w.p, U: u.U, z: u.z, pU: u.p, d, normalA: ksA.normal, normalB: ksB.normal });
+    const ksA = ksNormality(xs),
+      ksB = ksNormality(ys);
+    comparisons.push({
+      a,
+      b,
+      metric: m,
+      t: w.t,
+      df: w.df,
+      pT: w.p,
+      U: u.U,
+      z: u.z,
+      pU: u.p,
+      d,
+      normalA: ksA.normal,
+      normalB: ksB.normal,
+    });
   }
 }
 
@@ -178,10 +269,11 @@ const svg4 = severitySplitSvg(severitySumPerAlgo);
 
 // ---------- 5. Build HTML + PDF ----------
 console.log("[5/5] PDF kuruluyor...");
-const fmt = (x, d = 3) => isFinite(x) ? x.toFixed(d) : "—";
+const fmt = (x, d = 3) => (isFinite(x) ? x.toFixed(d) : "—");
 const pct = (x) => `${(x * 100).toFixed(2)}%`;
-const sig = (p) => p < 0.001 ? "<.001" : p.toFixed(4);
-const stars = (p) => p < 0.001 ? "***" : p < 0.01 ? "**" : p < 0.05 ? "*" : "";
+const sig = (p) => (p < 0.001 ? "<.001" : p.toFixed(4));
+const stars = (p) =>
+  p < 0.001 ? "***" : p < 0.01 ? "**" : p < 0.05 ? "*" : "";
 
 const html = `<!doctype html>
 <html lang="tr"><head><meta charset="utf-8"><title>Bölüm 3-5 Raporu</title>
@@ -291,16 +383,18 @@ yaklaşım koşul-içi varyansı azaltır ve testlerin güvenilirliğini arttır
 <h3>4.2 Tanımlayıcı istatistikler (ortalama ± SD)</h3>
 <table>
 <tr><th>Algoritma</th><th>SC</th><th>TC</th><th>ITDR</th><th>Olay/Koşu</th><th>Süre (ms)</th></tr>
-${Object.entries(stats).map(([name, s]) => {
-  const evs = results[name].map((r) => r.eventsConsumed);
-  const dur = results[name].map((r) => r.durationMs);
-  return `<tr><td class="l">${name}</td>
+${Object.entries(stats)
+  .map(([name, s]) => {
+    const evs = results[name].map((r) => r.eventsConsumed);
+    const dur = results[name].map((r) => r.durationMs);
+    return `<tr><td class="l">${name}</td>
     <td>${pct(s.sc.mean)} ± ${pct(s.sc.sd)}</td>
     <td>${pct(s.tc.mean)} ± ${pct(s.tc.sd)}</td>
     <td>${pct(s.itdr.mean)} ± ${pct(s.itdr.sd)}</td>
     <td>${mean(evs).toFixed(1)} ± ${sd(evs).toFixed(1)}</td>
     <td>${mean(dur).toFixed(1)} ± ${sd(dur).toFixed(1)}</td></tr>`;
-}).join("")}
+  })
+  .join("")}
 </table>
 
 <h3>4.3 Hipotez testleri (ikili karşılaştırmalar)</h3>
@@ -311,7 +405,9 @@ verilmiştir.</p>
 
 <table>
 <tr><th>Karşılaştırma</th><th>Metrik</th><th>Welch t</th><th>df</th><th>p (Welch)</th><th>U</th><th>p (M-W)</th><th>d</th><th>Normal?</th></tr>
-${comparisons.map((c) => `<tr>
+${comparisons
+  .map(
+    (c) => `<tr>
   <td class="l">${c.a} vs ${c.b}</td>
   <td>${c.metric.toUpperCase()}</td>
   <td>${fmt(c.t, 3)}</td>
@@ -321,7 +417,9 @@ ${comparisons.map((c) => `<tr>
   <td>${sig(c.pU)} ${stars(c.pU)}</td>
   <td>${fmt(c.d, 2)}</td>
   <td>${c.normalA && c.normalB ? "evet" : "hayır"}</td>
-</tr>`).join("")}
+</tr>`,
+  )
+  .join("")}
 </table>
 <p style="font-size:9.5pt;color:#555;">İşaretler: * p&lt;.05, ** p&lt;.01, *** p&lt;.001. Cohen's d
 büyüklük yorumu: 0.2 küçük, 0.5 orta, 0.8 büyük, ≥1.2 çok büyük etki.</p>
@@ -372,14 +470,18 @@ const jsonPath = path.join(__dirname, "trials.json");
 await fs.writeFile(htmlPath, html, "utf8");
 
 // dump raw data
-let csv = "algorithm,trial,stateCoverage,transitionCoverage,itdr,eventsConsumed,durationMs\n";
+let csv =
+  "algorithm,trial,stateCoverage,transitionCoverage,itdr,eventsConsumed,durationMs\n";
 for (const [name, rs] of Object.entries(results)) {
   rs.forEach((r, i) => {
     csv += `${name},${i},${r.stateCoverage},${r.transitionCoverage},${r.itdr},${r.eventsConsumed},${r.durationMs}\n`;
   });
 }
 await fs.writeFile(csvPath, csv);
-await fs.writeFile(jsonPath, JSON.stringify({ results, stats, comparisons, severitySumPerAlgo }, null, 2));
+await fs.writeFile(
+  jsonPath,
+  JSON.stringify({ results, stats, comparisons, severitySumPerAlgo }, null, 2),
+);
 
 const browser = await puppeteer.launch({
   executablePath: execSync("which chromium").toString().trim(),
@@ -390,7 +492,9 @@ const page = await browser.newPage();
 await page.goto("file://" + htmlPath, { waitUntil: "networkidle0" });
 const pdfPath = path.join(__dirname, "Bolum_3_5_Rapor.pdf");
 await page.pdf({
-  path: pdfPath, format: "A4", printBackground: true,
+  path: pdfPath,
+  format: "A4",
+  printBackground: true,
   margin: { top: "22mm", right: "20mm", bottom: "22mm", left: "22mm" },
   displayHeaderFooter: true,
   headerTemplate: `<div style="font-size:8pt;color:#888;width:100%;text-align:center;">Bölüm 3-5 — Tor FSM MDT Raporu</div>`,
@@ -403,9 +507,15 @@ console.log("JSON yazıldı:", jsonPath);
 
 function interpretFindings(stats, comparisons) {
   const sigs = comparisons.filter((c) => c.pT < 0.05);
-  const b3vsB1_tc = comparisons.find((c) => c.a === "B3_MDT" && c.b === "B1_Random" && c.metric === "tc");
-  const b3vsB2_tc = comparisons.find((c) => c.a === "B3_MDT" && c.b === "B2_GreedySC" && c.metric === "tc");
-  const b3vsB1_itdr = comparisons.find((c) => c.a === "B3_MDT" && c.b === "B1_Random" && c.metric === "itdr");
+  const b3vsB1_tc = comparisons.find(
+    (c) => c.a === "B3_MDT" && c.b === "B1_Random" && c.metric === "tc",
+  );
+  const b3vsB2_tc = comparisons.find(
+    (c) => c.a === "B3_MDT" && c.b === "B2_GreedySC" && c.metric === "tc",
+  );
+  const b3vsB1_itdr = comparisons.find(
+    (c) => c.a === "B3_MDT" && c.b === "B1_Random" && c.metric === "itdr",
+  );
   const tcGain1 = (stats.B3_MDT.tc.mean - stats.B1_Random.tc.mean) * 100;
   const tcGain2 = (stats.B3_MDT.tc.mean - stats.B2_GreedySC.tc.mean) * 100;
   const itdrGain = (stats.B3_MDT.itdr.mean - stats.B1_Random.itdr.mean) * 100;

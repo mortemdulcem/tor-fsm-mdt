@@ -1,4 +1,11 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  boolean,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -33,9 +40,18 @@ export const violations = pgTable("violations", {
   timestamp: timestamp("timestamp").defaultNow().notNull(),
 });
 
-export const insertTestRunSchema = createInsertSchema(testRuns).omit({ id: true, createdAt: true });
-export const insertTransitionSchema = createInsertSchema(transitions).omit({ id: true, timestamp: true });
-export const insertViolationSchema = createInsertSchema(violations).omit({ id: true, timestamp: true });
+export const insertTestRunSchema = createInsertSchema(testRuns).omit({
+  id: true,
+  createdAt: true,
+});
+export const insertTransitionSchema = createInsertSchema(transitions).omit({
+  id: true,
+  timestamp: true,
+});
+export const insertViolationSchema = createInsertSchema(violations).omit({
+  id: true,
+  timestamp: true,
+});
 
 export type TestRun = typeof testRuns.$inferSelect;
 export type InsertTestRun = z.infer<typeof insertTestRunSchema>;

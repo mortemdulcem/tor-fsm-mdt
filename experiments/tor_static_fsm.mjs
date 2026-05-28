@@ -16,8 +16,12 @@ import { STATES, EVENTS, VALID, k } from "../server/fsm.ts";
 const TOR_SRC = "/tmp/tor_src/tor/src/core/or";
 
 let files;
-try { files = (await fs.readdir(TOR_SRC)).filter((f) => f.endsWith(".c")); }
-catch { console.warn("Tor source not cloned; skipping."); process.exit(0); }
+try {
+  files = (await fs.readdir(TOR_SRC)).filter((f) => f.endsWith(".c"));
+} catch {
+  console.warn("Tor source not cloned; skipping.");
+  process.exit(0);
+}
 
 // 1) For each file, first build an index of function definitions, then map
 //    each circuit_set_state call to the most recent function def above it.
@@ -38,20 +42,33 @@ for (const f of files) {
     // Confirm by looking ahead for "{" within 4 lines.
     let ok = false;
     for (let k = i + 1; k < Math.min(lines.length, i + 6); k++) {
-      if (lines[k].trim().startsWith("{")) { ok = true; break; }
-      if (lines[k].trim() === "" || lines[k].endsWith(",") || /^\s*\w+/.test(lines[k])) continue;
+      if (lines[k].trim().startsWith("{")) {
+        ok = true;
+        break;
+      }
+      if (
+        lines[k].trim() === "" ||
+        lines[k].endsWith(",") ||
+        /^\s*\w+/.test(lines[k])
+      )
+        continue;
       break;
     }
     if (ok) fnDefs.push({ line: i, name: m[1] });
   }
 
   for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].match(/circuit_set_state\([^,]+,\s*(CIRCUIT_STATE_[A-Z_]+)\s*\)/);
+    const m = lines[i].match(
+      /circuit_set_state\([^,]+,\s*(CIRCUIT_STATE_[A-Z_]+)\s*\)/,
+    );
     if (!m) continue;
     // Find the most recent fnDef whose line < i.
     let fn = "(unknown)";
     for (let j = fnDefs.length - 1; j >= 0; j--) {
-      if (fnDefs[j].line < i) { fn = fnDefs[j].name; break; }
+      if (fnDefs[j].line < i) {
+        fn = fnDefs[j].name;
+        break;
+      }
     }
     sites.push({ file: f, line: i + 1, fn, target: m[1] });
   }
@@ -75,16 +92,28 @@ const FN_TO_EVENT = {
 };
 
 const STATE_MAP = {
-  CIRCUIT_STATE_BUILDING:          { spec: "CIRCUIT_BUILDING", note: "1:1" },
-  CIRCUIT_STATE_ONIONSKIN_PENDING: { spec: "CREATE_SENT",      note: "approximate (server-side variant)" },
-  CIRCUIT_STATE_CHAN_WAIT:         { spec: "TLS_HANDSHAKE",    note: "approximate" },
-  CIRCUIT_STATE_GUARD_WAIT:        { spec: "(no spec analog)", note: "vanguards-specific gate state" },
-  CIRCUIT_STATE_OPEN:              { spec: "CIRCUIT_READY",    note: "implementation merges READY+TRANSMITTING" },
+  CIRCUIT_STATE_BUILDING: { spec: "CIRCUIT_BUILDING", note: "1:1" },
+  CIRCUIT_STATE_ONIONSKIN_PENDING: {
+    spec: "CREATE_SENT",
+    note: "approximate (server-side variant)",
+  },
+  CIRCUIT_STATE_CHAN_WAIT: { spec: "TLS_HANDSHAKE", note: "approximate" },
+  CIRCUIT_STATE_GUARD_WAIT: {
+    spec: "(no spec analog)",
+    note: "vanguards-specific gate state",
+  },
+  CIRCUIT_STATE_OPEN: {
+    spec: "CIRCUIT_READY",
+    note: "implementation merges READY+TRANSMITTING",
+  },
 };
 
 const implStates = Array.from(new Set(sites.map((s) => s.target)));
 const implTransitions = sites.map((s) => ({
-  file: s.file, line: s.line, fn: s.fn, target: s.target,
+  file: s.file,
+  line: s.line,
+  fn: s.fn,
+  target: s.target,
   event_proxy: FN_TO_EVENT[s.fn] || "(unmapped function)",
   spec_state: STATE_MAP[s.target]?.spec || "(unknown)",
   note: STATE_MAP[s.target]?.note || "",
@@ -97,15 +126,28 @@ const structural = {
   spec_states: STATES,
   impl_states: implStates,
   state_mapping: STATE_MAP,
-  unmapped_in_spec: implStates.filter((s) => !STATE_MAP[s] || STATE_MAP[s].spec.includes("no spec")),
-  unrepresented_in_impl: ["IDLE", "CONNECTING", "TRANSMITTING", "CLOSING", "CLOSED", "ERROR"], // documented analysis
+  unmapped_in_spec: implStates.filter(
+    (s) => !STATE_MAP[s] || STATE_MAP[s].spec.includes("no spec"),
+  ),
+  unrepresented_in_impl: [
+    "IDLE",
+    "CONNECTING",
+    "TRANSMITTING",
+    "CLOSING",
+    "CLOSED",
+    "ERROR",
+  ], // documented analysis
 };
 
 // 4) Aggregate findings: per impl-state, list (fn, file:line) tuples.
 const perState = {};
 for (const t of implTransitions) {
   if (!perState[t.target]) perState[t.target] = [];
-  perState[t.target].push({ fn: t.fn, where: `${t.file}:${t.line}`, event_proxy: t.event_proxy });
+  perState[t.target].push({
+    fn: t.fn,
+    where: `${t.file}:${t.line}`,
+    event_proxy: t.event_proxy,
+  });
 }
 
 // 5) Honest disagreement matrix at the structural level.
@@ -125,7 +167,8 @@ const out = {
     repo: "https://gitlab.torproject.org/tpo/core/tor",
     path: "src/core/or",
     files_scanned: files.length,
-    method: "regex scan of circuit_set_state() call sites + column-0 function-header heuristic for enclosing function name",
+    method:
+      "regex scan of circuit_set_state() call sites + column-0 function-header heuristic for enclosing function name",
     scanned_at: new Date().toISOString(),
   },
   sites_count: sites.length,
@@ -141,8 +184,14 @@ const out = {
   ],
 };
 
-await fs.writeFile(path.resolve(import.meta.dirname, "tor_static_fsm.json"), JSON.stringify(out, null, 2), "utf8");
+await fs.writeFile(
+  path.resolve(import.meta.dirname, "tor_static_fsm.json"),
+  JSON.stringify(out, null, 2),
+  "utf8",
+);
 console.log(`Scanned ${files.length} files in ${TOR_SRC}`);
-console.log(`Found ${sites.length} circuit_set_state() call sites → ${implStates.length} distinct impl states.`);
+console.log(
+  `Found ${sites.length} circuit_set_state() call sites → ${implStates.length} distinct impl states.`,
+);
 console.log("Impl states:", implStates.join(", "));
 console.log("Wrote: experiments/tor_static_fsm.json");
