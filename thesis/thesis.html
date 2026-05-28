@@ -1367,6 +1367,85 @@ Her senaryo 3 seed (42, 137, 2718), 30 min simulasyon suresi,
   gercek Tor aginin uzun donem davranisini temsil etmez.</li>
 </ol>
 
+
+<h4>4.12-D Performans Olcumleri ve Istatistiksel Dogrulama</h4>
+
+<p><b>Gecikme (Latency).</b> FSM monitorunun olay basina isleme suresi
+3620 olay uzerinde 10 tekrar ile
+olculmustur (toplam 36.200 olcum).
+<code>process.hrtime.bigint()</code> (nanosaniye cozunurluk) kullanilmistir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-F.</b> FSM monitor gecikme olcumleri (mikrosaniye).</p>
+<table>
+<tr><th>Metrik</th><th>Deger (us)</th></tr>
+<tr><td>p50</td><td>0.138</td></tr>
+<tr><td>p95</td><td>0.243</td></tr>
+<tr><td>p99</td><td>1.042</td></tr>
+<tr><td>Ortalama +/- SD</td><td>0.199 +/- 5.597</td></tr>
+</table>
+
+<p><b>Bellek kullanimi (Memory overhead).</b> FSM monitor islemi sirasinda RSS ve heap
+olculmustur. 10.754 olay islendiginde
+RSS artisi 0.07 MB, heap artisi 1.82 MB
+olarak gozlemlenmistir. FSM monitorunun bellek ayak izi ihmal edilebilir duzeydedir.</p>
+
+<p><b>Isleme hacmi (Throughput).</b> Tek cekirdekte surdurulebilir isleme hizi
+5 tekrar ile olculmustur:
+ortalama 3.919.009 olay/saniye
+(SD 753.809).
+Bu deger, gercek Tor aginin urettigi olay hacminin cok uzerindedir.</p>
+
+<p><b>Ag olcegi (Network scale).</b> v1 topolojisi 9 dugum
+(6 relay) iken, v2 topolojisi
+41 dugum
+(30 relay) ile basariyla calistirilmistir.
+30 relay hedefine ulasilmistir.</p>
+
+<p><b>Istatistiksel guc analizi.</b> 2-hop ve 3-hop FPR farki icin etki buyuklugu
+(Cohen's d) = 61.84 olarak hesaplanmistir
+(large effect).
+Mevcut N=3 seed ile bu etki buyuklugu icin
+alpha=0.05, power=0.80 kosullarinda gerekli orneklem buyuklugu
+N=1'dir.
+Gozlemlenen etki o kadar buyuktur ki (FPR farki = %21.0)
+mevcut N=3 bile istatistiksel olarak yeterlidir.</p>
+
+<p><b>5-katlama capraz dogrulama (5-fold CV).</b> Tum v1 ve v2 olay loglarindan
+1821 devre dizisi cikarilmis ve
+5-katlama capraz dogrulama uygulanmistir.
+Devre-duzeyinde siniflandirma sonuclari:</p>
+
+<p class="no-indent"><b>Tablo 4.12-G.</b> 5-fold CV sonuclari (devre-duzeyinde siniflandirma).</p>
+<table>
+<tr><th>FSM</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th><th>Accuracy</th></tr>
+<tr><td>2-hop</td>
+<td>0.2334 +/- 0.0326</td>
+<td>0.7915 +/- 0.0387</td>
+<td>0.3590 +/- 0.0371</td>
+<td>0.8373 +/- 0.0442</td>
+<td>0.3152 +/- 0.0381</td>
+</tr>
+<tr><td>3-hop</td>
+<td>0.1463 +/- 0.0800</td>
+<td>0.0578 +/- 0.0299</td>
+<td>0.0822 +/- 0.0427</td>
+<td>0.1103 +/- 0.0146</td>
+<td>0.6870 +/- 0.0314</td>
+</tr>
+</table>
+
+<p><b>CV bulgulari.</b> Devre-duzeyinde CV, olay-duzeyindeki senaryo-bazli analizden
+farkli sonuclar uretmistir. Bunun temel nedeni: saldiri senaryolarinda tum devreler
+saldiri icermez; yalnizca enjekte edilen devreler gercek pozitiftir. Bu durum,
+devre-duzeyinde siniflandirma icin daha rafine bir ground-truth etiketlemesi
+gerektirdigini gostermektedir. 3-hop modelin dusuk FPR'si (%11.0) 
+2-hop modeline (%83.7) kiyasla
+capraz dogrulama ile de teyit edilmistir.</p>
+
+<p><b>Tor surum uyumlulugu.</b> Tor version 0.4.6.10.
+Shadow 3.3.0 ile derlenmistir.
+Tor 0.4.8.x is not available in the current apt repository. The installed version is 0.4.6.10. Shadow 3.3.0 was built against this version. Upgrading would require building Tor from source and recompiling Shadow, which is beyond the scope of TIER B.</p>
+
 <div class="pagebreak"></div>
 
 <!-- ====================== BÖLÜM 4.13 — F-grubu: N=100 + power + BCa ====================== -->

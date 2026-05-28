@@ -1,0 +1,463 @@
+{
+  "tier": "B",
+  "timestamp": "2026-05-28T12:06:08.528Z",
+  "b1_latency": {
+    "totalMeasurements": 36200,
+    "eventsPerRepeat": 3620,
+    "repeats": 10,
+    "unit": "microseconds",
+    "mean_us": 0.19899682320442513,
+    "sd_us": 5.596894540658645,
+    "p50_us": 0.138,
+    "p95_us": 0.243,
+    "p99_us": 1.042,
+    "min_us": 0.102,
+    "max_us": 1055.962,
+    "sourceFile": "/home/ubuntu/repos/tor-fsm-mdt/experiments/shadow_runs_v2/benign/run_seed137/events.jsonl"
+  },
+  "b2_memory": {
+    "rssBeforeMB": 102.8125,
+    "rssAfterAllMB": 102.88671875,
+    "rssDeltaMB": 0.07421875,
+    "heapBeforeMB": 14.956321716308594,
+    "heapAfterMB": 16.77741241455078,
+    "heapDeltaMB": 1.8210906982421875,
+    "perRunSamples": [
+      {
+        "scenario": "benign",
+        "seed": "run_seed137",
+        "eventCount": 3620,
+        "rssBeforeMB": 102.8125,
+        "rssAfterMB": 102.8125,
+        "rssDeltaMB": 0
+      },
+      {
+        "scenario": "benign",
+        "seed": "run_seed2718",
+        "eventCount": 3582,
+        "rssBeforeMB": 102.8125,
+        "rssAfterMB": 102.8125,
+        "rssDeltaMB": 0
+      },
+      {
+        "scenario": "benign",
+        "seed": "run_seed42",
+        "eventCount": 3552,
+        "rssBeforeMB": 102.8125,
+        "rssAfterMB": 102.88671875,
+        "rssDeltaMB": 0.07421875
+      }
+    ],
+    "totalEventsProcessed": 10754
+  },
+  "b3_throughput": {
+    "repeats": 5,
+    "eventsPerRun": 10754,
+    "eventsPerSecond": {
+      "mean": 3919008.8932286776,
+      "sd": 753809.1354856755,
+      "min": 3177624.605936432,
+      "max": 4807099.165529782
+    },
+    "elapsedMs": {
+      "mean": 2.82641,
+      "sd": 0.5374563006194084
+    }
+  },
+  "b4_network_scale": {
+    "v1_topology": {
+      "directory_authorities": 1,
+      "relays": 6,
+      "clients": 2,
+      "total_nodes": 9
+    },
+    "v2_topology": {
+      "directory_authorities": 3,
+      "relays": 30,
+      "clients": 8,
+      "total_nodes": 41
+    },
+    "status": "ACHIEVED",
+    "notes": "30-relay topology ran successfully in v2 (Shadow 3.3.0). No memory/time limits hit. Average simulation time ~22 seconds for 30 min simulated time."
+  },
+  "b5_tor_version": {
+    "currentVersion": "Tor version 0.4.6.10.",
+    "targetVersion": "0.4.8.x",
+    "status": "DOCUMENTED",
+    "notes": "Tor 0.4.8.x is not available in the current apt repository. The installed version is 0.4.6.10. Shadow 3.3.0 was built against this version. Upgrading would require building Tor from source and recompiling Shadow, which is beyond the scope of TIER B.",
+    "shadowVersion": "3.3.0",
+    "compatibility": "Shadow 3.3.0 is compiled against Tor 0.4.6.10. Upgrading Tor may require Shadow recompilation."
+  },
+  "b6_power_analysis": {
+    "fprComparison": {
+      "fpr2hop_mean": 0.2634058021763122,
+      "fpr3hop_mean": 0.053081771838192064,
+      "difference": 0.21032403033812014,
+      "pooledSD": 0.003401322659791775,
+      "cohenD": 61.83595364957111,
+      "interpretation": "large effect"
+    },
+    "sampleSizeRequirements": {
+      "alpha0.05_power0.8": {
+        "alpha": 0.05,
+        "power": 0.8,
+        "requiredN": 1,
+        "effectSize": 61.83595364957111
+      },
+      "alpha0.05_power0.9": {
+        "alpha": 0.05,
+        "power": 0.9,
+        "requiredN": 1,
+        "effectSize": 61.83595364957111
+      },
+      "alpha0.05_power0.95": {
+        "alpha": 0.05,
+        "power": 0.95,
+        "requiredN": 1,
+        "effectSize": 61.83595364957111
+      },
+      "alpha0.01_power0.8": {
+        "alpha": 0.01,
+        "power": 0.8,
+        "requiredN": 1,
+        "effectSize": 61.83595364957111
+      },
+      "alpha0.01_power0.9": {
+        "alpha": 0.01,
+        "power": 0.9,
+        "requiredN": 1,
+        "effectSize": 61.83595364957111
+      },
+      "alpha0.01_power0.95": {
+        "alpha": 0.01,
+        "power": 0.95,
+        "requiredN": 1,
+        "effectSize": 61.83595364957111
+      }
+    },
+    "precisionEffects": {
+      "replay_attack": {
+        "precision2hop": 0.3478553544895108,
+        "precision3hop": 0.725872243655568,
+        "diff": 0.3780168891660572,
+        "cohenD": 105.39061116885878,
+        "requiredN_alpha05_power80": 1
+      },
+      "circuit_bypass": {
+        "precision2hop": 0.44922409535702373,
+        "precision3hop": 0.8018882425089223,
+        "diff": 0.3526641471518986,
+        "cohenD": 66.08554165971397,
+        "requiredN_alpha05_power80": 1
+      },
+      "ghost_circuit": {
+        "precision2hop": 0.2658959411900588,
+        "precision3hop": 0.6426158760862238,
+        "diff": 0.376719934896165,
+        "cohenD": 84.38756020808529,
+        "requiredN_alpha05_power80": 1
+      },
+      "handshake_skip": {
+        "precision2hop": 0.2896876353237034,
+        "precision3hop": 0.6693363354199994,
+        "diff": 0.379648700096296,
+        "cohenD": 58.15529037938158,
+        "requiredN_alpha05_power80": 1
+      },
+      "premature_data": {
+        "precision2hop": 0.28286033159596374,
+        "precision3hop": 0.6618885641092737,
+        "diff": 0.3790282325133099,
+        "cohenD": 53.246216945828074,
+        "requiredN_alpha05_power80": 1
+      },
+      "create_flood": {
+        "precision2hop": 0.6654935277274333,
+        "precision3hop": 0.9080271182779459,
+        "diff": 0.2425335905505126,
+        "cohenD": 74.21247537930539,
+        "requiredN_alpha05_power80": 1
+      }
+    },
+    "currentSampleSize": 3,
+    "notes": "Current N=3 seeds per condition. Power analysis shows required N for detecting the observed 2-hop vs 3-hop FPR difference at various alpha/power levels."
+  },
+  "b7_cross_validation": {
+    "2hop": {
+      "kFolds": 5,
+      "totalSequences": 1821,
+      "foldResults": [
+        {
+          "fold": 0,
+          "testSize": 364,
+          "tp": 77,
+          "fp": 212,
+          "tn": 49,
+          "fn": 26,
+          "precision": 0.2664359861591695,
+          "recall": 0.7475728155339806,
+          "f1": 0.39285714285714285,
+          "fpr": 0.8122605363984674,
+          "accuracy": 0.34615384615384615
+        },
+        {
+          "fold": 1,
+          "testSize": 364,
+          "tp": 80,
+          "fp": 227,
+          "tn": 33,
+          "fn": 24,
+          "precision": 0.26058631921824105,
+          "recall": 0.7692307692307693,
+          "f1": 0.38929440389294406,
+          "fpr": 0.8730769230769231,
+          "accuracy": 0.31043956043956045
+        },
+        {
+          "fold": 2,
+          "testSize": 364,
+          "tp": 59,
+          "fp": 233,
+          "tn": 55,
+          "fn": 17,
+          "precision": 0.20205479452054795,
+          "recall": 0.7763157894736842,
+          "f1": 0.32065217391304346,
+          "fpr": 0.8090277777777778,
+          "accuracy": 0.3131868131868132
+        },
+        {
+          "fold": 3,
+          "testSize": 364,
+          "tp": 63,
+          "fp": 258,
+          "tn": 30,
+          "fn": 13,
+          "precision": 0.19626168224299065,
+          "recall": 0.8289473684210527,
+          "f1": 0.31738035264483627,
+          "fpr": 0.8958333333333334,
+          "accuracy": 0.2554945054945055
+        },
+        {
+          "fold": 4,
+          "testSize": 365,
+          "tp": 71,
+          "fp": 223,
+          "tn": 57,
+          "fn": 14,
+          "precision": 0.24149659863945577,
+          "recall": 0.8352941176470589,
+          "f1": 0.3746701846965699,
+          "fpr": 0.7964285714285714,
+          "accuracy": 0.3506849315068493
+        }
+      ],
+      "aggregated": {
+        "precision": {
+          "mean": 0.23336707615608102,
+          "sd": 0.03262590372750445,
+          "min": 0.19626168224299065,
+          "max": 0.2664359861591695,
+          "perFold": [
+            0.2664359861591695,
+            0.26058631921824105,
+            0.20205479452054795,
+            0.19626168224299065,
+            0.24149659863945577
+          ]
+        },
+        "recall": {
+          "mean": 0.7914721720613092,
+          "sd": 0.038653275067088606,
+          "min": 0.7475728155339806,
+          "max": 0.8352941176470589,
+          "perFold": [
+            0.7475728155339806,
+            0.7692307692307693,
+            0.7763157894736842,
+            0.8289473684210527,
+            0.8352941176470589
+          ]
+        },
+        "f1": {
+          "mean": 0.35897085160090725,
+          "sd": 0.037122628818283536,
+          "min": 0.31738035264483627,
+          "max": 0.39285714285714285,
+          "perFold": [
+            0.39285714285714285,
+            0.38929440389294406,
+            0.32065217391304346,
+            0.31738035264483627,
+            0.3746701846965699
+          ]
+        },
+        "fpr": {
+          "mean": 0.8373254284030146,
+          "sd": 0.04416702124676672,
+          "min": 0.7964285714285714,
+          "max": 0.8958333333333334,
+          "perFold": [
+            0.8122605363984674,
+            0.8730769230769231,
+            0.8090277777777778,
+            0.8958333333333334,
+            0.7964285714285714
+          ]
+        },
+        "accuracy": {
+          "mean": 0.3151919313563149,
+          "sd": 0.038107681018220374,
+          "min": 0.2554945054945055,
+          "max": 0.3506849315068493,
+          "perFold": [
+            0.34615384615384615,
+            0.31043956043956045,
+            0.3131868131868132,
+            0.2554945054945055,
+            0.3506849315068493
+          ]
+        }
+      }
+    },
+    "3hop": {
+      "kFolds": 5,
+      "totalSequences": 1821,
+      "foldResults": [
+        {
+          "fold": 0,
+          "testSize": 364,
+          "tp": 7,
+          "fp": 27,
+          "tn": 234,
+          "fn": 96,
+          "precision": 0.20588235294117646,
+          "recall": 0.06796116504854369,
+          "f1": 0.1021897810218978,
+          "fpr": 0.10344827586206896,
+          "accuracy": 0.6620879120879121
+        },
+        {
+          "fold": 1,
+          "testSize": 364,
+          "tp": 5,
+          "fp": 30,
+          "tn": 230,
+          "fn": 99,
+          "precision": 0.14285714285714285,
+          "recall": 0.04807692307692308,
+          "f1": 0.07194244604316546,
+          "fpr": 0.11538461538461539,
+          "accuracy": 0.6456043956043956
+        },
+        {
+          "fold": 2,
+          "testSize": 364,
+          "tp": 1,
+          "fp": 31,
+          "tn": 257,
+          "fn": 75,
+          "precision": 0.03125,
+          "recall": 0.013157894736842105,
+          "f1": 0.018518518518518517,
+          "fpr": 0.1076388888888889,
+          "accuracy": 0.7087912087912088
+        },
+        {
+          "fold": 3,
+          "testSize": 364,
+          "tp": 5,
+          "fp": 38,
+          "tn": 250,
+          "fn": 71,
+          "precision": 0.11627906976744186,
+          "recall": 0.06578947368421052,
+          "f1": 0.08403361344537814,
+          "fpr": 0.13194444444444445,
+          "accuracy": 0.7005494505494505
+        },
+        {
+          "fold": 4,
+          "testSize": 365,
+          "tp": 8,
+          "fp": 26,
+          "tn": 254,
+          "fn": 77,
+          "precision": 0.23529411764705882,
+          "recall": 0.09411764705882353,
+          "f1": 0.13445378151260504,
+          "fpr": 0.09285714285714286,
+          "accuracy": 0.7178082191780822
+        }
+      ],
+      "aggregated": {
+        "precision": {
+          "mean": 0.146312536642564,
+          "sd": 0.08003065192362654,
+          "min": 0.03125,
+          "max": 0.23529411764705882,
+          "perFold": [
+            0.20588235294117646,
+            0.14285714285714285,
+            0.03125,
+            0.11627906976744186,
+            0.23529411764705882
+          ]
+        },
+        "recall": {
+          "mean": 0.05782062072106858,
+          "sd": 0.029889404953477937,
+          "min": 0.013157894736842105,
+          "max": 0.09411764705882353,
+          "perFold": [
+            0.06796116504854369,
+            0.04807692307692308,
+            0.013157894736842105,
+            0.06578947368421052,
+            0.09411764705882353
+          ]
+        },
+        "f1": {
+          "mean": 0.082227628108313,
+          "sd": 0.04270232969707085,
+          "min": 0.018518518518518517,
+          "max": 0.13445378151260504,
+          "perFold": [
+            0.1021897810218978,
+            0.07194244604316546,
+            0.018518518518518517,
+            0.08403361344537814,
+            0.13445378151260504
+          ]
+        },
+        "fpr": {
+          "mean": 0.11025467348743212,
+          "sd": 0.0145997081971568,
+          "min": 0.09285714285714286,
+          "max": 0.13194444444444445,
+          "perFold": [
+            0.10344827586206896,
+            0.11538461538461539,
+            0.1076388888888889,
+            0.13194444444444445,
+            0.09285714285714286
+          ]
+        },
+        "accuracy": {
+          "mean": 0.6869682372422099,
+          "sd": 0.03139185365167164,
+          "min": 0.6456043956043956,
+          "max": 0.7178082191780822,
+          "perFold": [
+            0.6620879120879121,
+            0.6456043956043956,
+            0.7087912087912088,
+            0.7005494505494505,
+            0.7178082191780822
+          ]
+        }
+      }
+    }
+  }
+}

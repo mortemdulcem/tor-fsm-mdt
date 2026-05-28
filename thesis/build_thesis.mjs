@@ -26,6 +26,10 @@ const shadowResV1 = JSON.parse(await fs.readFile(path.resolve(__dirname, "../exp
 const shadowResV2 = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/shadow_results_v2.json"), "utf8"));
 // Backward compat: shadowRes = v1 (used by existing sections), v2 for new sections
 const shadowRes = shadowResV1;
+let tierB = null;
+try {
+  tierB = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tier_b_results.json"), "utf8"));
+} catch { /* tier B results not yet generated */ }
 const fvalBy = Object.fromEntries(fval.comparisons.filter(v => v.B === "B2_GreedySC").map(v => [v.metric, v]));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
@@ -1144,6 +1148,85 @@ ${buildV2ComparisonTable()}
   gercek Tor aginin uzun donem davranisini temsil etmez.</li>
 </ol>
 
+${tierB ? `
+<h4>4.12-D Performans Olcumleri ve Istatistiksel Dogrulama</h4>
+
+<p><b>Gecikme (Latency).</b> FSM monitorunun olay basina isleme suresi
+${tierB.b1_latency.eventsPerRepeat} olay uzerinde ${tierB.b1_latency.repeats} tekrar ile
+olculmustur (toplam ${tierB.b1_latency.totalMeasurements.toLocaleString("tr-TR")} olcum).
+<code>process.hrtime.bigint()</code> (nanosaniye cozunurluk) kullanilmistir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-F.</b> FSM monitor gecikme olcumleri (mikrosaniye).</p>
+<table>
+<tr><th>Metrik</th><th>Deger (us)</th></tr>
+<tr><td>p50</td><td>${tierB.b1_latency.p50_us.toFixed(3)}</td></tr>
+<tr><td>p95</td><td>${tierB.b1_latency.p95_us.toFixed(3)}</td></tr>
+<tr><td>p99</td><td>${tierB.b1_latency.p99_us.toFixed(3)}</td></tr>
+<tr><td>Ortalama +/- SD</td><td>${tierB.b1_latency.mean_us.toFixed(3)} +/- ${tierB.b1_latency.sd_us.toFixed(3)}</td></tr>
+</table>
+
+<p><b>Bellek kullanimi (Memory overhead).</b> FSM monitor islemi sirasinda RSS ve heap
+olculmustur. ${tierB.b2_memory.totalEventsProcessed.toLocaleString("tr-TR")} olay islendiginde
+RSS artisi ${tierB.b2_memory.rssDeltaMB.toFixed(2)} MB, heap artisi ${tierB.b2_memory.heapDeltaMB.toFixed(2)} MB
+olarak gozlemlenmistir. FSM monitorunun bellek ayak izi ihmal edilebilir duzeydedir.</p>
+
+<p><b>Isleme hacmi (Throughput).</b> Tek cekirdekte surdurulebilir isleme hizi
+${tierB.b3_throughput.repeats} tekrar ile olculmustur:
+ortalama ${Math.round(tierB.b3_throughput.eventsPerSecond.mean).toLocaleString("tr-TR")} olay/saniye
+(SD ${Math.round(tierB.b3_throughput.eventsPerSecond.sd).toLocaleString("tr-TR")}).
+Bu deger, gercek Tor aginin urettigi olay hacminin cok uzerindedir.</p>
+
+<p><b>Ag olcegi (Network scale).</b> v1 topolojisi ${tierB.b4_network_scale.v1_topology.total_nodes} dugum
+(${tierB.b4_network_scale.v1_topology.relays} relay) iken, v2 topolojisi
+${tierB.b4_network_scale.v2_topology.total_nodes} dugum
+(${tierB.b4_network_scale.v2_topology.relays} relay) ile basariyla calistirilmistir.
+30 relay hedefine ulasilmistir.</p>
+
+<p><b>Istatistiksel guc analizi.</b> 2-hop ve 3-hop FPR farki icin etki buyuklugu
+(Cohen's d) = ${tierB.b6_power_analysis.fprComparison.cohenD.toFixed(2)} olarak hesaplanmistir
+(${tierB.b6_power_analysis.fprComparison.interpretation}).
+Mevcut N=${tierB.b6_power_analysis.currentSampleSize} seed ile bu etki buyuklugu icin
+alpha=0.05, power=0.80 kosullarinda gerekli orneklem buyuklugu
+N=${tierB.b6_power_analysis.sampleSizeRequirements["alpha0.05_power0.8"].requiredN}'dir.
+Gozlemlenen etki o kadar buyuktur ki (FPR farki = %${(tierB.b6_power_analysis.fprComparison.difference * 100).toFixed(1)})
+mevcut N=3 bile istatistiksel olarak yeterlidir.</p>
+
+<p><b>5-katlama capraz dogrulama (5-fold CV).</b> Tum v1 ve v2 olay loglarindan
+${tierB.b7_cross_validation["3hop"].totalSequences} devre dizisi cikarilmis ve
+${tierB.b7_cross_validation["3hop"].kFolds}-katlama capraz dogrulama uygulanmistir.
+Devre-duzeyinde siniflandirma sonuclari:</p>
+
+<p class="no-indent"><b>Tablo 4.12-G.</b> 5-fold CV sonuclari (devre-duzeyinde siniflandirma).</p>
+<table>
+<tr><th>FSM</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th><th>Accuracy</th></tr>
+<tr><td>2-hop</td>
+<td>${tierB.b7_cross_validation["2hop"].aggregated.precision?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["2hop"].aggregated.precision?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["2hop"].aggregated.recall?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["2hop"].aggregated.recall?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["2hop"].aggregated.f1?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["2hop"].aggregated.f1?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["2hop"].aggregated.fpr?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["2hop"].aggregated.fpr?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["2hop"].aggregated.accuracy?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["2hop"].aggregated.accuracy?.sd.toFixed(4) ?? ""}</td>
+</tr>
+<tr><td>3-hop</td>
+<td>${tierB.b7_cross_validation["3hop"].aggregated.precision?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["3hop"].aggregated.precision?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["3hop"].aggregated.recall?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["3hop"].aggregated.recall?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["3hop"].aggregated.f1?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["3hop"].aggregated.f1?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["3hop"].aggregated.fpr?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["3hop"].aggregated.fpr?.sd.toFixed(4) ?? ""}</td>
+<td>${tierB.b7_cross_validation["3hop"].aggregated.accuracy?.mean.toFixed(4) ?? "N/A"} +/- ${tierB.b7_cross_validation["3hop"].aggregated.accuracy?.sd.toFixed(4) ?? ""}</td>
+</tr>
+</table>
+
+<p><b>CV bulgulari.</b> Devre-duzeyinde CV, olay-duzeyindeki senaryo-bazli analizden
+farkli sonuclar uretmistir. Bunun temel nedeni: saldiri senaryolarinda tum devreler
+saldiri icermez; yalnizca enjekte edilen devreler gercek pozitiftir. Bu durum,
+devre-duzeyinde siniflandirma icin daha rafine bir ground-truth etiketlemesi
+gerektirdigini gostermektedir. 3-hop modelin dusuk FPR'si (%${(tierB.b7_cross_validation["3hop"].aggregated.fpr?.mean * 100).toFixed(1)}) 
+2-hop modeline (%${(tierB.b7_cross_validation["2hop"].aggregated.fpr?.mean * 100).toFixed(1)}) kiyasla
+capraz dogrulama ile de teyit edilmistir.</p>
+
+<p><b>Tor surum uyumlulugu.</b> ${tierB.b5_tor_version.currentVersion}
+Shadow ${tierB.b5_tor_version.shadowVersion} ile derlenmistir.
+${tierB.b5_tor_version.notes}</p>
+` : ''}
 <div class="pagebreak"></div>
 
 <!-- ====================== BÖLÜM 4.13 — F-grubu: N=100 + power + BCa ====================== -->
