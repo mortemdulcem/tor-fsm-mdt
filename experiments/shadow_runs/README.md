@@ -14,7 +14,7 @@
 
 - 1 directory authority (`4uthority`)
 - 6 relays: `relay1`-`relay5` (guard/middle/exit), `exit1` (exit-only)
-- 3 clients: `client1`-`client3`
+- 2 clients (1 direct client, 1 tor client)
 - 1 file server (`fileserver`) for tgen traffic
 
 All nodes share a single-node GML graph with 50 ms latency, 1 Gbit bandwidth.

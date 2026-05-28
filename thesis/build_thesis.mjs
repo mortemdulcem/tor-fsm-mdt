@@ -960,7 +960,7 @@ runtime davranış farkı aşağıdaki Shadow deneyleriyle kısmen ölçülmüş
 
 <p>Yukarıdaki statik analizin <i>runtime</i> karşılığı olarak, Shadow discrete-event
 ağ simülatörü ${cite(18)} (v${shadowRes.metadata.shadow_version}) üzerinde gerçek
-Tor binary'si (v${shadowRes.metadata.tor_version.replace('Tor version ','').replace('.','')})
+Tor binary'si (v${shadowRes.metadata.tor_version.replace('Tor version ','').replace(/\.$/,'')})
 koşturulmuş ve info-level log çıktısından per-circuit FSM olay dizileri
 çıkarılmıştır. Bu, Bölüm 6.3.3'te "gelecek çalışma" olarak listelenen
 S5-S6 adımlarının <b>uygulanmış</b> hâlidir.</p>
@@ -1253,7 +1253,7 @@ gcc&nbsp;-O3 C portu mevcut latency karşılaştırmasının nitel sonucunu zate
   ortamında uygulanamaz" olarak belgelenmişti. Sonradan farklı bir
   çalışma ortamında (Ubuntu, sudo erişimli VM) Shadow
   v${shadowRes.metadata.shadow_version} kaynak koddan derlenerek kurulmuş,
-  Tor ${shadowRes.metadata.tor_version.replace('Tor version ','').replace('.','')} ile
+  Tor ${shadowRes.metadata.tor_version.replace('Tor version ','').replace(/\.$/,'')} ile
   entegre edilmiştir.</li>
   <li><b>Uygulama:</b> Bölüm 4.12-B'de raporlanan deneyler
   ${shadowRes.summary.totalSimulations} Shadow simülasyonu
@@ -1361,7 +1361,7 @@ aşağıdaki tabloda açıkça gösterilmiştir:</p>
 <td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
 <tr style="background:#d4edda;"><td style="padding:4pt;border:1px solid #999;">S5</td>
 <td style="padding:4pt;border:1px solid #999;">Simüle edilmiş ağ ortamında runtime trace</td>
-<td style="padding:4pt;border:1px solid #999;">Shadow v${shadowRes.metadata.shadow_version} + Tor ${shadowRes.metadata.tor_version.replace('Tor version ','').replace('.','')}; ${shadowRes.metadata.network_topology.relays} relay topoloji; ${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay yakalandı (Bölüm 4.12-B)</td>
+<td style="padding:4pt;border:1px solid #999;">Shadow v${shadowRes.metadata.shadow_version} + Tor ${shadowRes.metadata.tor_version.replace('Tor version ','').replace(/\.$/,'')}; ${shadowRes.metadata.network_topology.relays} relay topoloji; ${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay yakalandı (Bölüm 4.12-B)</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
 <tr style="background:#d4edda;"><td style="padding:4pt;border:1px solid #999;">S6</td>
 <td style="padding:4pt;border:1px solid #999;">Saldırı senaryolarıyla gerçek FPR/TPR ölçümü</td>
