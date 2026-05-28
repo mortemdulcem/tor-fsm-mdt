@@ -1,0 +1,65 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt
+git fetch origin
+git reset --hard origin/devin/1779968748-mega-tier-a
+npx tsx experiments/shadow_harness_v2.mjs 2>&1 | tee /tmp/harness_output.txt
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (5/5), done.
+remote: Total 8 (delta 6), reused 5 (delta 3), pack-reused 0 (from 0)
+Nesneler açılıyor: 100% (8/8), 1.59 KiB | 814.00 KiB/sn, bitti.
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+   442f508..118ca10  devin/1779968748-mega-tier-a -> origin/devin/1779968748-mega-tier-a
+HEAD şimdi şurada: 118ca10 fix: tolerate Shadow non-zero exit when simulation data exists
+=== Shadow + Tor v2 Harness (Expanded Topology) ===
+
+--- Phase 1: Running benign Shadow simulations ---
+  Running Shadow simulation: benign seed=42 ...
+  Shadow exited non-zero but simulation data exists. Treating as success (3.6s).
+  Confirmed: simulation completed (30 min sim time).
+  Seed 42: 67 circuits, 153 events
+  Running Shadow simulation: benign seed=137 ...
+  Shadow exited non-zero but simulation data exists. Treating as success (2.6s).
+  Confirmed: simulation completed (30 min sim time).
+  Seed 137: 66 circuits, 150 events
+  Running Shadow simulation: benign seed=2718 ...
+  Shadow exited non-zero but simulation data exists. Treating as success (3.3s).
+  Confirmed: simulation completed (30 min sim time).
+  Seed 2718: 67 circuits, 153 events
+
+--- Phase 2: Analyzing all scenarios x FSM models ---
+  v2_2hop_benign: P=N/A R=N/A F1=N/A FPR=0.5614 +/- 0.0010
+  v2_3hop_benign: P=N/A R=N/A F1=N/A FPR=0.5614 +/- 0.0010
+  v2_2hop_replay_attack: P=0.6000 +/- 0.0000 R=1.0000 +/- 0.0000 F1=0.7500 +/- 0.0000 FPR=0.5614 +/- 0.0010
+  v2_3hop_replay_attack: P=0.6000 +/- 0.0000 R=1.0000 +/- 0.0000 F1=0.7500 +/- 0.0000 FPR=0.5614 +/- 0.0010
+  v2_2hop_circuit_bypass: P=0.6098 +/- 0.0010 R=1.0000 +/- 0.0000 F1=0.7576 +/- 0.0007 FPR=0.5614 +/- 0.0010
+  v2_3hop_circuit_bypass: P=0.6098 +/- 0.0010 R=1.0000 +/- 0.0000 F1=0.7576 +/- 0.0007 FPR=0.5614 +/- 0.0010
+  v2_2hop_ghost_circuit: P=0.5000 +/- 0.0000 R=1.0000 +/- 0.0000 F1=0.6667 +/- 0.0000 FPR=0.5614 +/- 0.0010
+  v2_3hop_ghost_circuit: P=0.5000 +/- 0.0000 R=1.0000 +/- 0.0000 F1=0.6667 +/- 0.0000 FPR=0.5614 +/- 0.0010
+  v2_2hop_handshake_skip: P=0.4386 +/- 0.0010 R=1.0000 +/- 0.0000 F1=0.6098 +/- 0.0010 FPR=0.5614 +/- 0.0010
+  v2_3hop_handshake_skip: P=0.4386 +/- 0.0010 R=1.0000 +/- 0.0000 F1=0.6098 +/- 0.0010 FPR=0.5614 +/- 0.0010
+  v2_2hop_premature_data: P=0.0000 +/- 0.0000 R=N/A F1=N/A FPR=0.5614 +/- 0.0010
+  v2_3hop_premature_data: P=0.0000 +/- 0.0000 R=N/A F1=N/A FPR=0.5614 +/- 0.0010
+  v2_2hop_create_flood: P=0.0000 +/- 0.0000 R=N/A F1=N/A FPR=0.5614 +/- 0.0010
+  v2_3hop_create_flood: P=0.0000 +/- 0.0000 R=N/A F1=N/A FPR=0.5614 +/- 0.0010
+
+Results written to: /home/tez/tor-fsm-mdt/experiments/shadow_results_v2.json
+
+=== V2 RESULTS SUMMARY ===
+
+FSM    | Scenario         | Precision       | Recall          | F1              | FPR
+-------|------------------|-----------------|-----------------|-----------------|----------------
+2hop   | benign           | N/A             | N/A             | N/A             | 0.5614 +/- 0.0010
+2hop   | replay_attack    | 0.6000 +/- 0.0000 | 1.0000 +/- 0.0000 | 0.7500 +/- 0.0000 | 0.5614 +/- 0.0010
+2hop   | circuit_bypass   | 0.6098 +/- 0.0010 | 1.0000 +/- 0.0000 | 0.7576 +/- 0.0007 | 0.5614 +/- 0.0010
+2hop   | ghost_circuit    | 0.5000 +/- 0.0000 | 1.0000 +/- 0.0000 | 0.6667 +/- 0.0000 | 0.5614 +/- 0.0010
+2hop   | handshake_skip   | 0.4386 +/- 0.0010 | 1.0000 +/- 0.0000 | 0.6098 +/- 0.0010 | 0.5614 +/- 0.0010
+2hop   | premature_data   | 0.0000 +/- 0.0000 | N/A             | N/A             | 0.5614 +/- 0.0010
+2hop   | create_flood     | 0.0000 +/- 0.0000 | N/A             | N/A             | 0.5614 +/- 0.0010
+3hop   | benign           | N/A             | N/A             | N/A             | 0.5614 +/- 0.0010
+3hop   | replay_attack    | 0.6000 +/- 0.0000 | 1.0000 +/- 0.0000 | 0.7500 +/- 0.0000 | 0.5614 +/- 0.0010
+3hop   | circuit_bypass   | 0.6098 +/- 0.0010 | 1.0000 +/- 0.0000 | 0.7576 +/- 0.0007 | 0.5614 +/- 0.0010
+3hop   | ghost_circuit    | 0.5000 +/- 0.0000 | 1.0000 +/- 0.0000 | 0.6667 +/- 0.0000 | 0.5614 +/- 0.0010
+3hop   | handshake_skip   | 0.4386 +/- 0.0010 | 1.0000 +/- 0.0000 | 0.6098 +/- 0.0010 | 0.5614 +/- 0.0010
+3hop   | premature_data   | 0.0000 +/- 0.0000 | N/A             | N/A             | 0.5614 +/- 0.0010
+3hop   | create_flood     | 0.0000 +/- 0.0000 | N/A             | N/A             | 0.5614 +/- 0.0010
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
