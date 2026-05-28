@@ -30,6 +30,10 @@ let tierB = null;
 try {
   tierB = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tier_b_results.json"), "utf8"));
 } catch { /* tier B results not yet generated */ }
+let tierC = null;
+try {
+  tierC = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/tier_c_results.json"), "utf8"));
+} catch { /* tier C results not yet generated */ }
 const fvalBy = Object.fromEntries(fval.comparisons.filter(v => v.B === "B2_GreedySC").map(v => [v.metric, v]));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
@@ -430,7 +434,78 @@ tablosunun otorite kaynağıdır. Microsoft Research'ün veri-tabanlı FSM güve
 çalışması ${cite(20)} state-level analizin endüstriyel uygulanabilirliğini gösterir, ancak
 Tor'a özel değildir.</p>
 
-<h3>2.7 PRISMA Akış Diyagramı</h3>
+<h3>2.7 Ilgili Calismalarin Karsilastirmasi</h3>
+
+<p>Asagidaki tablo, FSM-tabanli veya anomali tespiti-tabanli Tor izleme calismalari ile
+bu tezin yaklasimini karsilastirmaktadir. Yalnizca dogrulanmis yayinlar dahil edilmistir.</p>
+
+<p class="no-indent"><b>Tablo 2.1.</b> Ilgili calismalarin karsilastirmasi.</p>
+<table>
+<tr><th>Calisma</th><th>Yontem</th><th>Precision</th><th>Recall</th><th>Ag Olcegi</th><th>Notlar</th></tr>
+<tr>
+  <td>de Ruiter &amp; Poll (2015) ${cite(9)}</td>
+  <td>Protocol state fuzzing (TLS)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Tekil TLS impl.</td>
+  <td>State-machine inferans ile bug kesfedilmis; Tor degil, TLS uzerinde</td>
+</tr>
+<tr>
+  <td>Fiteriu-Brostean et al. (2016) ${cite(10)}</td>
+  <td>Model ogrenme + model checking (TCP)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Tekil TCP impl.</td>
+  <td>L* ile FSM cikarimi; bizim gelecek calismamiz icin referans</td>
+</tr>
+<tr>
+  <td>Murdoch &amp; Danezis (2005) ${cite(2)}</td>
+  <td>Trafik korelasyon (timing)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Canli Tor agi</td>
+  <td>Dusuk maliyetli saldiri; FSM-tabanli degil, trafik analizi</td>
+</tr>
+<tr>
+  <td>Karunanayake et al. (2021) ${cite(5)}</td>
+  <td>Survey (7 saldiri kategorisi)</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>Survey</td>
+  <td>Saldiri taksonomisi; bizim saldiri vektoru kumemizin kaynagi</td>
+</tr>
+<tr>
+  <td>Bu tez (2-hop FSM)</td>
+  <td>Spec-derived deterministik DFA</td>
+  <td>0.329-0.436</td>
+  <td>0.988-1.000</td>
+  <td>Shadow: 30 relay</td>
+  <td>Yuksek recall, dusuk precision (yapisal FP nedeniyle)</td>
+</tr>
+<tr>
+  <td>Bu tez (3-hop FSM)</td>
+  <td>Spec-derived deterministik DFA</td>
+  <td>0.642-0.908</td>
+  <td>0.982-1.000</td>
+  <td>Shadow: 30 relay</td>
+  <td>Yapisal FP giderilmis; FPR %26.3 -> %5.3</td>
+</tr>
+<tr>
+  <td>Bu tez (Isolation Forest)</td>
+  <td>Unsupervised ML (sklearn)</td>
+  <td>0.258</td>
+  <td>0.257</td>
+  <td>Ayni veri seti</td>
+  <td>Devre-duzeyinde; FSM olay-duzeyinde daha etkili</td>
+</tr>
+</table>
+
+<p><b>Not:</b> Dogrudan karsilastirma sinirlidir cunku (1) onceki calismalar Tor uzerinde
+FSM-tabanli anomali tespiti yapmamistir (farkli protokoller veya farkli yontemler
+kullanmistir), (2) deney ortamlari farklidir. Bu tablo, metodolojik pozisyonlamayi
+gostermek icin sunulmaktadir.</p>
+
+<h3>2.8 PRISMA Akis Diyagrami</h3>
 <p>Bölüm 2.1'de tarif edilen SLR sürecinin PRISMA akışı Şekil 5'te sunulmuştur. Bu çalışmaya
 özgü iki dürüst not zorunludur: <b>(i)</b> canlı akademik veritabanı erişimi (Scopus, WoS,
 IEEE Xplore) bu ortamda mevcut değildir; bu nedenle "identified through database searching"
@@ -1226,6 +1301,52 @@ capraz dogrulama ile de teyit edilmistir.</p>
 <p><b>Tor surum uyumlulugu.</b> ${tierB.b5_tor_version.currentVersion}
 Shadow ${tierB.b5_tor_version.shadowVersion} ile derlenmistir.
 ${tierB.b5_tor_version.notes}</p>
+` : ''}
+${tierC ? `
+<h4>4.12-E Makine Ogrenmesi Karsilastirmasi (Isolation Forest)</h4>
+
+<p>FSM monitorunun performansini baglamlandirmak icin, ayni olay verileri uzerinde
+denetimsiz (unsupervised) bir makine ogrenmesi modeli (Isolation Forest, scikit-learn
+v1.8.0) egitilmistir. Her devre icin ${tierC.dataset.features_per_circuit} ozellik
+(event histogram, durum ziyaret sayilari, ihlal sayisi, dizi uzunlugu, gecerli oran)
+cikarilmistir. Toplam ${tierC.dataset.total_circuits} devre
+(${tierC.dataset.benign_circuits} benign, ${tierC.dataset.attack_circuits} saldiri)
+uzerinde degerlendirilmistir.</p>
+
+<p class="no-indent"><b>Tablo 4.12-H.</b> FSM vs Isolation Forest karsilastirmasi
+(devre-duzeyinde siniflandirma).</p>
+<table>
+<tr><th>Yontem</th><th>Precision</th><th>Recall</th><th>F1</th><th>AUC</th></tr>
+<tr>
+  <td>FSM 3-hop</td>
+  <td>${tierC.c1_isolation_forest.fsm_3hop_baseline.precision.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.fsm_3hop_baseline.recall.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.fsm_3hop_baseline.f1.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.fsm_3hop_baseline.auc.toFixed(4)}</td>
+</tr>
+<tr>
+  <td>Isolation Forest</td>
+  <td>${tierC.c1_isolation_forest.full_dataset.precision.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.full_dataset.recall.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.full_dataset.f1.toFixed(4)}</td>
+  <td>${tierC.c1_isolation_forest.full_dataset.auc.toFixed(4)}</td>
+</tr>
+</table>
+
+<p><b>Bulgular.</b> Her iki yontem de devre-duzeyinde siniflandirmada dusuk performans
+gostermistir (F1 &lt; 0.26). Bu sonucun iki temel nedeni vardir:
+(1) Saldiri senaryolarinda tum devreler saldiri icermez; yalnizca enjekte edilen
+devreler gercek pozitiftir. Senaryo-bazli etiketleme, devre-duzeyinde coarse-grained
+kalmaktadir.
+(2) FSM monitoru olay-duzeyinde anomali tespiti icin tasarlanmistir, devre-duzeyinde
+siniflandirma icin degil. Olay-duzeyinde recall = 1.000 olan FSM'in devre-duzeyinde
+dusuk performansi, analiz granularitesinin etkisini gostermektedir.</p>
+
+<p>Isolation Forest 5-katlama CV sonuclari:
+F1 = ${tierC.c1_isolation_forest.cv_5fold.f1.mean.toFixed(4)} +/- ${tierC.c1_isolation_forest.cv_5fold.f1.sd.toFixed(4)},
+AUC = ${tierC.c1_isolation_forest.cv_5fold.auc.mean.toFixed(4)} +/- ${tierC.c1_isolation_forest.cv_5fold.auc.sd.toFixed(4)}.
+Near-random AUC (~0.50), bu veri setinde devre-duzeyinde ayirt edicilik olmadigi
+anlamina gelmektedir. FSM'in olay-duzeyindeki ustunlugu korunmaktadir.</p>
 ` : ''}
 <div class="pagebreak"></div>
 

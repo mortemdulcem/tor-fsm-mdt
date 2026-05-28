@@ -1,0 +1,133 @@
+{
+  "tier": "C",
+  "timestamp": "2026-05-28T12:09:31",
+  "c1_isolation_forest": {
+    "full_dataset": {
+      "precision": 0.2585034013605442,
+      "recall": 0.25675675675675674,
+      "f1": 0.2576271186440678,
+      "auc": 0.49864406890550683,
+      "confusion_matrix": [
+        [
+          1050,
+          327
+        ],
+        [
+          330,
+          114
+        ]
+      ],
+      "n_estimators": 200,
+      "contamination": 0.24382207578253706
+    },
+    "cv_5fold": {
+      "precision": {
+        "mean": 0.2540749867980989,
+        "sd": 0.06466780591462279,
+        "values": [
+          0.2692307692307692,
+          0.2222222222222222,
+          0.3695652173913043,
+          0.23157894736842105,
+          0.17777777777777778
+        ]
+      },
+      "recall": {
+        "mean": 0.24535240040858017,
+        "sd": 0.07363063838871099,
+        "values": [
+          0.23595505617977527,
+          0.18181818181818182,
+          0.38202247191011235,
+          0.24719101123595505,
+          0.1797752808988764
+        ]
+      },
+      "f1": {
+        "mean": 0.24901779964522194,
+        "sd": 0.06853797686494541,
+        "values": [
+          0.25149700598802394,
+          0.2,
+          0.3756906077348066,
+          0.2391304347826087,
+          0.1787709497206704
+        ]
+      },
+      "auc": {
+        "mean": 0.4976417521576291,
+        "sd": 0.039960327687471195,
+        "values": [
+          0.4799910438039407,
+          0.5327733860342556,
+          0.5522574055158325,
+          0.4822880490296221,
+          0.4408988764044944
+        ]
+      }
+    },
+    "fsm_3hop_baseline": {
+      "precision": 0.14606741573033707,
+      "recall": 0.05855855855855856,
+      "f1": 0.08360128617363344,
+      "auc": 0.47488174448958764,
+      "confusion_matrix": [
+        [
+          1225,
+          152
+        ],
+        [
+          418,
+          26
+        ]
+      ]
+    }
+  },
+  "c2_confusion_matrices": {
+    "files": [
+      "/home/ubuntu/repos/tor-fsm-mdt/experiments/figures/cm_fsm_3hop.png",
+      "/home/ubuntu/repos/tor-fsm-mdt/experiments/figures/cm_fsm_circuit_bypass.png",
+      "/home/ubuntu/repos/tor-fsm-mdt/experiments/figures/cm_fsm_replay_attack.png",
+      "/home/ubuntu/repos/tor-fsm-mdt/experiments/figures/cm_isolation_forest.png"
+    ]
+  },
+  "c3_roc_curves": {
+    "file": "/home/ubuntu/repos/tor-fsm-mdt/experiments/figures/roc_comparison.png",
+    "fsm_auc": 0.47488174448958764,
+    "if_auc": 0.49864406890550683
+  },
+  "dataset": {
+    "total_circuits": 1821,
+    "benign_circuits": 1377,
+    "attack_circuits": 444,
+    "features_per_circuit": 26,
+    "feature_names": [
+      "event_CONNECT",
+      "event_TLS_OK",
+      "event_TLS_FAIL",
+      "event_SEND_CREATE",
+      "event_RECV_CREATED",
+      "event_SEND_EXTEND",
+      "event_RECV_EXTENDED",
+      "event_SEND_RELAY_DATA",
+      "event_RECV_RELAY_DATA",
+      "event_SEND_DESTROY",
+      "event_RECV_DESTROY",
+      "event_CIRCUIT_CLOSED",
+      "event_TIMEOUT",
+      "state_IDLE",
+      "state_CONNECTING",
+      "state_TLS_HANDSHAKE",
+      "state_CREATE_SENT",
+      "state_CIRCUIT_BUILDING",
+      "state_CIRCUIT_READY",
+      "state_TRANSMITTING",
+      "state_CLOSING",
+      "state_CLOSED",
+      "state_ERROR",
+      "violations",
+      "seq_length",
+      "valid_ratio"
+    ]
+  }
+}
