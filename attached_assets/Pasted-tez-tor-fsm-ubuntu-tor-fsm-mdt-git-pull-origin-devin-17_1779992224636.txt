@@ -1,0 +1,492 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ git pull origin devin/1779968748-mega-tier-a
+cp -r experiments/topology/generated shadow.data.template
+shadow --template-directory shadow.data.template shadow.yaml
+remote: Enumerating objects: 235, done.
+remote: Counting objects: 100% (235/235), done.
+remote: Compressing objects: 100% (185/185), done.
+remote: Total 232 (delta 8), reused 232 (delta 8), pack-reused 0 (from 0)
+Nesneler alınıyor: 100% (232/232), 78.59 KiB | 1.29 MiB/sn, bitti.
+Farklar çözülüyor: 100% (8/8), 3 yerel nesneyle tamamlandı.
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+ * branch            devin/1779968748-mega-tier-a -> FETCH_HEAD
+   536ed0d..1240552  devin/1779968748-mega-tier-a -> origin/devin/1779968748-mega-tier-a
+Güncelleniyor: 536ed0d..1240552
+Fast-forward
+ experiments/topology/generated/conf/authgen.pw                             |   1 +
+ experiments/topology/generated/conf/authgen.torrc                          |   2 ++
+ experiments/topology/generated/conf/shadowresolv.conf                      |   1 +
+ experiments/topology/generated/conf/tgen.client.graphml.xml                |  27 +++++++++++++++++++++++++++
+ experiments/topology/generated/conf/tgen.server.graphml.xml                |   8 ++++++++
+ experiments/topology/generated/conf/tgen.torclient.graphml.xml             |  29 +++++++++++++++++++++++++++++
+ experiments/topology/generated/conf/tor.authority.torrc                    |   9 +++++++++
+ experiments/topology/generated/conf/tor.client.torrc                       |   4 ++++
+ experiments/topology/generated/conf/tor.common.torrc                       |  28 ++++++++++++++++++++++++++++
+ experiments/topology/generated/conf/tor.exit.torrc                         |   1 +
+ experiments/topology/generated/conf/tor.non-exit.torrc                     |   1 +
+ experiments/topology/generated/conf/tor.relay.torrc                        |   3 +++
+ experiments/topology/generated/hosts/4uthority/fingerprint                 |   1 +
+ experiments/topology/generated/hosts/4uthority/keys/authority_certificate  |  46 ++++++++++++++++++++++++++++++++++++++++++++++
+ experiments/topology/generated/hosts/4uthority/keys/authority_identity_key |  41 +++++++++++++++++++++++++++++++++++++++++
+ experiments/topology/generated/hosts/4uthority/keys/authority_signing_key  |  27 +++++++++++++++++++++++++++
+ experiments/topology/generated/hosts/4uthority/keys/secret_id_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/4uthority/keys/secret_onion_key       |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/4uthority/keys/secret_onion_key_ntor  |   1 +
+ experiments/topology/generated/hosts/4uthority/torrc                       |   0
+ experiments/topology/generated/hosts/4uthority/torrc-defaults              |   3 +++
+ experiments/topology/generated/hosts/da2/fingerprint                       |   1 +
+ experiments/topology/generated/hosts/da2/keys/authority_certificate        |  46 ++++++++++++++++++++++++++++++++++++++++++++++
+ experiments/topology/generated/hosts/da2/keys/authority_identity_key       |  41 +++++++++++++++++++++++++++++++++++++++++
+ experiments/topology/generated/hosts/da2/keys/authority_signing_key        |  27 +++++++++++++++++++++++++++
+ experiments/topology/generated/hosts/da2/keys/secret_id_key                |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/da2/keys/secret_onion_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/da2/keys/secret_onion_key_ntor        |   1 +
+ experiments/topology/generated/hosts/da2/torrc                             |   0
+ experiments/topology/generated/hosts/da2/torrc-defaults                    |   3 +++
+ experiments/topology/generated/hosts/da3/fingerprint                       |   1 +
+ experiments/topology/generated/hosts/da3/keys/authority_certificate        |  46 ++++++++++++++++++++++++++++++++++++++++++++++
+ experiments/topology/generated/hosts/da3/keys/authority_identity_key       |  41 +++++++++++++++++++++++++++++++++++++++++
+ experiments/topology/generated/hosts/da3/keys/authority_signing_key        |  27 +++++++++++++++++++++++++++
+ experiments/topology/generated/hosts/da3/keys/secret_id_key                |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/da3/keys/secret_onion_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/da3/keys/secret_onion_key_ntor        | Bin 0 -> 64 bytes
+ experiments/topology/generated/hosts/da3/torrc                             |   0
+ experiments/topology/generated/hosts/da3/torrc-defaults                    |   3 +++
+ experiments/topology/generated/hosts/exit1/fingerprint                     |   1 +
+ experiments/topology/generated/hosts/exit1/keys/secret_id_key              |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit1/keys/secret_onion_key           |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit1/keys/secret_onion_key_ntor      |   1 +
+ experiments/topology/generated/hosts/exit1/torrc                           |   0
+ experiments/topology/generated/hosts/exit1/torrc-defaults                  |   3 +++
+ experiments/topology/generated/hosts/exit10/fingerprint                    |   1 +
+ experiments/topology/generated/hosts/exit10/keys/secret_id_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit10/keys/secret_onion_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit10/keys/secret_onion_key_ntor     |   1 +
+ experiments/topology/generated/hosts/exit10/torrc                          |   0
+ experiments/topology/generated/hosts/exit10/torrc-defaults                 |   3 +++
+ experiments/topology/generated/hosts/exit2/fingerprint                     |   1 +
+ experiments/topology/generated/hosts/exit2/keys/secret_id_key              |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit2/keys/secret_onion_key           |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit2/keys/secret_onion_key_ntor      | Bin 0 -> 64 bytes
+ experiments/topology/generated/hosts/exit2/torrc                           |   0
+ experiments/topology/generated/hosts/exit2/torrc-defaults                  |   3 +++
+ experiments/topology/generated/hosts/exit3/fingerprint                     |   1 +
+ experiments/topology/generated/hosts/exit3/keys/secret_id_key              |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit3/keys/secret_onion_key           |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit3/keys/secret_onion_key_ntor      | Bin 0 -> 64 bytes
+ experiments/topology/generated/hosts/exit3/torrc                           |   0
+ experiments/topology/generated/hosts/exit3/torrc-defaults                  |   3 +++
+ experiments/topology/generated/hosts/exit4/fingerprint                     |   1 +
+ experiments/topology/generated/hosts/exit4/keys/secret_id_key              |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit4/keys/secret_onion_key           |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit4/keys/secret_onion_key_ntor      |   1 +
+ experiments/topology/generated/hosts/exit4/torrc                           |   0
+ experiments/topology/generated/hosts/exit4/torrc-defaults                  |   3 +++
+ experiments/topology/generated/hosts/exit5/fingerprint                     |   1 +
+ experiments/topology/generated/hosts/exit5/keys/secret_id_key              |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit5/keys/secret_onion_key           |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit5/keys/secret_onion_key_ntor      |   1 +
+ experiments/topology/generated/hosts/exit5/torrc                           |   0
+ experiments/topology/generated/hosts/exit5/torrc-defaults                  |   3 +++
+ experiments/topology/generated/hosts/exit6/fingerprint                     |   1 +
+ experiments/topology/generated/hosts/exit6/keys/secret_id_key              |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit6/keys/secret_onion_key           |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit6/keys/secret_onion_key_ntor      |   1 +
+ experiments/topology/generated/hosts/exit6/torrc                           |   0
+ experiments/topology/generated/hosts/exit6/torrc-defaults                  |   3 +++
+ experiments/topology/generated/hosts/exit7/fingerprint                     |   1 +
+ experiments/topology/generated/hosts/exit7/keys/secret_id_key              |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit7/keys/secret_onion_key           |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit7/keys/secret_onion_key_ntor      |   1 +
+ experiments/topology/generated/hosts/exit7/torrc                           |   0
+ experiments/topology/generated/hosts/exit7/torrc-defaults                  |   3 +++
+ experiments/topology/generated/hosts/exit8/fingerprint                     |   1 +
+ experiments/topology/generated/hosts/exit8/keys/secret_id_key              |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit8/keys/secret_onion_key           |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit8/keys/secret_onion_key_ntor      |   2 ++
+ experiments/topology/generated/hosts/exit8/torrc                           |   0
+ experiments/topology/generated/hosts/exit8/torrc-defaults                  |   3 +++
+ experiments/topology/generated/hosts/exit9/fingerprint                     |   1 +
+ experiments/topology/generated/hosts/exit9/keys/secret_id_key              |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit9/keys/secret_onion_key           |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/exit9/keys/secret_onion_key_ntor      |   1 +
+ experiments/topology/generated/hosts/exit9/torrc                           |   0
+ experiments/topology/generated/hosts/exit9/torrc-defaults                  |   3 +++
+ experiments/topology/generated/hosts/relay1/fingerprint                    |   1 +
+ experiments/topology/generated/hosts/relay1/keys/secret_id_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay1/keys/secret_onion_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay1/keys/secret_onion_key_ntor     |   2 ++
+ experiments/topology/generated/hosts/relay1/torrc                          |   0
+ experiments/topology/generated/hosts/relay1/torrc-defaults                 |   3 +++
+ experiments/topology/generated/hosts/relay10/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay10/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay10/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay10/keys/secret_onion_key_ntor    |   2 ++
+ experiments/topology/generated/hosts/relay10/torrc                         |   0
+ experiments/topology/generated/hosts/relay10/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay11/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay11/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay11/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay11/keys/secret_onion_key_ntor    |   1 +
+ experiments/topology/generated/hosts/relay11/torrc                         |   0
+ experiments/topology/generated/hosts/relay11/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay12/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay12/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay12/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay12/keys/secret_onion_key_ntor    |   1 +
+ experiments/topology/generated/hosts/relay12/torrc                         |   0
+ experiments/topology/generated/hosts/relay12/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay13/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay13/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay13/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay13/keys/secret_onion_key_ntor    |   1 +
+ experiments/topology/generated/hosts/relay13/torrc                         |   0
+ experiments/topology/generated/hosts/relay13/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay14/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay14/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay14/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay14/keys/secret_onion_key_ntor    |   1 +
+ experiments/topology/generated/hosts/relay14/torrc                         |   0
+ experiments/topology/generated/hosts/relay14/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay15/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay15/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay15/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay15/keys/secret_onion_key_ntor    |   1 +
+ experiments/topology/generated/hosts/relay15/torrc                         |   0
+ experiments/topology/generated/hosts/relay15/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay16/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay16/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay16/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay16/keys/secret_onion_key_ntor    |   1 +
+ experiments/topology/generated/hosts/relay16/torrc                         |   0
+ experiments/topology/generated/hosts/relay16/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay17/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay17/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay17/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay17/keys/secret_onion_key_ntor    |   1 +
+ experiments/topology/generated/hosts/relay17/torrc                         |   0
+ experiments/topology/generated/hosts/relay17/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay18/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay18/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay18/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay18/keys/secret_onion_key_ntor    |   1 +
+ experiments/topology/generated/hosts/relay18/torrc                         |   0
+ experiments/topology/generated/hosts/relay18/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay19/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay19/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay19/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay19/keys/secret_onion_key_ntor    | Bin 0 -> 64 bytes
+ experiments/topology/generated/hosts/relay19/torrc                         |   0
+ experiments/topology/generated/hosts/relay19/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay2/fingerprint                    |   1 +
+ experiments/topology/generated/hosts/relay2/keys/secret_id_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay2/keys/secret_onion_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay2/keys/secret_onion_key_ntor     |   1 +
+ experiments/topology/generated/hosts/relay2/torrc                          |   0
+ experiments/topology/generated/hosts/relay2/torrc-defaults                 |   3 +++
+ experiments/topology/generated/hosts/relay20/fingerprint                   |   1 +
+ experiments/topology/generated/hosts/relay20/keys/secret_id_key            |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay20/keys/secret_onion_key         |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay20/keys/secret_onion_key_ntor    |   1 +
+ experiments/topology/generated/hosts/relay20/torrc                         |   0
+ experiments/topology/generated/hosts/relay20/torrc-defaults                |   3 +++
+ experiments/topology/generated/hosts/relay3/fingerprint                    |   1 +
+ experiments/topology/generated/hosts/relay3/keys/secret_id_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay3/keys/secret_onion_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay3/keys/secret_onion_key_ntor     |   1 +
+ experiments/topology/generated/hosts/relay3/torrc                          |   0
+ experiments/topology/generated/hosts/relay3/torrc-defaults                 |   3 +++
+ experiments/topology/generated/hosts/relay4/fingerprint                    |   1 +
+ experiments/topology/generated/hosts/relay4/keys/secret_id_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay4/keys/secret_onion_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay4/keys/secret_onion_key_ntor     | Bin 0 -> 64 bytes
+ experiments/topology/generated/hosts/relay4/torrc                          |   0
+ experiments/topology/generated/hosts/relay4/torrc-defaults                 |   3 +++
+ experiments/topology/generated/hosts/relay5/fingerprint                    |   1 +
+ experiments/topology/generated/hosts/relay5/keys/secret_id_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay5/keys/secret_onion_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay5/keys/secret_onion_key_ntor     |   3 +++
+ experiments/topology/generated/hosts/relay5/torrc                          |   0
+ experiments/topology/generated/hosts/relay5/torrc-defaults                 |   3 +++
+ experiments/topology/generated/hosts/relay6/fingerprint                    |   1 +
+ experiments/topology/generated/hosts/relay6/keys/secret_id_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay6/keys/secret_onion_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay6/keys/secret_onion_key_ntor     |   1 +
+ experiments/topology/generated/hosts/relay6/torrc                          |   0
+ experiments/topology/generated/hosts/relay6/torrc-defaults                 |   3 +++
+ experiments/topology/generated/hosts/relay7/fingerprint                    |   1 +
+ experiments/topology/generated/hosts/relay7/keys/secret_id_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay7/keys/secret_onion_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay7/keys/secret_onion_key_ntor     | Bin 0 -> 64 bytes
+ experiments/topology/generated/hosts/relay7/torrc                          |   0
+ experiments/topology/generated/hosts/relay7/torrc-defaults                 |   3 +++
+ experiments/topology/generated/hosts/relay8/fingerprint                    |   1 +
+ experiments/topology/generated/hosts/relay8/keys/secret_id_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay8/keys/secret_onion_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay8/keys/secret_onion_key_ntor     |   1 +
+ experiments/topology/generated/hosts/relay8/torrc                          |   0
+ experiments/topology/generated/hosts/relay8/torrc-defaults                 |   3 +++
+ experiments/topology/generated/hosts/relay9/fingerprint                    |   1 +
+ experiments/topology/generated/hosts/relay9/keys/secret_id_key             |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay9/keys/secret_onion_key          |  16 ++++++++++++++++
+ experiments/topology/generated/hosts/relay9/keys/secret_onion_key_ntor     |   1 +
+ experiments/topology/generated/hosts/relay9/torrc                          |   0
+ experiments/topology/generated/hosts/relay9/torrc-defaults                 |   3 +++
+ experiments/topology/generated/hosts/torclient/torrc                       |   0
+ experiments/topology/generated/hosts/torclient/torrc-defaults              |   2 ++
+ experiments/topology/generated/hosts/torclient2/torrc                      |   0
+ experiments/topology/generated/hosts/torclient2/torrc-defaults             |   2 ++
+ experiments/topology/generated/hosts/torclient3/torrc                      |   0
+ experiments/topology/generated/hosts/torclient3/torrc-defaults             |   2 ++
+ experiments/topology/generated/hosts/torclient4/torrc                      |   0
+ experiments/topology/generated/hosts/torclient4/torrc-defaults             |   2 ++
+ experiments/topology/generated/hosts/torclient5/torrc                      |   0
+ experiments/topology/generated/hosts/torclient5/torrc-defaults             |   2 ++
+ experiments/topology/generated/hosts/torclient6/torrc                      |   0
+ experiments/topology/generated/hosts/torclient6/torrc-defaults             |   2 ++
+ experiments/topology/generated/hosts/torclient7/torrc                      |   0
+ experiments/topology/generated/hosts/torclient7/torrc-defaults             |   2 ++
+ experiments/topology/generated/hosts/torclient8/torrc                      |   0
+ experiments/topology/generated/hosts/torclient8/torrc-defaults             |   2 ++
+ 235 files changed, 1692 insertions(+)
+ create mode 100644 experiments/topology/generated/conf/authgen.pw
+ create mode 100644 experiments/topology/generated/conf/authgen.torrc
+ create mode 100644 experiments/topology/generated/conf/shadowresolv.conf
+ create mode 100644 experiments/topology/generated/conf/tgen.client.graphml.xml
+ create mode 100644 experiments/topology/generated/conf/tgen.server.graphml.xml
+ create mode 100644 experiments/topology/generated/conf/tgen.torclient.graphml.xml
+ create mode 100644 experiments/topology/generated/conf/tor.authority.torrc
+ create mode 100644 experiments/topology/generated/conf/tor.client.torrc
+ create mode 100644 experiments/topology/generated/conf/tor.common.torrc
+ create mode 100644 experiments/topology/generated/conf/tor.exit.torrc
+ create mode 100644 experiments/topology/generated/conf/tor.non-exit.torrc
+ create mode 100644 experiments/topology/generated/conf/tor.relay.torrc
+ create mode 100644 experiments/topology/generated/hosts/4uthority/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/4uthority/keys/authority_certificate
+ create mode 100644 experiments/topology/generated/hosts/4uthority/keys/authority_identity_key
+ create mode 100644 experiments/topology/generated/hosts/4uthority/keys/authority_signing_key
+ create mode 100644 experiments/topology/generated/hosts/4uthority/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/4uthority/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/4uthority/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/4uthority/torrc
+ create mode 100644 experiments/topology/generated/hosts/4uthority/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/da2/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/da2/keys/authority_certificate
+ create mode 100644 experiments/topology/generated/hosts/da2/keys/authority_identity_key
+ create mode 100644 experiments/topology/generated/hosts/da2/keys/authority_signing_key
+ create mode 100644 experiments/topology/generated/hosts/da2/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/da2/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/da2/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/da2/torrc
+ create mode 100644 experiments/topology/generated/hosts/da2/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/da3/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/da3/keys/authority_certificate
+ create mode 100644 experiments/topology/generated/hosts/da3/keys/authority_identity_key
+ create mode 100644 experiments/topology/generated/hosts/da3/keys/authority_signing_key
+ create mode 100644 experiments/topology/generated/hosts/da3/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/da3/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/da3/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/da3/torrc
+ create mode 100644 experiments/topology/generated/hosts/da3/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/exit1/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/exit1/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/exit1/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/exit1/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/exit1/torrc
+ create mode 100644 experiments/topology/generated/hosts/exit1/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/exit10/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/exit10/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/exit10/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/exit10/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/exit10/torrc
+ create mode 100644 experiments/topology/generated/hosts/exit10/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/exit2/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/exit2/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/exit2/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/exit2/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/exit2/torrc
+ create mode 100644 experiments/topology/generated/hosts/exit2/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/exit3/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/exit3/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/exit3/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/exit3/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/exit3/torrc
+ create mode 100644 experiments/topology/generated/hosts/exit3/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/exit4/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/exit4/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/exit4/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/exit4/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/exit4/torrc
+ create mode 100644 experiments/topology/generated/hosts/exit4/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/exit5/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/exit5/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/exit5/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/exit5/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/exit5/torrc
+ create mode 100644 experiments/topology/generated/hosts/exit5/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/exit6/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/exit6/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/exit6/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/exit6/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/exit6/torrc
+ create mode 100644 experiments/topology/generated/hosts/exit6/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/exit7/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/exit7/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/exit7/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/exit7/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/exit7/torrc
+ create mode 100644 experiments/topology/generated/hosts/exit7/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/exit8/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/exit8/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/exit8/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/exit8/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/exit8/torrc
+ create mode 100644 experiments/topology/generated/hosts/exit8/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/exit9/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/exit9/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/exit9/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/exit9/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/exit9/torrc
+ create mode 100644 experiments/topology/generated/hosts/exit9/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay1/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay1/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay1/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay1/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay1/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay1/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay10/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay10/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay10/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay10/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay10/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay10/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay11/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay11/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay11/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay11/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay11/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay11/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay12/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay12/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay12/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay12/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay12/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay12/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay13/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay13/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay13/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay13/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay13/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay13/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay14/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay14/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay14/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay14/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay14/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay14/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay15/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay15/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay15/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay15/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay15/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay15/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay16/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay16/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay16/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay16/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay16/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay16/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay17/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay17/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay17/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay17/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay17/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay17/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay18/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay18/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay18/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay18/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay18/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay18/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay19/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay19/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay19/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay19/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay19/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay19/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay2/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay2/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay2/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay2/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay2/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay2/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay20/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay20/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay20/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay20/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay20/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay20/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay3/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay3/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay3/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay3/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay3/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay3/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay4/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay4/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay4/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay4/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay4/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay4/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay5/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay5/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay5/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay5/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay5/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay5/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay6/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay6/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay6/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay6/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay6/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay6/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay7/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay7/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay7/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay7/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay7/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay7/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay8/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay8/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay8/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay8/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay8/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay8/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/relay9/fingerprint
+ create mode 100644 experiments/topology/generated/hosts/relay9/keys/secret_id_key
+ create mode 100644 experiments/topology/generated/hosts/relay9/keys/secret_onion_key
+ create mode 100644 experiments/topology/generated/hosts/relay9/keys/secret_onion_key_ntor
+ create mode 100644 experiments/topology/generated/hosts/relay9/torrc
+ create mode 100644 experiments/topology/generated/hosts/relay9/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/torclient/torrc
+ create mode 100644 experiments/topology/generated/hosts/torclient/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/torclient2/torrc
+ create mode 100644 experiments/topology/generated/hosts/torclient2/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/torclient3/torrc
+ create mode 100644 experiments/topology/generated/hosts/torclient3/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/torclient4/torrc
+ create mode 100644 experiments/topology/generated/hosts/torclient4/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/torclient5/torrc
+ create mode 100644 experiments/topology/generated/hosts/torclient5/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/torclient6/torrc
+ create mode 100644 experiments/topology/generated/hosts/torclient6/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/torclient7/torrc
+ create mode 100644 experiments/topology/generated/hosts/torclient7/torrc-defaults
+ create mode 100644 experiments/topology/generated/hosts/torclient8/torrc
+ create mode 100644 experiments/topology/generated/hosts/torclient8/torrc-defaults
+Failed to load configuration file shadow.yaml
+
+Caused by:
+    0: Could not open config file
+    1: No such file or directory (os error 2)
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+
