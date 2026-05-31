@@ -38,7 +38,7 @@ Two hunks:
    memset(&cc, 0, sizeof(cc));
  
 +  if (getenv("TOR_FSM_ATTACK_CIRCUIT_HIJACK") && circ->cpath &&
-+      circ->cpath->state == CPATH_STATE_OPEN && circ->n_circ_id) {
++      circ->cpath->state == CPATH_STATE_OPEN && circ->base_.n_circ_id) {
 +    create_cell_t hcc; onion_handshake_state_t hst; cell_t hcell; int hf, hl;
 +    const node_t *hn;
 +    memset(&hcc,0,sizeof(hcc)); memset(&hst,0,sizeof(hst));
@@ -53,7 +53,7 @@ Two hunks:
 +    hl = onion_skin_create(hcc.handshake_type,circ->cpath->extend_info,
 +                           &hst,hcc.onionskin);
 +    if (hl>=0) { hcc.handshake_len=hl;
-+      if (create_cell_format(&hcell,&hcc)==0) { hcell.circ_id=circ->n_circ_id;
++      if (create_cell_format(&hcell,&hcc)==0) { hcell.circ_id=circ->base_.n_circ_id;
 +        append_cell_to_circuit_queue(TO_CIRCUIT(circ),circ->base_.n_chan,
 +                                     &hcell,CELL_DIRECTION_OUT,0);
 +        log_info(LD_CIRC,"First hop: finished sending %s cell to %s",

