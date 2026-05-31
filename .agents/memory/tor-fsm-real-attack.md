@@ -55,10 +55,16 @@ the Shadow RUN must happen on the VM.
 2. DONE & VERIFIED — patched run shows SEND_CREATE INFO line TWICE per circuit:
    harness regex match count 9 (benign) → 18 (attack), as identical-timestamp pairs.
    Log: `/tmp/cf_test/shadow.data/hosts/torclient/tor.1000.stdout`.
-3. NEXT — run the harness on this REAL log and confirm it classifies CREATE_FLOOD (the harness
-   has NO synthetic create_flood injection, so detection is a clean real-attack result). Harness
-   had a path bug `SHADOW_EXAMPLE_DIR=/home/ubuntu/...` (real is `/home/tez/...`) — fix before run.
-4. Update thesis: only CREATE_FLOOD becomes real; replay/bypass/premature stay synthetic.
+3. DONE & VERIFIED — fed the REAL patched-binary log through the harness's own parser+detector
+   via `experiments/cf_detect.mjs`: 9 circuits → 9 CREATE_FLOOD (`CREATE_SENT x SEND_CREATE ->
+   CREATE_FLOOD MEDIUM`), one per duplicated first-hop circuit. shadow_harness.mjs was made
+   importable (main() guarded behind a direct-run check + `export { parseTorHostLog,
+   runFsmOnAllCircuits }`; `.bak` saved) so cf_detect reuses the EXACT detector, no duplication.
+4. BASELINE CONTROL (do for rigor) — same patched binary, env var OFF (benign), parse the same
+   way: CREATE_FLOOD must be 0. The attack's only delta is CREATE_FLOOD 0->9; the other
+   violation types (PREMATURE_DATA ~15, REPLAY_ATTACK 2, GHOST_CIRCUIT 2) are PARSER BASELINE
+   artifacts present in benign too (real Tor log -> simplified FSM mapping), NOT the attack.
+5. Update thesis: only CREATE_FLOOD becomes real; replay/bypass/premature stay synthetic.
    S6 honestly: "CREATE_FLOOD gerçek, diğerleri sentetik".
 
 **Scope honesty:** this does NOT make all of S6 real — only one attack type.
