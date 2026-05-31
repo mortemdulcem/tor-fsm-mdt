@@ -1,0 +1,37 @@
+tez@tor-fsm-ubuntu:/tmp/cf_test$ cd ~/tor-0.4.6.10
+echo "kaynak patch sayisi:"; grep -c TOR_FSM_ATTACK_CREATE_FLOOD src/core/or/circuitbuild.c
+make -j4 > /tmp/make.log 2>&1
+echo "MAKE_EXIT=$?"; tail -4 /tmp/make.log
+echo "binary zamani:"; ls -la --time-style=+%H:%M:%S src/app/tor
+cd /tmp/cf_test
+rm -rf shadow.data
+if [ -d shadow.data.template ]; then TPL="--template-directory shadow.data.template"; else TPL=""; fi
+~/.local/bin/shadow $TPL shadow.yaml > shadow.log 2>&1
+echo "SHADOW_EXIT=$?"
+LOG=/tmp/cf_test/shadow.data/hosts/torclient/tor.1000.stdout
+echo "SEND_CREATE sayisi:"; grep -cE "circuit_send_first_onion_skin\(\).*sending CREATE" "$LOG"
+echo "--- ilk 8 satir (ayni timestamp CIFT olmali) ---"
+grep -E "First hop: finished sending" "$LOG" | head -8
+kaynak patch sayisi:
+1
+MAKE_EXIT=0
+  CCLD     src/test/test-hs-ntor-cl
+  CCLD     src/app/tor
+  CCLD     src/test/bench
+make[1]: Leaving directory '/home/tez/tor-0.4.6.10'
+binary zamani:
+-rwxrwxr-x 1 tez tez 12756144 22:19:34 src/app/tor
+SHADOW_EXIT=0
+SEND_CREATE sayisi:
+18
+--- ilk 8 satir (ayni timestamp CIFT olmali) ---
+Jan 01 00:15:01.401 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE_FAST cell to '<unnamed>'
+Jan 01 00:15:01.401 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE_FAST cell to '<unnamed>'
+Jan 01 00:15:02.122 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE_FAST cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 at 11.0.0.7'
+Jan 01 00:15:02.122 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE_FAST cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 at 11.0.0.7'
+Jan 01 00:15:03.401 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+Jan 01 00:15:03.401 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+Jan 01 00:15:04.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+Jan 01 00:15:04.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+tez@tor-fsm-ubuntu:/tmp/cf_test$ 
+

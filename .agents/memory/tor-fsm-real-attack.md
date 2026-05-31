@@ -11,15 +11,24 @@ protocol violation that the harness's log parser already detects.
 
 ## Harness log → event mapping (the key dependency)
 The Shadow harness (`experiments/shadow_harness.mjs`, lives on the user's VM + GitHub
-`mortemdulcem/tor-fsm-mdt`, NOT in the Replit workspace) parses Tor's **debug-level** log
-lines of the form `function_name(): message`. Critical mappings:
-- `circuit_send_first_onion_skin(): ...sending create cell` → **SEND_CREATE**
+`mortemdulcem/tor-fsm-mdt`, NOT in the Replit workspace) parses Tor log lines of the form
+`function_name(): message` with the regex `circuit_send_first_onion_skin\(\).*sending CREATE`
+(case-insensitive). Critical mappings:
+- `circuit_send_first_onion_skin(): ...sending CREATE...` → **SEND_CREATE**
 - `connection_ap_handshake_send_begin()` → **SEND_RELAY_DATA**
 - `circuit_build_no_more_hops(): circuit built` → circuit built
 - `circuit_finish_handshake()` → RECV_CREATED / (synthesized SEND_EXTEND + RECV_EXTENDED)
 
-**Why this matters:** a real attack only needs the patched Tor to emit one of these log
-lines out of FSM order. CREATE_FLOOD = the SEND_CREATE log appearing twice for one circuit.
+**CRITICAL (cost real debugging time): real Shadow runs log at INFO, not debug.** At INFO the
+ONLY matching line is `circuit_send_first_onion_skin(): First hop: finished sending CREATE cell
+to '...'` (emitted ONCE per circuit at the end of the function). The debug line `First skin;
+sending create cell.` never appears. So a CREATE_FLOOD patch that only adds a second *debug*
+line (or a second cell without a second matching INFO line) is INVISIBLE to the harness.
+
+**Why this matters:** a real attack must emit a SECOND copy of that INFO line. CREATE_FLOOD =
+the matching SEND_CREATE INFO line appearing twice for one circuit. The two log_info calls run
+in the same function call → both carry the SAME simulated timestamp, so success looks like
+identical-timestamp PAIRS in the client log.
 
 ## CREATE_FLOOD patch (verified compiles on VM Tor 0.4.6.10)
 In `src/core/or/circuitbuild.c`, function `circuit_send_first_onion_skin`, after the first
@@ -41,10 +50,14 @@ exactly why the thesis VM (Bölüm 4.15) exists. Patch + compile-verify can be d
 the Shadow RUN must happen on the VM.
 
 ## Remaining steps (multi-session)
-1. Point ONE attacker host's process in the run's shadow.yaml at `~/tor-0.4.6.10/src/app/tor`
-   with environment `TOR_FSM_ATTACK_CREATE_FLOOD=1`; benign hosts keep system tor.
-2. Confirm the client's tor log shows TWO `sending create cell` lines for one circuit.
-3. Disable the harness's SYNTHETIC create_flood injection; parse the real duplicate instead.
+1. DONE — torclient in `/tmp/cf_test/shadow.yaml` points at `~/tor-0.4.6.10/src/app/tor`
+   with environment `TOR_FSM_ATTACK_CREATE_FLOOD:"1"`.
+2. DONE & VERIFIED — patched run shows SEND_CREATE INFO line TWICE per circuit:
+   harness regex match count 9 (benign) → 18 (attack), as identical-timestamp pairs.
+   Log: `/tmp/cf_test/shadow.data/hosts/torclient/tor.1000.stdout`.
+3. NEXT — run the harness on this REAL log and confirm it classifies CREATE_FLOOD (the harness
+   has NO synthetic create_flood injection, so detection is a clean real-attack result). Harness
+   had a path bug `SHADOW_EXAMPLE_DIR=/home/ubuntu/...` (real is `/home/tez/...`) — fix before run.
 4. Update thesis: only CREATE_FLOOD becomes real; replay/bypass/premature stay synthetic.
    S6 honestly: "CREATE_FLOOD gerçek, diğerleri sentetik".
 
