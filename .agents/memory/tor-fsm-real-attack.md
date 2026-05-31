@@ -85,6 +85,24 @@ LINE ORDER, not wall-clock.
 - Minor hardening (defensive only; run already exits 0 since circuit is OPEN→n_chan non-null):
   add `circ->base_.n_chan` to the gate condition; append_cell_to_circuit_queue return is ignored.
 
+## NOT genuinely realizable: HANDSHAKE_SKIP & PREMATURE_DATA (structural blockers)
+- **HANDSHAKE_SKIP** needs SEND_CREATE in IDLE/CONNECTING or SEND_EXTEND in CREATE_SENT. Tor sends the
+  first CREATE only AFTER the channel/TLS is OPEN (circuit_send_first_onion_skin is gated on channel
+  ready); parser emits SEND_EXTEND only on the 2nd+ circuit_finish_handshake (after hop1 RECV_CREATED).
+  So the recognized log can't appear before its prerequisite without FABRICATING the log line (forbidden).
+- **PREMATURE_DATA** needs SEND_RELAY_DATA in CREATE_SENT/CIRCUIT_BUILDING. But Tor sends RELAY_BEGIN
+  only after circuit OPEN: `connection_ap_handshake_attach_chosen_circuit` has
+  `tor_assert(circ->base_.state == CIRCUIT_STATE_OPEN)` and `connection_ap_supports_optimistic_data`
+  returns 0 unless `on_circuit->state == CIRCUIT_STATE_OPEN`. (Tor "optimistic data" = don't wait for
+  exit CONNECTED; it is NOT begin-before-circuit-open.) So a genuine client never emits premature data.
+- **Benign PREMATURE_DATA:21 is a PARSER ARTIFACT**, not real premature data: begin for an already-OPEN
+  circuit gets attributed to a more-recently-created circuit via `lastCircuitId` (its FSM still early).
+  Report this as a detector limitation / FPR source, NOT as detected premature data.
+- **Why CREATE_FLOOD/CIRCUIT_HIJACK ARE realizable but these two are not:** a duplicate CREATE rides an
+  already-OPEN channel (real transmittable cell, relay drops it). HANDSHAKE_SKIP/PREMATURE_DATA require
+  emitting a cell BEFORE its prerequisite exists — Tor's layering forbids transmit, so only a fake log
+  or parser-attribution gaming could fake them. Decision: keep both SYNTHETIC, clearly labeled.
+
 ## Extending to other attack types (same env-gate pattern, benign-by-default)
 - **CIRCUIT_HIJACK (CRITICAL) — DONE & VERIFIED (non-destructive variant, run exits 0).**
   Result: attack(flag on)=9 circuits→CIRCUIT_HIJACK 9; benign(SAME binary, flag off, env var fully
