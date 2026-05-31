@@ -1,0 +1,27 @@
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ cd /tmp/cf_test
+rm -rf shadow.data
+if [ -d shadow.data.template ]; then TPL="--template-directory shadow.data.template"; else TPL=""; fi
+~/.local/bin/shadow $TPL shadow.yaml > shadow.log 2>&1
+echo "SHADOW_EXIT=$?"; tail -3 shadow.log
+LOG=/tmp/cf_test/shadow.data/hosts/torclient/tor.1000.stdout
+echo "SEND_CREATE eslesme sayisi:"; grep -cE "circuit_send_first_onion_skin\(\).*sending CREATE" "$LOG"
+echo "--- ilk satirlar (ayni hedefe pespese CIFT gorunmeli) ---"
+grep -nE "First hop: finished sending" "$LOG" | head -12
+SHADOW_EXIT=0
+00:00:08.544597 [53209:shadow] n/a [INFO] [n/a] [controller.rs:67] [shadow_rs::core::controller] Finished simulation
+00:00:08.544598 [53209:shadow] n/a [INFO] [n/a] [shadow.rs:234] [shadow_rs::shadow] Log message buffering is disabled during cleanup
+** Shadow completed successfully
+SEND_CREATE eslesme sayisi:
+9
+--- ilk satirlar (ayni hedefe pespese CIFT gorunmeli) ---
+90:Jan 01 00:15:01.401 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE_FAST cell to '<unnamed>'
+199:Jan 01 00:15:02.122 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE_FAST cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 at 11.0.0.7'
+253:Jan 01 00:15:03.401 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+275:Jan 01 00:15:04.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+316:Jan 01 00:15:05.401 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3FB0BD7827C760FE7F9DD810FCB10322D63AB4CF~relay1 [HNyAJRdDGQ6ZsKX9+4qoQ2kl3dyMuSbKi85g1x8tIDY] at 11.0.0.5'
+335:Jan 01 00:15:06.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+365:Jan 01 00:15:07.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3FB0BD7827C760FE7F9DD810FCB10322D63AB4CF~relay1 [HNyAJRdDGQ6ZsKX9+4qoQ2kl3dyMuSbKi85g1x8tIDY] at 11.0.0.5'
+2349:Jan 01 00:25:01.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+2634:Jan 01 00:25:58.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+tez@tor-fsm-ubuntu:/tmp/cf_test$ 
+
