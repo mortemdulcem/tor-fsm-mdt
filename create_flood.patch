@@ -1,0 +1,19 @@
+--- a/src/core/or/circuitbuild.c
++++ b/src/core/or/circuitbuild.c
+@@ -1006,6 +1006,16 @@
+     return - END_CIRC_REASON_RESOURCELIMIT;
+   tor_trace(TR_SUBSYS(circuit), TR_EV(first_onion_skin), circ, circ->cpath);
+ 
++  /* FSM-MDT CREATE_FLOOD attack: when running as the designated attacker node
++   * (gated by an environment variable so the same binary is benign by default),
++   * deliver a second, duplicate CREATE cell on the same circuit. This is a real
++   * protocol violation on the wire (two CREATE cells for one circuit id), not a
++   * fabricated log line. */
++  if (getenv("TOR_FSM_ATTACK_CREATE_FLOOD")) {
++    log_debug(LD_CIRC,"First skin; sending create cell.");
++    (void) circuit_deliver_create_cell(TO_CIRCUIT(circ), &cc, 0);
++  }
++
+   circ->cpath->state = CPATH_STATE_AWAITING_KEYS;
+   circuit_set_state(TO_CIRCUIT(circ), CIRCUIT_STATE_BUILDING);
+   log_info(LD_CIRC,"First hop: finished sending %s cell to '%s'",
