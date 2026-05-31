@@ -1,63 +1,71 @@
-Tor 0.4.6.10 — PREMATURE_DATA real-attack patch (env-gated, benign by default)
-File: src/core/or/circuitbuild.c  (modified-client / fault-injection model, same
-spirit as CREATE_FLOOD and CIRCUIT_HIJACK)
+Tor 0.4.6.10 — PREMATURE_DATA real-attack (v2: stream-attach hook + marker)
+Files: src/core/or/circuituse.c (Tor patch) + experiments/shadow_harness.mjs (parser)
+Model: modified (malicious) client, env-gated (TOR_FSM_ATTACK_PREMATURE_DATA), benign by default.
 
-GOAL
-  Produce a GENUINE RELAY_BEGIN cell on the wire while the circuit's FSM is still
-  in CIRCUIT_BUILDING (i.e. before the circuit is READY). The harness keys
-  PREMATURE_DATA off the real connection_ap_handshake_send_begin() info-log; that
-  log is emitted only from inside the real function, so we call the real function
-  (no fabricated log line).
+WHY v1 FAILED
+  v1 hooked circuit_finish_handshake (first hop) and looked for an AP stream in
+  AP_CONN_STATE_CIRCUIT_WAIT. In this Shadow run Tor keeps a pool of pre-built
+  OPEN circuits, so a stream is essentially never WAITING at first-hop-completion
+  time => the hook found no stream and fired ~0 times (begins 30≈31, no delta).
+  Also the begin log line carries the n_circ_id (channel id, ~2.8e9), NOT the
+  global_identifier the parser keys on, so it could not be attributed correctly.
 
-WHY THIS IS THE ONLY GENUINE PATH
-  A stock Tor client NEVER emits premature data: connection_ap_handshake_send_begin
-  is reached only via connection_ap_handshake_attach_chosen_circuit, which asserts
-  circ->base_.state == CIRCUIT_STATE_OPEN; and connection_ap_supports_optimistic_data
-  returns 0 unless the circuit is OPEN. So the only way to get a real begin cell
-  during BUILDING is a modified (malicious) client that links a waiting stream to
-  the first (already-OPEN) hop and sends the begin early. The cell is real; the
-  relay (a middle node) will reject/END the stream, the circuit survives.
+v2 DESIGN
+  Tor patch (circuituse.c, connection_ap_handshake_attach_circuit, general-conn
+  branch, immediately BEFORE circuit_get_open_circ_or_launch):
+    When env set and the stream is a CONNECT stream not yet on a circuit, scan
+    circuit_get_global_list() for an ORIGIN, CIRCUIT_STATE_BUILDING, PURPOSE
+    C_GENERAL circuit whose first hop (cpath) is CPATH_STATE_OPEN. If found:
+      link_apconn_to_circ(conn, foc, foc->cpath);   // first (OPEN) hop
+      log_info(LD_CIRC, "TOR_FSM_PREMATURE_BEGIN gid=%u", foc->global_identifier);
+      connection_ap_handshake_send_begin(conn);      // GENUINE RELAY_BEGIN early
+      return 1;
+    Otherwise fall through to normal attach (no premature that time).
+  This sends a REAL begin cell down a half-built circuit (first hop open, circuit
+  not yet OPEN) and logs the circuit's GLOBAL id — the same id origin_circuit_new
+  logs and the parser keys on. Honest: the marker records a real action + real id.
 
-HOOK (circuit_finish_handshake, right after CIRC_EVENT_EXTENDED for the FIRST hop)
-  At that point circ->cpath (hop 1) is CPATH_STATE_OPEN and the circuit is BUILDING.
-  We grab one AP stream in AP_CONN_STATE_CIRCUIT_WAIT, link it to circ at the first
-  hop (replicating link_apconn_to_circ inline because that fn is static in
-  circuituse.c; passing cpath=circ->cpath avoids the OPEN-state assert), and call
-  connection_ap_handshake_send_begin(ec).
+  Safety: link_apconn_to_circ is in the same file (static, callable). We bypass
+  connection_ap_handshake_attach_chosen_circuit (which asserts state==OPEN) by
+  calling link + send_begin directly. assert_circ_anonymity_ok only asserts on
+  onehop_tunnel; a general 3-hop circuit skips it. cpath first hop is OPEN so
+  crypto is ready and connection_edge_send_command succeeds.
 
-SAFETY
-  - assert_circ_anonymity_ok (in send_begin) only asserts when build_state->
-    onehop_tunnel is set; normal 3-hop general circuits skip it -> no abort.
-  - We filter SOCKS_COMMAND_IS_CONNECT and require !on_circuit, so we never hijack
-    a RESOLVE stream (would trip send_begin's SOCKS_COMMAND_IS_CONNECT assert) and
-    never double-link a stream.
-  - Fires once per circuit (first hop). Benign by default (env unset => no-op).
+  Parser (shadow_harness.mjs):
+    - new vars: lastReadyCircuitId, pendingPrematureGid
+    - on last-hop RECV_EXTENDED push: lastReadyCircuitId = cid  (circuit now READY)
+    - on marker line "TOR_FSM_PREMATURE_BEGIN gid=N": pendingPrematureGid = N
+    - on begin line "connection_ap_handshake_send_begin(): Sending relay cell":
+        cid = pendingPrematureGid || lastReadyCircuitId || lastCircuitId
+        (marker -> BUILDING circ -> PREMATURE_DATA; otherwise -> READY -> valid)
+      begin regex narrowed to the "Sending relay cell" line so each begin counts
+      once (the old /send_begin\(\)/ matched BOTH that and the "Address/port sent"
+      line, double-counting).
 
---- a/src/core/or/circuitbuild.c (includes)
-+++ b/src/core/or/circuitbuild.c
-@@
- #include "core/or/entry_connection_st.h"
-+#include "core/or/socks_request_st.h"
+  Net effect (expected): benign PREMATURE_DATA ~0 (FPR fixed); attack
+  PREMATURE_DATA = number of genuine early begins forced onto building circuits.
 
---- a/src/core/or/circuitbuild.c (circuit_finish_handshake)
-+++ b/src/core/or/circuitbuild.c
-@@
-   circuit_event_status(circ, CIRC_EVENT_EXTENDED, 0);
-+
-+  if (hop == circ->cpath && getenv("TOR_FSM_ATTACK_PREMATURE_DATA")) {
-+    connection_t *pc = connection_get_by_type_state(CONN_TYPE_AP, AP_CONN_STATE_CIRCUIT_WAIT);
-+    if (pc) {
-+      entry_connection_t *ec = TO_ENTRY_CONN(pc);
-+      if (ec->socks_request && SOCKS_COMMAND_IS_CONNECT(ec->socks_request->command) && !ENTRY_TO_EDGE_CONN(ec)->on_circuit) {
-+        ENTRY_TO_EDGE_CONN(ec)->next_stream = circ->p_streams;
-+        ENTRY_TO_EDGE_CONN(ec)->on_circuit = TO_CIRCUIT(circ);
-+        circ->p_streams = ENTRY_TO_EDGE_CONN(ec);
-+        ENTRY_TO_EDGE_CONN(ec)->cpath_layer = circ->cpath;
-+        (void) connection_ap_handshake_send_begin(ec);
-+      }
+  NOTE: hit count is timing-dependent (needs a building circuit with first hop
+  open at stream-attach time). If too low, escalate to a forcing variant (make the
+  stream wait for a building circuit instead of taking an open one).
+
+--- circuituse.c (connection_ap_handshake_attach_circuit, before get_open_circ_or_launch)
++    if (getenv("TOR_FSM_ATTACK_PREMATURE_DATA") &&
++        conn->socks_request->command == SOCKS_COMMAND_CONNECT &&
++        !ENTRY_TO_EDGE_CONN(conn)->on_circuit) {
++      SMARTLIST_FOREACH_BEGIN(circuit_get_global_list(), circuit_t *, fc) {
++        if (CIRCUIT_IS_ORIGIN(fc) && fc->state == CIRCUIT_STATE_BUILDING &&
++            fc->purpose == CIRCUIT_PURPOSE_C_GENERAL) {
++          origin_circuit_t *foc = TO_ORIGIN_CIRCUIT(fc);
++          if (foc->cpath && foc->cpath->state == CPATH_STATE_OPEN) {
++            link_apconn_to_circ(conn, foc, foc->cpath);
++            log_info(LD_CIRC, "TOR_FSM_PREMATURE_BEGIN gid=%u", (unsigned)foc->global_identifier);
++            if (connection_ap_handshake_send_begin(conn) >= 0)
++              return 1;
++          }
++        }
++      } SMARTLIST_FOREACH_END(fc);
 +    }
-+  }
-+
-   /* (CIRCUIT_HIJACK block, if applied, follows here) */
-   return 0;
- }
+     retval = circuit_get_open_circ_or_launch(conn,
+             connection_ap_get_nonrend_circ_purpose(conn),
+             &circ);
