@@ -1,0 +1,39 @@
+ez@tor-fsm-ubuntu:/tmp/cf_test$ cat > ~/tor-fsm-mdt/experiments/cf_detect.mjs <<'CFEOF'
+// CREATE_FLOOD real-attack detector — standalone re-parser.
+// FSM detector imported from server/fsm.ts (single source of truth);
+// parser + FSM runner copied verbatim from shadow_harness.mjs.
+import { readFileSync, writeFileSync } from "node:fs";
+import { VALID, k, classifyInvalid } from "../server/fsm.ts";
+  let buildingCircuitId = null;
+function parseTorHostLog(logContent, hostName) {
+  const lines = logContent.split("\n");d+ [\d:.]+)/);
+  let lastCircuitId = null;Match[1] : null;\d:.]+)/);
+  const circuits = {}; ? tsMatch[1] : null;
+  let orconnEstablished = false;
+  let orconnPending = false;ch(/origin_circuit_new\(\): Circuit (\d+)/);
+  const circuitHopCount = {};h(/origin_circuit_new\(\): Circuit (\d+)/);
+  let buildingCircuitId = null;
+      lastCircuitId = cid;
+  for (const line of lines) {cuits[cid] = [];
+    const tsMatch = line.match(/^(\w+ \d+ [\d:.]+)/);p: ts, host: hostName });
+    const ts = tsMatch ? tsMatch[1] : null;
+    if (!ts) continue;push({ event: "TLS_OK", timestamp: ts, host: hostName });
+      } else {
+    const circNew = line.match(/origin_circuit_new\(\): Circuit (\d+)/);
+    if (circNew) {
+      const cid = circNew[1];
+      lastCircuitId = cid;
+      if (!circuits[cid]) circuits[cid] = [];
+      circuits[cid].push({ event: "CONNECT", timestamp: ts, host: hostName });
+      if (orconnEstablished) {
+        circuits[cid].push({ event: "TLS_OK", timestamp: ts, host: hostName });
+      } else {tate >= 7 && !orconnEstablished) {
+        orconnPending = true;rue;
+      } orconnPending = false;
+      continue;tCircuitId && circuits[lastCircuitId]) {
+    }     circuits[lastCircuitId].push({ event: "TLS_OK", timestamp: ts, host: hostName });
+    perCircuit[cid] = { eventCount: events.length, validCount: result.validCount, invalidCount: result.invalidCount, finalState: res    const orconn = line.match(/ORCONN BEST_ANY state (?:-?\d+)->(\d+)/);nt: totalInvalid, circuitCount: Object.keys(circuitMap).leng    if (orconn) {circuit ${v.circuitId}: ${v.from} x ${v.event} -> ${v.classification.type} (${v.classification.severity}) @ ${v.tim      const newState = parseInt(orconn[1]);t.json", JSON.stringify({ logPath, circuitCount: fsm.circuitCount, validCount: fsm.validC      if (newState >= 7 && !orconnEstablished) {byType, createFloodCount: createFlood.length, createFloodSamples: createFlood.slice(        orconnEstablished = true;
+cd ~/tor-fsm-mdt && npx tsx experiments/cf_detect.mjs</parameter>ateFloodCount: createFlood.length, createFloodSamples: createFlood.
+bash: beklenmeyen jeton `newline' yakınında sözdizim hatası
+tez@tor-fsm-ubuntu:/tmp/cf_test$ 
+
