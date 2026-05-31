@@ -1,0 +1,36 @@
+--- a/src/core/or/circuitbuild.c
++++ b/src/core/or/circuitbuild.c
+@@ -1,6 +1,33 @@
+ // Tor 0.4.6.10 patch: HANDSHAKE_SKIP attack
+ // Skip TLS handshake, send CREATE cell directly without proper state verification
+ // This violates the normal circuit initialization protocol
++//
++// Attack: Attacker-controlled relay sends CREATE cell immediately upon connection
++// without completing TLS handshake. This breaks the FSM by skipping RECV_CREATED
++// state and attempting early circuit extension.
++//
++// Location: circuit_send_first_onion_skin() in src/core/or/circuitbuild.c
++// When: Applied to malicious relay in Shadow simulation
++// Effect: Injects CREATE events that violate FSM state transitions
++// Detection: FSM detects transition from non-CREATE-ready state
++// Ground Truth Oracle: log_notice(LD_GENERAL, "ATTACK_HANDSHAKE_SKIP circ=%u", cid)
++
++--- In circuit_send_first_onion_skin() function:
++
++  // Normal code path:
++  if (conn->tls_state >= TLS_STATE_OPEN) {
++    // TLS handshake completed, safe to send CREATE
++    circuit_send_create_cell(circ);
++  }
++
++  // ATTACK injection point:
++  // Remove the TLS state check; send CREATE directly
++  
++  // Attacker code (patch):
++  if (1) { // Always true - bypass TLS check
++    log_notice(LD_GENERAL, "ATTACK_HANDSHAKE_SKIP circ=%u", circ->global_identifier);
++    circuit_send_create_cell(circ);  // Send without handshake completion
++  }
+ 
+ // References:
+ // - Tor src/core/or/circuitbuild.c: circuit_send_first_onion_skin()

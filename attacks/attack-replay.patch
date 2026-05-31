@@ -1,0 +1,40 @@
+--- a/src/core/or/relay.c
++++ b/src/core/or/relay.c
+@@ -1,6 +1,36 @@
+ // Tor 0.4.6.10 patch: REPLAY_ATTACK
+ // Replay previously seen RELAY cells by re-injecting them into the circuit queue
+ // This violates FSM semantics by duplicating valid state transitions
++//
++// Attack: Malicious relay intercepts and records a valid RELAY cell (e.g., RELAY_DATA)
++// Then re-injects the same cell multiple times after circuit closure or timeout
++// This causes spurious events that violate normal circuit behavior
++//
++// Location: circuit_receive_relay_cell() in src/core/or/relay.c
++// When: Applied to malicious relay in Shadow simulation
++// Effect: Injects duplicate RELAY_DATA events after circuit should be closed
++// Detection: FSM detects impossible state transitions (e.g., SEND_RELAY_DATA in CLOSED state)
++// Ground Truth Oracle: log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d", cid, rh->command)
++
++--- In circuit_receive_relay_cell() function:
++
++  // Normal code path:
++  // Process relay cell only if circuit is OPEN
++  if (circ->state == CIRCUIT_STATE_OPEN) {
++    process_relay_cell(circ, cell);
++  }
++
++  // ATTACK injection point:
++  // Store seen cells and replay them later
++  
++  // Attacker code (patch):
++  // After normal processing, check if we have cached cells to replay
++  if (circ->state == CIRCUIT_STATE_CLOSED) {
++    for (const cached_cell in attacker_replay_cache[circ->id]) {
++      log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d",
++                 circ->global_identifier, cached_cell->command);
++      process_relay_cell(circ, cached_cell);  // Replay after closure
++    }
++  }
+ 
+ // References:
+ // - Tor src/core/or/relay.c: circuit_receive_relay_cell()

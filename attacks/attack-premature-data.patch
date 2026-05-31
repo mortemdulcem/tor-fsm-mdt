@@ -1,0 +1,39 @@
+--- a/src/core/or/relay.c
++++ b/src/core/or/relay.c
+@@ -1,6 +1,36 @@
+ // Tor 0.4.6.10 patch: PREMATURE_DATA
+ // Send RELAY_DATA on a circuit before READY state is reached
+ // This violates FSM by sending data before all hops are extended
++//
++// Attack: Malicious relay sends application data (RELAY_DATA) to client
++// before circuit extension is complete and connection is READY
++// Normal protocol: Circuit must complete all hops, then send BEGIN, then data
++// Attack breaks this by sending data prematurely
++//
++// Location: connection_edge_process_inbuf() in src/core/or/relay.c
++// When: Applied to malicious relay in Shadow simulation
++// Effect: Injects SEND_RELAY_DATA events before SEND_CREATE/RECV_EXTENDED complete
++// Detection: FSM detects data send from non-READY state
++// Ground Truth Oracle: log_notice(LD_GENERAL, "ATTACK_PREMATURE_DATA circ=%u state=%d", cid, state)
++
++--- In connection_edge_process_inbuf() function:
++
++  // Normal code path:
++  if (conn->state == CONN_STATE_READY) {
++    // Safe to send data - circuit is built and connection established
++    relay_data_to_client(conn, data);
++  }
++
++  // ATTACK injection point:
++  // Remove state check; send data regardless of circuit readiness
++  
++  // Attacker code (patch):
++  if (conn->state < CONN_STATE_READY) {
++    log_notice(LD_GENERAL, "ATTACK_PREMATURE_DATA circ=%u state=%d",
++               conn->circ->global_identifier, conn->state);
++    // Send data before handshake completion
++    relay_data_to_client(conn, data);
++  }
+ 
+ // References:
+ // - Tor src/core/or/relay.c: connection_edge_process_inbuf()
