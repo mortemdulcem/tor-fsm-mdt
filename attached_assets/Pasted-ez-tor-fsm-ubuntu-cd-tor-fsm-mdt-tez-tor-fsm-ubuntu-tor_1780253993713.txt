@@ -1,0 +1,2037 @@
+ez@tor-fsm-ubuntu:~$ cd ~/tor-fsm-mdt
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ ls experiments/
+baselines.mjs                report.html
+b_extensions.json            shadow_harness.mjs
+b_extensions.mjs             shadow_harness_v2.mjs
+Bolum_3_5_Rapor.pdf          shadow_results_4cell.json
+build_report.mjs             shadow_results.json
+c_extensions.json            shadow_results_v1.json
+c_extensions.mjs             shadow_results_v2.json
+c_latency                    shadow_runs
+d_extensions.json            shadow_runs_expanded_template
+d_extensions.mjs             shadow_runs_v1
+f_extensions.json            shadow_runs_v2
+f_extensions.mjs             stats.mjs
+f_extensions_validated.json  tier_b_experiments.mjs
+figures                      tier_b_results.json
+figures.mjs                  tier_c_ml_baseline.py
+figures_v2.mjs               tier_c_results.json
+f_validate_statsmodels.py    topology
+g_extensions.json            tor_static_fsm.json
+g_extensions.mjs             tor_static_fsm.mjs
+merge_results.mjs            trials.csv
+reanalyze_fsm.mjs            trials.json
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ which shadow; which tor; tor --version
+/home/tez/.local/bin/shadow
+/usr/sbin/tor
+Tor version 0.4.6.10.
+Tor is running on Linux with Libevent 2.1.12-stable, OpenSSL 3.0.2, Zlib 1.2.11, Liblzma 5.2.5, Libzstd 1.4.8 and Glibc 2.35 as libc.
+Tor compiled with GCC version 11.2.0
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ ls ~/tor-0.4.6.10/ 2>/dev/null && echo "TOR KAYNAK VAR" || echo "TOR KAYNAK YOK"
+TOR KAYNAK YOK
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~
+wget https://dist.torproject.org/tor-0.4.6.10.tar.gz
+tar xzf tor-0.4.6.10.tar.gz
+cd ~/tor-0.4.6.10
+sudo apt-get update
+sudo apt-get install -y build-essential libevent-dev libssl-dev zlib1g-dev pkg-config
+./configure --disable-asciidoc --disable-unittests --disable-manpage --disable-html-manual
+make -j$(nproc)
+ls -la src/app/tor && echo "VANILLA DERLENDI"
+--2026-05-31 21:45:43--  https://dist.torproject.org/tor-0.4.6.10.tar.gz
+dist.torproject.org (dist.torproject.org) çözümleniyor... 204.8.99.146, 116.202.120.165, 116.202.120.166, ...
+dist.torproject.org (dist.torproject.org)|204.8.99.146|:443 bağlanılıyor... bağlantı kuruldu.
+HTTP isteği gönderildi, cevap bekleniyor... 200 OK
+Uzunluk: 7811644 (7,4M) [application/x-gzip]
+Kayıt yeri: ‘tor-0.4.6.10.tar.gz’
+
+tor-0.4.6.10.tar.gz 100%[===================>]   7,45M  1,15MB/s    süre 8,1s  
+
+2026-05-31 21:45:52 (941 KB/s) - ‘tor-0.4.6.10.tar.gz’ kaydedildi [7811644/7811644]
+
+[sudo] tez için parola: 
+Aynı:  1 http://tr.archive.ubuntu.com/ubuntu jammy InRelease                   
+Aynı:  2 https://deb.nodesource.com/node_22.x nodistro InRelease               
+Aynı:  3 http://tr.archive.ubuntu.com/ubuntu jammy-updates InRelease         
+Aynı:  4 http://security.ubuntu.com/ubuntu jammy-security InRelease
+Aynı:  5 http://tr.archive.ubuntu.com/ubuntu jammy-backports InRelease
+Paket listeleri okunuyor... Bitti
+Paket listeleri okunuyor... Bitti
+Bağımlılık ağacı oluşturuluyor... Bitti
+Durum bilgisi okunuyor... Bitti               
+build-essential zaten en yeni sürümde (12.9ubuntu3).
+libevent-dev zaten en yeni sürümde (2.1.12-stable-1build3).
+pkg-config zaten en yeni sürümde (0.29.2-1ubuntu3).
+libssl-dev zaten en yeni sürümde (3.0.2-0ubuntu1.23).
+zlib1g-dev zaten en yeni sürümde (1:1.2.11.dfsg-2ubuntu9.2).
+0 paket yükseltilecek, 0 yeni paket kurulacak, 0 paket kaldırılacak ve 34 paket yükseltilmeyecek.
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether make supports nested variables... (cached) yes
+checking whether make supports the include directive... yes (GNU style)
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking whether gcc understands -c and -o together... yes
+checking dependency style of gcc... gcc3
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking for pkg-config... /usr/bin/pkg-config
+checking pkg-config is at least version 0.9.0... yes
+checking for SYSTEMD... no
+configure: Okay, checking for systemd a different way...
+checking for SYSTEMD... no
+checking for ar... ar
+checking the archiver (ar) interface... ar
+checking for gcc... (cached) gcc
+checking whether we are using the GNU C compiler... (cached) yes
+checking whether gcc accepts -g... (cached) yes
+checking for gcc option to accept ISO C89... (cached) none needed
+checking whether gcc understands -c and -o together... (cached) yes
+checking dependency style of gcc... (cached) gcc3
+checking how to run the C preprocessor... gcc -E
+checking whether make sets $(MAKE)... (cached) yes
+checking for ranlib... ranlib
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for C compiler vendor... gnu
+checking for C compiler version... 11.4.0
+checking for C compiler vendor... (cached) gnu
+checking for perl... perl
+checking for asciidoc... none
+checking for a2x... no
+checking for a2x.py... no
+checking for gcc option to accept ISO C99... none needed
+checking for Python 3... /usr/bin/python3
+checking for flexible array members... yes
+checking for working C99 mid-block declaration syntax... yes
+checking for working C99 designated initializers... yes
+checking for __attribute__((fallthrough))... yes
+checking for win32... no
+checking for MIPSpro compiler... no
+checking whether byte ordering is bigendian... no
+checking for library containing socket... none required
+checking for library containing gethostbyname... none required
+checking for library containing dlopen... none required
+checking for library containing inet_aton... none required
+checking for library containing backtrace... none required
+checking for library containing clock_gettime... none required
+checking for library containing pthread_create... none required
+checking for library containing pthread_detach... none required
+checking for _NSGetEnviron... no
+checking for RtlSecureZeroMemory... no
+checking for SecureZeroMemory... no
+checking for accept4... yes
+checking for backtrace... yes
+checking for backtrace_symbols_fd... yes
+checking for eventfd... yes
+checking for explicit_bzero... yes
+checking for timingsafe_memcmp... no
+checking for flock... yes
+checking for fsync... yes
+checking for ftime... yes
+checking for get_current_dir_name... yes
+checking for getaddrinfo... yes
+checking for getdelim... yes
+checking for getifaddrs... yes
+checking for getline... yes
+checking for getrlimit... yes
+checking for gettimeofday... yes
+checking for gmtime_r... yes
+checking for gnu_get_libc_version... yes
+checking for inet_aton... yes
+checking for ioctl... yes
+checking for issetugid... no
+checking for llround... no
+checking for localtime_r... yes
+checking for lround... no
+checking for madvise... yes
+checking for memmem... yes
+checking for memset_s... no
+checking for minherit... no
+checking for mmap... yes
+checking for pipe... yes
+checking for pipe2... yes
+checking for prctl... yes
+checking for readpassphrase... no
+checking for rint... no
+checking for sigaction... yes
+checking for socketpair... yes
+checking for statvfs... yes
+checking for strncasecmp... yes
+checking for strcasecmp... yes
+checking for strlcat... no
+checking for strlcpy... no
+checking for strnlen... yes
+checking for strptime... yes
+checking for strtok_r... yes
+checking for strtoull... yes
+checking for sysconf... yes
+checking for sysctl... no
+checking for timegm... yes
+checking for truncate... yes
+checking for uname... yes
+checking for usleep... yes
+checking for vasprintf... yes
+checking for _vscprintf... no
+checking for a pre-Yosemite OS X build target... no
+checking for mach_approximate_time... no
+checking for a pre-Sierra OSX build target... no
+checking for clock_gettime... yes
+checking for getentropy... yes
+checking pthread.h usability... yes
+checking pthread.h presence... yes
+checking for pthread.h... yes
+checking for pthread_create... yes
+checking for pthread_condattr_setclock... yes
+checking for glob... yes
+checking whether free(NULL) works... yes
+checking for libevent directory... (system)
+checking whether we need extra options to link libevent... (none)
+checking event2/event.h usability... yes
+checking event2/event.h presence... yes
+checking for event2/event.h... yes
+checking event2/dns.h usability... yes
+checking event2/dns.h presence... yes
+checking for event2/dns.h... yes
+checking event2/bufferevent_ssl.h usability... yes
+checking event2/bufferevent_ssl.h presence... yes
+checking for event2/bufferevent_ssl.h... yes
+checking for library containing event_new... -levent
+checking for library containing evdns_base_new... none required
+checking for evutil_secure_rng_set_urandom_device_file... yes
+checking for evutil_secure_rng_add_bytes... yes
+checking for evdns_base_get_nameserver_addr... yes
+checking whether Libevent is new enough... yes
+checking for library containing pow... -lm
+configure: Now, we'll look for OpenSSL >= 1.0.1
+checking for openssl directory... (system)
+checking whether we need extra options to link openssl... (none)
+checking for OpenSSL >= 3.0.0... yes
+checking for OpenSSL < 1.0.1... no
+checking whether LibreSSL TLS 1.3 APIs are busted... no
+checking for significant mismatch between openssl headers and libraries... no
+checking for struct ssl_method_st.get_cipher_by_char... no
+checking for ERR_load_KDF_strings... yes
+checking for EVP_PBE_scrypt... yes
+checking for SSL_CIPHER_find... yes
+checking for SSL_CTX_set1_groups_list... no
+checking for SSL_CTX_set_security_level... yes
+checking for SSL_SESSION_get_master_key... yes
+checking for SSL_get_client_ciphers... yes
+checking for SSL_get_client_random... yes
+checking for SSL_get_server_random... yes
+checking for TLS_method... yes
+checking for SSL.state... no
+checking size of SHA_CTX... 96
+checking for struct tcp_info.tcpi_unacked... yes
+checking for struct tcp_info.tcpi_snd_mss... yes
+checking for zlib directory... (system)
+checking whether we need extra options to link zlib... (none)
+checking for LZMA... no
+configure: WARNING: Unable to find liblzma, check the PKG_CONFIG_PATH environment variable, or set LZMA_CFLAGS and LZMA_LIBS.
+checking for ZSTD... no
+configure: WARNING: Unable to find libzstd, check the PKG_CONFIG_PATH environment variable, or set ZSTD_CFLAGS and ZSTD_LIBS.
+checking for cap_init in -lcap... no
+configure: Libcap was not found. Capabilities will not be usable.
+checking for cap_set_proc... no
+checking whether the compiler accepts -fstack-protector-all... yes
+checking whether the compiler accepts -Wstack-protector... yes
+checking whether the compiler accepts --param ssp-buffer-size=1... yes
+checking whether the compiler accepts -fPIE... yes
+checking whether the linker accepts -pie... yes
+checking whether the compiler accepts -fwrapv... yes
+checking whether we can run hardened binaries... yes
+checking whether the linker accepts -z relro -z now... yes
+checking whether the linker accepts -rdynamic... yes
+checking whether the compiler accepts -fomit-frame-pointer... yes
+checking whether the compiler accepts -fasynchronous-unwind-tables... yes
+checking seccomp.h usability... no
+checking seccomp.h presence... no
+checking for seccomp.h... no
+checking for library containing seccomp_init... no
+checking libscrypt.h usability... no
+checking libscrypt.h presence... no
+checking for libscrypt.h... no
+checking for library containing libscrypt_scrypt... no
+checking for libscrypt_scrypt... no
+checking whether we can use curve25519-donna-c64... yes
+checking crypto_scalarmult_curve25519.h usability... no
+checking crypto_scalarmult_curve25519.h presence... no
+checking for crypto_scalarmult_curve25519.h... no
+checking nacl/crypto_scalarmult_curve25519.h usability... no
+checking nacl/crypto_scalarmult_curve25519.h presence... no
+checking for nacl/crypto_scalarmult_curve25519.h... no
+checking for nacl compiled with a fast curve25519 implementation... no
+checking for special C compiler options needed for large files... no
+checking for _FILE_OFFSET_BITS value needed for large files... no
+checking errno.h usability... yes
+checking errno.h presence... yes
+checking for errno.h... yes
+checking fcntl.h usability... yes
+checking fcntl.h presence... yes
+checking for fcntl.h... yes
+checking signal.h usability... yes
+checking signal.h presence... yes
+checking for signal.h... yes
+checking for string.h... (cached) yes
+checking sys/capability.h usability... no
+checking sys/capability.h presence... no
+checking for sys/capability.h... no
+checking sys/fcntl.h usability... yes
+checking sys/fcntl.h presence... yes
+checking for sys/fcntl.h... yes
+checking for sys/stat.h... (cached) yes
+checking sys/time.h usability... yes
+checking sys/time.h presence... yes
+checking for sys/time.h... yes
+checking for sys/types.h... (cached) yes
+checking time.h usability... yes
+checking time.h presence... yes
+checking for time.h... yes
+checking for unistd.h... (cached) yes
+checking arpa/inet.h usability... yes
+checking arpa/inet.h presence... yes
+checking for arpa/inet.h... yes
+checking crt_externs.h usability... no
+checking crt_externs.h presence... no
+checking for crt_externs.h... no
+checking execinfo.h usability... yes
+checking execinfo.h presence... yes
+checking for execinfo.h... yes
+checking gnu/libc-version.h usability... yes
+checking gnu/libc-version.h presence... yes
+checking for gnu/libc-version.h... yes
+checking grp.h usability... yes
+checking grp.h presence... yes
+checking for grp.h... yes
+checking ifaddrs.h usability... yes
+checking ifaddrs.h presence... yes
+checking for ifaddrs.h... yes
+checking for inttypes.h... (cached) yes
+checking limits.h usability... yes
+checking limits.h presence... yes
+checking for limits.h... yes
+checking linux/types.h usability... yes
+checking linux/types.h presence... yes
+checking for linux/types.h... yes
+checking mach/vm_inherit.h usability... no
+checking mach/vm_inherit.h presence... no
+checking for mach/vm_inherit.h... no
+checking machine/limits.h usability... no
+checking machine/limits.h presence... no
+checking for machine/limits.h... no
+checking malloc.h usability... yes
+checking malloc.h presence... yes
+checking for malloc.h... yes
+checking netdb.h usability... yes
+checking netdb.h presence... yes
+checking for netdb.h... yes
+checking netinet/in.h usability... yes
+checking netinet/in.h presence... yes
+checking for netinet/in.h... yes
+checking netinet/in6.h usability... no
+checking netinet/in6.h presence... no
+checking for netinet/in6.h... no
+checking pwd.h usability... yes
+checking pwd.h presence... yes
+checking for pwd.h... yes
+checking readpassphrase.h usability... no
+checking readpassphrase.h presence... no
+checking for readpassphrase.h... no
+checking stdatomic.h usability... yes
+checking stdatomic.h presence... yes
+checking for stdatomic.h... yes
+checking sys/eventfd.h usability... yes
+checking sys/eventfd.h presence... yes
+checking for sys/eventfd.h... yes
+checking sys/file.h usability... yes
+checking sys/file.h presence... yes
+checking for sys/file.h... yes
+checking sys/ioctl.h usability... yes
+checking sys/ioctl.h presence... yes
+checking for sys/ioctl.h... yes
+checking sys/limits.h usability... no
+checking sys/limits.h presence... no
+checking for sys/limits.h... no
+checking sys/mman.h usability... yes
+checking sys/mman.h presence... yes
+checking for sys/mman.h... yes
+checking sys/param.h usability... yes
+checking sys/param.h presence... yes
+checking for sys/param.h... yes
+checking sys/prctl.h usability... yes
+checking sys/prctl.h presence... yes
+checking for sys/prctl.h... yes
+checking sys/random.h usability... yes
+checking sys/random.h presence... yes
+checking for sys/random.h... yes
+checking sys/resource.h usability... yes
+checking sys/resource.h presence... yes
+checking for sys/resource.h... yes
+checking sys/select.h usability... yes
+checking sys/select.h presence... yes
+checking for sys/select.h... yes
+checking sys/socket.h usability... yes
+checking sys/socket.h presence... yes
+checking for sys/socket.h... yes
+checking sys/statvfs.h usability... yes
+checking sys/statvfs.h presence... yes
+checking for sys/statvfs.h... yes
+checking sys/syscall.h usability... yes
+checking sys/syscall.h presence... yes
+checking for sys/syscall.h... yes
+checking sys/sysctl.h usability... no
+checking sys/sysctl.h presence... no
+checking for sys/sysctl.h... no
+checking for sys/time.h... (cached) yes
+checking for sys/types.h... (cached) yes
+checking sys/un.h usability... yes
+checking sys/un.h presence... yes
+checking for sys/un.h... yes
+checking sys/utime.h usability... no
+checking sys/utime.h presence... no
+checking for sys/utime.h... no
+checking sys/wait.h usability... yes
+checking sys/wait.h presence... yes
+checking for sys/wait.h... yes
+checking syslog.h usability... yes
+checking syslog.h presence... yes
+checking for syslog.h... yes
+checking utime.h usability... yes
+checking utime.h presence... yes
+checking for utime.h... yes
+checking glob.h usability... yes
+checking glob.h presence... yes
+checking for glob.h... yes
+checking for sys/param.h... (cached) yes
+checking for net/if.h... yes
+checking for net/pfvar.h... no
+checking for linux/if.h... yes
+checking for linux/netfilter_ipv4.h... yes
+checking for linux/netfilter_ipv6/ip6_tables.h... yes
+checking for struct timeval.tv_sec... yes
+checking size of char... 1
+checking size of short... 2
+checking size of int... 4
+checking size of unsigned int... 4
+checking size of long... 8
+checking size of long long... 8
+checking size of __int64... 0
+checking size of void *... 8
+checking size of time_t... 8
+checking size of size_t... 8
+checking size of pid_t... 4
+checking for uint... yes
+checking for u_char... yes
+checking for ssize_t... yes
+checking ucontext.h usability... yes
+checking ucontext.h presence... yes
+checking for ucontext.h... yes
+checking sys/ucontext.h usability... yes
+checking sys/ucontext.h presence... yes
+checking for sys/ucontext.h... yes
+checking cygwin/signal.h usability... no
+checking cygwin/signal.h presence... no
+checking for cygwin/signal.h... no
+checking how to access the program counter from a struct ucontext... uc_mcontext.gregs[REG_RIP]
+checking for struct in6_addr... yes
+checking for struct sockaddr_in6... yes
+checking for sa_family_t... yes
+checking for struct in6_addr.s6_addr32... yes
+checking for struct in6_addr.s6_addr16... yes
+checking for struct sockaddr_in.sin_len... no
+checking for struct sockaddr_in6.sin6_len... no
+checking for rlim_t... yes
+checking whether time_t is signed... yes
+checking whether size_t is signed... no
+checking whether enum always is signed... no
+checking size of socklen_t... 4
+checking size of cell_t... 0
+checking whether C11 stdatomic.h actually works... yes
+checking whether memset(0) sets pointers to NULL... yes
+checking whether memset(0) sets doubles to 0.0... yes
+checking whether we can malloc(0) safely.... yes
+checking whether we are using 2s-complement arithmetic... yes
+checking whether right-shift on negative values does sign-extension... yes
+checking whether uint8_t is the same type as unsigned char... yes
+checking for mlockall... yes
+checking whether mlockall is declared... yes
+checking for getresuid... yes
+checking for getresgid... yes
+checking for gethostbyname_r... yes
+checking how many arguments gethostbyname_r() wants... 6
+checking whether the C compiler supports __func__... yes
+checking whether the C compiler supports __FUNC__... no
+checking whether the C compiler supports __FUNCTION__... yes
+checking whether we have extern char **environ already declared... yes
+checking whether the compiler accepts -Waddress... yes
+checking whether the compiler accepts -Waddress-of-array-temporary... no
+checking whether the compiler accepts -Waddress-of-temporary... no
+checking whether the compiler accepts -Wambiguous-macro... no
+checking whether the compiler accepts -Wanonymous-pack-parens... no
+checking whether the compiler accepts -Warc... no
+checking whether the compiler accepts -Warc-abi... no
+checking whether the compiler accepts -Warc-bridge-casts-disallowed-in-nonarc... no
+checking whether the compiler accepts -Warc-maybe-repeated-use-of-weak... no
+checking whether the compiler accepts -Warc-performSelector-leaks... no
+checking whether the compiler accepts -Warc-repeated-use-of-weak... no
+checking whether the compiler accepts -Warray-bounds... yes
+checking whether the compiler accepts -Warray-bounds-pointer-arithmetic... no
+checking whether the compiler accepts -Wasm... no
+checking whether the compiler accepts -Wasm-operand-widths... no
+checking whether the compiler accepts -Watomic-properties... no
+checking whether the compiler accepts -Watomic-property-with-user-defined-accessor... no
+checking whether the compiler accepts -Wauto-import... no
+checking whether the compiler accepts -Wauto-storage-class... no
+checking whether the compiler accepts -Wauto-var-id... no
+checking whether the compiler accepts -Wavailability... no
+checking whether the compiler accepts -Wbackslash-newline-escape... no
+checking whether the compiler accepts -Wbad-array-new-length... no
+checking whether the compiler accepts -Wbind-to-temporary-copy... no
+checking whether the compiler accepts -Wbitfield-constant-conversion... no
+checking whether the compiler accepts -Wbool-conversion... no
+checking whether the compiler accepts -Wbool-conversions... no
+checking whether the compiler accepts -Wbuiltin-requires-header... no
+checking whether the compiler accepts -Wchar-align... no
+checking whether the compiler accepts -Wcompare-distinct-pointer-types... no
+checking whether the compiler accepts -Wcomplex-component-init... no
+checking whether the compiler accepts -Wconditional-type-mismatch... no
+checking whether the compiler accepts -Wconfig-macros... no
+checking whether the compiler accepts -Wconstant-conversion... no
+checking whether the compiler accepts -Wconstant-logical-operand... no
+checking whether the compiler accepts -Wconstexpr-not-const... no
+checking whether the compiler accepts -Wcustom-atomic-properties... no
+checking whether the compiler accepts -Wdangling-field... no
+checking whether the compiler accepts -Wdangling-initializer-list... no
+checking whether the compiler accepts -Wdate-time... yes
+checking whether the compiler accepts -Wdelegating-ctor-cycles... no
+checking whether the compiler accepts -Wdeprecated-implementations... no
+checking whether the compiler accepts -Wdeprecated-register... no
+checking whether the compiler accepts -Wdirect-ivar-access... no
+checking whether the compiler accepts -Wdiscard-qual... no
+checking whether the compiler accepts -Wdistributed-object-modifiers... no
+checking whether the compiler accepts -Wdivision-by-zero... no
+checking whether the compiler accepts -Wdollar-in-identifier-extension... no
+checking whether the compiler accepts -Wdouble-promotion... yes
+checking whether the compiler accepts -Wduplicate-decl-specifier... yes
+checking whether the compiler accepts -Wduplicate-enum... no
+checking whether the compiler accepts -Wduplicate-method-arg... no
+checking whether the compiler accepts -Wduplicate-method-match... no
+checking whether the compiler accepts -Wduplicated-cond... yes
+checking whether the compiler accepts -Wdynamic-class-memaccess... no
+checking whether the compiler accepts -Wembedded-directive... no
+checking whether the compiler accepts -Wempty-translation-unit... no
+checking whether the compiler accepts -Wenum-conversion... yes
+checking whether the compiler accepts -Wexit-time-destructors... no
+checking whether the compiler accepts -Wexplicit-ownership-type... no
+checking whether the compiler accepts -Wextern-initializer... no
+checking whether the compiler accepts -Wextra... yes
+checking whether the compiler accepts -Wextra-semi... no
+checking whether the compiler accepts -Wextra-tokens... no
+checking whether the compiler accepts -Wflexible-array-extensions... no
+checking whether the compiler accepts -Wfloat-conversion... yes
+checking whether the compiler accepts -Wformat-non-iso... no
+checking whether the compiler accepts -Wfour-char-constants... no
+checking whether the compiler accepts -Wgcc-compat... no
+checking whether the compiler accepts -Wglobal-constructors... no
+checking whether the compiler accepts -Wgnu-array-member-paren-init... no
+checking whether the compiler accepts -Wgnu-designator... no
+checking whether the compiler accepts -Wgnu-static-float-init... no
+checking whether the compiler accepts -Wheader-guard... no
+checking whether the compiler accepts -Wheader-hygiene... no
+checking whether the compiler accepts -Widiomatic-parentheses... no
+checking whether the compiler accepts -Wignored-attributes... yes
+checking whether the compiler accepts -Wimplicit-atomic-properties... no
+checking whether the compiler accepts -Wimplicit-conversion-floating-point-to-bool... no
+checking whether the compiler accepts -Wimplicit-exception-spec-mismatch... no
+checking whether the compiler accepts -Wimplicit-fallthrough... yes
+checking whether the compiler accepts -Wimplicit-fallthrough-per-function... no
+checking whether the compiler accepts -Wimplicit-retain-self... no
+checking whether the compiler accepts -Wimport-preprocessor-directive-pedantic... no
+checking whether the compiler accepts -Wincompatible-library-redeclaration... no
+checking whether the compiler accepts -Wincompatible-pointer-types-discards-qualifiers... no
+checking whether the compiler accepts -Wincomplete-implementation... no
+checking whether the compiler accepts -Wincomplete-module... no
+checking whether the compiler accepts -Wincomplete-umbrella... no
+checking whether the compiler accepts -Winit-self... yes
+checking whether the compiler accepts -Wint-conversions... no
+checking whether the compiler accepts -Wint-to-void-pointer-cast... no
+checking whether the compiler accepts -Winteger-overflow... no
+checking whether the compiler accepts -Winvalid-constexpr... no
+checking whether the compiler accepts -Winvalid-iboutlet... no
+checking whether the compiler accepts -Winvalid-noreturn... no
+checking whether the compiler accepts -Winvalid-pp-token... no
+checking whether the compiler accepts -Winvalid-source-encoding... no
+checking whether the compiler accepts -Winvalid-token-paste... no
+checking whether the compiler accepts -Wknr-promoted-parameter... no
+checking whether the compiler accepts -Wlarge-by-value-copy... no
+checking whether the compiler accepts -Wliteral-conversion... no
+checking whether the compiler accepts -Wliteral-range... no
+checking whether the compiler accepts -Wlocal-type-template-args... no
+checking whether the compiler accepts -Wlogical-op... yes
+checking whether the compiler accepts -Wloop-analysis... no
+checking whether the compiler accepts -Wmain-return-type... no
+checking whether the compiler accepts -Wmalformed-warning-check... no
+checking whether the compiler accepts -Wmethod-signatures... no
+checking whether the compiler accepts -Wmicrosoft... no
+checking whether the compiler accepts -Wmicrosoft-exists... no
+checking whether the compiler accepts -Wmismatched-parameter-types... no
+checking whether the compiler accepts -Wmismatched-return-types... no
+checking whether the compiler accepts -Wmissing-field-initializers... yes
+checking whether the compiler accepts -Wmissing-format-attribute... yes
+checking whether the compiler accepts -Wmissing-noreturn... yes
+checking whether the compiler accepts -Wmissing-selector-name... no
+checking whether the compiler accepts -Wmissing-sysroot... no
+checking whether the compiler accepts -Wmissing-variable-declarations... no
+checking whether the compiler accepts -Wmodule-conflict... no
+checking whether the compiler accepts -Wnested-anon-types... no
+checking whether the compiler accepts -Wnewline-eof... no
+checking whether the compiler accepts -Wnon-literal-null-conversion... no
+checking whether the compiler accepts -Wnon-pod-varargs... no
+checking whether the compiler accepts -Wnonportable-cfstrings... no
+checking whether the compiler accepts -Wnormalized=nfkc... yes
+checking whether the compiler accepts -Wnull-arithmetic... no
+checking whether the compiler accepts -Wnull-character... no
+checking whether the compiler accepts -Wnull-conversion... no
+checking whether the compiler accepts -Wnull-dereference... yes
+checking whether the compiler accepts -Wout-of-line-declaration... no
+checking whether the compiler accepts -Wover-aligned... no
+checking whether the compiler accepts -Woverlength-strings... yes
+checking whether the compiler accepts -Woverride-init... yes
+checking whether the compiler accepts -Woverriding-method-mismatch... no
+checking whether the compiler accepts -Wpointer-type-mismatch... no
+checking whether the compiler accepts -Wpredefined-identifier-outside-function... no
+checking whether the compiler accepts -Wprotocol-property-synthesis-ambiguity... no
+checking whether the compiler accepts -Wreadonly-iboutlet-property... no
+checking whether the compiler accepts -Wreadonly-setter-attrs... no
+checking whether the compiler accepts -Wreceiver-expr... no
+checking whether the compiler accepts -Wreceiver-forward-class... no
+checking whether the compiler accepts -Wreceiver-is-weak... no
+checking whether the compiler accepts -Wreinterpret-base-class... no
+checking whether the compiler accepts -Wrequires-super-attribute... no
+checking whether the compiler accepts -Wreserved-user-defined-literal... no
+checking whether the compiler accepts -Wreturn-stack-address... no
+checking whether the compiler accepts -Wsection... no
+checking whether the compiler accepts -Wselector-type-mismatch... no
+checking whether the compiler accepts -Wsentinel... no
+checking whether the compiler accepts -Wserialized-diagnostics... no
+checking whether the compiler accepts -Wshadow... yes
+checking whether the compiler accepts -Wshift-count-negative... yes
+checking whether the compiler accepts -Wshift-count-overflow... yes
+checking whether the compiler accepts -Wshift-negative-value... yes
+checking whether the compiler accepts -Wshift-overflow=2... yes
+checking whether the compiler accepts -Wshift-sign-overflow... no
+checking whether the compiler accepts -Wshorten-64-to-32... no
+checking whether the compiler accepts -Wsizeof-array-argument... yes
+checking whether the compiler accepts -Wsource-uses-openmp... no
+checking whether the compiler accepts -Wstatic-float-init... no
+checking whether the compiler accepts -Wstatic-in-inline... no
+checking whether the compiler accepts -Wstatic-local-in-inline... no
+checking whether the compiler accepts -Wstrict-overflow=1... yes
+checking whether the compiler accepts -Wstring-compare... yes
+checking whether the compiler accepts -Wstring-conversion... no
+checking whether the compiler accepts -Wstrlcpy-strlcat-size... no
+checking whether the compiler accepts -Wstrncat-size... no
+checking whether the compiler accepts -Wsuggest-attribute=format... yes
+checking whether the compiler accepts -Wsuggest-attribute=noreturn... yes
+checking whether the compiler accepts -Wsuper-class-method-mismatch... no
+checking whether the compiler accepts -Wswitch-bool... yes
+checking whether the compiler accepts -Wsync-nand... yes
+checking whether the compiler accepts -Wtautological-constant-out-of-range-compare... no
+checking whether the compiler accepts -Wtentative-definition-incomplete-type... no
+checking whether the compiler accepts -Wtrampolines... yes
+checking whether the compiler accepts -Wtype-safety... no
+checking whether the compiler accepts -Wtypedef-redefinition... no
+checking whether the compiler accepts -Wtypename-missing... no
+checking whether the compiler accepts -Wundefined-inline... no
+checking whether the compiler accepts -Wundefined-internal... no
+checking whether the compiler accepts -Wundefined-reinterpret-cast... no
+checking whether the compiler accepts -Wunicode... no
+checking whether the compiler accepts -Wunicode-whitespace... no
+checking whether the compiler accepts -Wunknown-warning-option... no
+checking whether the compiler accepts -Wunnamed-type-template-args... no
+checking whether the compiler accepts -Wunneeded-member-function... no
+checking whether the compiler accepts -Wunsequenced... no
+checking whether the compiler accepts -Wunsupported-visibility... no
+checking whether the compiler accepts -Wunused-but-set-parameter... yes
+checking whether the compiler accepts -Wunused-but-set-variable... yes
+checking whether the compiler accepts -Wunused-command-line-argument... no
+checking whether the compiler accepts -Wunused-const-variable=2... yes
+checking whether the compiler accepts -Wunused-exception-parameter... no
+checking whether the compiler accepts -Wunused-local-typedefs... yes
+checking whether the compiler accepts -Wunused-member-function... no
+checking whether the compiler accepts -Wunused-sanitize-argument... no
+checking whether the compiler accepts -Wunused-volatile-lvalue... no
+checking whether the compiler accepts -Wuser-defined-literals... no
+checking whether the compiler accepts -Wvariadic-macros... yes
+checking whether the compiler accepts -Wvector-conversion... no
+checking whether the compiler accepts -Wvector-conversions... no
+checking whether the compiler accepts -Wvexing-parse... no
+checking whether the compiler accepts -Wvisibility... no
+checking whether the compiler accepts -Wvla-extension... no
+checking whether the compiler accepts -Wzero-length-array... no
+checking whether the compiler accepts @warning_flags... no
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Doxyfile
+config.status: creating Makefile
+config.status: creating config.rust
+config.status: creating contrib/operator-tools/tor.logrotate
+config.status: creating src/config/torrc.sample
+config.status: creating src/config/torrc.minimal
+config.status: creating src/rust/.cargo/config
+config.status: creating scripts/maint/checkOptionDocs.pl
+config.status: creating warning_flags
+config.status: creating orconfig.h
+config.status: executing depfiles commands
+checking for tput... /usr/bin/tput
+
+Tor Version: Tor 0.4.6.10 
+
+Build Features
+  Compiler:                                                      gcc
+  Host OS:                                                       linux-gnu
+
+  Warnings are fatal (--enable-fatal-warnings):                  no
+  Rust support (--enable-rust):                                  no
+  Cargo Online Fetch (--enable-cargo-online-mode):               no
+  Android support (--enable-android):                            no
+
+Static Build
+  tor (--enable-static-tor):                                     no
+  libevent (--enable-static-libevent):                           no
+  libssl (--enable-static-openssl):                              no
+  zlib1g (--enable-static-zlib):                                 no
+
+Optional Libraries
+  libnss (--enable-nss):                                         no
+  libseccomp (--disable-seccomp):                                yes
+  libscrypt (--disable-libscrypt):                               yes
+  Systemd support (--enable-systemd):                            no
+  liblzma (--enable-lzma):                                       no
+  libzstd (--enable-zstd):                                       no
+
+Hardening
+  Compiler Hardening (--disable-gcc-hardening):                  yes
+  Linker Hardening (--disable-linker-hardening):                 yes
+  Fragile Hardening (--enable-fragile-hardening, dev only):      no
+
+Modules
+  relay (--disable-module-relay):                                yes
+  dirauth (--disable-module-dirauth):                            yes
+  dircache:                                                      yes
+
+Documentation
+  AsciiDoc (--disable-asciidoc):                                 no
+  Man Pages (--disable-manpage):                                 no
+  HTML Manual (--disable-html-manual):                           no
+
+Tests
+  Unit tests (--disable-unittests):                              no
+  assert()s enabled (--enable-asserts-in-tests, dev only):       no
+  Code Coverage (--enable-coverage):                             no
+  libFuzzer support (--enable-libfuzzer):                        no
+  OSS-Fuzz support (--enable-oss-fuzz):                          no
+
+Tracing (--enable-tracing-instrumentation-<type>)
+  Tracepoints to log_debug() (log-debug):                        no
+  USDT Instrumentation (usdt):                                   no
+  LTTng Instrumentation (lttng):                                 no
+
+Install Directories
+  Binaries:                                                      /usr/local/bin
+  Configuration:                                                 /usr/local/etc/tor
+  Man Pages:                                                     /usr/local/share/man
+
+Configure Line: ./configure --disable-asciidoc --disable-unittests --disable-manpage --disable-html-manual
+
+  WARNING: 
+Encountered 2 warning(s). See messages above for more info.
+  
+make  all-am
+make[1]: Entering directory '/home/tez/tor-0.4.6.10'
+  CC       src/app/main/risky_options.o
+  CC       src/app/main/main.o
+  CC       src/app/main/shutdown.o
+  CC       src/app/main/subsystem_list.o
+  CC       src/app/main/subsysmgr.o
+  CC       src/ext/lib_libtor_ctime_a-csiphash.o
+  CC       src/trunnel/libor_trunnel_a-channelpadding_negotiation.o
+  CC       src/trunnel/libor_trunnel_a-sendme_cell.o
+  CC       src/trunnel/libor_trunnel_a-socks5.o
+  CC       src/trunnel/libor_trunnel_a-netinfo.o
+  CC       src/trunnel/libor_trunnel_a-circpad_negotiation.o
+  CC       src/tools/tor_runner.o
+  CC       src/app/main/tor_main.o
+  CC       src/core/crypto/hs_ntor.o
+  CC       src/core/crypto/onion_crypto.o
+  CC       src/core/crypto/onion_fast.o
+  CC       src/core/crypto/onion_ntor.o
+  CC       src/core/crypto/onion_tap.o
+  CC       src/core/crypto/relay_crypto.o
+  CC       src/core/mainloop/connection.o
+  CC       src/core/mainloop/cpuworker.o
+  CC       src/core/mainloop/mainloop.o
+  CC       src/core/mainloop/mainloop_pubsub.o
+  CC       src/core/mainloop/mainloop_sys.o
+  CC       src/core/mainloop/netstatus.o
+  CC       src/core/mainloop/periodic.o
+  CC       src/core/or/address_set.o
+  CC       src/core/or/channel.o
+  CC       src/core/or/channelpadding.o
+  CC       src/core/or/channeltls.o
+  CC       src/core/or/circuitbuild.o
+  CC       src/core/or/circuitlist.o
+  CC       src/core/or/circuitmux.o
+  CC       src/core/or/circuitmux_ewma.o
+  CC       src/core/or/circuitpadding.o
+  CC       src/core/or/circuitpadding_machines.o
+  CC       src/core/or/circuitstats.o
+  CC       src/core/or/circuituse.o
+  CC       src/core/or/crypt_path.o
+  CC       src/core/or/command.o
+  CC       src/core/or/connection_edge.o
+  CC       src/core/or/connection_or.o
+  CC       src/core/or/dos.o
+  CC       src/core/or/dos_config.o
+  CC       src/core/or/dos_sys.o
+  CC       src/core/or/extendinfo.o
+  CC       src/core/or/onion.o
+  CC       src/core/or/ocirc_event.o
+  CC       src/core/or/or_periodic.o
+  CC       src/core/or/or_sys.o
+  CC       src/core/or/orconn_event.o
+  CC       src/core/or/policies.o
+  CC       src/core/or/protover.o
+  CC       src/core/or/protover_rust.o
+  CC       src/core/or/reasons.o
+  CC       src/core/or/relay.o
+  CC       src/core/or/scheduler.o
+  CC       src/core/or/scheduler_kist.o
+  CC       src/core/or/scheduler_vanilla.o
+  CC       src/core/or/sendme.o
+  CC       src/core/or/status.o
+  CC       src/core/or/versions.o
+  CC       src/core/proto/proto_cell.o
+  CC       src/core/proto/proto_control0.o
+  CC       src/core/proto/proto_ext_or.o
+  CC       src/core/proto/proto_haproxy.o
+  CC       src/core/proto/proto_http.o
+  CC       src/core/proto/proto_socks.o
+  CC       src/feature/api/tor_api.o
+  CC       src/feature/client/addressmap.o
+  CC       src/feature/client/bridges.o
+  CC       src/feature/client/circpathbias.o
+  CC       src/feature/client/dnsserv.o
+  CC       src/feature/client/entrynodes.o
+  CC       src/feature/client/proxymode.o
+  CC       src/feature/client/transports.o
+  CC       src/feature/control/btrack.o
+  CC       src/feature/control/btrack_circuit.o
+  CC       src/feature/control/btrack_orconn.o
+  CC       src/feature/control/btrack_orconn_cevent.o
+  CC       src/feature/control/btrack_orconn_maps.o
+  CC       src/feature/control/control.o
+  CC       src/feature/control/control_auth.o
+  CC       src/feature/control/control_bootstrap.o
+  CC       src/feature/control/control_cmd.o
+  CC       src/feature/control/control_hs.o
+  CC       src/feature/control/control_events.o
+  CC       src/feature/control/control_fmt.o
+  CC       src/feature/control/control_getinfo.o
+  CC       src/feature/control/control_proto.o
+  CC       src/feature/control/getinfo_geoip.o
+  CC       src/feature/dirauth/authmode.o
+  CC       src/feature/dirauth/bridgeauth.o
+  CC       src/feature/dirauth/bwauth.o
+  CC       src/feature/dirauth/dirauth_config.o
+  CC       src/feature/dirauth/dirauth_periodic.o
+  CC       src/feature/dirauth/dirauth_sys.o
+  CC       src/feature/dirauth/dircollate.o
+  CC       src/feature/dirauth/dirvote.o
+  CC       src/feature/dirauth/dsigs_parse.o
+  CC       src/feature/dirauth/guardfraction.o
+  CC       src/feature/dirauth/keypin.o
+  CC       src/feature/dirauth/process_descs.o
+  CC       src/feature/dirauth/reachability.o
+  CC       src/feature/dirauth/recommend_pkg.o
+  CC       src/feature/dirauth/shared_random.o
+  CC       src/feature/dirauth/shared_random_state.o
+  CC       src/feature/dirauth/voteflags.o
+  CC       src/feature/dirauth/voting_schedule.o
+  CC       src/feature/dircache/conscache.o
+  CC       src/feature/dircache/consdiffmgr.o
+  CC       src/feature/dircache/dircache.o
+  CC       src/feature/dircache/dirserv.o
+  CC       src/feature/dirclient/dirclient.o
+  CC       src/feature/dirclient/dirclient_modes.o
+  CC       src/feature/dirclient/dlstatus.o
+  CC       src/feature/dircommon/consdiff.o
+  CC       src/feature/dircommon/directory.o
+  CC       src/feature/dircommon/fp_pair.o
+  CC       src/feature/dirparse/authcert_parse.o
+  CC       src/feature/dirparse/microdesc_parse.o
+  CC       src/feature/dirparse/ns_parse.o
+  CC       src/feature/dirparse/parsecommon.o
+  CC       src/feature/dirparse/policy_parse.o
+  CC       src/feature/dirparse/routerparse.o
+  CC       src/feature/dirparse/sigcommon.o
+  CC       src/feature/dirparse/signing.o
+  CC       src/feature/dirparse/unparseable.o
+  CC       src/feature/hibernate/hibernate.o
+  CC       src/feature/hs_common/replaycache.o
+  CC       src/feature/hs_common/shared_random_client.o
+  CC       src/feature/hs/hs_cache.o
+  CC       src/feature/hs/hs_cell.o
+  CC       src/feature/hs/hs_circuit.o
+  CC       src/feature/hs/hs_circuitmap.o
+  CC       src/feature/hs/hs_client.o
+  CC       src/feature/hs/hs_common.o
+  CC       src/feature/hs/hs_config.o
+  CC       src/feature/hs/hs_control.o
+  CC       src/feature/hs/hs_descriptor.o
+  CC       src/feature/hs/hs_dos.o
+  CC       src/feature/hs/hs_ident.o
+  CC       src/feature/hs/hs_intropoint.o
+  CC       src/feature/hs/hs_metrics.o
+  CC       src/feature/hs/hs_ob.o
+  CC       src/feature/hs/hs_service.o
+  CC       src/feature/hs/hs_stats.o
+  CC       src/feature/hs/hs_sys.o
+  CC       src/feature/hs/hs_metrics_entry.o
+  CC       src/feature/keymgt/loadkey.o
+  CC       src/feature/metrics/metrics.o
+  CC       src/feature/metrics/metrics_sys.o
+  CC       src/feature/nodelist/authcert.o
+  CC       src/feature/nodelist/describe.o
+  CC       src/feature/nodelist/dirlist.o
+  CC       src/feature/nodelist/microdesc.o
+  CC       src/feature/nodelist/networkstatus.o
+  CC       src/feature/nodelist/nickname.o
+  CC       src/feature/nodelist/nodefamily.o
+  CC       src/feature/nodelist/nodelist.o
+  CC       src/feature/nodelist/node_select.o
+  CC       src/feature/nodelist/routerinfo.o
+  CC       src/feature/nodelist/routerlist.o
+  CC       src/feature/nodelist/routerset.o
+  CC       src/feature/nodelist/fmt_routerstatus.o
+  CC       src/feature/nodelist/torcert.o
+  CC       src/feature/relay/onion_queue.o
+  CC       src/feature/relay/relay_find_addr.o
+  CC       src/feature/relay/router.o
+  CC       src/feature/relay/circuitbuild_relay.o
+  CC       src/feature/relay/dns.o
+  CC       src/feature/relay/ext_orport.o
+  CC       src/feature/relay/routermode.o
+  CC       src/feature/relay/relay_config.o
+  CC       src/feature/relay/relay_handshake.o
+  CC       src/feature/relay/relay_periodic.o
+  CC       src/feature/relay/relay_sys.o
+  CC       src/feature/relay/routerkeys.o
+  CC       src/feature/relay/selftest.o
+  CC       src/feature/relay/transport_config.o
+  CC       src/feature/rend/rendcommon.o
+  CC       src/feature/rend/rendmid.o
+  CC       src/feature/stats/bwhist.o
+  CC       src/feature/stats/connstats.o
+  CC       src/feature/stats/geoip_stats.o
+  CC       src/feature/stats/rephist.o
+  CC       src/feature/stats/predict_ports.o
+  CC       src/app/config/config.o
+  CC       src/app/config/quiet_level.o
+  CC       src/app/config/resolve_addr.o
+  CC       src/app/config/statefile.o
+  CC       src/lib/compress/compress.o
+  CC       src/lib/compress/compress_buf.o
+  CC       src/lib/compress/compress_lzma.o
+  CC       src/lib/compress/compress_none.o
+  CC       src/lib/compress/compress_zstd.o
+  CC       src/lib/compress/compress_zlib.o
+  CC       src/lib/evloop/compat_libevent.o
+  CC       src/lib/evloop/evloop_sys.o
+  CC       src/lib/evloop/procmon.o
+  CC       src/lib/evloop/timers.o
+  CC       src/lib/evloop/token_bucket.o
+  CC       src/lib/evloop/workqueue.o
+  CC       src/lib/tls/libtor_tls_a-buffers_tls.o
+  CC       src/lib/tls/libtor_tls_a-tortls.o
+  CC       src/lib/tls/libtor_tls_a-x509.o
+  CC       src/lib/tls/libtor_tls_a-tortls_openssl.o
+  CC       src/lib/tls/libtor_tls_a-x509_openssl.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_cipher.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_curve25519.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_dh.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_digest.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_ed25519.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_format.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_hkdf.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_init.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_ope.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_pwbox.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_rand.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_rand_fast.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_rand_numeric.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_rsa.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_s2k.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_util.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-digestset.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-aes_openssl.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_digest_openssl.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_rsa_openssl.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_dh_openssl.o
+  CC       src/lib/crypt_ops/libtor_crypt_ops_a-crypto_openssl_mgt.o
+  CC       src/ext/keccak-tiny/libkeccak_tiny_a-keccak-tiny-unrolled.o
+  CC       src/ext/curve25519_donna/lib_libcurve25519_donna_a-curve25519-donna-c64.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_0.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_1.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_add.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_cmov.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_copy.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_frombytes.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_invert.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_isnegative.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_isnonzero.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_mul.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_neg.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_pow22523.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_sq.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_sq2.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_sub.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-fe_tobytes.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_add.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_double_scalarmult.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_frombytes.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_madd.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_msub.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_p1p1_to_p2.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_p1p1_to_p3.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_p2_0.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_p2_dbl.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_p3_0.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_p3_dbl.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_p3_to_cached.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_p3_to_p2.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_p3_tobytes.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_precomp_0.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_scalarmult_base.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_sub.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-ge_tobytes.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-open.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-keypair.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-sc_muladd.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-sc_reduce.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-sign.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-keyconv.o
+  CC       src/ext/ed25519/ref10/libed25519_ref10_a-blinding.o
+  CC       src/ext/ed25519/donna/libed25519_donna_a-ed25519_tor.o
+  CC       src/lib/geoip/geoip.o
+  CC       src/lib/process/daemon.o
+  CC       src/lib/process/env.o
+  CC       src/lib/process/pidfile.o
+  CC       src/lib/process/process.o
+  CC       src/lib/process/process_sys.o
+  CC       src/lib/process/process_unix.o
+  CC       src/lib/process/process_win32.o
+  CC       src/lib/process/restrict.o
+  CC       src/lib/process/setuid.o
+  CC       src/lib/process/waitpid.o
+  CC       src/lib/buf/buffers.o
+  CC       src/lib/confmgt/confmgt.o
+  CC       src/lib/confmgt/structvar.o
+  CC       src/lib/confmgt/type_defs.o
+  CC       src/lib/confmgt/typedvar.o
+  CC       src/lib/confmgt/unitparse.o
+  CC       src/lib/pubsub/pubsub_build.o
+  CC       src/lib/pubsub/pubsub_check.o
+  CC       src/lib/pubsub/pubsub_publish.o
+  CC       src/lib/dispatch/dispatch_cfg.o
+  CC       src/lib/dispatch/dispatch_core.o
+  CC       src/lib/dispatch/dispatch_naming.o
+  CC       src/lib/dispatch/dispatch_new.o
+  CC       src/lib/time/compat_time.o
+  CC       src/lib/time/time_sys.o
+  CC       src/lib/time/tvdiff.o
+  CC       src/lib/fs/conffile.o
+  CC       src/lib/fs/dir.o
+  CC       src/lib/fs/files.o
+  CC       src/lib/fs/freespace.o
+  CC       src/lib/fs/lockfile.o
+  CC       src/lib/fs/mmap.o
+  CC       src/lib/fs/path.o
+  CC       src/lib/fs/storagedir.o
+  CC       src/lib/fs/userdb.o
+  CC       src/lib/encoding/binascii.o
+  CC       src/lib/encoding/confline.o
+  CC       src/lib/encoding/cstring.o
+  CC       src/lib/encoding/keyval.o
+  CC       src/lib/encoding/kvline.o
+  CC       src/lib/encoding/pem.o
+  CC       src/lib/encoding/qstring.o
+  CC       src/lib/encoding/time_fmt.o
+  CC       src/lib/sandbox/sandbox.o
+  CC       src/lib/container/bloomfilt.o
+  CC       src/lib/container/map.o
+  CC       src/lib/container/namemap.o
+  CC       src/lib/container/order.o
+  CC       src/lib/container/smartlist.o
+  CC       src/lib/net/address.o
+  CC       src/lib/net/alertsock.o
+  CC       src/lib/net/buffers_net.o
+  CC       src/lib/net/gethostname.o
+  CC       src/lib/net/inaddr.o
+  CC       src/lib/net/network_sys.o
+  CC       src/lib/net/resolve.o
+  CC       src/lib/net/socket.o
+  CC       src/lib/net/socketpair.o
+  CC       src/lib/thread/compat_threads.o
+  CC       src/lib/thread/numcpus.o
+  CC       src/lib/thread/compat_pthreads.o
+  CC       src/lib/memarea/memarea.o
+  CC       src/lib/math/fp.o
+  CC       src/lib/math/laplace.o
+  CC       src/lib/math/prob_distr.o
+  CC       src/lib/meminfo/meminfo.o
+  CC       src/lib/osinfo/uname.o
+  CC       src/lib/osinfo/libc.o
+  CC       src/lib/log/ratelim.o
+  CC       src/lib/log/escape.o
+  CC       src/lib/log/log.o
+  CC       src/lib/log/log_sys.o
+  CC       src/lib/log/util_bug.o
+  CC       src/lib/lock/compat_mutex.o
+  CC       src/lib/lock/compat_mutex_pthreads.o
+  CC       src/lib/fdio/fdio.o
+  CC       src/lib/string/compat_ctype.o
+  CC       src/lib/string/compat_string.o
+  CC       src/lib/string/util_string.o
+  CC       src/lib/string/parse_int.o
+  CC       src/lib/string/printf.o
+  CC       src/lib/string/scanf.o
+  CC       src/lib/term/getpass.o
+  CC       src/ext/readpassphrase.o
+  CC       src/lib/smartlist_core/smartlist_core.o
+  CC       src/lib/smartlist_core/smartlist_split.o
+  CC       src/lib/malloc/malloc.o
+  CC       src/lib/malloc/map_anon.o
+  CC       src/lib/wallclock/approx_time.o
+  CC       src/lib/wallclock/time_to_tm.o
+  CC       src/lib/wallclock/tor_gettimeofday.o
+  CC       src/lib/err/backtrace.o
+  CC       src/lib/err/torerr.o
+  CC       src/lib/err/torerr_sys.o
+  CC       src/lib/version/git_revision.o
+  CC       src/lib/version/version.o
+  CC       src/lib/llharden/winprocess_sys.o
+  CC       src/lib/intmath/addsub.o
+  CC       src/lib/intmath/bits.o
+  CC       src/lib/intmath/muldiv.o
+  CC       src/lib/intmath/weakrng.o
+  CC       src/lib/ctime/libtor_ctime_a-di_ops.o
+  CC       src/lib/metrics/metrics_store.o
+  CC       src/lib/metrics/metrics_store_entry.o
+  CC       src/lib/metrics/metrics_common.o
+  CC       src/lib/metrics/prometheus.o
+  CC       src/ext/trunnel/trunnel_libor_trunnel_a-trunnel.o
+  CC       src/trunnel/libor_trunnel_a-ed25519_cert.o
+  CC       src/trunnel/libor_trunnel_a-link_handshake.o
+  CC       src/trunnel/libor_trunnel_a-pwbox.o
+  CC       src/trunnel/hs/libor_trunnel_a-cell_common.o
+  CC       src/trunnel/hs/libor_trunnel_a-cell_establish_intro.o
+  CC       src/trunnel/hs/libor_trunnel_a-cell_introduce1.o
+  CC       src/trunnel/hs/libor_trunnel_a-cell_rendezvous.o
+  CC       src/lib/trace/trace_stub.o
+  CC       src/tools/tor-resolve.o
+  CC       src/tools/tor-print-ed-signing-cert.o
+  CC       src/tools/tor-gencert.o
+  CC       src/test/bench.o
+  CC       src/test/test_hs_ntor_cl.o
+  CC       src/test/test_ntor_cl.o
+  AR       src/tools/libtorrunner.a
+  AR       src/core/libtor-app.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-compress.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-evloop.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-tls.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-crypt-ops.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libcurve25519_donna.a
+  AR       src/ext/keccak-tiny/libkeccak-tiny.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/ext/ed25519/ref10/libed25519_ref10.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/ext/ed25519/donna/libed25519_donna.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-geoip.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-process.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-buf.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-confmgt.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-pubsub.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-dispatch.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-time.a
+  AR       src/lib/libtor-fs.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-encoding.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-sandbox.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-container.a
+  AR       src/lib/libtor-net.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-thread.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-memarea.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-meminfo.a
+  AR       src/lib/libtor-math.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-osinfo.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-log.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-lock.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-fdio.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-string.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-term.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-smartlist-core.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-malloc.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-wallclock.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-err.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-version.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-llharden.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-intmath.a
+  AR       src/lib/libtor-ctime.a
+ar: ar: `u' modifier ignored since `D' is the default (see `U')
+`u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-metrics.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/trunnel/libor-trunnel.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       src/lib/libtor-trace.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  CCLD     src/tools/tor-gencert
+  AR       libtor.a
+  CCLD     src/tools/tor-resolve
+  CCLD     src/tools/tor-print-ed-signing-cert
+ar: `u' modifier ignored since `D' is the default (see `U')
+  CCLD     src/test/bench
+  CCLD     src/app/tor
+  CCLD     src/test/test-ntor-cl
+  CCLD     src/test/test-hs-ntor-cl
+make[1]: Leaving directory '/home/tez/tor-0.4.6.10'
+-rwxrwxr-x 1 tez tez 12755952 May 31 21:55 src/app/tor
+VANILLA DERLENDI
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ cd ~/tor-0.4.6.10 2>/dev/null || (cd ~ && curl -sL https://dist.torproject.org/tor-0.4.6.10.tar.gz -o tor-0.4.6.10.tar.gz && tar xzf tor-0.4.6.10.tar.gz && cd tor-0.4.6.10)
+cat > /tmp/create_flood.patch <<'PATCH'
+--- a/src/core/or/circuitbuild.c
++++ b/src/core/or/circuitbuild.c
+@@ -1006,6 +1006,16 @@
+     return - END_CIRC_REASON_RESOURCELIMIT;
+   tor_trace(TR_SUBSYS(circuit), TR_EV(first_onion_skin), circ, circ->cpath);
+ 
++  /* FSM-MDT CREATE_FLOOD attack: when running as the designated attacker node
++   * (gated by an environment variable so the same binary is benign by default),
++   * deliver a second, duplicate CREATE cell on the same circuit. This is a real
++   * protocol violation on the wire (two CREATE cells for one circuit id), not a
++   * fabricated log line. */
++  if (getenv("TOR_FSM_ATTACK_CREATE_FLOOD")) {
++    log_debug(LD_CIRC,"First skin; sending create cell.");
++    (void) circuit_deliver_create_cell(TO_CIRCUIT(circ), &cc, 0);
++  }
++
+   circ->cpath->state = CPATH_STATE_AWAITING_KEYS;
+I" ~/tor-0.4.6.10 && patch -p1 < /tmp/create_flood.patch && echo "PATCH UYGULAND
+patching file src/core/or/circuitbuild.c
+PATCH UYGULANDI
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ cd ~/tor-0.4.6.10
+sudo apt-get install -y build-essential libevent-dev libssl-dev zlib1g-dev pkg-config
+./configure --disable-asciidoc --disable-unittests --disable-manpage --disable-html-manual
+make -j$(nproc)
+ls -la src/app/tor && echo "PATCHLI TOR DERLENDI"
+Paket listeleri okunuyor... Bitti
+Bağımlılık ağacı oluşturuluyor... Bitti
+Durum bilgisi okunuyor... Bitti               
+build-essential zaten en yeni sürümde (12.9ubuntu3).
+libevent-dev zaten en yeni sürümde (2.1.12-stable-1build3).
+pkg-config zaten en yeni sürümde (0.29.2-1ubuntu3).
+libssl-dev zaten en yeni sürümde (3.0.2-0ubuntu1.23).
+zlib1g-dev zaten en yeni sürümde (1:1.2.11.dfsg-2ubuntu9.2).
+0 paket yükseltilecek, 0 yeni paket kurulacak, 0 paket kaldırılacak ve 34 paket yükseltilmeyecek.
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether make supports nested variables... (cached) yes
+checking whether make supports the include directive... yes (GNU style)
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking whether gcc understands -c and -o together... yes
+checking dependency style of gcc... gcc3
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking for pkg-config... /usr/bin/pkg-config
+checking pkg-config is at least version 0.9.0... yes
+checking for SYSTEMD... no
+configure: Okay, checking for systemd a different way...
+checking for SYSTEMD... no
+checking for ar... ar
+checking the archiver (ar) interface... ar
+checking for gcc... (cached) gcc
+checking whether we are using the GNU C compiler... (cached) yes
+checking whether gcc accepts -g... (cached) yes
+checking for gcc option to accept ISO C89... (cached) none needed
+checking whether gcc understands -c and -o together... (cached) yes
+checking dependency style of gcc... (cached) gcc3
+checking how to run the C preprocessor... gcc -E
+checking whether make sets $(MAKE)... (cached) yes
+checking for ranlib... ranlib
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for C compiler vendor... gnu
+checking for C compiler version... 11.4.0
+checking for C compiler vendor... (cached) gnu
+checking for perl... perl
+checking for asciidoc... none
+checking for a2x... no
+checking for a2x.py... no
+checking for gcc option to accept ISO C99... none needed
+checking for Python 3... /usr/bin/python3
+checking for flexible array members... yes
+checking for working C99 mid-block declaration syntax... yes
+checking for working C99 designated initializers... yes
+checking for __attribute__((fallthrough))... yes
+checking for win32... no
+checking for MIPSpro compiler... no
+checking whether byte ordering is bigendian... no
+checking for library containing socket... none required
+checking for library containing gethostbyname... none required
+checking for library containing dlopen... none required
+checking for library containing inet_aton... none required
+checking for library containing backtrace... none required
+checking for library containing clock_gettime... none required
+checking for library containing pthread_create... none required
+checking for library containing pthread_detach... none required
+checking for _NSGetEnviron... no
+checking for RtlSecureZeroMemory... no
+checking for SecureZeroMemory... no
+checking for accept4... yes
+checking for backtrace... yes
+checking for backtrace_symbols_fd... yes
+checking for eventfd... yes
+checking for explicit_bzero... yes
+checking for timingsafe_memcmp... no
+checking for flock... yes
+checking for fsync... yes
+checking for ftime... yes
+checking for get_current_dir_name... yes
+checking for getaddrinfo... yes
+checking for getdelim... yes
+checking for getifaddrs... yes
+checking for getline... yes
+checking for getrlimit... yes
+checking for gettimeofday... yes
+checking for gmtime_r... yes
+checking for gnu_get_libc_version... yes
+checking for inet_aton... yes
+checking for ioctl... yes
+checking for issetugid... no
+checking for llround... no
+checking for localtime_r... yes
+checking for lround... no
+checking for madvise... yes
+checking for memmem... yes
+checking for memset_s... no
+checking for minherit... no
+checking for mmap... yes
+checking for pipe... yes
+checking for pipe2... yes
+checking for prctl... yes
+checking for readpassphrase... no
+checking for rint... no
+checking for sigaction... yes
+checking for socketpair... yes
+checking for statvfs... yes
+checking for strncasecmp... yes
+checking for strcasecmp... yes
+checking for strlcat... no
+checking for strlcpy... no
+checking for strnlen... yes
+checking for strptime... yes
+checking for strtok_r... yes
+checking for strtoull... yes
+checking for sysconf... yes
+checking for sysctl... no
+checking for timegm... yes
+checking for truncate... yes
+checking for uname... yes
+checking for usleep... yes
+checking for vasprintf... yes
+checking for _vscprintf... no
+checking for a pre-Yosemite OS X build target... no
+checking for mach_approximate_time... no
+checking for a pre-Sierra OSX build target... no
+checking for clock_gettime... yes
+checking for getentropy... yes
+checking pthread.h usability... yes
+checking pthread.h presence... yes
+checking for pthread.h... yes
+checking for pthread_create... yes
+checking for pthread_condattr_setclock... yes
+checking for glob... yes
+checking whether free(NULL) works... yes
+checking for libevent directory... (system)
+checking whether we need extra options to link libevent... (none)
+checking event2/event.h usability... yes
+checking event2/event.h presence... yes
+checking for event2/event.h... yes
+checking event2/dns.h usability... yes
+checking event2/dns.h presence... yes
+checking for event2/dns.h... yes
+checking event2/bufferevent_ssl.h usability... yes
+checking event2/bufferevent_ssl.h presence... yes
+checking for event2/bufferevent_ssl.h... yes
+checking for library containing event_new... -levent
+checking for library containing evdns_base_new... none required
+checking for evutil_secure_rng_set_urandom_device_file... yes
+checking for evutil_secure_rng_add_bytes... yes
+checking for evdns_base_get_nameserver_addr... yes
+checking whether Libevent is new enough... yes
+checking for library containing pow... -lm
+configure: Now, we'll look for OpenSSL >= 1.0.1
+checking for openssl directory... (system)
+checking whether we need extra options to link openssl... (none)
+checking for OpenSSL >= 3.0.0... yes
+checking for OpenSSL < 1.0.1... no
+checking whether LibreSSL TLS 1.3 APIs are busted... no
+checking for significant mismatch between openssl headers and libraries... no
+checking for struct ssl_method_st.get_cipher_by_char... no
+checking for ERR_load_KDF_strings... yes
+checking for EVP_PBE_scrypt... yes
+checking for SSL_CIPHER_find... yes
+checking for SSL_CTX_set1_groups_list... no
+checking for SSL_CTX_set_security_level... yes
+checking for SSL_SESSION_get_master_key... yes
+checking for SSL_get_client_ciphers... yes
+checking for SSL_get_client_random... yes
+checking for SSL_get_server_random... yes
+checking for TLS_method... yes
+checking for SSL.state... no
+checking size of SHA_CTX... 96
+checking for struct tcp_info.tcpi_unacked... yes
+checking for struct tcp_info.tcpi_snd_mss... yes
+checking for zlib directory... (system)
+checking whether we need extra options to link zlib... (none)
+checking for LZMA... no
+configure: WARNING: Unable to find liblzma, check the PKG_CONFIG_PATH environment variable, or set LZMA_CFLAGS and LZMA_LIBS.
+checking for ZSTD... no
+configure: WARNING: Unable to find libzstd, check the PKG_CONFIG_PATH environment variable, or set ZSTD_CFLAGS and ZSTD_LIBS.
+checking for cap_init in -lcap... no
+configure: Libcap was not found. Capabilities will not be usable.
+checking for cap_set_proc... no
+checking whether the compiler accepts -fstack-protector-all... yes
+checking whether the compiler accepts -Wstack-protector... yes
+checking whether the compiler accepts --param ssp-buffer-size=1... yes
+checking whether the compiler accepts -fPIE... yes
+checking whether the linker accepts -pie... yes
+checking whether the compiler accepts -fwrapv... yes
+checking whether we can run hardened binaries... yes
+checking whether the linker accepts -z relro -z now... yes
+checking whether the linker accepts -rdynamic... yes
+checking whether the compiler accepts -fomit-frame-pointer... yes
+checking whether the compiler accepts -fasynchronous-unwind-tables... yes
+checking seccomp.h usability... no
+checking seccomp.h presence... no
+checking for seccomp.h... no
+checking for library containing seccomp_init... no
+checking libscrypt.h usability... no
+checking libscrypt.h presence... no
+checking for libscrypt.h... no
+checking for library containing libscrypt_scrypt... no
+checking for libscrypt_scrypt... no
+checking whether we can use curve25519-donna-c64... yes
+checking crypto_scalarmult_curve25519.h usability... no
+checking crypto_scalarmult_curve25519.h presence... no
+checking for crypto_scalarmult_curve25519.h... no
+checking nacl/crypto_scalarmult_curve25519.h usability... no
+checking nacl/crypto_scalarmult_curve25519.h presence... no
+checking for nacl/crypto_scalarmult_curve25519.h... no
+checking for nacl compiled with a fast curve25519 implementation... no
+checking for special C compiler options needed for large files... no
+checking for _FILE_OFFSET_BITS value needed for large files... no
+checking errno.h usability... yes
+checking errno.h presence... yes
+checking for errno.h... yes
+checking fcntl.h usability... yes
+checking fcntl.h presence... yes
+checking for fcntl.h... yes
+checking signal.h usability... yes
+checking signal.h presence... yes
+checking for signal.h... yes
+checking for string.h... (cached) yes
+checking sys/capability.h usability... no
+checking sys/capability.h presence... no
+checking for sys/capability.h... no
+checking sys/fcntl.h usability... yes
+checking sys/fcntl.h presence... yes
+checking for sys/fcntl.h... yes
+checking for sys/stat.h... (cached) yes
+checking sys/time.h usability... yes
+checking sys/time.h presence... yes
+checking for sys/time.h... yes
+checking for sys/types.h... (cached) yes
+checking time.h usability... yes
+checking time.h presence... yes
+checking for time.h... yes
+checking for unistd.h... (cached) yes
+checking arpa/inet.h usability... yes
+checking arpa/inet.h presence... yes
+checking for arpa/inet.h... yes
+checking crt_externs.h usability... no
+checking crt_externs.h presence... no
+checking for crt_externs.h... no
+checking execinfo.h usability... yes
+checking execinfo.h presence... yes
+checking for execinfo.h... yes
+checking gnu/libc-version.h usability... yes
+checking gnu/libc-version.h presence... yes
+checking for gnu/libc-version.h... yes
+checking grp.h usability... yes
+checking grp.h presence... yes
+checking for grp.h... yes
+checking ifaddrs.h usability... yes
+checking ifaddrs.h presence... yes
+checking for ifaddrs.h... yes
+checking for inttypes.h... (cached) yes
+checking limits.h usability... yes
+checking limits.h presence... yes
+checking for limits.h... yes
+checking linux/types.h usability... yes
+checking linux/types.h presence... yes
+checking for linux/types.h... yes
+checking mach/vm_inherit.h usability... no
+checking mach/vm_inherit.h presence... no
+checking for mach/vm_inherit.h... no
+checking machine/limits.h usability... no
+checking machine/limits.h presence... no
+checking for machine/limits.h... no
+checking malloc.h usability... yes
+checking malloc.h presence... yes
+checking for malloc.h... yes
+checking netdb.h usability... yes
+checking netdb.h presence... yes
+checking for netdb.h... yes
+checking netinet/in.h usability... yes
+checking netinet/in.h presence... yes
+checking for netinet/in.h... yes
+checking netinet/in6.h usability... no
+checking netinet/in6.h presence... no
+checking for netinet/in6.h... no
+checking pwd.h usability... yes
+checking pwd.h presence... yes
+checking for pwd.h... yes
+checking readpassphrase.h usability... no
+checking readpassphrase.h presence... no
+checking for readpassphrase.h... no
+checking stdatomic.h usability... yes
+checking stdatomic.h presence... yes
+checking for stdatomic.h... yes
+checking sys/eventfd.h usability... yes
+checking sys/eventfd.h presence... yes
+checking for sys/eventfd.h... yes
+checking sys/file.h usability... yes
+checking sys/file.h presence... yes
+checking for sys/file.h... yes
+checking sys/ioctl.h usability... yes
+checking sys/ioctl.h presence... yes
+checking for sys/ioctl.h... yes
+checking sys/limits.h usability... no
+checking sys/limits.h presence... no
+checking for sys/limits.h... no
+checking sys/mman.h usability... yes
+checking sys/mman.h presence... yes
+checking for sys/mman.h... yes
+checking sys/param.h usability... yes
+checking sys/param.h presence... yes
+checking for sys/param.h... yes
+checking sys/prctl.h usability... yes
+checking sys/prctl.h presence... yes
+checking for sys/prctl.h... yes
+checking sys/random.h usability... yes
+checking sys/random.h presence... yes
+checking for sys/random.h... yes
+checking sys/resource.h usability... yes
+checking sys/resource.h presence... yes
+checking for sys/resource.h... yes
+checking sys/select.h usability... yes
+checking sys/select.h presence... yes
+checking for sys/select.h... yes
+checking sys/socket.h usability... yes
+checking sys/socket.h presence... yes
+checking for sys/socket.h... yes
+checking sys/statvfs.h usability... yes
+checking sys/statvfs.h presence... yes
+checking for sys/statvfs.h... yes
+checking sys/syscall.h usability... yes
+checking sys/syscall.h presence... yes
+checking for sys/syscall.h... yes
+checking sys/sysctl.h usability... no
+checking sys/sysctl.h presence... no
+checking for sys/sysctl.h... no
+checking for sys/time.h... (cached) yes
+checking for sys/types.h... (cached) yes
+checking sys/un.h usability... yes
+checking sys/un.h presence... yes
+checking for sys/un.h... yes
+checking sys/utime.h usability... no
+checking sys/utime.h presence... no
+checking for sys/utime.h... no
+checking sys/wait.h usability... yes
+checking sys/wait.h presence... yes
+checking for sys/wait.h... yes
+checking syslog.h usability... yes
+checking syslog.h presence... yes
+checking for syslog.h... yes
+checking utime.h usability... yes
+checking utime.h presence... yes
+checking for utime.h... yes
+checking glob.h usability... yes
+checking glob.h presence... yes
+checking for glob.h... yes
+checking for sys/param.h... (cached) yes
+checking for net/if.h... yes
+checking for net/pfvar.h... no
+checking for linux/if.h... yes
+checking for linux/netfilter_ipv4.h... yes
+checking for linux/netfilter_ipv6/ip6_tables.h... yes
+checking for struct timeval.tv_sec... yes
+checking size of char... 1
+checking size of short... 2
+checking size of int... 4
+checking size of unsigned int... 4
+checking size of long... 8
+checking size of long long... 8
+checking size of __int64... 0
+checking size of void *... 8
+checking size of time_t... 8
+checking size of size_t... 8
+checking size of pid_t... 4
+checking for uint... yes
+checking for u_char... yes
+checking for ssize_t... yes
+checking ucontext.h usability... yes
+checking ucontext.h presence... yes
+checking for ucontext.h... yes
+checking sys/ucontext.h usability... yes
+checking sys/ucontext.h presence... yes
+checking for sys/ucontext.h... yes
+checking cygwin/signal.h usability... no
+checking cygwin/signal.h presence... no
+checking for cygwin/signal.h... no
+checking how to access the program counter from a struct ucontext... uc_mcontext.gregs[REG_RIP]
+checking for struct in6_addr... yes
+checking for struct sockaddr_in6... yes
+checking for sa_family_t... yes
+checking for struct in6_addr.s6_addr32... yes
+checking for struct in6_addr.s6_addr16... yes
+checking for struct sockaddr_in.sin_len... no
+checking for struct sockaddr_in6.sin6_len... no
+checking for rlim_t... yes
+checking whether time_t is signed... yes
+checking whether size_t is signed... no
+checking whether enum always is signed... no
+checking size of socklen_t... 4
+checking size of cell_t... 0
+checking whether C11 stdatomic.h actually works... yes
+checking whether memset(0) sets pointers to NULL... yes
+checking whether memset(0) sets doubles to 0.0... yes
+checking whether we can malloc(0) safely.... yes
+checking whether we are using 2s-complement arithmetic... yes
+checking whether right-shift on negative values does sign-extension... yes
+checking whether uint8_t is the same type as unsigned char... yes
+checking for mlockall... yes
+checking whether mlockall is declared... yes
+checking for getresuid... yes
+checking for getresgid... yes
+checking for gethostbyname_r... yes
+checking how many arguments gethostbyname_r() wants... 6
+checking whether the C compiler supports __func__... yes
+checking whether the C compiler supports __FUNC__... no
+checking whether the C compiler supports __FUNCTION__... yes
+checking whether we have extern char **environ already declared... yes
+checking whether the compiler accepts -Waddress... yes
+checking whether the compiler accepts -Waddress-of-array-temporary... no
+checking whether the compiler accepts -Waddress-of-temporary... no
+checking whether the compiler accepts -Wambiguous-macro... no
+checking whether the compiler accepts -Wanonymous-pack-parens... no
+checking whether the compiler accepts -Warc... no
+checking whether the compiler accepts -Warc-abi... no
+checking whether the compiler accepts -Warc-bridge-casts-disallowed-in-nonarc... no
+checking whether the compiler accepts -Warc-maybe-repeated-use-of-weak... no
+checking whether the compiler accepts -Warc-performSelector-leaks... no
+checking whether the compiler accepts -Warc-repeated-use-of-weak... no
+checking whether the compiler accepts -Warray-bounds... yes
+checking whether the compiler accepts -Warray-bounds-pointer-arithmetic... no
+checking whether the compiler accepts -Wasm... no
+checking whether the compiler accepts -Wasm-operand-widths... no
+checking whether the compiler accepts -Watomic-properties... no
+checking whether the compiler accepts -Watomic-property-with-user-defined-accessor... no
+checking whether the compiler accepts -Wauto-import... no
+checking whether the compiler accepts -Wauto-storage-class... no
+checking whether the compiler accepts -Wauto-var-id... no
+checking whether the compiler accepts -Wavailability... no
+checking whether the compiler accepts -Wbackslash-newline-escape... no
+checking whether the compiler accepts -Wbad-array-new-length... no
+checking whether the compiler accepts -Wbind-to-temporary-copy... no
+checking whether the compiler accepts -Wbitfield-constant-conversion... no
+checking whether the compiler accepts -Wbool-conversion... no
+checking whether the compiler accepts -Wbool-conversions... no
+checking whether the compiler accepts -Wbuiltin-requires-header... no
+checking whether the compiler accepts -Wchar-align... no
+checking whether the compiler accepts -Wcompare-distinct-pointer-types... no
+checking whether the compiler accepts -Wcomplex-component-init... no
+checking whether the compiler accepts -Wconditional-type-mismatch... no
+checking whether the compiler accepts -Wconfig-macros... no
+checking whether the compiler accepts -Wconstant-conversion... no
+checking whether the compiler accepts -Wconstant-logical-operand... no
+checking whether the compiler accepts -Wconstexpr-not-const... no
+checking whether the compiler accepts -Wcustom-atomic-properties... no
+checking whether the compiler accepts -Wdangling-field... no
+checking whether the compiler accepts -Wdangling-initializer-list... no
+checking whether the compiler accepts -Wdate-time... yes
+checking whether the compiler accepts -Wdelegating-ctor-cycles... no
+checking whether the compiler accepts -Wdeprecated-implementations... no
+checking whether the compiler accepts -Wdeprecated-register... no
+checking whether the compiler accepts -Wdirect-ivar-access... no
+checking whether the compiler accepts -Wdiscard-qual... no
+checking whether the compiler accepts -Wdistributed-object-modifiers... no
+checking whether the compiler accepts -Wdivision-by-zero... no
+checking whether the compiler accepts -Wdollar-in-identifier-extension... no
+checking whether the compiler accepts -Wdouble-promotion... yes
+checking whether the compiler accepts -Wduplicate-decl-specifier... yes
+checking whether the compiler accepts -Wduplicate-enum... no
+checking whether the compiler accepts -Wduplicate-method-arg... no
+checking whether the compiler accepts -Wduplicate-method-match... no
+checking whether the compiler accepts -Wduplicated-cond... yes
+checking whether the compiler accepts -Wdynamic-class-memaccess... no
+checking whether the compiler accepts -Wembedded-directive... no
+checking whether the compiler accepts -Wempty-translation-unit... no
+checking whether the compiler accepts -Wenum-conversion... yes
+checking whether the compiler accepts -Wexit-time-destructors... no
+checking whether the compiler accepts -Wexplicit-ownership-type... no
+checking whether the compiler accepts -Wextern-initializer... no
+checking whether the compiler accepts -Wextra... yes
+checking whether the compiler accepts -Wextra-semi... no
+checking whether the compiler accepts -Wextra-tokens... no
+checking whether the compiler accepts -Wflexible-array-extensions... no
+checking whether the compiler accepts -Wfloat-conversion... yes
+checking whether the compiler accepts -Wformat-non-iso... no
+checking whether the compiler accepts -Wfour-char-constants... no
+checking whether the compiler accepts -Wgcc-compat... no
+checking whether the compiler accepts -Wglobal-constructors... no
+checking whether the compiler accepts -Wgnu-array-member-paren-init... no
+checking whether the compiler accepts -Wgnu-designator... no
+checking whether the compiler accepts -Wgnu-static-float-init... no
+checking whether the compiler accepts -Wheader-guard... no
+checking whether the compiler accepts -Wheader-hygiene... no
+checking whether the compiler accepts -Widiomatic-parentheses... no
+checking whether the compiler accepts -Wignored-attributes... yes
+checking whether the compiler accepts -Wimplicit-atomic-properties... no
+checking whether the compiler accepts -Wimplicit-conversion-floating-point-to-bool... no
+checking whether the compiler accepts -Wimplicit-exception-spec-mismatch... no
+checking whether the compiler accepts -Wimplicit-fallthrough... yes
+checking whether the compiler accepts -Wimplicit-fallthrough-per-function... no
+checking whether the compiler accepts -Wimplicit-retain-self... no
+checking whether the compiler accepts -Wimport-preprocessor-directive-pedantic... no
+checking whether the compiler accepts -Wincompatible-library-redeclaration... no
+checking whether the compiler accepts -Wincompatible-pointer-types-discards-qualifiers... no
+checking whether the compiler accepts -Wincomplete-implementation... no
+checking whether the compiler accepts -Wincomplete-module... no
+checking whether the compiler accepts -Wincomplete-umbrella... no
+checking whether the compiler accepts -Winit-self... yes
+checking whether the compiler accepts -Wint-conversions... no
+checking whether the compiler accepts -Wint-to-void-pointer-cast... no
+checking whether the compiler accepts -Winteger-overflow... no
+checking whether the compiler accepts -Winvalid-constexpr... no
+checking whether the compiler accepts -Winvalid-iboutlet... no
+checking whether the compiler accepts -Winvalid-noreturn... no
+checking whether the compiler accepts -Winvalid-pp-token... no
+checking whether the compiler accepts -Winvalid-source-encoding... no
+checking whether the compiler accepts -Winvalid-token-paste... no
+checking whether the compiler accepts -Wknr-promoted-parameter... no
+checking whether the compiler accepts -Wlarge-by-value-copy... no
+checking whether the compiler accepts -Wliteral-conversion... no
+checking whether the compiler accepts -Wliteral-range... no
+checking whether the compiler accepts -Wlocal-type-template-args... no
+checking whether the compiler accepts -Wlogical-op... yes
+checking whether the compiler accepts -Wloop-analysis... no
+checking whether the compiler accepts -Wmain-return-type... no
+checking whether the compiler accepts -Wmalformed-warning-check... no
+checking whether the compiler accepts -Wmethod-signatures... no
+checking whether the compiler accepts -Wmicrosoft... no
+checking whether the compiler accepts -Wmicrosoft-exists... no
+checking whether the compiler accepts -Wmismatched-parameter-types... no
+checking whether the compiler accepts -Wmismatched-return-types... no
+checking whether the compiler accepts -Wmissing-field-initializers... yes
+checking whether the compiler accepts -Wmissing-format-attribute... yes
+checking whether the compiler accepts -Wmissing-noreturn... yes
+checking whether the compiler accepts -Wmissing-selector-name... no
+checking whether the compiler accepts -Wmissing-sysroot... no
+checking whether the compiler accepts -Wmissing-variable-declarations... no
+checking whether the compiler accepts -Wmodule-conflict... no
+checking whether the compiler accepts -Wnested-anon-types... no
+checking whether the compiler accepts -Wnewline-eof... no
+checking whether the compiler accepts -Wnon-literal-null-conversion... no
+checking whether the compiler accepts -Wnon-pod-varargs... no
+checking whether the compiler accepts -Wnonportable-cfstrings... no
+checking whether the compiler accepts -Wnormalized=nfkc... yes
+checking whether the compiler accepts -Wnull-arithmetic... no
+checking whether the compiler accepts -Wnull-character... no
+checking whether the compiler accepts -Wnull-conversion... no
+checking whether the compiler accepts -Wnull-dereference... yes
+checking whether the compiler accepts -Wout-of-line-declaration... no
+checking whether the compiler accepts -Wover-aligned... no
+checking whether the compiler accepts -Woverlength-strings... yes
+checking whether the compiler accepts -Woverride-init... yes
+checking whether the compiler accepts -Woverriding-method-mismatch... no
+checking whether the compiler accepts -Wpointer-type-mismatch... no
+checking whether the compiler accepts -Wpredefined-identifier-outside-function... no
+checking whether the compiler accepts -Wprotocol-property-synthesis-ambiguity... no
+checking whether the compiler accepts -Wreadonly-iboutlet-property... no
+checking whether the compiler accepts -Wreadonly-setter-attrs... no
+checking whether the compiler accepts -Wreceiver-expr... no
+checking whether the compiler accepts -Wreceiver-forward-class... no
+checking whether the compiler accepts -Wreceiver-is-weak... no
+checking whether the compiler accepts -Wreinterpret-base-class... no
+checking whether the compiler accepts -Wrequires-super-attribute... no
+checking whether the compiler accepts -Wreserved-user-defined-literal... no
+checking whether the compiler accepts -Wreturn-stack-address... no
+checking whether the compiler accepts -Wsection... no
+checking whether the compiler accepts -Wselector-type-mismatch... no
+checking whether the compiler accepts -Wsentinel... no
+checking whether the compiler accepts -Wserialized-diagnostics... no
+checking whether the compiler accepts -Wshadow... yes
+checking whether the compiler accepts -Wshift-count-negative... yes
+checking whether the compiler accepts -Wshift-count-overflow... yes
+checking whether the compiler accepts -Wshift-negative-value... yes
+checking whether the compiler accepts -Wshift-overflow=2... yes
+checking whether the compiler accepts -Wshift-sign-overflow... no
+checking whether the compiler accepts -Wshorten-64-to-32... no
+checking whether the compiler accepts -Wsizeof-array-argument... yes
+checking whether the compiler accepts -Wsource-uses-openmp... no
+checking whether the compiler accepts -Wstatic-float-init... no
+checking whether the compiler accepts -Wstatic-in-inline... no
+checking whether the compiler accepts -Wstatic-local-in-inline... no
+checking whether the compiler accepts -Wstrict-overflow=1... yes
+checking whether the compiler accepts -Wstring-compare... yes
+checking whether the compiler accepts -Wstring-conversion... no
+checking whether the compiler accepts -Wstrlcpy-strlcat-size... no
+checking whether the compiler accepts -Wstrncat-size... no
+checking whether the compiler accepts -Wsuggest-attribute=format... yes
+checking whether the compiler accepts -Wsuggest-attribute=noreturn... yes
+checking whether the compiler accepts -Wsuper-class-method-mismatch... no
+checking whether the compiler accepts -Wswitch-bool... yes
+checking whether the compiler accepts -Wsync-nand... yes
+checking whether the compiler accepts -Wtautological-constant-out-of-range-compare... no
+checking whether the compiler accepts -Wtentative-definition-incomplete-type... no
+checking whether the compiler accepts -Wtrampolines... yes
+checking whether the compiler accepts -Wtype-safety... no
+checking whether the compiler accepts -Wtypedef-redefinition... no
+checking whether the compiler accepts -Wtypename-missing... no
+checking whether the compiler accepts -Wundefined-inline... no
+checking whether the compiler accepts -Wundefined-internal... no
+checking whether the compiler accepts -Wundefined-reinterpret-cast... no
+checking whether the compiler accepts -Wunicode... no
+checking whether the compiler accepts -Wunicode-whitespace... no
+checking whether the compiler accepts -Wunknown-warning-option... no
+checking whether the compiler accepts -Wunnamed-type-template-args... no
+checking whether the compiler accepts -Wunneeded-member-function... no
+checking whether the compiler accepts -Wunsequenced... no
+checking whether the compiler accepts -Wunsupported-visibility... no
+checking whether the compiler accepts -Wunused-but-set-parameter... yes
+checking whether the compiler accepts -Wunused-but-set-variable... yes
+checking whether the compiler accepts -Wunused-command-line-argument... no
+checking whether the compiler accepts -Wunused-const-variable=2... yes
+checking whether the compiler accepts -Wunused-exception-parameter... no
+checking whether the compiler accepts -Wunused-local-typedefs... yes
+checking whether the compiler accepts -Wunused-member-function... no
+checking whether the compiler accepts -Wunused-sanitize-argument... no
+checking whether the compiler accepts -Wunused-volatile-lvalue... no
+checking whether the compiler accepts -Wuser-defined-literals... no
+checking whether the compiler accepts -Wvariadic-macros... yes
+checking whether the compiler accepts -Wvector-conversion... no
+checking whether the compiler accepts -Wvector-conversions... no
+checking whether the compiler accepts -Wvexing-parse... no
+checking whether the compiler accepts -Wvisibility... no
+checking whether the compiler accepts -Wvla-extension... no
+checking whether the compiler accepts -Wzero-length-array... no
+checking whether the compiler accepts @warning_flags... no
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Doxyfile
+config.status: creating Makefile
+config.status: creating config.rust
+config.status: creating contrib/operator-tools/tor.logrotate
+config.status: creating src/config/torrc.sample
+config.status: creating src/config/torrc.minimal
+config.status: creating src/rust/.cargo/config
+config.status: creating scripts/maint/checkOptionDocs.pl
+config.status: creating warning_flags
+config.status: creating orconfig.h
+config.status: orconfig.h is unchanged
+config.status: executing depfiles commands
+checking for tput... /usr/bin/tput
+
+Tor Version: Tor 0.4.6.10 
+
+Build Features
+  Compiler:                                                      gcc
+  Host OS:                                                       linux-gnu
+
+  Warnings are fatal (--enable-fatal-warnings):                  no
+  Rust support (--enable-rust):                                  no
+  Cargo Online Fetch (--enable-cargo-online-mode):               no
+  Android support (--enable-android):                            no
+
+Static Build
+  tor (--enable-static-tor):                                     no
+  libevent (--enable-static-libevent):                           no
+  libssl (--enable-static-openssl):                              no
+  zlib1g (--enable-static-zlib):                                 no
+
+Optional Libraries
+  libnss (--enable-nss):                                         no
+  libseccomp (--disable-seccomp):                                yes
+  libscrypt (--disable-libscrypt):                               yes
+  Systemd support (--enable-systemd):                            no
+  liblzma (--enable-lzma):                                       no
+  libzstd (--enable-zstd):                                       no
+
+Hardening
+  Compiler Hardening (--disable-gcc-hardening):                  yes
+  Linker Hardening (--disable-linker-hardening):                 yes
+  Fragile Hardening (--enable-fragile-hardening, dev only):      no
+
+Modules
+  relay (--disable-module-relay):                                yes
+  dirauth (--disable-module-dirauth):                            yes
+  dircache:                                                      yes
+
+Documentation
+  AsciiDoc (--disable-asciidoc):                                 no
+  Man Pages (--disable-manpage):                                 no
+  HTML Manual (--disable-html-manual):                           no
+
+Tests
+  Unit tests (--disable-unittests):                              no
+  assert()s enabled (--enable-asserts-in-tests, dev only):       no
+  Code Coverage (--enable-coverage):                             no
+  libFuzzer support (--enable-libfuzzer):                        no
+  OSS-Fuzz support (--enable-oss-fuzz):                          no
+
+Tracing (--enable-tracing-instrumentation-<type>)
+  Tracepoints to log_debug() (log-debug):                        no
+  USDT Instrumentation (usdt):                                   no
+  LTTng Instrumentation (lttng):                                 no
+
+Install Directories
+  Binaries:                                                      /usr/local/bin
+  Configuration:                                                 /usr/local/etc/tor
+  Man Pages:                                                     /usr/local/share/man
+
+Configure Line: ./configure --disable-asciidoc --disable-unittests --disable-manpage --disable-html-manual
+
+  WARNING: 
+Encountered 2 warning(s). See messages above for more info.
+  
+make  all-am
+make[1]: Entering directory '/home/tez/tor-0.4.6.10'
+  CC       src/core/or/circuitbuild.o
+  AR       src/core/libtor-app.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       libtor.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  CCLD     src/test/test-hs-ntor-cl
+  CCLD     src/test/test-ntor-cl
+  CCLD     src/app/tor
+  CCLD     src/test/bench
+make[1]: Leaving directory '/home/tez/tor-0.4.6.10'
+-rwxrwxr-x 1 tez tez 12756176 May 31 21:57 src/app/tor
+PATCHLI TOR DERLENDI
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ 
