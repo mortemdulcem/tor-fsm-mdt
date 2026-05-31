@@ -1,0 +1,39 @@
+ez@tor-fsm-ubuntu:~/tor-0.4.6.10$ cd ~/tor-0.4.6.10
+echo "=== send_begin cagrilar ==="; grep -rn "connection_ap_handshake_send_begin" src/core/ | grep -v "\.h:"
+echo "=== optimistic kapisi ==="; grep -rn "optimistic" src/core/or/connection_edge.c src/core/or/circuituse.c | head -30
+=== send_begin cagrilar ===
+grep: src/core/libtor-app.a: İkili dosya eşleşiyor
+grep: src/core/or/circuituse.o: İkili dosya eşleşiyor
+src/core/or/circuituse.c:2778:    if (connection_ap_handshake_send_begin(conn) < 0)
+src/core/or/circuituse.c:2969:      if (connection_ap_handshake_send_begin(conn) < 0)
+grep: src/core/or/connection_edge.o: İkili dosya eşleşiyor
+src/core/or/connection_edge.c:3207:connection_ap_handshake_send_begin,(entry_connection_t *ap_conn))
+=== optimistic kapisi ===
+src/core/or/connection_edge.c:165:static int connection_ap_supports_optimistic_data(const entry_connection_t *);
+src/core/or/connection_edge.c:356:      if (connection_ap_supports_optimistic_data(EDGE_TO_ENTRY_CONN(conn))) {
+src/core/or/connection_edge.c:370:      /* Fall through if the connection is on a circuit without optimistic
+src/core/or/connection_edge.c:626:   * It can arrive after waiting on connected, because of optimistic
+src/core/or/connection_edge.c:1570:  if (conn->pending_optimistic_data) {
+src/core/or/connection_edge.c:1571:    buf_set_to_copy(&conn->sending_optimistic_data,
+src/core/or/connection_edge.c:1572:                    conn->pending_optimistic_data);
+src/core/or/connection_edge.c:3123: * an exit that supports optimistic data. */
+src/core/or/connection_edge.c:3125:connection_ap_supports_optimistic_data(const entry_connection_t *conn)
+src/core/or/connection_edge.c:3128:  /* We can only send optimistic data if we're connected to an open
+src/core/or/connection_edge.c:3138:  return conn->may_use_optimistic_data;
+src/core/or/connection_edge.c:3307:       ap_conn->sending_optimistic_data) &&
+src/core/or/connection_edge.c:3308:      connection_ap_supports_optimistic_data(ap_conn)) {
+src/core/or/connection_edge.c:3311:             ap_conn->sending_optimistic_data ?
+src/core/or/connection_edge.c:3312:             (long)buf_datalen(ap_conn->sending_optimistic_data) : 0);
+src/core/or/connection_edge.c:3721:      // XXX: Hrmm. It looks like optimistic data can't go through this
+src/core/or/connection_edge.c:3723:      // We don't want to mark optimistically opened streams as successful.
+src/core/or/connection_edge.c:4322:    /* in case there are any queued data cells, from e.g. optimistic data */
+src/core/or/circuituse.c:1388:    entry_conn->may_use_optimistic_data = 0;
+src/core/or/circuituse.c:2315:         * guards_retry_optimistic() always returns true here. */
+src/core/or/circuituse.c:2316:        int rv = guards_retry_optimistic(options);
+src/core/or/circuituse.c:2655:  /* See if we can use optimistic data on this circuit */
+src/core/or/circuituse.c:2660:    apconn->may_use_optimistic_data = 1;
+src/core/or/circuituse.c:2662:    apconn->may_use_optimistic_data = 0;
+src/core/or/circuituse.c:2664:           "optimistic data for connection to %s",
+src/core/or/circuituse.c:2670:           apconn->may_use_optimistic_data ? "does" : "doesn't",
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ 
+
