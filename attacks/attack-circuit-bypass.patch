@@ -1,0 +1,40 @@
+--- a/src/core/or/circuituse.c
++++ b/src/core/or/circuituse.c
+@@ -1,6 +1,36 @@
+ // Tor 0.4.6.10 patch: CIRCUIT_BYPASS
+ // Skip EXTEND hops, connect directly to exit relay
+ // This violates FSM by bypassing normal circuit extension protocol
++//
++// Attack: Malicious relay intercepts a circuit extension request (EXTEND cell)
++// and instead of properly forwarding to next hop, directly connects to destination
++// This bypasses the designed circuit path and violates multi-hop architecture
++//
++// Location: circuit_get_open_circ_or_launch() in src/core/or/circuituse.c
++// When: Applied to malicious relay in Shadow simulation
++// Effect: Injects circuit state changes that skip intermediate hops
++// Detection: FSM detects missing SEND_EXTEND/RECV_EXTENDED transitions
++// Ground Truth Oracle: log_notice(LD_GENERAL, "ATTACK_CIRCUIT_BYPASS circ=%u dest=%s", cid, addr)
++
++--- In circuit_get_open_circ_or_launch() function:
++
++  // Normal code path:
++  if (need_circuit_for_dest) {
++    for each hop in path {
++      send_extend_cell(circ, next_hop);
++      wait_for_extended_response();
++    }
++  }
++
++  // ATTACK injection point:
++  // Skip intermediate hops, connect directly to final destination
++  
++  // Attacker code (patch):
++  if (need_circuit_for_dest && attacker_controlled) {
++    log_notice(LD_GENERAL, "ATTACK_CIRCUIT_BYPASS circ=%u dest=%s",
++               circ->global_identifier, fmt_addr(&circ->cpath->extend_info->addr));
++    // Skip EXTEND cells, connect directly to exit
++    direct_connect_to_destination(circ);
++  }
+ 
+ // References:
+ // - Tor src/core/or/circuituse.c: circuit_get_open_circ_or_launch()
