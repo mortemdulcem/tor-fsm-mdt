@@ -77,13 +77,25 @@ is why only some attack classes are realizable; the FSM *state* at detection is 
 LINE ORDER, not wall-clock.
 
 ## Extending to other attack types (same env-gate pattern, benign-by-default)
-- **CIRCUIT_HIJACK (CRITICAL) — feasible.** In `circuit_finish_handshake`, after first hop
-  keys installed (`hop == circ->cpath`, circuit now BUILDING), gated by
-  `TOR_FSM_ATTACK_CIRCUIT_HIJACK`, re-call `circuit_send_first_onion_skin(circ)` → real CREATE
-  on a live circuit + its own SEND_CREATE log → classified CIRCUIT_HIJACK in BUILDING. MUST
-  restore `hop->state = CPATH_STATE_OPEN` afterwards (the re-call sets it AWAITING_KEYS) or the
-  next `circuit_send_next_onion_skin` asserts `cpath->state==OPEN` and crashes Shadow. Patch
-  saved at workspace `circuit_hijack.patch`.
+- **CIRCUIT_HIJACK (CRITICAL) — DETECTION works; needs non-destructive variant for a clean run.**
+  In `circuit_finish_handshake`, after first hop OPEN (`hop == circ->cpath`, circuit BUILDING),
+  gated by `TOR_FSM_ATTACK_CIRCUIT_HIJACK`, re-call `circuit_send_first_onion_skin(circ)` → emits
+  a 2nd `circuit_send_first_onion_skin(): ...sending CREATE` log AFTER the `circuit_finish_handshake():
+  Finished building circuit hop:` line → parser reads SEND_CREATE in BUILDING → CIRCUIT_HIJACK. The
+  log IS produced (detection valid even when the run "fails").
+  **Gotcha — NOT a crash:** `circuit_deliver_create_cell` (inside that function) REASSIGNS a new
+  n_circ_id via get_unique_circ_id_by_chan. The relay answers the 2nd CREATE with CREATED on the
+  new id; the already-built client circuit then logs `got extended when circ already built? Closing`
+  and tears the circuit down. All circuits die → tgen never completes → Shadow reports the process
+  "running" at sim end (exit≠0). It is the attack's real impact, not an assert/segfault.
+  **Non-destructive fix (for a run that exits 0):** send the extra CREATE on the EXISTING
+  `circ->n_circ_id` instead of reassigning — build the create_cell into a LOCAL throwaway
+  `onion_handshake_state_t`, `create_cell_format()` it, set `cell.circ_id = circ->n_circ_id`,
+  `append_cell_to_circuit_queue(TO_CIRCUIT(circ), circ->base_.n_chan, &cell, CELL_DIRECTION_OUT, 0)`,
+  emit the recognized log, release the local state, return 0. Relay drops the duplicate CREATE on a
+  known circ id → circuit survives → sim completes. (Needs create_cell_format/append_cell_to_circuit_queue
+  declared in circuitbuild.c's includes — they are if circuit_deliver_create_cell is defined there; else
+  add the header.) Patch saved at workspace `circuit_hijack.patch`.
 - **HANDSHAKE_SKIP / PREMATURE_DATA — uncertain.** Need a recognized SEND_CREATE before TLS_OK
   (CONNECTING) resp. SEND_RELAY_DATA before circuit READY. These require sending the real cell
   from a context where Tor's invariants likely assert, or the recognized funcname is not on the
