@@ -1,0 +1,24 @@
+--- a/src/core/or/circuitbuild.c
++++ b/src/core/or/circuitbuild.c
+@@ circuit_finish_handshake
+   hop->state = CPATH_STATE_OPEN;
+   log_info(LD_CIRC,"Finished building circuit hop:");
+   circuit_log_path(LOG_INFO,LD_CIRC,circ);
+   circuit_event_status(circ, CIRC_EVENT_EXTENDED, 0);
+ 
++  /* FSM-MDT CIRCUIT_HIJACK attack (env-gated, benign by default).
++   * After the FIRST hop's keys are installed and the circuit is in BUILDING,
++   * re-issue a genuine first-hop CREATE on the already-active circuit by calling
++   * circuit_send_first_onion_skin(). This sends a REAL CREATE cell on a live
++   * circuit (a true protocol violation = hijack signature), and that function
++   * emits its own info log line, which the FSM harness reads as a SEND_CREATE
++   * occurring in CIRCUIT_BUILDING. No log line is fabricated. We restore the
++   * first hop's OPEN state afterwards so the normal multi-hop build proceeds. */
++  if (hop == circ->cpath && getenv("TOR_FSM_ATTACK_CIRCUIT_HIJACK")) {
++    (void) circuit_send_first_onion_skin(circ);
++    hop->state = CPATH_STATE_OPEN;
++    circuit_set_state(TO_CIRCUIT(circ), CIRCUIT_STATE_BUILDING);
++  }
++
+   return 0;
+ }

@@ -67,4 +67,32 @@ the Shadow RUN must happen on the VM.
 5. Update thesis: only CREATE_FLOOD becomes real; replay/bypass/premature stay synthetic.
    S6 honestly: "CREATE_FLOOD gerçek, diğerleri sentetik".
 
-**Scope honesty:** this does NOT make all of S6 real — only one attack type.
+## Funcname-keyed parser ⇒ honesty constraint on WHICH attacks can be real
+The harness recognizes each FSM event by the Tor-logged **function name** (`funcname():`)
+plus content (e.g. SEND_CREATE only from `circuit_send_first_onion_skin()`; SEND_RELAY_DATA
+only from `connection_ap_handshake_send_begin()`). So a REAL attack must route the genuine
+cell **through that exact function** so the log carries the right funcname — you CANNOT emit
+the recognized line from another function (that would be a fabricated log = forbidden). This
+is why only some attack classes are realizable; the FSM *state* at detection is driven by log
+LINE ORDER, not wall-clock.
+
+## Extending to other attack types (same env-gate pattern, benign-by-default)
+- **CIRCUIT_HIJACK (CRITICAL) — feasible.** In `circuit_finish_handshake`, after first hop
+  keys installed (`hop == circ->cpath`, circuit now BUILDING), gated by
+  `TOR_FSM_ATTACK_CIRCUIT_HIJACK`, re-call `circuit_send_first_onion_skin(circ)` → real CREATE
+  on a live circuit + its own SEND_CREATE log → classified CIRCUIT_HIJACK in BUILDING. MUST
+  restore `hop->state = CPATH_STATE_OPEN` afterwards (the re-call sets it AWAITING_KEYS) or the
+  next `circuit_send_next_onion_skin` asserts `cpath->state==OPEN` and crashes Shadow. Patch
+  saved at workspace `circuit_hijack.patch`.
+- **HANDSHAKE_SKIP / PREMATURE_DATA — uncertain.** Need a recognized SEND_CREATE before TLS_OK
+  (CONNECTING) resp. SEND_RELAY_DATA before circuit READY. These require sending the real cell
+  from a context where Tor's invariants likely assert, or the recognized funcname is not on the
+  path. Attempt via separate env gates; if Tor asserts / emits nothing, report HONESTLY as
+  "stayed synthetic" — do not forge.
+
+## Per-attack run pattern
+One rebuild; per attack a separate Shadow run with only that env var set, parsed by cf_detect;
+compare each against the env-OFF benign baseline. The attack's signal = the violation type that
+is ~0 in benign and >0 under its flag (CREATE_FLOOD 0→9 verified; CIRCUIT_HIJACK benign=0).
+
+**Scope honesty:** this does NOT make all of S6 real — only the attack types actually verified.
