@@ -1,0 +1,776 @@
+{
+  "metadata": {
+    "analysis_date": "2026-05-28T11:49:18.650Z",
+    "description": "Re-analysis of v1 and v2 Shadow event logs under both 2-hop and 3-hop FSMs",
+    "v1_topology": {
+      "authorities": 1,
+      "relays": 6,
+      "clients": 2
+    },
+    "v2_topology": {
+      "authorities": 1,
+      "relays": 11,
+      "clients": 5
+    },
+    "fsm_2hop_transitions": 25,
+    "fsm_3hop_transitions": 27
+  },
+  "cells": {
+    "v1_2hop": {
+      "benign": {
+        "runsCompleted": 3,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": {
+          "mean": 0.2505358182252373,
+          "sd": 0.007145203678630221
+        },
+        "avgCircuits": 74,
+        "avgEvents": 677,
+        "runs": [
+          {
+            "scenario": "benign",
+            "totalEvents": 687,
+            "circuitCount": 75,
+            "validTransitions": 508,
+            "structuralViolations": 179,
+            "tp": 0,
+            "fp": 179,
+            "fn": 0,
+            "tn": 508,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.26055312954876275,
+            "violationBreakdown": {
+              "CIRCUIT_HIJACK": 152,
+              "HANDSHAKE_SKIP": 6,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 13
+            }
+          },
+          {
+            "scenario": "benign",
+            "totalEvents": 667,
+            "circuitCount": 73,
+            "validTransitions": 504,
+            "structuralViolations": 163,
+            "tp": 0,
+            "fp": 163,
+            "fn": 0,
+            "tn": 504,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.24437781109445278,
+            "violationBreakdown": {
+              "CIRCUIT_HIJACK": 144,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 11
+            }
+          },
+          {
+            "scenario": "benign",
+            "totalEvents": 677,
+            "circuitCount": 74,
+            "validTransitions": 510,
+            "structuralViolations": 167,
+            "tp": 0,
+            "fp": 167,
+            "fn": 0,
+            "tn": 510,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.2466765140324963,
+            "violationBreakdown": {
+              "CIRCUIT_HIJACK": 148,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 11
+            }
+          }
+        ]
+      },
+      "replay_attack": {
+        "runsCompleted": 3,
+        "precision": {
+          "mean": 0.3686087152092022,
+          "sd": 0.004021929455063755
+        },
+        "recall": {
+          "mean": 1,
+          "sd": 0
+        },
+        "f1": {
+          "mean": 0.5386492998550695,
+          "sd": 0.0043024630661960325
+        },
+        "fpr": {
+          "mean": 0.2505358182252373,
+          "sd": 0.007145203678630221
+        },
+        "avgCircuits": 74,
+        "avgEvents": 776,
+        "runs": [
+          {
+            "scenario": "replay_attack",
+            "totalEvents": 789,
+            "circuitCount": 75,
+            "validTransitions": 508,
+            "totalViolations": 281,
+            "injectedAttacks": 102,
+            "detectedAttacks": 102,
+            "tp": 102,
+            "fp": 179,
+            "fn": 0,
+            "tn": 508,
+            "precision": 0.36298932384341637,
+            "recall": 1,
+            "f1": 0.5326370757180157,
+            "fpr": 0.26055312954876275,
+            "violationBreakdown": {
+              "CIRCUIT_HIJACK": 164,
+              "HANDSHAKE_SKIP": 96,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 13
+            },
+            "attackBreakdown": {
+              "HANDSHAKE_SKIP": 90,
+              "CIRCUIT_HIJACK": 12
+            }
+          },
+          {
+            "scenario": "replay_attack",
+            "totalEvents": 763,
+            "circuitCount": 73,
+            "validTransitions": 504,
+            "totalViolations": 259,
+            "injectedAttacks": 96,
+            "detectedAttacks": 96,
+            "tp": 96,
+            "fp": 163,
+            "fn": 0,
+            "tn": 504,
+            "precision": 0.37065637065637064,
+            "recall": 1,
+            "f1": 0.5408450704225353,
+            "fpr": 0.24437781109445278,
+            "violationBreakdown": {
+              "CIRCUIT_HIJACK": 156,
+              "HANDSHAKE_SKIP": 84,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 11
+            },
+            "attackBreakdown": {
+              "HANDSHAKE_SKIP": 84,
+              "CIRCUIT_HIJACK": 12
+            }
+          },
+          {
+            "scenario": "replay_attack",
+            "totalEvents": 776,
+            "circuitCount": 74,
+            "validTransitions": 510,
+            "totalViolations": 266,
+            "injectedAttacks": 99,
+            "detectedAttacks": 99,
+            "tp": 99,
+            "fp": 167,
+            "fn": 0,
+            "tn": 510,
+            "precision": 0.37218045112781956,
+            "recall": 1,
+            "f1": 0.5424657534246575,
+            "fpr": 0.2466765140324963,
+            "violationBreakdown": {
+              "CIRCUIT_HIJACK": 160,
+              "HANDSHAKE_SKIP": 87,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 11
+            },
+            "attackBreakdown": {
+              "HANDSHAKE_SKIP": 87,
+              "CIRCUIT_HIJACK": 12
+            }
+          }
+        ]
+      },
+      "circuit_bypass": {
+        "runsCompleted": 3,
+        "precision": {
+          "mean": 0.46608674363270525,
+          "sd": 0.007265029389903218
+        },
+        "recall": {
+          "mean": 1,
+          "sd": 0
+        },
+        "f1": {
+          "mean": 0.6357906329066548,
+          "sd": 0.006781623168603727
+        },
+        "fpr": {
+          "mean": 0.2505358182252373,
+          "sd": 0.007145203678630221
+        },
+        "avgCircuits": 74,
+        "avgEvents": 825,
+        "runs": [
+          {
+            "scenario": "circuit_bypass",
+            "totalEvents": 837,
+            "circuitCount": 75,
+            "validTransitions": 508,
+            "totalViolations": 329,
+            "injectedAttacks": 150,
+            "detectedAttacks": 150,
+            "tp": 150,
+            "fp": 179,
+            "fn": 0,
+            "tn": 508,
+            "precision": 0.45592705167173253,
+            "recall": 1,
+            "f1": 0.6263048016701461,
+            "fpr": 0.26055312954876275,
+            "violationBreakdown": {
+              "CIRCUIT_BYPASS": 75,
+              "HANDSHAKE_SKIP": 81,
+              "CIRCUIT_HIJACK": 152,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 13
+            },
+            "attackBreakdown": {
+              "CIRCUIT_BYPASS": 75,
+              "HANDSHAKE_SKIP": 75
+            }
+          },
+          {
+            "scenario": "circuit_bypass",
+            "totalEvents": 813,
+            "circuitCount": 73,
+            "validTransitions": 504,
+            "totalViolations": 309,
+            "injectedAttacks": 146,
+            "detectedAttacks": 146,
+            "tp": 146,
+            "fp": 163,
+            "fn": 0,
+            "tn": 504,
+            "precision": 0.47249190938511326,
+            "recall": 1,
+            "f1": 0.6417582417582418,
+            "fpr": 0.24437781109445278,
+            "violationBreakdown": {
+              "CIRCUIT_BYPASS": 73,
+              "HANDSHAKE_SKIP": 73,
+              "CIRCUIT_HIJACK": 144,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 11
+            },
+            "attackBreakdown": {
+              "CIRCUIT_BYPASS": 73,
+              "HANDSHAKE_SKIP": 73
+            }
+          },
+          {
+            "scenario": "circuit_bypass",
+            "totalEvents": 825,
+            "circuitCount": 74,
+            "validTransitions": 510,
+            "totalViolations": 315,
+            "injectedAttacks": 148,
+            "detectedAttacks": 148,
+            "tp": 148,
+            "fp": 167,
+            "fn": 0,
+            "tn": 510,
+            "precision": 0.46984126984126984,
+            "recall": 1,
+            "f1": 0.6393088552915767,
+            "fpr": 0.2466765140324963,
+            "violationBreakdown": {
+              "CIRCUIT_BYPASS": 74,
+              "HANDSHAKE_SKIP": 74,
+              "CIRCUIT_HIJACK": 148,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 11
+            },
+            "attackBreakdown": {
+              "CIRCUIT_BYPASS": 74,
+              "HANDSHAKE_SKIP": 74
+            }
+          }
+        ]
+      }
+    },
+    "v1_3hop": {
+      "benign": {
+        "runsCompleted": 3,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": {
+          "mean": 0.03195068659319434,
+          "sd": 0.005200513405781612
+        },
+        "avgCircuits": 74,
+        "avgEvents": 677,
+        "runs": [
+          {
+            "scenario": "benign",
+            "totalEvents": 687,
+            "circuitCount": 75,
+            "validTransitions": 660,
+            "structuralViolations": 27,
+            "tp": 0,
+            "fp": 27,
+            "fn": 0,
+            "tn": 660,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.039301310043668124,
+            "violationBreakdown": {
+              "HANDSHAKE_SKIP": 6,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 13
+            }
+          },
+          {
+            "scenario": "benign",
+            "totalEvents": 667,
+            "circuitCount": 73,
+            "validTransitions": 648,
+            "structuralViolations": 19,
+            "tp": 0,
+            "fp": 19,
+            "fn": 0,
+            "tn": 648,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.02848575712143928,
+            "violationBreakdown": {
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 11
+            }
+          },
+          {
+            "scenario": "benign",
+            "totalEvents": 677,
+            "circuitCount": 74,
+            "validTransitions": 658,
+            "structuralViolations": 19,
+            "tp": 0,
+            "fp": 19,
+            "fn": 0,
+            "tn": 658,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.028064992614475627,
+            "violationBreakdown": {
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 11
+            }
+          }
+        ]
+      },
+      "replay_attack": {
+        "runsCompleted": 3,
+        "precision": {
+          "mean": 0.8214877779872382,
+          "sd": 0.021839319081159547
+        },
+        "recall": {
+          "mean": 1,
+          "sd": 0
+        },
+        "f1": {
+          "mean": 0.9018372953551061,
+          "sd": 0.013276298152152973
+        },
+        "fpr": {
+          "mean": 0.03195068659319434,
+          "sd": 0.005200513405781612
+        },
+        "avgCircuits": 74,
+        "avgEvents": 776,
+        "runs": [
+          {
+            "scenario": "replay_attack",
+            "totalEvents": 789,
+            "circuitCount": 75,
+            "validTransitions": 660,
+            "totalViolations": 129,
+            "injectedAttacks": 102,
+            "detectedAttacks": 102,
+            "tp": 102,
+            "fp": 27,
+            "fn": 0,
+            "tn": 660,
+            "precision": 0.7906976744186046,
+            "recall": 1,
+            "f1": 0.8831168831168831,
+            "fpr": 0.039301310043668124,
+            "violationBreakdown": {
+              "HANDSHAKE_SKIP": 96,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "CIRCUIT_HIJACK": 12,
+              "PREMATURE_DATA": 13
+            },
+            "attackBreakdown": {
+              "HANDSHAKE_SKIP": 90,
+              "CIRCUIT_HIJACK": 12
+            }
+          },
+          {
+            "scenario": "replay_attack",
+            "totalEvents": 763,
+            "circuitCount": 73,
+            "validTransitions": 648,
+            "totalViolations": 115,
+            "injectedAttacks": 96,
+            "detectedAttacks": 96,
+            "tp": 96,
+            "fp": 19,
+            "fn": 0,
+            "tn": 648,
+            "precision": 0.8347826086956521,
+            "recall": 1,
+            "f1": 0.909952606635071,
+            "fpr": 0.02848575712143928,
+            "violationBreakdown": {
+              "HANDSHAKE_SKIP": 84,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "CIRCUIT_HIJACK": 12,
+              "PREMATURE_DATA": 11
+            },
+            "attackBreakdown": {
+              "HANDSHAKE_SKIP": 84,
+              "CIRCUIT_HIJACK": 12
+            }
+          },
+          {
+            "scenario": "replay_attack",
+            "totalEvents": 776,
+            "circuitCount": 74,
+            "validTransitions": 658,
+            "totalViolations": 118,
+            "injectedAttacks": 99,
+            "detectedAttacks": 99,
+            "tp": 99,
+            "fp": 19,
+            "fn": 0,
+            "tn": 658,
+            "precision": 0.8389830508474576,
+            "recall": 1,
+            "f1": 0.9124423963133641,
+            "fpr": 0.028064992614475627,
+            "violationBreakdown": {
+              "HANDSHAKE_SKIP": 87,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "CIRCUIT_HIJACK": 12,
+              "PREMATURE_DATA": 11
+            },
+            "attackBreakdown": {
+              "HANDSHAKE_SKIP": 87,
+              "CIRCUIT_HIJACK": 12
+            }
+          }
+        ]
+      },
+      "circuit_bypass": {
+        "runsCompleted": 3,
+        "precision": {
+          "mean": 0.8728445522924361,
+          "sd": 0.017960093336769935
+        },
+        "recall": {
+          "mean": 1,
+          "sd": 0
+        },
+        "f1": {
+          "mean": 0.9320068282515552,
+          "sd": 0.010311395836121425
+        },
+        "fpr": {
+          "mean": 0.03195068659319434,
+          "sd": 0.005200513405781612
+        },
+        "avgCircuits": 74,
+        "avgEvents": 825,
+        "runs": [
+          {
+            "scenario": "circuit_bypass",
+            "totalEvents": 837,
+            "circuitCount": 75,
+            "validTransitions": 660,
+            "totalViolations": 177,
+            "injectedAttacks": 150,
+            "detectedAttacks": 150,
+            "tp": 150,
+            "fp": 27,
+            "fn": 0,
+            "tn": 660,
+            "precision": 0.847457627118644,
+            "recall": 1,
+            "f1": 0.9174311926605504,
+            "fpr": 0.039301310043668124,
+            "violationBreakdown": {
+              "CIRCUIT_BYPASS": 75,
+              "HANDSHAKE_SKIP": 81,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 13
+            },
+            "attackBreakdown": {
+              "CIRCUIT_BYPASS": 75,
+              "HANDSHAKE_SKIP": 75
+            }
+          },
+          {
+            "scenario": "circuit_bypass",
+            "totalEvents": 813,
+            "circuitCount": 73,
+            "validTransitions": 648,
+            "totalViolations": 165,
+            "injectedAttacks": 146,
+            "detectedAttacks": 146,
+            "tp": 146,
+            "fp": 19,
+            "fn": 0,
+            "tn": 648,
+            "precision": 0.8848484848484849,
+            "recall": 1,
+            "f1": 0.9389067524115756,
+            "fpr": 0.02848575712143928,
+            "violationBreakdown": {
+              "CIRCUIT_BYPASS": 73,
+              "HANDSHAKE_SKIP": 73,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 11
+            },
+            "attackBreakdown": {
+              "CIRCUIT_BYPASS": 73,
+              "HANDSHAKE_SKIP": 73
+            }
+          },
+          {
+            "scenario": "circuit_bypass",
+            "totalEvents": 825,
+            "circuitCount": 74,
+            "validTransitions": 658,
+            "totalViolations": 167,
+            "injectedAttacks": 148,
+            "detectedAttacks": 148,
+            "tp": 148,
+            "fp": 19,
+            "fn": 0,
+            "tn": 658,
+            "precision": 0.8862275449101796,
+            "recall": 1,
+            "f1": 0.9396825396825398,
+            "fpr": 0.028064992614475627,
+            "violationBreakdown": {
+              "CIRCUIT_BYPASS": 74,
+              "HANDSHAKE_SKIP": 74,
+              "REPLAY_ATTACK": 4,
+              "GHOST_CIRCUIT": 4,
+              "PREMATURE_DATA": 11
+            },
+            "attackBreakdown": {
+              "CIRCUIT_BYPASS": 74,
+              "HANDSHAKE_SKIP": 74
+            }
+          }
+        ]
+      }
+    },
+    "v2_2hop": {
+      "benign": {
+        "runsCompleted": 3,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": {
+          "mean": 0.2634058021763122,
+          "sd": 0.004391451148343417
+        },
+        "avgCircuits": 385,
+        "avgEvents": 3584.6666666666665,
+        "runs": [
+          {
+            "scenario": "benign",
+            "totalEvents": 3552,
+            "circuitCount": 382,
+            "validTransitions": 2628,
+            "structuralViolations": 924,
+            "tp": 0,
+            "fp": 924,
+            "fn": 0,
+            "tn": 2628,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.26013513513513514,
+            "violationBreakdown": {
+              "CIRCUIT_HIJACK": 745,
+              "REPLAY_ATTACK": 34,
+              "GHOST_CIRCUIT": 34,
+              "PREMATURE_DATA": 105,
+              "CREATE_FLOOD": 6
+            }
+          },
+          {
+            "scenario": "benign",
+            "totalEvents": 3620,
+            "circuitCount": 388,
+            "validTransitions": 2644,
+            "structuralViolations": 976,
+            "tp": 0,
+            "fp": 976,
+            "fn": 0,
+            "tn": 2644,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.2696132596685083,
+            "violationBreakdown": {
+              "CIRCUIT_HIJACK": 775,
+              "REPLAY_ATTACK": 39,
+              "GHOST_CIRCUIT": 39,
+              "HANDSHAKE_SKIP": 2,
+              "CREATE_FLOOD": 7,
+              "PREMATURE_DATA": 114
+            }
+          },
+          {
+            "scenario": "benign",
+            "totalEvents": 3582,
+            "circuitCount": 385,
+            "validTransitions": 2649,
+            "structuralViolations": 933,
+            "tp": 0,
+            "fp": 933,
+            "fn": 0,
+            "tn": 2649,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.26046901172529313,
+            "violationBreakdown": {
+              "CIRCUIT_HIJACK": 748,
+              "REPLAY_ATTACK": 33,
+              "GHOST_CIRCUIT": 33,
+              "CREATE_FLOOD": 9,
+              "HANDSHAKE_SKIP": 8,
+              "PREMATURE_DATA": 102
+            }
+          }
+        ]
+      }
+    },
+    "v2_3hop": {
+      "benign": {
+        "runsCompleted": 3,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": {
+          "mean": 0.053081771838192064,
+          "sd": 0.0019629438310199503
+        },
+        "avgCircuits": 385,
+        "avgEvents": 3584.6666666666665,
+        "runs": [
+          {
+            "scenario": "benign",
+            "totalEvents": 3552,
+            "circuitCount": 382,
+            "validTransitions": 3370,
+            "structuralViolations": 182,
+            "tp": 0,
+            "fp": 182,
+            "fn": 0,
+            "tn": 3370,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.051238738738738736,
+            "violationBreakdown": {
+              "REPLAY_ATTACK": 34,
+              "GHOST_CIRCUIT": 34,
+              "CIRCUIT_HIJACK": 3,
+              "PREMATURE_DATA": 105,
+              "CREATE_FLOOD": 6
+            }
+          },
+          {
+            "scenario": "benign",
+            "totalEvents": 3620,
+            "circuitCount": 388,
+            "validTransitions": 3418,
+            "structuralViolations": 202,
+            "tp": 0,
+            "fp": 202,
+            "fn": 0,
+            "tn": 3418,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.05580110497237569,
+            "violationBreakdown": {
+              "REPLAY_ATTACK": 39,
+              "GHOST_CIRCUIT": 39,
+              "HANDSHAKE_SKIP": 2,
+              "CIRCUIT_HIJACK": 1,
+              "CREATE_FLOOD": 7,
+              "PREMATURE_DATA": 114
+            }
+          },
+          {
+            "scenario": "benign",
+            "totalEvents": 3582,
+            "circuitCount": 385,
+            "validTransitions": 3395,
+            "structuralViolations": 187,
+            "tp": 0,
+            "fp": 187,
+            "fn": 0,
+            "tn": 3395,
+            "precision": null,
+            "recall": null,
+            "f1": null,
+            "fpr": 0.05220547180346175,
+            "violationBreakdown": {
+              "REPLAY_ATTACK": 33,
+              "GHOST_CIRCUIT": 33,
+              "CREATE_FLOOD": 9,
+              "CIRCUIT_HIJACK": 2,
+              "HANDSHAKE_SKIP": 8,
+              "PREMATURE_DATA": 102
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -22,6 +22,7 @@ const torStatic = JSON.parse(await fs.readFile(path.resolve(__dirname, "../exper
 const fext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions.json"), "utf8"));
 const fval = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions_validated.json"), "utf8"));
 const gext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/g_extensions.json"), "utf8"));
+const fourCell = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/shadow_results_4cell.json"), "utf8"));
 const fvalBy = Object.fromEntries(fval.comparisons.filter(v => v.B === "B2_GreedySC").map(v => [v.metric, v]));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
@@ -30,6 +31,7 @@ const sevSplit = trials.severitySumPerAlgo;
 // Helpers
 const pct = (x) => `${(x * 100).toFixed(2)}%`;
 const fmt = (x, d = 3) => isFinite(x) ? x.toFixed(d) : "—";
+const f4 = (x) => x == null ? "N/A" : (typeof x === "object" ? `${x.mean.toFixed(4)} ± ${x.sd.toFixed(4)}` : Number(x).toFixed(4));
 const sig = (p) => p < 0.001 ? "&lt;.001" : p.toFixed(4);
 const stars = (p) => p < 0.001 ? "***" : p < 0.01 ? "**" : p < 0.05 ? "*" : "";
 
@@ -322,6 +324,13 @@ sistematik literatür taraması (SLR, bkz. Bölüm 2) ile teyit edilmiştir.</p>
   harici bir Ubuntu 22.04 VirtualBox VM'inde 9-host kanonik topoloji üzerinde
   <b>bit bit reproducibility doğrulaması</b> (3 senaryo × 3 seed = 9 simülasyon;
   bkz. Bölüm 4.15).</li>
+  <li>Ampirik doğrulamanın spesifikasyon analizinin gözden kaçırdığı bir
+  <b>model hatasını yakalaması</b>: baz 2-hop FSM'in meşru çok-hop devre uzatmasını
+  yanlış-pozitif (CIRCUIT_HIJACK) saydığı gösterilmiş; Tor'un 3-hop davranışını
+  modelleyen iki geçişlik prensipli düzeltme, aynı gerçek event log'larında
+  yanlış-pozitif oranını
+  ${f4(fourCell.cells.v1_2hop.benign.fpr)} → ${f4(fourCell.cells.v1_3hop.benign.fpr)}
+  düşürürken recall = 1.0000 korunmuştur (bkz. Bölüm 4.16).</li>
 </ol>
 
 <h3>1.4 Tezin Yapısı</h3>
@@ -1141,6 +1150,14 @@ reproduction sonuçları (CI ortamı ile harici VM ortalama ± SD).</p>
 <tr><td>replay_attack</td><td>0.3686 ± 0.0040</td><td>1.0000 ± 0.0000</td><td>0.5386 ± 0.0043</td><td>0.2505 ± 0.0071</td></tr>
 <tr><td>circuit_bypass</td><td>0.4661 ± 0.0073</td><td>1.0000 ± 0.0000</td><td>0.6358 ± 0.0068</td><td>0.2505 ± 0.0071</td></tr>
 </table>
+<p class="no-indent"><i>Not:</i> Tablo 4.15'teki değerler, repoda commit edilmiş referans
+<code>shadow_results.json</code> dosyasının <i>orijinal muhasebesini</i> yansıtır;
+burada <i>benign</i> senaryosunda FPR yalnızca enjekte edilmiş saldırılara karşı
+ölçüldüğü için 0.0000 görünür. Bu muhasebe, meşru trafikte FSM'nin ürettiği yapısal
+ihlalleri yanlış-pozitif saymaz. Bölüm 4.16, aynı <i>gerçek</i> event log'larını
+hem dürüst yanlış-pozitif muhasebesiyle (benign yapısal ihlal = FP) hem de
+düzeltilmiş bir FSM modeliyle yeniden analiz eder ve bu rakamların neden ve nasıl
+değiştiğini gösterir.</p>
 
 <p class="no-indent"><b>Yorum.</b> Bu bulgu üç şeyi birlikte gösterir:
 (i) Shadow + Tor + harness + FSM analizi zinciri <i>seed-deterministiktir</i>;
@@ -1154,6 +1171,88 @@ operasyonel sağlamlığını desteklerken, Bölüm 6.2.1(B)'de değinilen tam-�
 runtime trace araştırmasının (modifiye tor client ile saldırı tetikleme, pcap
 seviyesinde cell decode) yerini tutmaz; bu adım Bölüm 6.3.3 yol haritasında
 korunmaktadır.</p>
+
+<div class="pagebreak"></div>
+
+<!-- ====================== BÖLÜM 4.16 — 2-hop → 3-hop FSM düzeltmesi ====================== -->
+<h3>4.16 Ampirik Doğrulamanın Bir Model Hatasını Yakalaması: 2-hop → 3-hop FSM Düzeltmesi</h3>
+
+<p>Bölüm 4.15'teki bit-bit reproducibility, FSM analiz hattının
+<i>deterministik</i> olduğunu kanıtlar; ancak determinizm tek başına modelin
+<i>doğru</i> olduğunu garanti etmez. Aynı gerçek Shadow event log'larının
+daha yakından incelenmesi, spesifikasyondan türetilen FSM'in kritik bir
+<i>model-gerçeklik uyumsuzluğu</i> içerdiğini ortaya koymuştur. Bu bölüm, hiçbir
+yeni Shadow koşusu yapılmadan (<code>experiments/reanalyze_fsm.mjs</code>;
+girdi: Bölüm 4.15'te commit edilmiş <code>events.jsonl</code> dosyaları) yapılan
+yeniden analizin bulgularını raporlar. Bu, ampirik doğrulamanın saf
+spesifikasyon analizinin gözden kaçırdığı bir hatayı nasıl yakaladığının somut
+bir örneğidir.</p>
+
+<p class="no-indent"><b>Tespit edilen hata.</b> Tezin baz FSM modeli, devre
+yaşam döngüsünü <i>2-hop</i> bir basitleştirme olarak ele alır: <code>SEND_EXTEND</code>
+yalnızca <code>CIRCUIT_BUILDING</code> durumundan geçerli kabul edilir. Oysa Tor,
+varsayılan olarak <i>3-hop</i> devre kurar; istemci ilk hop kurulduktan sonra
+ikinci ve üçüncü hop için tekrar <code>SEND_EXTEND</code> gönderir. Baz model bu
+<i>meşru</i> çok-hop uzatmayı (CIRCUIT_READY durumundan gelen <code>SEND_EXTEND</code>)
+<code>CIRCUIT_HIJACK</code> (hop enjeksiyonu) saldırısı olarak yanlış sınıflandırmıştır.
+Gerçek <i>benign</i> Shadow trafiğinde yapısal ihlallerin büyük çoğunluğu (koşu
+başına ~150 CIRCUIT_HIJACK) tam olarak bu yanlış-pozitiften kaynaklanmaktaydı.</p>
+
+<p class="no-indent"><b>Düzeltme.</b> 3-hop modeli, baz modele yalnızca iki geçiş
+ekler (kural silme veya gevşetme <i>değil</i>; Tor'un gerçek davranışını modelleyen
+prensipli bir tamamlama):</p>
+<pre style="background:#f4f4f4;border:1px solid #ccc;padding:6pt;font-size:9pt;">
+CIRCUIT_READY + SEND_EXTEND   → CIRCUIT_BUILDING
+CIRCUIT_READY + RECV_EXTENDED → CIRCUIT_READY</pre>
+<p class="no-indent">Bu, geçerli geçiş sayısını
+${fourCell.metadata.fsm_2hop_transitions}'ten
+${fourCell.metadata.fsm_3hop_transitions}'ye çıkarır.</p>
+
+<p class="no-indent"><b>Dürüst muhasebe.</b> Bu yeniden analiz, Bölüm 4.15'in
+aksine, <i>benign</i> trafikte FSM'nin ürettiği her yapısal ihlali açıkça
+yanlış-pozitif (FP) olarak sayar — çünkü tanım gereği saldırısız trafikte
+bulunan her ihlal bir yanlış alarmdır. Aşağıdaki tüm rakamlar bu dürüst muhasebe
+ile, ${fourCell.metadata.v1_topology.authorities + fourCell.metadata.v1_topology.relays + fourCell.metadata.v1_topology.clients}-host
+kanonik topolojide (${fourCell.metadata.v1_topology.authorities} authority +
+${fourCell.metadata.v1_topology.relays} relay +
+${fourCell.metadata.v1_topology.clients} istemci; Bölüm 4.15 ile aynı topoloji,
+<i>genişletme yok</i>) ve 3 senaryo × 3 seed üzerinden hesaplanmıştır.</p>
+
+<p class="no-indent"><b>Tablo 4.16.</b> Aynı gerçek event log'ları üzerinde
+2-hop (baz) ve 3-hop (düzeltilmiş) FSM altında tespit metrikleri
+(${fourCell.metadata.v1_topology.authorities + fourCell.metadata.v1_topology.relays + fourCell.metadata.v1_topology.clients}-host
+topoloji, ortalama ± SD, N = 3 seed).</p>
+<table>
+<tr><th>Senaryo</th><th>Model</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th></tr>
+<tr><td rowspan="2">benign</td><td>2-hop</td><td>N/A</td><td>N/A</td><td>N/A</td><td>${f4(fourCell.cells.v1_2hop.benign.fpr)}</td></tr>
+<tr><td>3-hop</td><td>N/A</td><td>N/A</td><td>N/A</td><td><b>${f4(fourCell.cells.v1_3hop.benign.fpr)}</b></td></tr>
+<tr><td rowspan="2">replay_attack</td><td>2-hop</td><td>${f4(fourCell.cells.v1_2hop.replay_attack.precision)}</td><td>${f4(fourCell.cells.v1_2hop.replay_attack.recall)}</td><td>${f4(fourCell.cells.v1_2hop.replay_attack.f1)}</td><td>${f4(fourCell.cells.v1_2hop.replay_attack.fpr)}</td></tr>
+<tr><td>3-hop</td><td><b>${f4(fourCell.cells.v1_3hop.replay_attack.precision)}</b></td><td>${f4(fourCell.cells.v1_3hop.replay_attack.recall)}</td><td><b>${f4(fourCell.cells.v1_3hop.replay_attack.f1)}</b></td><td><b>${f4(fourCell.cells.v1_3hop.replay_attack.fpr)}</b></td></tr>
+<tr><td rowspan="2">circuit_bypass</td><td>2-hop</td><td>${f4(fourCell.cells.v1_2hop.circuit_bypass.precision)}</td><td>${f4(fourCell.cells.v1_2hop.circuit_bypass.recall)}</td><td>${f4(fourCell.cells.v1_2hop.circuit_bypass.f1)}</td><td>${f4(fourCell.cells.v1_2hop.circuit_bypass.fpr)}</td></tr>
+<tr><td>3-hop</td><td><b>${f4(fourCell.cells.v1_3hop.circuit_bypass.precision)}</b></td><td>${f4(fourCell.cells.v1_3hop.circuit_bypass.recall)}</td><td><b>${f4(fourCell.cells.v1_3hop.circuit_bypass.f1)}</b></td><td><b>${f4(fourCell.cells.v1_3hop.circuit_bypass.fpr)}</b></td></tr>
+</table>
+
+<p class="no-indent"><b>Yorum.</b> Düzeltilmiş 3-hop model, meşru çok-hop
+uzatmayı artık doğru sınıflandırdığı için yanlış-pozitif oranını <i>benign</i>
+trafikte ${f4(fourCell.cells.v1_2hop.benign.fpr)}'ten
+${f4(fourCell.cells.v1_3hop.benign.fpr)}'ye düşürür; replay tespitinde precision
+${f4(fourCell.cells.v1_2hop.replay_attack.precision)} → ${f4(fourCell.cells.v1_3hop.replay_attack.precision)},
+F1 ${f4(fourCell.cells.v1_2hop.replay_attack.f1)} → ${f4(fourCell.cells.v1_3hop.replay_attack.f1)};
+circuit_bypass tespitinde precision ${f4(fourCell.cells.v1_2hop.circuit_bypass.precision)} →
+${f4(fourCell.cells.v1_3hop.circuit_bypass.precision)} olur. Her iki modelde de
+recall = 1.0000 korunur: düzeltme hiçbir gerçek saldırıyı kaçırmaz, yalnızca
+yanlış alarmları temizler. Bu bulgu metodolojik olarak önemlidir — <i>ampirik
+Shadow doğrulaması, saf δ-matris analizinin tek başına ortaya çıkaramayacağı bir
+model eksikliğini görünür kılmıştır</i>.</p>
+
+<p class="no-indent"><b>Dürüst sınırlılık.</b> Tablo 4.16'da <i>benign</i> FPR
+rakamları tamamen gerçek Shadow/Tor trafiğine dayanır. Buna karşılık
+replay_attack ve circuit_bypass senaryolarındaki precision/recall/F1 değerleri,
+gerçek benign trafiğe <i>sentetik olarak enjekte edilmiş</i> saldırı olayları
+üzerinden hesaplanmıştır (modifiye edilmiş Tor istemcisiyle gerçek saldırı
+tetikleme değil; bkz. Bölüm 6.2.1(B) ve 6.3.3). Dolayısıyla bu tablo, tespit
+mantığının <i>doğruluğunu</i> ve düzeltmenin <i>etkisini</i> gösterir; gerçek
+ağda gözlemlenmiş saldırı tabanlı bir saha çalışması iddiası taşımaz.</p>
 
 <div class="pagebreak"></div>
 
@@ -1171,7 +1270,7 @@ korunmaktadır.</p>
 <h2>6. Sonuç ve Gelecek Çalışmalar</h2>
 
 <h3>6.1 Katkıların Yeniden Değerlendirilmesi</h3>
-<p>Bölüm 1.3'te beş katkı listelenmiş, bu tezde hepsi gerçekleştirilmiştir:</p>
+<p>Bölüm 1.3'te altı katkı listelenmiş, bu tezde hepsi gerçekleştirilmiştir:</p>
 <ul>
   <li><b>Katkı 1 (tam δ-matrisi):</b> Ek A'da ${totalValid} geçerli ikili tek tablo olarak
   verilmiştir; literatürde benzer bir derleme mevcut değildir (G1).</li>
@@ -1189,6 +1288,15 @@ korunmaktadır.</p>
   <i>tüm bilimsel alanlarda bit bit eşleştiği</i> gösterilmiştir. Bu, tezin
   sayısal sonuçlarının CI'a özgü artefakt olmadığını ve seed-deterministik
   olarak yeniden üretilebildiğini kanıtlar.</li>
+  <li><b>Katkı 6 (ampirik doğrulamanın model hatasını yakalaması):</b> Bölüm 4.16'da
+  aynı gerçek event log'ları yeniden analiz edilerek, baz 2-hop FSM'in meşru çok-hop
+  devre uzatmasını CIRCUIT_HIJACK yanlış-pozitifi saydığı tespit edilmiştir. Tor'un
+  3-hop davranışını modelleyen iki geçişlik prensipli düzeltme, dürüst yanlış-pozitif
+  muhasebesi altında benign FPR'yi ${f4(fourCell.cells.v1_2hop.benign.fpr)} →
+  ${f4(fourCell.cells.v1_3hop.benign.fpr)}, replay F1'i
+  ${f4(fourCell.cells.v1_2hop.replay_attack.f1)} → ${f4(fourCell.cells.v1_3hop.replay_attack.f1)}
+  iyileştirmiş, recall = 1.0000 korunmuştur. Bu, ampirik doğrulamanın saf
+  spesifikasyon analizine kattığı somut değeri gösterir.</li>
 </ul>
 
 <h3>6.2 Sınırlılıklar</h3>
@@ -1349,20 +1457,22 @@ aşağıdaki tabloda açıkça gösterilmiştir:</p>
 <tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S6</td>
 <td style="padding:4pt;border:1px solid #999;">Saldırı senaryolarıyla gerçek FPR/TPR ölçümü</td>
 <td style="padding:4pt;border:1px solid #999;">Shadow içinde modifiye tor client ile 4 saldırı sınıfı tetikleme + classifyInvalid doğrulama</td>
-<td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (yol haritası: 6.3.3, Adım 9)</td></tr>
+<td style="padding:4pt;border:1px solid #999;"><b>Kısmen</b>: benign FPR gerçek Shadow trafiğinden ölçüldü (Bölüm 4.16); saldırı precision/recall ise gerçek trafiğe sentetik enjeksiyonla hesaplandı. Modifiye tor client ile gerçek saldırı tetikleme hâlâ yapılmadı (yol haritası: 6.3.3, Adım 9)</td></tr>
 <tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S7</td>
 <td style="padding:4pt;border:1px solid #999;">Üretim Tor relay'inde alan dağıtımı</td>
 <td style="padding:4pt;border:1px solid #999;">Tor Project ile entegrasyon, gerçek anonim trafikte uzun dönem ölçüm</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (Tor Project işbirliği gerektirir)</td></tr>
 </table>
 
-<p>Mevcut çalışma <b>S1-S4 seviyelerini tamamlamıştır</b>; bu, akademik metodoloji
+<p>Mevcut çalışma <b>S1-S5 seviyelerini tamamlamış, S6'yı kısmen gerçekleştirmiştir</b>
+(benign FPR gerçek Shadow trafiğinden ölçülmüş, saldırı metrikleri sentetik
+enjeksiyonla hesaplanmıştır; bkz. Bölüm 4.16); bu, akademik metodoloji
 çalışması için yeterli olmakla birlikte güvenlik aracı olarak nihai
-değerlendirmeyi içermez. <b>S5-S6 geçişi tek bir kavramsal sıçrama değil,
+değerlendirmeyi içermez. <b>Tam S6-S7 geçişi tek bir kavramsal sıçrama değil,
 6.3.3'te 10 adıma ayrılmış mühendislik işidir</b>; her adımın girdisi, çıktısı,
 mevcut repo dosyalarına bağlantısı ve süre tahmini somut olarak verilmiştir.
 Bu yapı, çalışmanın olgunluk seviyesinin <i>belirsizlik nedeniyle değil,
-zaman ve ortam kısıtı nedeniyle</i> S4'te durduğunu kanıtlar.</p>
+zaman ve ortam kısıtı nedeniyle</i> S5'te (S6 kısmen) durduğunu kanıtlar.</p>
 
 <p><b>Üç temel teknik dönüşüm.</b> Metodolojik prototipten gerçek çalışmaya
 geçiş, koddaki üç noktada yapılacak <i>oracle değişimi</i> ile sağlanır;
@@ -1419,9 +1529,9 @@ gerçekçi süre tahminleri:</p>
 
 <p>Bu üç profil için süreler birbirinden çok uzak değildir; bu, kritik darboğazın
 <i>insan zekası ve algoritma kararları değil, ortam erişimi ve simülasyon
-çalışma süresi</i> olduğunu gösterir. Mevcut çalışma S1-S4'ün <b>tek-kişi,
-tek-oturum, sandbox-kısıtlı bir ortamda tamamlanabilir maksimum</b> olduğunu
-ortaya koymaktadır.</p>
+çalışma süresi</i> olduğunu gösterir. Mevcut çalışma S1-S5'in (ve S6'nın kısmi
+bölümünün) <b>tek-kişi, tek-oturum, sandbox-kısıtlı bir ortamda tamamlanabilir
+maksimum</b> olduğunu ortaya koymaktadır.</p>
 
 <h4>6.3.2 Konu Bazlı Genişletmeler</h4>
 <ol>
@@ -1530,7 +1640,7 @@ değer taşır: teyit, modelin dış geçerliğini güçlendirir; düzeltme, Bö
 <h4>6.3.4 Mevcut Çalışmanın Konumu</h4>
 <p>Bölüm 4.10-4.14 ve 6.2.1, bu çalışmanın <b>simülasyon-doğrulamalı metodoloji önerisi
 + üretim kaynak kodundan yapısal kanıt + algoritma-doğrulamalı L*</b> seviyesinde
-(yukarıdaki S1-S4) olduğunu açıkça konumlandırır. 6.3.3 planı tamamlandığında,
+(yukarıdaki S1-S5, S6 kısmen) olduğunu açıkça konumlandırır. 6.3.3 planı tamamlandığında,
 çalışma <b>runtime-doğrulamalı güvenlik aracı</b> seviyesine taşınır. Bu iki seviye arasındaki
 fark, tezin katkısını geçersiz kılmaz; aksine, mevcut metodoloji + algoritma + istatistik
 + statik FSM + L* zincirinin <i>kullanılmaya hazır</i> olduğunu ve sonraki adımın yalnızca
