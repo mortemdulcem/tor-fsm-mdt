@@ -1,0 +1,59 @@
+tez@tor-fsm-ubuntu:/tmp/cf_test$ find /tmp/cf_test -name 'torrc*'
+echo "=== torrc Log satirlari ==="
+find /tmp/cf_test -name 'torrc*' -exec grep -Hn -i "log" {} \;
+echo "=== torclient logunda seviye dagilimi ==="
+LOG=/tmp/cf_test/shadow.data/hosts/torclient/tor.1000.stdout
+grep -oE "\[(debug|info|notice|warn|err)\]" "$LOG" | sort | uniq -c
+echo "=== create/circuit gecen satir var mi ==="
+grep -icE "create|first skin|circuit built" "$LOG"
+grep -iE "sending create|first skin|circuit_send_first" "$LOG" | head
+/tmp/cf_test/shadow.data/hosts/relay1/torrc
+/tmp/cf_test/shadow.data/hosts/relay1/torrc-defaults
+/tmp/cf_test/shadow.data/hosts/4uthority/torrc
+/tmp/cf_test/shadow.data/hosts/4uthority/torrc-defaults
+/tmp/cf_test/shadow.data/hosts/relay3/torrc
+/tmp/cf_test/shadow.data/hosts/relay3/torrc-defaults
+/tmp/cf_test/shadow.data/hosts/relay2/torrc
+/tmp/cf_test/shadow.data/hosts/relay2/torrc-defaults
+/tmp/cf_test/shadow.data/hosts/exit1/torrc
+/tmp/cf_test/shadow.data/hosts/exit1/torrc-defaults
+/tmp/cf_test/shadow.data/hosts/exit2/torrc
+/tmp/cf_test/shadow.data/hosts/exit2/torrc-defaults
+/tmp/cf_test/shadow.data/hosts/torclient/torrc
+/tmp/cf_test/shadow.data/hosts/torclient/torrc-defaults
+/tmp/cf_test/shadow.data/hosts/relay4/torrc
+/tmp/cf_test/shadow.data/hosts/relay4/torrc-defaults
+/tmp/cf_test/shadow.data.template/hosts/relay1/torrc
+/tmp/cf_test/shadow.data.template/hosts/relay1/torrc-defaults
+/tmp/cf_test/shadow.data.template/hosts/4uthority/torrc
+/tmp/cf_test/shadow.data.template/hosts/4uthority/torrc-defaults
+/tmp/cf_test/shadow.data.template/hosts/relay3/torrc
+/tmp/cf_test/shadow.data.template/hosts/relay3/torrc-defaults
+/tmp/cf_test/shadow.data.template/hosts/relay2/torrc
+/tmp/cf_test/shadow.data.template/hosts/relay2/torrc-defaults
+/tmp/cf_test/shadow.data.template/hosts/exit1/torrc
+/tmp/cf_test/shadow.data.template/hosts/exit1/torrc-defaults
+/tmp/cf_test/shadow.data.template/hosts/exit2/torrc
+/tmp/cf_test/shadow.data.template/hosts/exit2/torrc-defaults
+/tmp/cf_test/shadow.data.template/hosts/torclient/torrc
+/tmp/cf_test/shadow.data.template/hosts/torclient/torrc-defaults
+/tmp/cf_test/shadow.data.template/hosts/relay4/torrc
+/tmp/cf_test/shadow.data.template/hosts/relay4/torrc-defaults
+=== torrc Log satirlari ===
+=== torclient logunda seviye dagilimi ===
+    746 [info]
+   2957 [notice]
+      7 [warn]
+=== create/circuit gecen satir var mi ===
+33
+Jan 01 00:15:01.401 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE_FAST cell to '<unnamed>'
+Jan 01 00:15:02.122 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE_FAST cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 at 11.0.0.7'
+Jan 01 00:15:03.401 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+Jan 01 00:15:04.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+Jan 01 00:15:05.401 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3FB0BD7827C760FE7F9DD810FCB10322D63AB4CF~relay1 [HNyAJRdDGQ6ZsKX9+4qoQ2kl3dyMuSbKi85g1x8tIDY] at 11.0.0.5'
+Jan 01 00:15:06.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+Jan 01 00:15:07.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3FB0BD7827C760FE7F9DD810FCB10322D63AB4CF~relay1 [HNyAJRdDGQ6ZsKX9+4qoQ2kl3dyMuSbKi85g1x8tIDY] at 11.0.0.5'
+Jan 01 00:25:01.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+Jan 01 00:25:58.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE cell to '$3BAEAC8E24C87B4E536484837B67966487A93214~relay3 [er01Vk9KdOgw8cowq7AW/fX6cvEvkxqytBGkSrpzQS8] at 11.0.0.7'
+tez@tor-fsm-ubuntu:/tmp/cf_test$ ^C
+tez@tor-fsm-ubuntu:/tmp/cf_test$ 
