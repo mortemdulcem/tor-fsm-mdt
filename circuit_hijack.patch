@@ -38,7 +38,8 @@ Two hunks:
    memset(&cc, 0, sizeof(cc));
  
 +  if (getenv("TOR_FSM_ATTACK_CIRCUIT_HIJACK") && circ->cpath &&
-+      circ->cpath->state == CPATH_STATE_OPEN && circ->base_.n_circ_id) {
++      circ->cpath->state == CPATH_STATE_OPEN && circ->base_.n_circ_id &&
++      circ->base_.n_chan) {  /* n_chan guard: deref'd below for identity + queue */
 +    create_cell_t hcc; onion_handshake_state_t hst; cell_t hcell; int hf, hl;
 +    const node_t *hn;
 +    memset(&hcc,0,sizeof(hcc)); memset(&hst,0,sizeof(hst));

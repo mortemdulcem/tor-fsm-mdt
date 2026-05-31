@@ -76,10 +76,21 @@ the recognized line from another function (that would be a fabricated log = forb
 is why only some attack classes are realizable; the FSM *state* at detection is driven by log
 LINE ORDER, not wall-clock.
 
+## Architect verdict (both real attacks): PASS, scope caveat
+- Frame in thesis as "fault-injected real protocol violations in MODIFIED Tor, env-gated, benign-by-default";
+  do NOT claim wild/remote exploitability. Two validated REAL attacks (CREATE_FLOOD, CIRCUIT_HIJACK) +
+  remaining classes explicitly labeled synthetic/spec-derived = most defensible thesis strategy.
+- PREMATURE_DATA benign 21 vs attack 11 = collateral distribution shift from altered timing, NOT an
+  improvement; report normalized (per-circuit / per-active-second) with CIs across repeated runs.
+- Minor hardening (defensive only; run already exits 0 since circuit is OPEN→n_chan non-null):
+  add `circ->base_.n_chan` to the gate condition; append_cell_to_circuit_queue return is ignored.
+
 ## Extending to other attack types (same env-gate pattern, benign-by-default)
 - **CIRCUIT_HIJACK (CRITICAL) — DONE & VERIFIED (non-destructive variant, run exits 0).**
-  Result: 9 circuits → CIRCUIT_HIJACK 9 (one per circuit); REPLAY/GHOST/PREMATURE stay at benign
-  baseline (3/3/11), CREATE_FLOOD 0. n_circ_id is on the BASE circuit: use `circ->base_.n_circ_id`
+  Result: attack(flag on)=9 circuits→CIRCUIT_HIJACK 9; benign(SAME binary, flag off, env var fully
+  REMOVED — note getenv("")!=NULL so setting "" does NOT disable)=9 circuits→CIRCUIT_HIJACK 0. Only
+  delta is CIRCUIT_HIJACK 0→9 (REPLAY/GHOST 3/3 both; PREMATURE 21 benign vs 11 attack — baseline
+  artifact, not the signal). n_circ_id is on the BASE circuit: use `circ->base_.n_circ_id`
   (origin_circuit_t has no n_circ_id member). create_cell_format + append_cell_to_circuit_queue ARE
   declared in circuitbuild.c (no extra include needed). History below kept for context:
   In `circuit_finish_handshake`, after first hop OPEN (`hop == circ->cpath`, circuit BUILDING),
