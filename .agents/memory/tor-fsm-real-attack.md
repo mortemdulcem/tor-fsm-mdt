@@ -77,7 +77,11 @@ is why only some attack classes are realizable; the FSM *state* at detection is 
 LINE ORDER, not wall-clock.
 
 ## Extending to other attack types (same env-gate pattern, benign-by-default)
-- **CIRCUIT_HIJACK (CRITICAL) — DETECTION works; needs non-destructive variant for a clean run.**
+- **CIRCUIT_HIJACK (CRITICAL) — DONE & VERIFIED (non-destructive variant, run exits 0).**
+  Result: 9 circuits → CIRCUIT_HIJACK 9 (one per circuit); REPLAY/GHOST/PREMATURE stay at benign
+  baseline (3/3/11), CREATE_FLOOD 0. n_circ_id is on the BASE circuit: use `circ->base_.n_circ_id`
+  (origin_circuit_t has no n_circ_id member). create_cell_format + append_cell_to_circuit_queue ARE
+  declared in circuitbuild.c (no extra include needed). History below kept for context:
   In `circuit_finish_handshake`, after first hop OPEN (`hop == circ->cpath`, circuit BUILDING),
   gated by `TOR_FSM_ATTACK_CIRCUIT_HIJACK`, re-call `circuit_send_first_onion_skin(circ)` → emits
   a 2nd `circuit_send_first_onion_skin(): ...sending CREATE` log AFTER the `circuit_finish_handshake():
