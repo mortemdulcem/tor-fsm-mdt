@@ -1,0 +1,144 @@
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ D=$(ls -d /home/ubuntu/shadow/examples/docs/tor 2>/dev/null || dirname "$(find ~ /home -path '*examples/docs/tor/shadow.yaml' 2>/dev/null | head -1)")
+echo "DIR=$D"
+cat "$D/shadow.yaml"
+DIR=/home/tez/shadow/examples/docs/tor
+general:
+  stop_time: 30 min
+network:
+  graph:
+    type: gml
+    inline: |
+      graph [
+        directed 0
+        node [
+          id 0
+          host_bandwidth_down "1 Gbit"
+          host_bandwidth_up "1 Gbit"
+        ]
+        edge [
+          source 0
+          target 0
+          latency "50 ms"
+          jitter "0 ms"
+          packet_loss 0.0
+        ]
+      ]
+hosts:
+  fileserver:
+    network_node_id: 0
+    processes:
+    - path: tgen
+      # See https://shadow.github.io/docs/guide/compatibility_notes.html#libopenblas
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.server.graphml.xml
+      start_time: 1
+      expected_final_state: running
+  4uthority:
+    network_node_id: 0
+    ip_addr: 100.0.0.1
+    processes:
+    - path: tor
+      args: --Address 4uthority --Nickname 4uthority
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 1
+      expected_final_state: running
+  exit1:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit1 --Nickname exit1
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit2:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit2 --Nickname exit2
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay1:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay1 --Nickname relay1
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay2:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay2 --Nickname relay2
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay3:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay3 --Nickname relay3
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay4:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay4 --Nickname relay4
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  client:
+    network_node_id: 0
+    processes:
+    - path: tgen
+      # See https://shadow.github.io/docs/guide/compatibility_notes.html#libopenblas
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.client.graphml.xml
+      start_time: 600
+  torclient:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address torclient --Nickname torclient
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      # See https://shadow.github.io/docs/guide/compatibility_notes.html#libopenblas
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ grep -nE "SHADOW_EXAMPLE_DIR|TOR_FSM_ATTACK|inject|CREATE_FLOOD|/tor\b|attack" ~/tor-fsm-mdt/experiments/shadow_harness.mjs | head -30harness.mjs | head -30
+222:        injected: ev.injected || false,
+223:        attackType: ev.attackType || null,
+282:// 3) Attack injection
+285:function injectReplayAttack(circuitMap) {
+287:  let injectedCount = 0;
+302:            injected: true,
+303:            attackType: "REPLAY_ATTACK",
+305:          injectedCount++;
+313:  return { circuits: modified, injectedCount };
+316:function injectCircuitBypass(circuitMap) {
+318:  let injectedCount = 0;
+331:            injected: true,
+332:            attackType: "CIRCUIT_BYPASS",
+338:            injected: true,
+339:            attackType: "HANDSHAKE_SKIP",
+342:        injectedCount += 2;
+349:  return { circuits: modified, injectedCount };
+356:function computeMetrics(fsmResult, scenario, injectedCount) {
+379:  const attackViolations = fsmResult.violations.filter((v) => v.injected);
+380:  const benignViolations = fsmResult.violations.filter((v) => !v.injected);
+382:  const tp = attackViolations.length;
+383:  const fn = Math.max(0, injectedCount - tp);
+401:    injectedAttacks: injectedCount,
+412:    attackBreakdown: breakdownViolations(attackViolations),
+429:const SHADOW_EXAMPLE_DIR = "/home/ubuntu/shadow/examples/docs/tor";
+437:  const srcDir = SHADOW_EXAMPLE_DIR;
+520:  const SCENARIOS = ["benign", "replay_attack", "circuit_bypass"];
+581:      let injectedCount = 0;
+583:      if (scenario === "replay_attack") {
+584:        const result = injectReplayAttack(circuitMap);
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ 
