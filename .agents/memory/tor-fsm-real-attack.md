@@ -128,6 +128,27 @@ v3 succeeds via a DIFFERENT, genuine path: inject the early cell from WITHIN cir
 - **Status: THREE attacks real+verified (native-log, non-circular): CREATE_FLOOD, CIRCUIT_HIJACK,
   PREMATURE_DATA.** Files on premature-transport branch: experiments/premature_v3.sh (+ premature_detect.mjs).
 
+## Multi-seed metrics pipeline (full_pipeline.sh + metrics.mjs + detect_json.mjs)
+- **Patch files are NOT clean `patch -p1` diffs.** `create_flood.patch` is a near-clean unified diff,
+  but `circuit_hijack.patch` and `premature_data.patch` are PROSE + partial/truncated hunks
+  (premature_data.patch is the STALE v1 circuituse.c path, superseded by the v3 perl hook in
+  premature_v3.sh). So do NOT auto-`patch -p1` them. `full_pipeline.sh` instead ASSUMES the VM tor
+  source already has the hooks (greps circuitbuild.c for TOR_FSM_ATTACK_CREATE_FLOOD /
+  _CIRCUIT_HIJACK / TOR_FSM_PREMATURE_SEND) and SKIPS any attack whose hook is absent — safe, never
+  edits the working source.
+- **Confusion-matrix methodology (honest):** unit = client circuit; label = scenario (attack=+,
+  benign=−); prediction = FSM flags that type on the circuit. Recall is HIGH BY CONSTRUCTION (the
+  detector keys on the event the attack produces), so the scientifically meaningful number is the
+  benign FALSE-POSITIVE RATE, not recall. CREATE_FLOOD/CIRCUIT_HIJACK get a clean per-seed confusion
+  matrix (non-circular: organic CREATE log). PREMATURE is reported SEPARATELY: native relay
+  zero-stream-id count (attack vs benign) as the headline, begin-noise FPR (noise/circuits) as the
+  honest detector FPR, marker recall only with a "semi-circular" caveat.
+- **Seeds** set via Shadow `general.seed` (python text-edit in full_pipeline.sh, structure-agnostic).
+  metrics.mjs aggregates mean±SD±95% t-CI (n=3 → wide; hardcoded t-table). `node metrics.mjs
+  --selftest` validates the formulas with non-real numbers (clearly labelled).
+- Files live on `premature-transport` branch: full_pipeline.sh, detect_json.mjs, metrics.mjs,
+  attack_status.md (the gerçek/sentetik/gerçekleştirilemez classification table for the thesis).
+
 ## NOT genuinely realizable: HANDSHAKE_SKIP (structural blocker)
 - **HANDSHAKE_SKIP** needs SEND_CREATE in IDLE/CONNECTING or SEND_EXTEND in CREATE_SENT. Tor sends the
   first CREATE only AFTER the channel/TLS is OPEN (circuit_send_first_onion_skin is gated on channel
