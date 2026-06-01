@@ -1,0 +1,57 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ git checkout attack-scenarios -- experiments/shadow_harness.mjs
+fatal: geçersiz başvuru: attack-scenarios
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cat experiments/runs/results.jsonl
+echo "----"
+cat > /tmp/inspect.mjs <<'EOF'
+import { parseTorHostLog, runFsmOnAllCircuits } from "./experiments/shadow_harness.mjs";
+import { readFileSync } from "node:fs";
+const log = "experiments/runs/circuit_hijack/seed42/hosts/torclient/tor.1000.stdout";
+const c = parseTorHostLog(readFileSync(log, "utf8"), "torclient");
+const f = runFsmOnAllCircuits(c);
+console.log("circuitCount:", f.circuitCount, "violations:", f.violations.length);
+console.log("keys:", Object.keys(f.violations[0] || {}));
+console.log("sample:", JSON.stringify(f.violations[0]));
+EOF
+npx tsx /tmp/inspect.mjs
+{"attack":"create_flood","seed":42,"scenario":"attack","circuits":9,"flagged":9,"flaggedCircuits":null,"native":18,"markers":0,"types":{"CREATE_FLOOD":9,"PREMATURE_DATA":4,"REPLAY_ATTACK":2,"GHOST_CIRCUIT":2,"CIRCUIT_HIJACK":12}}
+{"attack":"create_flood","seed":42,"scenario":"benign","circuits":9,"flagged":0,"flaggedCircuits":null,"native":9,"markers":0,"types":{"PREMATURE_DATA":5,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12}}
+{"attack":"circuit_hijack","seed":42,"scenario":"attack","circuits":9,"flagged":21,"flaggedCircuits":null,"native":18,"markers":0,"types":{"CIRCUIT_HIJACK":21,"PREMATURE_DATA":4,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3}}
+{"attack":"circuit_hijack","seed":42,"scenario":"benign","circuits":9,"flagged":12,"flaggedCircuits":null,"native":9,"markers":0,"types":{"PREMATURE_DATA":5,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12}}
+{"attack":"premature_data","seed":42,"scenario":"attack","circuits":9,"flagged":17,"flaggedCircuits":null,"native":12,"markers":12,"types":{"PREMATURE_DATA":17,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12},"prem_injected":5,"prem_noise":12}
+{"attack":"premature_data","seed":42,"scenario":"benign","circuits":9,"flagged":5,"flaggedCircuits":null,"native":0,"markers":0,"types":{"PREMATURE_DATA":5,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12},"prem_injected":0,"prem_noise":5}
+{"attack":"create_flood","seed":137,"scenario":"attack","circuits":9,"flagged":9,"flaggedCircuits":null,"native":18,"markers":0,"types":{"CREATE_FLOOD":9,"PREMATURE_DATA":5,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12}}
+{"attack":"create_flood","seed":137,"scenario":"benign","circuits":9,"flagged":0,"flaggedCircuits":null,"native":9,"markers":0,"types":{"PREMATURE_DATA":4,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12}}
+{"attack":"circuit_hijack","seed":137,"scenario":"attack","circuits":10,"flagged":22,"flaggedCircuits":null,"native":20,"markers":0,"types":{"CIRCUIT_HIJACK":22,"PREMATURE_DATA":6,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3}}
+{"attack":"circuit_hijack","seed":137,"scenario":"benign","circuits":9,"flagged":12,"flaggedCircuits":null,"native":9,"markers":0,"types":{"PREMATURE_DATA":4,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12}}
+{"attack":"premature_data","seed":137,"scenario":"attack","circuits":9,"flagged":9,"flaggedCircuits":null,"native":12,"markers":12,"types":{"PREMATURE_DATA":9,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12},"prem_injected":5,"prem_noise":4}
+{"attack":"premature_data","seed":137,"scenario":"benign","circuits":9,"flagged":4,"flaggedCircuits":null,"native":0,"markers":0,"types":{"PREMATURE_DATA":4,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12},"prem_injected":0,"prem_noise":4}
+{"attack":"create_flood","seed":2718,"scenario":"attack","circuits":9,"flagged":9,"flaggedCircuits":null,"native":18,"markers":0,"types":{"CREATE_FLOOD":9,"PREMATURE_DATA":5,"REPLAY_ATTACK":2,"GHOST_CIRCUIT":2,"CIRCUIT_HIJACK":12}}
+{"attack":"create_flood","seed":2718,"scenario":"benign","circuits":9,"flagged":0,"flaggedCircuits":null,"native":9,"markers":0,"types":{"PREMATURE_DATA":4,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12}}
+{"attack":"circuit_hijack","seed":2718,"scenario":"attack","circuits":8,"flagged":20,"flaggedCircuits":null,"native":16,"markers":0,"types":{"CIRCUIT_HIJACK":20,"PREMATURE_DATA":3,"REPLAY_ATTACK":2,"GHOST_CIRCUIT":2}}
+{"attack":"circuit_hijack","seed":2718,"scenario":"benign","circuits":9,"flagged":12,"flaggedCircuits":null,"native":9,"markers":0,"types":{"PREMATURE_DATA":4,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12}}
+{"attack":"premature_data","seed":2718,"scenario":"attack","circuits":9,"flagged":11,"flaggedCircuits":null,"native":12,"markers":12,"types":{"PREMATURE_DATA":11,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":14},"prem_injected":7,"prem_noise":4}
+{"attack":"premature_data","seed":2718,"scenario":"benign","circuits":9,"flagged":4,"flaggedCircuits":null,"native":0,"markers":0,"types":{"PREMATURE_DATA":4,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12},"prem_injected":0,"prem_noise":4}
+----
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/tmp/experiments/shadow_harness.mjs' imported from /tmp/inspect.mjs
+Did you mean to import "../home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs"?
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:861:10)
+    at defaultResolve (node:internal/modules/esm/resolve:985:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///home/tez/tor-fsm-mdt/node_modules/tsx/dist/esm/index.mjs?1780313117093:2:3744)
+    at resolveDirectory (file:///home/tez/tor-fsm-mdt/node_modules/tsx/dist/esm/index.mjs?1780313117093:2:4243)
+    at resolveTsPaths (file:///home/tez/tor-fsm-mdt/node_modules/tsx/dist/esm/index.mjs?1780313117093:2:4984)
+    at resolve (file:///home/tez/tor-fsm-mdt/node_modules/tsx/dist/esm/index.mjs?1780313117093:2:5361)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at Hooks.resolve (node:internal/modules/esm/hooks:240:30) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///tmp/experiments/shadow_harness.mjs'
+}
+
+Node.js v22.22.2
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+
