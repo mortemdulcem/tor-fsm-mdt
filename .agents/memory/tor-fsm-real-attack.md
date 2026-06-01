@@ -117,16 +117,16 @@ v3 succeeds via a DIFFERENT, genuine path: inject the early cell from WITHIN cir
   consequence of the real cell — NOT a marker. Detection = grep ALL host logs (relays) for that line:
   attack>0, benign=0. Same non-circular logic as CREATE_FLOOD keying on the native duplicate SEND_CREATE.
   premature_v3.sh step 6 now reports this as the PRIMARY signal; marker+FSM are cross-check/illustrative.
-- **PENDING VM VERIFICATION:** LOG_PROTOCOL_WARN defaults to LOG_INFO (ProtocolWarnings off); the line
-  shows only if the RELAY hosts log at info. The shadow tor example's `conf/tor.common.torrc` sets
-  `Log info stdout` (shared by relays) so it should appear; if [NATIVE SIGNAL] is 0 in BOTH runs, relays
-  aren't at info → add `Log info` to relay torrc and re-run. Not yet confirmed on VM.
+- **VM-VERIFIED (non-circular):** native line appears on `relay1` (first hop), emitted by Tor's own
+  `handle_relay_cell_command()` (the relay.c:1677 message; func name is the wrapper, still native).
+  ATTACK = 12 lines / 1 host, BENIGN = 0. 1:1 with the 12 markers → each real premature cell really
+  reached relay1 and Tor rejected it. LOG_PROTOCOL_WARN→INFO worked because the shadow tor example's
+  `conf/tor.common.torrc` (`Log info stdout`) applies to relays too. PREMATURE_DATA now stands on the
+  SAME non-circular footing as CREATE_FLOOD/CIRCUIT_HIJACK.
 - **Framing:** fault-injected real protocol violation in MODIFIED Tor, env-gated, benign-by-default —
   NOT a claim that a stock client or remote attacker emits this.
-- **Status: CREATE_FLOOD + CIRCUIT_HIJACK = real+verified (native-log, non-circular).** PREMATURE_DATA:
-  real cell sent + non-circular native signal DESIGNED (relay.c zero-stream-id), but native signal NOT
-  YET confirmed on VM — only the semi-circular marker run is confirmed so far. Files on
-  premature-transport branch: experiments/premature_v3.sh (+ premature_detect.mjs).
+- **Status: THREE attacks real+verified (native-log, non-circular): CREATE_FLOOD, CIRCUIT_HIJACK,
+  PREMATURE_DATA.** Files on premature-transport branch: experiments/premature_v3.sh (+ premature_detect.mjs).
 
 ## NOT genuinely realizable: HANDSHAKE_SKIP (structural blocker)
 - **HANDSHAKE_SKIP** needs SEND_CREATE in IDLE/CONNECTING or SEND_EXTEND in CREATE_SENT. Tor sends the
