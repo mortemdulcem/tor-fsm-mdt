@@ -24,6 +24,7 @@ const scenario = arg("scenario");
 const seed = Number(arg("seed", "0"));
 const log = arg("log");
 const native = Number(arg("native", "0"));
+const markers = Number(arg("markers", "0"));
 
 const TYPE = {
   create_flood: "CREATE_FLOOD",
@@ -49,13 +50,24 @@ for (const v of fsm.violations) {
 
 const target = fsm.violations.filter((v) => v.classification.type === TYPE);
 
+// Per-circuit confusion matrix istiyoruz: ayni devredeki birden fazla ihlal
+// SAYIM sismesine yol acmasin diye benzersiz devre sayisini (mumkunse) cikar.
+// Harness ihlal nesnesinde devre kimligi alani adi degisebilir -> birkac olasi
+// adi dene; hicbiri yoksa null birak (metrics.mjs flagged'a duser ve clamp eder).
+const cidOf = (v) =>
+  v.circuitId ?? v.cid ?? v.gid ?? v.circId ?? v.circ ?? v.id ?? null;
+const flaggedCircuitsSet = new Set(target.map(cidOf).filter((x) => x != null));
+const flaggedCircuits = flaggedCircuitsSet.size > 0 ? flaggedCircuitsSet.size : null;
+
 const out = {
   attack,
   seed,
   scenario,
   circuits: fsm.circuitCount,
-  flagged: target.length,
-  native,
+  flagged: target.length,        // ihlal olayi sayisi
+  flaggedCircuits,               // benzersiz devre sayisi (yoksa null)
+  native,                        // non-circular native sinyal (grep, pipeline)
+  markers,                       // saldirinin kendi marker sayisi (premature icin)
   types: byType,
 };
 
