@@ -89,12 +89,38 @@ rm -rf shadow.data.premature shadow.data.benign2
 
 # ---------------------------------------------------------------------------
 say "6) Detection (attack vs benign)"
-ATK="$CFT/shadow.data.premature/hosts/torclient/tor.1000.stdout"
-BEN="$CFT/shadow.data.benign2/hosts/torclient/tor.1000.stdout"
+ADIR="$CFT/shadow.data.premature/hosts"
+BDIR="$CFT/shadow.data.benign2/hosts"
+ATK="$ADIR/torclient/tor.1000.stdout"
+BEN="$BDIR/torclient/tor.1000.stdout"
 cd - >/dev/null
-echo "MARKER (attack icindeki gercek erken-DATA gonderim sayisi):"; grep -c "TOR_FSM_PREMATURE_SEND" "$ATK" 2>/dev/null || echo 0
-echo "MARKER ornek (ilk 3, cstate=0 => CIRCUIT_STATE_BUILDING, satir 935 assert ile garanti):"; grep "TOR_FSM_PREMATURE_SEND" "$ATK" 2>/dev/null | head -3
-echo "MARKER (benign'de olmamali):"; grep -c "TOR_FSM_PREMATURE_SEND" "$BEN" 2>/dev/null || echo 0
-echo "--- ATTACK detect ---"; npx tsx experiments/premature_detect.mjs "$ATK"
-echo "--- BENIGN detect ---"; npx tsx experiments/premature_detect.mjs "$BEN"
-say "BITTI — gercek sinyal: ATTACK'ta INJECTED PREMATURE_DATA > 0, BENIGN'de = 0 olmali"
+
+# --- (A) Cross-check (marker'im): kac gercek erken-DATA hucresi gonderildi ---
+#     Bu sadece "gonderim oldu mu" kontrolu; ASIL kanit asagidaki native log.
+echo "[cross-check] client gonderim marker'i (TOR_FSM_PREMATURE_SEND):"
+echo "  attack: $(grep -c TOR_FSM_PREMATURE_SEND "$ATK" 2>/dev/null || echo 0)   benign: $(grep -c TOR_FSM_PREMATURE_SEND "$BEN" 2>/dev/null || echo 0)"
+echo "  ornek: $(grep TOR_FSM_PREMATURE_SEND "$ATK" 2>/dev/null | head -1)"
+
+# --- (B) ASIL NON-CIRCULAR KANIT: Tor'un KENDI protokol-ihlali logu ---
+#     Erken hucre stream_id=0 ile gidiyor. Ilk hop relay onu islerken
+#     Tor'un kendi kodu (src/core/or/relay.c:1677) sunu basar:
+#       "Relay data cell with zero stream_id. Dropping."
+#     Bu marker DEGIL; gercek hucrenin relay'de yarattigi dogal sonuc.
+#     CREATE_FLOOD'un Tor'un native cift-CREATE loguna dayanmasiyla ayni mantik.
+NATIVE='Relay data cell with zero stream_id'
+echo "[NATIVE SIGNAL] Tor'un kendi protokol-ihlali logu (relay.c:1677), tum host loglari:"
+AC=$(grep -rl "$NATIVE" "$ADIR" 2>/dev/null | wc -l); AN=$(grep -rh "$NATIVE" "$ADIR" 2>/dev/null | wc -l)
+BC=$(grep -rl "$NATIVE" "$BDIR" 2>/dev/null | wc -l); BN=$(grep -rh "$NATIVE" "$BDIR" 2>/dev/null | wc -l)
+echo "  ATTACK : $AN satir, $AC host"
+echo "  BENIGN : $BN satir, $BC host"
+echo "  hangi host(lar) attack'ta logladi:"; grep -rl "$NATIVE" "$ADIR" 2>/dev/null | sed "s#$ADIR/##;s#/.*##" | sort -u | sed 's/^/    /'
+echo "  ATTACK ornek (ilk 2, native Tor satiri):"; grep -rh "$NATIVE" "$ADIR" 2>/dev/null | head -2 | sed 's/^/    /'
+
+# --- (C) FSM dedektoru (marker tabanli, ikincil/illustratif) ---
+echo "--- FSM dedektor (marker tabanli; ikincil) ATTACK ---"; npx tsx experiments/premature_detect.mjs "$ATK"
+echo "--- FSM dedektor (marker tabanli; ikincil) BENIGN ---"; npx tsx experiments/premature_detect.mjs "$BEN"
+
+say "BITTI"
+echo "ASIL KANIT (non-circular): [NATIVE SIGNAL] ATTACK > 0, BENIGN = 0 olmali."
+echo "  -> Tor'un KENDI logu, gercek erken DATA hucresinin relay'de yarattigi protokol ihlali."
+echo "  Marker ve FSM dedektoru yalnizca capraz-kontrol/illustrasyon."

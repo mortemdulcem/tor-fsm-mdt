@@ -101,16 +101,31 @@ v3 succeeds via a DIFFERENT, genuine path: inject the early cell from WITHIN cir
   right circuit.
 - **Harness wiring:** `TOR_FSM_PREMATURE_SEND gid=N` → push `{event:"SEND_RELAY_DATA", injected:true,
   attackType:"PREMATURE_DATA"}` onto circuits[N]. FSM: BUILDING × SEND_RELAY_DATA → PREMATURE_DATA (HIGH).
-- **VERIFIED RESULT (Shadow, env-gated, same binary):** marker fired 12× (gids 3,4,...); detector
+- **Marker run (Shadow, env-gated, same binary):** marker fired 12× (gids 3,4,...); FSM detector
   INJECTED PREMATURE_DATA = 5 in attack, 0 in benign. 12 markers→5 injected because a circuit's later
   circuit_send_next_onion_skin calls happen when it is already READY (not a violation). begin-noise
-  (lastCircuitId mis-attribution) is ~6 attack / ~9 benign in BOTH runs — report SEPARATELY, it is not
-  the signal. Success criterion met: INJECTED attack>0, benign=0.
-- **Non-circular:** the BUILDING state is derived from the line-935 assert + log line order, independent
-  of Tor's own circuit_finish_handshake logs; `injected:true` separates it from begin-noise. Same
-  legitimacy framing as CREATE_FLOOD/CIRCUIT_HIJACK: fault-injected real protocol violation in MODIFIED
-  Tor, env-gated, benign-by-default — NOT a claim that a stock client or remote attacker emits this.
-- **THREE attacks now real+verified: CREATE_FLOOD, CIRCUIT_HIJACK, PREMATURE_DATA.** Files on
+  (lastCircuitId mis-attribution) is ~6 attack / ~9 benign in BOTH runs — report SEPARATELY.
+- **CIRCULARITY CAVEAT (important, user-flagged):** the marker-based FSM detection above is SEMI-CIRCULAR
+  — the same patch that sends the cell ALSO emits the `TOR_FSM_PREMATURE_SEND` marker the detector keys
+  on. This is exactly the flaw we rejected in the Devin branch. The cell is REAL, but the detection
+  signal is self-emitted, so it is weaker than CREATE_FLOOD/CIRCUIT_HIJACK (those key on Tor's OWN native
+  log). Do NOT present the marker/FSM number as the clean headline result.
+- **NON-CIRCULAR signal (the honest proof):** the premature cell is sent with `stream_id=0`
+  (`relay_send_command_from_edge(0, ...)`). The first-hop relay processes it and Tor's OWN code at
+  `src/core/or/relay.c:1677` logs `"Relay data cell with zero stream_id. Dropping."` via
+  `log_fn(LOG_PROTOCOL_WARN, LD_PROTOCOL, ...)`. This is Tor's native protocol-violation log, a real
+  consequence of the real cell — NOT a marker. Detection = grep ALL host logs (relays) for that line:
+  attack>0, benign=0. Same non-circular logic as CREATE_FLOOD keying on the native duplicate SEND_CREATE.
+  premature_v3.sh step 6 now reports this as the PRIMARY signal; marker+FSM are cross-check/illustrative.
+- **PENDING VM VERIFICATION:** LOG_PROTOCOL_WARN defaults to LOG_INFO (ProtocolWarnings off); the line
+  shows only if the RELAY hosts log at info. The shadow tor example's `conf/tor.common.torrc` sets
+  `Log info stdout` (shared by relays) so it should appear; if [NATIVE SIGNAL] is 0 in BOTH runs, relays
+  aren't at info → add `Log info` to relay torrc and re-run. Not yet confirmed on VM.
+- **Framing:** fault-injected real protocol violation in MODIFIED Tor, env-gated, benign-by-default —
+  NOT a claim that a stock client or remote attacker emits this.
+- **Status: CREATE_FLOOD + CIRCUIT_HIJACK = real+verified (native-log, non-circular).** PREMATURE_DATA:
+  real cell sent + non-circular native signal DESIGNED (relay.c zero-stream-id), but native signal NOT
+  YET confirmed on VM — only the semi-circular marker run is confirmed so far. Files on
   premature-transport branch: experiments/premature_v3.sh (+ premature_detect.mjs).
 
 ## NOT genuinely realizable: HANDSHAKE_SKIP (structural blocker)
