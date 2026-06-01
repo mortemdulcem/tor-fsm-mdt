@@ -1,0 +1,42 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ git pull
+node experiments/export_features.mjs | cat
+remote: Enumerating objects: 12, done.
+remote: Counting objects: 100% (12/12), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 8 (delta 6), reused 0 (delta 0), pack-reused 0 (from 0)
+Nesneler açılıyor: 100% (8/8), 1.52 KiB | 310.00 KiB/sn, bitti.
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+   20ca8fd..267828c  premature-transport -> origin/premature-transport
+Güncelleniyor: 20ca8fd..267828c
+Fast-forward
+ experiments/attack_status.md    |  3 +++
+ experiments/export_features.mjs | 25 ++++++++++++++++++++++---
+ 2 files changed, 25 insertions(+), 3 deletions(-)
+  [parse sekli] Object; ust anahtarlar: [
+  '1', '2', '3',
+  '4', '5', '6',
+  '7', '8', '9'
+]
+  benign/benign seed=42: 9 devre
+  attack/create_flood seed=42: 9 devre
+  attack/circuit_hijack seed=42: 9 devre
+  attack/premature_data seed=42: 9 devre
+  benign/benign seed=137: 9 devre
+  attack/create_flood seed=137: 9 devre
+  attack/circuit_hijack seed=137: 10 devre
+  attack/premature_data seed=137: 9 devre
+  benign/benign seed=2718: 9 devre
+  attack/create_flood seed=2718: 9 devre
+  attack/circuit_hijack seed=2718: 9 devre
+  attack/premature_data seed=2718: 9 devre
+
+--- ornek devre anahtarlari --- [
+  '0', '1', '2',
+  '3', '4', '5',
+  '6', '7'
+]
+--- transition dizisi anahtari bulunamadi; tum devre ornegi: ---
+[{"event":"CONNECT","timestamp":"Jan 01 00:15:01.000","host":"torclient"},{"event":"TLS_OK","timestamp":"Jan 01 00:15:01.200","host":"torclient"},{"event":"SEND_CREATE","timestamp":"Jan 01 00:15:01.401","host":"torclient"},{"event":"RECV_CREATED","timestamp":"Jan 01 00:15:01.501","host":"torclient"},{"event":"SEND_RELAY_DATA","timestamp":"Jan 01 00:15:01.501","host":"torclient"},{"event":"SEND_RELAY_DATA","timestamp":"Jan 01 00:15:01.611","host":"torclient"},{"event":"SEND_DESTROY","timestamp":"Jan 01 00:16:10.050","host":"torclient"},{"event":"CIRCUIT_CLOSED","timestamp":"Jan 01 00:16:10.050"
+
+yazildi: experiments/ml_dataset.json (109 devre, 3 seed)
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
