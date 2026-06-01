@@ -20,17 +20,36 @@ const logPath = (sub, seed) =>
   `${RUNS}/${sub}/seed${seed}/hosts/torclient/tor.1000.stdout`;
 
 const dataset = [];
+let shapeLogged = false;
+
+// parseTorHostLog cikti sekli kesin bilinmiyor (dizi / Map / id->devre nesnesi /
+// {circuits:[...]}); uydurma yerine hepsini normalize ederek devre listesine cevir.
+function toCircuitList(circuits) {
+  if (circuits == null) return [];
+  if (Array.isArray(circuits)) return circuits;
+  if (circuits instanceof Map) return Array.from(circuits.values());
+  if (Array.isArray(circuits.circuits)) return circuits.circuits;
+  if (typeof circuits === "object") return Object.values(circuits);
+  return [];
+}
 
 function add(scenario, attack, seed, file) {
   if (!existsSync(file)) {
     console.log(`  atla (log yok): ${file}`);
     return;
   }
-  const circuits = parseTorHostLog(readFileSync(file, "utf8"), "torclient");
-  for (const c of circuits) {
+  const raw = parseTorHostLog(readFileSync(file, "utf8"), "torclient");
+  if (!shapeLogged) {
+    const ctor = raw && raw.constructor ? raw.constructor.name : typeof raw;
+    console.log(`  [parse sekli] ${ctor}; ust anahtarlar:`,
+      raw && typeof raw === "object" && !Array.isArray(raw) ? Object.keys(raw).slice(0, 10) : "(dizi/diger)");
+    shapeLogged = true;
+  }
+  const list = toCircuitList(raw);
+  for (const c of list) {
     dataset.push({ scenario, attack, seed: Number(seed), circuit: c });
   }
-  console.log(`  ${scenario}/${attack} seed=${seed}: ${circuits.length} devre`);
+  console.log(`  ${scenario}/${attack} seed=${seed}: ${list.length} devre`);
 }
 
 for (const seed of SEEDS) {
