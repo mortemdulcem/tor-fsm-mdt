@@ -1,0 +1,171 @@
+{
+  "data": {
+    "n_circuits": 109,
+    "n_seeds": 3,
+    "seeds": [
+      42,
+      137,
+      2718
+    ],
+    "features": [
+      "n_events",
+      "CIRCUIT_CLOSED",
+      "CONNECT",
+      "RECV_CREATED",
+      "RECV_EXTENDED",
+      "SEND_CREATE",
+      "SEND_DESTROY",
+      "SEND_EXTEND",
+      "SEND_RELAY_DATA",
+      "TLS_OK"
+    ],
+    "n_features": 10,
+    "counts": {
+      "benign": 27,
+      "create_flood": 27,
+      "circuit_hijack": 28,
+      "premature_data": 27
+    }
+  },
+  "structural": {
+    "unique_per_class": {
+      "circuit_hijack": 11,
+      "create_flood": 9,
+      "premature_data": 10,
+      "benign": 8
+    },
+    "overlap": {
+      "create_flood__circuit_hijack": {
+        "inter": 8,
+        "na": 9,
+        "nb": 11
+      },
+      "premature_data__benign": {
+        "inter": 2,
+        "na": 10,
+        "nb": 8
+      },
+      "create_flood__benign": {
+        "inter": 0,
+        "na": 9,
+        "nb": 8
+      },
+      "circuit_hijack__benign": {
+        "inter": 0,
+        "na": 11,
+        "nb": 8
+      }
+    },
+    "loso_dup": {
+      "42": {
+        "dup": 34,
+        "total": 36,
+        "ratio": 0.9444444444444444
+      },
+      "137": {
+        "dup": 36,
+        "total": 37,
+        "ratio": 0.972972972972973
+      },
+      "2718": {
+        "dup": 30,
+        "total": 36,
+        "ratio": 0.8333333333333334
+      }
+    }
+  },
+  "supervised": {
+    "per_attack_recall": {
+      "create_flood": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "circuit_hijack": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "premature_data": {
+        "mean": 0.07407407407407407,
+        "sd": 0.05237828008789241
+      }
+    },
+    "precision": {
+      "mean": 1.0,
+      "sd": 0.0
+    },
+    "recall": {
+      "mean": 0.6948853615520282,
+      "sd": 0.020415938100159153
+    },
+    "f1": {
+      "mean": 0.8198067632850242,
+      "sd": 0.01431452404833724
+    }
+  },
+  "unsupervised": {
+    "per_attack_recall": {
+      "create_flood": {
+        "mean": 0.7777777777777777,
+        "sd": 0.09072184232530289
+      },
+      "circuit_hijack": {
+        "mean": 0.7518518518518519,
+        "sd": 0.036664796061524715
+      },
+      "premature_data": {
+        "mean": 1.0,
+        "sd": 0.0
+      }
+    },
+    "precision": {
+      "mean": 0.7498207885304659,
+      "sd": 0.01758830701990724
+    },
+    "recall": {
+      "mean": 0.8421516754850087,
+      "sd": 0.04267567418893424
+    },
+    "f1": {
+      "mean": 0.7931034482758621,
+      "sd": 0.028155054514749183
+    }
+  },
+  "multiclass": {
+    "accuracy": {
+      "mean": 0.5415415415415415,
+      "sd": 0.01981880868190526
+    },
+    "labels": [
+      "benign",
+      "create_flood",
+      "circuit_hijack",
+      "premature_data"
+    ],
+    "confusion": [
+      [
+        22,
+        0,
+        0,
+        5
+      ],
+      [
+        0,
+        19,
+        8,
+        0
+      ],
+      [
+        0,
+        18,
+        10,
+        0
+      ],
+      [
+        19,
+        0,
+        0,
+        8
+      ]
+    ]
+  }
+}
