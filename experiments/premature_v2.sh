@@ -23,6 +23,17 @@ else
 fi
 grep -n "TOR_FSM_PREMATURE_BEGIN" "$CU"
 
+# 1b) Teshis probe: her CONNECT-stream baglama denemesinde, env acikken,
+# sömürülebilir pencere var mi diye sayar (building / building+cpath_open / open).
+# building_cpath_open>0 ise gercek firsat vardir; hep 0 ise Tor devreleri zaten
+# OPEN olduktan sonra stream bagliyor demektir (yapisal engel, kurulum hatasi degil).
+if grep -q "TOR_FSM_PREMATURE_PROBE" "$CU"; then
+  echo "probe zaten var (atlandi)"
+else
+  perl -0pi -e 's~(!ENTRY_TO_EDGE_CONN\(conn\)->on_circuit\) \{\n)~$1      { int _b=0,_o=0,_r=0;\n        SMARTLIST_FOREACH_BEGIN(circuit_get_global_list(), circuit_t *, pc) {\n          if (CIRCUIT_IS_ORIGIN(pc) && pc->purpose==CIRCUIT_PURPOSE_C_GENERAL) {\n            if (pc->state==CIRCUIT_STATE_BUILDING) { _b++;\n              origin_circuit_t *po=TO_ORIGIN_CIRCUIT(pc);\n              if (po->cpath && po->cpath->state==CPATH_STATE_OPEN) _o++; }\n            else if (pc->state==CIRCUIT_STATE_OPEN) _r++;\n          }\n        } SMARTLIST_FOREACH_END(pc);\n        log_info(LD_CIRC,"TOR_FSM_PREMATURE_PROBE building=%d building_cpath_open=%d open=%d",_b,_o,_r);\n      }\n~' "$CU"
+  if grep -q "TOR_FSM_PREMATURE_PROBE" "$CU"; then echo "probe eklendi OK"; else echo "HATA: probe anchor eslesmedi"; exit 1; fi
+fi
+
 # ---------------------------------------------------------------------------
 say "2) Tor build"
 ( cd "$TORSRC" && make -j"$(nproc)" src/app/tor 2>&1 | tail -8 )
@@ -82,6 +93,10 @@ ATK="$CFT/shadow.data.premature/hosts/torclient/tor.1000.stdout"
 BEN="$CFT/shadow.data.benign2/hosts/torclient/tor.1000.stdout"
 cd - >/dev/null
 echo "MARKER (attack icinde gercek erken-begin sayisi):"; grep -c "TOR_FSM_PREMATURE_BEGIN" "$ATK" 2>/dev/null || echo 0
+echo "--- PROBE teshisi (attack) ---"
+echo "PROBE toplam satir (env+binary etkin mi):"; grep -c "TOR_FSM_PREMATURE_PROBE" "$ATK" 2>/dev/null || echo 0
+echo "PROBE ornek (ilk 5):"; grep "TOR_FSM_PREMATURE_PROBE" "$ATK" 2>/dev/null | head -5
+echo "Somurulebilir pencere (building_cpath_open>0) olan deneme sayisi:"; grep "TOR_FSM_PREMATURE_PROBE" "$ATK" 2>/dev/null | grep "building_cpath_open=" | grep -vc "building_cpath_open=0 " || echo 0
 echo "--- ATTACK detect ---"; npx tsx experiments/cf_detect.mjs "$ATK"
 echo "--- BENIGN detect ---"; npx tsx experiments/cf_detect.mjs "$BEN"
 say "BITTI"
