@@ -71,9 +71,14 @@ const out = {
   types: byType,
 };
 
+// injected ground-truth (TUM saldirilar icin): violation nesnesinde injected:true
+// = saldirinin gercekten enjekte ettigi olay; injected:false = parser/begin-noise.
+// Bu, event-level confusion (TP=injected, FP=noise) icin gerekli.
+out.injected = target.filter((v) => v.injected === true).length;
+out.noise = target.length - out.injected;
 if (attack === "premature_data") {
-  out.prem_injected = target.filter((v) => v.injected === true).length;
-  out.prem_noise = target.filter((v) => v.injected !== true).length;
+  out.prem_injected = out.injected;
+  out.prem_noise = out.noise;
 }
 
 console.log(JSON.stringify(out));
