@@ -44,6 +44,11 @@ if [ ! -f "$HARNESS" ]; then echo "HATA: $HARNESS yok (repo kokunden calistir)";
 # 3a: fonksiyonlari export et (detektor import edebilsin)
 grep -q "export function parseTorHostLog" "$HARNESS" || perl -pi -e 's/^function parseTorHostLog\(/export function parseTorHostLog(/' "$HARNESS"
 grep -q "export function runFsmOnAllCircuits" "$HARNESS" || perl -pi -e 's/^function runFsmOnAllCircuits\(/export function runFsmOnAllCircuits(/' "$HARNESS"
+# 3a': harness'i import-guvenli yap. Dosya "const results = await main();" ile
+#      bitiyor -> her import main()'i (3x3 Shadow simulasyonu) tetikliyordu.
+#      main()'i sadece dosya DOGRUDAN calistirilinca cagir; import'ta atla.
+grep -q "pathToFileURL" "$HARNESS" || perl -pi -e 's/import \{ fileURLToPath \} from "node:url";/import { fileURLToPath, pathToFileURL } from "node:url";/' "$HARNESS"
+grep -q "import.meta.url === pathToFileURL" "$HARNESS" || perl -pi -e 's/const results = await main\(\);/const results = (import.meta.url === pathToFileURL(process.argv[1]).href) ? await main() : null;/' "$HARNESS"
 # 3b: TOR_FSM_PREMATURE_SEND gid=N -> circuits[gid]'e injected SEND_RELAY_DATA.
 #     gid = global_identifier = harness'in devre anahtari. Durum BUILDING harness
 #     tarafindan Tor'un circuit_finish_handshake loglarindan bagimsiz turetilir.
@@ -88,7 +93,7 @@ ATK="$CFT/shadow.data.premature/hosts/torclient/tor.1000.stdout"
 BEN="$CFT/shadow.data.benign2/hosts/torclient/tor.1000.stdout"
 cd - >/dev/null
 echo "MARKER (attack icindeki gercek erken-DATA gonderim sayisi):"; grep -c "TOR_FSM_PREMATURE_SEND" "$ATK" 2>/dev/null || echo 0
-echo "MARKER ornek (ilk 3, cstate=4 => CIRCUIT_STATE_BUILDING):"; grep "TOR_FSM_PREMATURE_SEND" "$ATK" 2>/dev/null | head -3
+echo "MARKER ornek (ilk 3, cstate=0 => CIRCUIT_STATE_BUILDING, satir 935 assert ile garanti):"; grep "TOR_FSM_PREMATURE_SEND" "$ATK" 2>/dev/null | head -3
 echo "MARKER (benign'de olmamali):"; grep -c "TOR_FSM_PREMATURE_SEND" "$BEN" 2>/dev/null || echo 0
 echo "--- ATTACK detect ---"; npx tsx experiments/premature_detect.mjs "$ATK"
 echo "--- BENIGN detect ---"; npx tsx experiments/premature_detect.mjs "$BEN"
