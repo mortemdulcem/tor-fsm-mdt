@@ -1,0 +1,2222 @@
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+...skipping...
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  }  )  ]           *  Find open bracket { ( [.
+  ESC-^F <c1> <c2>  *  Find close bracket <c2>.
+  ESC-^B <c1> <c2>  *  Find open bracket <c1>.
+        ---------------------------------------------------
+        Each "find close bracket" command goes forward to the close bracket 
+          matching the (N-th) open bracket in the top line.
+        Each "find open bracket" command goes backward to the open bracket 
+          matching the (N-th) close bracket in the bottom line.
+
+  m<letter>            Mark the current top line with <letter>.
+  M<letter>            Mark the current bottom line with <letter>.
+  '<letter>            Go to a previously marked position.
+  ''                   Go to the previous position.
+  ^X^X                 Same as '.
+  ESC-M<letter>        Clear a mark.
+        ---------------------------------------------------
+        A mark is any upper-case or lower-case letter.
+        Certain marks are predefined:
+             ^  means  beginning of the file
+             $  means  end of the file
+ ---------------------------------------------------------------------------
+
+                        CHANGING FILES
+  M<letter>            Mark the current bottom line with <letter>.
+  '<letter>            Go to a previously marked position.
+  ''                   Go to the previous position.
+  ^X^X                 Same as '.
+  ESC-M<letter>        Clear a mark.
+        ---------------------------------------------------
+        A mark is any upper-case or lower-case letter.
+        Certain marks are predefined:
+             ^  means  beginning of the file
+             $  means  end of the file
+ ---------------------------------------------------------------------------
+
+                        CHANGING FILES
+
+  :e [file]            Examine a new file.
+  ^X^V                 Same as :e.
+  :n                *  Examine the (N-th) next file from the command line.
+  :p                *  Examine the (N-th) previous file from the command line.
+  :x                *  Examine the first (or N-th) file from the command line.
+  :d                   Delete the current file from the command line list.
+  =  ^G  :f            Print current file name.
+ ---------------------------------------------------------------------------
+
+
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+
+
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  }  )  ]           *  Find open bracket { ( [.
+...skipping...
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  }  )  ]           *  Find open bracket { ( [.
+  ESC-^F <c1> <c2>  *  Find close bracket <c2>.
+  ESC-^B <c1> <c2>  *  Find open bracket <c1>.
+        ---------------------------------------------------
+        Each "find close bracket" command goes forward to the close bracket 
+          matching the (N-th) open bracket in the top line.
+        Each "find open bracket" command goes backward to the open bracket 
+          matching the (N-th) close bracket in the bottom line.
+
+  m<letter>            Mark the current top line with <letter>.
+  M<letter>            Mark the current bottom line with <letter>.
+  '<letter>            Go to a previously marked position.
+  ''                   Go to the previous position.
+  ^X^X                 Same as '.
+  ESC-M<letter>        Clear a mark.
+        ---------------------------------------------------
+        A mark is any upper-case or lower-case letter.
+        Certain marks are predefined:
+             ^  means  beginning of the file
+             $  means  end of the file
+ ---------------------------------------------------------------------------
+
+                        CHANGING FILES
+
+  :e [file]            Examine a new file.
+
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+...skipping...
+
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+...skipping...
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  }  )  ]           *  Find open bracket { ( [.
+  ESC-^F <c1> <c2>  *  Find close bracket <c2>.
+  ESC-^B <c1> <c2>  *  Find open bracket <c1>.
+        ---------------------------------------------------
+        Each "find close bracket" command goes forward to the close bracket 
+          matching the (N-th) open bracket in the top line.
+        Each "find open bracket" command goes backward to the open bracket 
+          matching the (N-th) close bracket in the bottom line.
+
+  m<letter>            Mark the current top line with <letter>.
+  M<letter>            Mark the current bottom line with <letter>.
+  '<letter>            Go to a previously marked position.
+  ''                   Go to the previous position.
+  ^X^X                 Same as '.
+  ESC-M<letter>        Clear a mark.
+        ---------------------------------------------------
+        A mark is any upper-case or lower-case letter.
+        Certain marks are predefined:
+             ^  means  beginning of the file
+             $  means  end of the file
+ ---------------------------------------------------------------------------
+
+                        CHANGING FILES
+
+  :e [file]            Examine a new file.
+...skipping...
+  ESC-^B <c1> <c2>  *  Find open bracket <c1>.
+        ---------------------------------------------------
+        Each "find close bracket" command goes forward to the close bracket 
+          matching the (N-th) open bracket in the top line.
+        Each "find open bracket" command goes backward to the open bracket 
+          matching the (N-th) close bracket in the bottom line.
+
+  m<letter>            Mark the current top line with <letter>.
+  M<letter>            Mark the current bottom line with <letter>.
+  '<letter>            Go to a previously marked position.
+  ''                   Go to the previous position.
+  ^X^X                 Same as '.
+  ESC-M<letter>        Clear a mark.
+        ---------------------------------------------------
+        A mark is any upper-case or lower-case letter.
+        Certain marks are predefined:
+             ^  means  beginning of the file
+             $  means  end of the file
+ ---------------------------------------------------------------------------
+
+                        CHANGING FILES
+
+  :e [file]            Examine a new file.
+  ^X^V                 Same as :e.
+  :n                *  Examine the (N-th) next file from the command line.
+  :p                *  Examine the (N-th) previous file from the command line.
+  :x                *  Examine the first (or N-th) file from the command line.
+  :d                   Delete the current file from the command line list.
+  =  ^G  :f            Print current file name.
+ ---------------------------------------------------------------------------
+
+                    MISCELLANEOUS COMMANDS
+
+  -<flag>              Toggle a command line option [see OPTIONS below].
+  --<name>             Toggle a command line option, by name.
+  _<flag>              Display the setting of a command line option.
+  __<name>             Display the setting of an option, by name.
+  __<name>             Display the setting of an option, by name.
+  +cmd                 Execute the less cmd each time a new file is examined.
+
+  !command             Execute the shell command with $SHELL.
+  |Xcommand            Pipe file between current pos & mark X to shell command.
+  s file               Save input to a file.
+  v                    Edit the current file with $VISUAL or $EDITOR.
+  V                    Print version number of "less".
+ ---------------------------------------------------------------------------
+
+                           OPTIONS
+
+        Most options may be changed either on the command line,
+        or from within less by using the - or -- command.
+        Options may be given in one of two forms: either a single
+        character preceded by a -, or a name preceded by --.
+
+  -?  ........  --help
+                  Display help (from command line).
+  -a  ........  --search-skip-screen
+                  Search skips current screen.
+  -A  ........  --SEARCH-SKIP-SCREEN
+                  Search starts just after target line.
+  -b [N]  ....  --buffers=[N]
+                  Number of buffers.
+  -B  ........  --auto-buffers
+                  Don't automatically allocate buffers for pipes.
+  -c  ........  --clear-screen
+                  Repaint by clearing rather than scrolling.
+  -d  ........  --dumb
+                  Dumb terminal.
+  -D xcolor  .  --color=xcolor
+                  Set screen colors.
+  -e  -E  ....  --quit-at-eof  --QUIT-AT-EOF
+                  Quit at end of file.
+  -f  ........  --force
+                  Force open non-regular files.
+  -F  ........  --quit-if-one-screen
+                  Quit if entire file fits on first screen.
+  -g  ........  --hilite-search
+                  Highlight only last match for searches.
+  -G  ........  --HILITE-SEARCH
+                  Don't highlight any matches for searches.
+  -h [N]  ....  --max-back-scroll=[N]
+                  Backward scroll limit.
+  -i  ........  --ignore-case
+                  Ignore case in searches that do not contain uppercase.
+  -I  ........  --IGNORE-CASE
+...skipping...
+
+                  Search file as each pattern character is typed in.
+                --line-num-width=N
+                  Set the width of the -N line number field to N characters.
+                --mouse
+                  Enable mouse input.
+                --no-keypad
+                  Don't send termcap keypad init/deinit strings.
+                --no-histdups
+                  Remove duplicates from command history.
+                --rscroll=C
+                  Set the character used to mark truncated lines.
+                --save-marks
+                  Retain marks across invocations of less.
+                --status-col-width=N
+                  Set the width of the -J status column to N characters.
+                --use-backslash
+                  Subsequent options use backslash as escape char.
+                --use-color
+                  Enables colored text.
+                --wheel-lines=N
+                  Each click of the mouse wheel moves N lines.
+
+
+...skipping...
+--- a/src/core/or/relay.c
++++ b/src/core/or/relay.c
+@@ -1,6 +1,36 @@
+ // Tor 0.4.6.10 patch: REPLAY_ATTACK
+ // Replay previously seen RELAY cells by re-injecting them into the circuit queue
+ // This violates FSM semantics by duplicating valid state transitions
++//
++// Attack: Malicious relay intercepts and records a valid RELAY cell (e.g., RELAY_DATA)
++// Then re-injects the same cell multiple times after circuit closure or timeout
++// This causes spurious events that violate normal circuit behavior
++//
++// Location: circuit_receive_relay_cell() in src/core/or/relay.c
++// When: Applied to malicious relay in Shadow simulation
++// Effect: Injects duplicate RELAY_DATA events after circuit should be closed
++// Detection: FSM detects impossible state transitions (e.g., SEND_RELAY_DATA in CLOSED state)
++// Ground Truth Oracle: log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d", cid, rh->command)
++
++--- In circuit_receive_relay_cell() function:
++
++  // Normal code path:
++  // Process relay cell only if circuit is OPEN
++  if (circ->state == CIRCUIT_STATE_OPEN) {
++    process_relay_cell(circ, cell);
++  }
++
++  // ATTACK injection point:
++  // Store seen cells and replay them later
++  
++  // Attacker code (patch):
++  // After normal processing, check if we have cached cells to replay
++  if (circ->state == CIRCUIT_STATE_CLOSED) {
++    for (const cached_cell in attacker_replay_cache[circ->id]) {
++      log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d",
++                 circ->global_identifier, cached_cell->command);
++      process_relay_cell(circ, cached_cell);  // Replay after closure
++    }
++  }
+ 
+ // References:
+ // - Tor src/core/or/relay.c: circuit_receive_relay_cell()
+
+~
+~
+~
+--- a/src/core/or/relay.c
++++ b/src/core/or/relay.c
+@@ -1,6 +1,36 @@
+ // Tor 0.4.6.10 patch: REPLAY_ATTACK
+ // Replay previously seen RELAY cells by re-injecting them into the circuit que
+ue
+ // This violates FSM semantics by duplicating valid state transitions
++//
++// Attack: Malicious relay intercepts and records a valid RELAY cell (e.g., REL
+AY_DATA)
++// Then re-injects the same cell multiple times after circuit closure or timeou
+t
++// This causes spurious events that violate normal circuit behavior
++//
++// Location: circuit_receive_relay_cell() in src/core/or/relay.c
++// When: Applied to malicious relay in Shadow simulation
++// Effect: Injects duplicate RELAY_DATA events after circuit should be closed
++// Detection: FSM detects impossible state transitions (e.g., SEND_RELAY_DATA i
+n CLOSED state)
++// Ground Truth Oracle: log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u 
+...skipping...
+~
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+...skipping...
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  }  )  ]           *  Find open bracket { ( [.
+  ESC-^F <c1> <c2>  *  Find close bracket <c2>.
+  ESC-^B <c1> <c2>  *  Find open bracket <c1>.
+        ---------------------------------------------------
+        Each "find close bracket" command goes forward to the close bracket 
+          matching the (N-th) open bracket in the top line.
+        Each "find open bracket" command goes backward to the open bracket 
+          matching the (N-th) close bracket in the bottom line.
+
+  m<letter>            Mark the current top line with <letter>.
+  M<letter>            Mark the current bottom line with <letter>.
+  '<letter>            Go to a previously marked position.
+  ''                   Go to the previous position.
+  ^X^X                 Same as '.
+  ESC-M<letter>        Clear a mark.
+        ---------------------------------------------------
+        A mark is any upper-case or lower-case letter.
+        Certain marks are predefined:
+             ^  means  beginning of the file
+             $  means  end of the file
+ ---------------------------------------------------------------------------
+
+                        CHANGING FILES
+  M<letter>            Mark the current bottom line with <letter>.
+  '<letter>            Go to a previously marked position.
+  ''                   Go to the previous position.
+  ^X^X                 Same as '.
+  ESC-M<letter>        Clear a mark.
+        ---------------------------------------------------
+        A mark is any upper-case or lower-case letter.
+        Certain marks are predefined:
+             ^  means  beginning of the file
+             $  means  end of the file
+ ---------------------------------------------------------------------------
+
+                        CHANGING FILES
+
+  :e [file]            Examine a new file.
+  ^X^V                 Same as :e.
+  :n                *  Examine the (N-th) next file from the command line.
+  :p                *  Examine the (N-th) previous file from the command line.
+  :x                *  Examine the first (or N-th) file from the command line.
+  :d                   Delete the current file from the command line list.
+  =  ^G  :f            Print current file name.
+ ---------------------------------------------------------------------------
+
+
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+
+
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  }  )  ]           *  Find open bracket { ( [.
+...skipping...
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  }  )  ]           *  Find open bracket { ( [.
+  ESC-^F <c1> <c2>  *  Find close bracket <c2>.
+  ESC-^B <c1> <c2>  *  Find open bracket <c1>.
+        ---------------------------------------------------
+        Each "find close bracket" command goes forward to the close bracket 
+          matching the (N-th) open bracket in the top line.
+        Each "find open bracket" command goes backward to the open bracket 
+          matching the (N-th) close bracket in the bottom line.
+
+  m<letter>            Mark the current top line with <letter>.
+  M<letter>            Mark the current bottom line with <letter>.
+  '<letter>            Go to a previously marked position.
+  ''                   Go to the previous position.
+  ^X^X                 Same as '.
+  ESC-M<letter>        Clear a mark.
+        ---------------------------------------------------
+        A mark is any upper-case or lower-case letter.
+        Certain marks are predefined:
+             ^  means  beginning of the file
+             $  means  end of the file
+ ---------------------------------------------------------------------------
+
+                        CHANGING FILES
+
+  :e [file]            Examine a new file.
+
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+...skipping...
+
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+...skipping...
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  }  )  ]           *  Find open bracket { ( [.
+  ESC-^F <c1> <c2>  *  Find close bracket <c2>.
+  ESC-^B <c1> <c2>  *  Find open bracket <c1>.
+        ---------------------------------------------------
+        Each "find close bracket" command goes forward to the close bracket 
+          matching the (N-th) open bracket in the top line.
+        Each "find open bracket" command goes backward to the open bracket 
+          matching the (N-th) close bracket in the bottom line.
+
+  m<letter>            Mark the current top line with <letter>.
+  M<letter>            Mark the current bottom line with <letter>.
+  '<letter>            Go to a previously marked position.
+  ''                   Go to the previous position.
+  ^X^X                 Same as '.
+  ESC-M<letter>        Clear a mark.
+        ---------------------------------------------------
+        A mark is any upper-case or lower-case letter.
+        Certain marks are predefined:
+             ^  means  beginning of the file
+             $  means  end of the file
+ ---------------------------------------------------------------------------
+
+                        CHANGING FILES
+
+  :e [file]            Examine a new file.
+...skipping...
+  ESC-^B <c1> <c2>  *  Find open bracket <c1>.
+        ---------------------------------------------------
+        Each "find close bracket" command goes forward to the close bracket 
+          matching the (N-th) open bracket in the top line.
+        Each "find open bracket" command goes backward to the open bracket 
+          matching the (N-th) close bracket in the bottom line.
+
+  m<letter>            Mark the current top line with <letter>.
+  M<letter>            Mark the current bottom line with <letter>.
+  '<letter>            Go to a previously marked position.
+  ''                   Go to the previous position.
+  ^X^X                 Same as '.
+  ESC-M<letter>        Clear a mark.
+        ---------------------------------------------------
+        A mark is any upper-case or lower-case letter.
+        Certain marks are predefined:
+             ^  means  beginning of the file
+             $  means  end of the file
+ ---------------------------------------------------------------------------
+
+                        CHANGING FILES
+
+  :e [file]            Examine a new file.
+  ^X^V                 Same as :e.
+  :n                *  Examine the (N-th) next file from the command line.
+  :p                *  Examine the (N-th) previous file from the command line.
+  :x                *  Examine the first (or N-th) file from the command line.
+  :d                   Delete the current file from the command line list.
+  =  ^G  :f            Print current file name.
+ ---------------------------------------------------------------------------
+
+                    MISCELLANEOUS COMMANDS
+
+  -<flag>              Toggle a command line option [see OPTIONS below].
+  --<name>             Toggle a command line option, by name.
+  _<flag>              Display the setting of a command line option.
+  __<name>             Display the setting of an option, by name.
+  __<name>             Display the setting of an option, by name.
+  +cmd                 Execute the less cmd each time a new file is examined.
+
+  !command             Execute the shell command with $SHELL.
+  |Xcommand            Pipe file between current pos & mark X to shell command.
+  s file               Save input to a file.
+  v                    Edit the current file with $VISUAL or $EDITOR.
+  V                    Print version number of "less".
+ ---------------------------------------------------------------------------
+
+                           OPTIONS
+
+        Most options may be changed either on the command line,
+        or from within less by using the - or -- command.
+        Options may be given in one of two forms: either a single
+        character preceded by a -, or a name preceded by --.
+
+  -?  ........  --help
+                  Display help (from command line).
+  -a  ........  --search-skip-screen
+                  Search skips current screen.
+  -A  ........  --SEARCH-SKIP-SCREEN
+                  Search starts just after target line.
+  -b [N]  ....  --buffers=[N]
+                  Number of buffers.
+  -B  ........  --auto-buffers
+                  Don't automatically allocate buffers for pipes.
+  -c  ........  --clear-screen
+                  Repaint by clearing rather than scrolling.
+  -d  ........  --dumb
+                  Dumb terminal.
+  -D xcolor  .  --color=xcolor
+                  Set screen colors.
+  -e  -E  ....  --quit-at-eof  --QUIT-AT-EOF
+                  Quit at end of file.
+  -f  ........  --force
+                  Force open non-regular files.
+  -F  ........  --quit-if-one-screen
+                  Quit if entire file fits on first screen.
+  -g  ........  --hilite-search
+                  Highlight only last match for searches.
+  -G  ........  --HILITE-SEARCH
+                  Don't highlight any matches for searches.
+  -h [N]  ....  --max-back-scroll=[N]
+                  Backward scroll limit.
+  -i  ........  --ignore-case
+                  Ignore case in searches that do not contain uppercase.
+  -I  ........  --IGNORE-CASE
+...skipping...
+
+                  Search file as each pattern character is typed in.
+                --line-num-width=N
+                  Set the width of the -N line number field to N characters.
+                --mouse
+                  Enable mouse input.
+                --no-keypad
+                  Don't send termcap keypad init/deinit strings.
+                --no-histdups
+                  Remove duplicates from command history.
+                --rscroll=C
+                  Set the character used to mark truncated lines.
+                --save-marks
+                  Retain marks across invocations of less.
+                --status-col-width=N
+                  Set the width of the -J status column to N characters.
+                --use-backslash
+                  Subsequent options use backslash as escape char.
+                --use-color
+                  Enables colored text.
+                --wheel-lines=N
+                  Each click of the mouse wheel moves N lines.
+
+
+ ---------------------------------------------------------------------------
+
+                          LINE EDITING
+
+        These keys can be used to edit text being entered 
+        on the "command line" at the bottom of the screen.
+
+ RightArrow ..................... ESC-l ... Move cursor right one character.
+ LeftArrow ...................... ESC-h ... Move cursor left one character.
+ ctrl-RightArrow  ESC-RightArrow  ESC-w ... Move cursor right one word.
+ ctrl-LeftArrow   ESC-LeftArrow   ESC-b ... Move cursor left one word.
+ HOME ........................... ESC-0 ... Move cursor to start of line.
+ END ............................ ESC-$ ... Move cursor to end of line.
+ BACKSPACE ................................ Delete char to left of cursor.
+ DELETE ......................... ESC-x ... Delete char under cursor.
+ ctrl-BACKSPACE   ESC-BACKSPACE ........... Delete word to left of cursor.
+ ctrl-DELETE .... ESC-DELETE .... ESC-X ... Delete word under cursor.
+ ctrl-U ......... ESC (MS-DOS only) ....... Delete entire line.
+ UpArrow ........................ ESC-k ... Retrieve previous command line.
+ DownArrow ...................... ESC-j ... Retrieve next command line.
+ TAB ...................................... Complete filename & cycle.
+ SHIFT-TAB ...................... ESC-TAB   Complete filename & reverse cycle.
+ ctrl-L ................................... Complete filename, list all.
+...skipping...
+~
+~
+~
+--- a/src/core/or/relay.c
++++ b/src/core/or/relay.c
+@@ -1,6 +1,36 @@
+ // Tor 0.4.6.10 patch: REPLAY_ATTACK
+ // Replay previously seen RELAY cells by re-injecting them into the circuit queue
+ // This violates FSM semantics by duplicating valid state transitions
++//
++// Attack: Malicious relay intercepts and records a valid RELAY cell (e.g., RELAY_DATA)
++// Then re-injects the same cell multiple times after circuit closure or timeout
++// This causes spurious events that violate normal circuit behavior
++//
++// Location: circuit_receive_relay_cell() in src/core/or/relay.c
++// When: Applied to malicious relay in Shadow simulation
++// Effect: Injects duplicate RELAY_DATA events after circuit should be closed
++// Detection: FSM detects impossible state transitions (e.g., SEND_RELAY_DATA in CLOSED state)
++// Ground Truth Oracle: log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d", cid, rh->command)
++
++--- In circuit_receive_relay_cell() function:
++
++  // Normal code path:
++  // Process relay cell only if circuit is OPEN
++  if (circ->state == CIRCUIT_STATE_OPEN) {
++    process_relay_cell(circ, cell);
++  }
++
++  // ATTACK injection point:
++  // Store seen cells and replay them later
++  
++  // Attacker code (patch):
++  // After normal processing, check if we have cached cells to replay
++  if (circ->state == CIRCUIT_STATE_CLOSED) {
++    for (const cached_cell in attacker_replay_cache[circ->id]) {
++      log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d",
++                 circ->global_identifier, cached_cell->command);
++      process_relay_cell(circ, cached_cell);  // Replay after closure
++    }
++  }
+ 
+ // References:
+ // - Tor src/core/or/relay.c: circuit_receive_relay_cell()
+/bin/bash: -c: satır 1: `'' için eşleşme aranırken beklenmedik dosya sonu
+/bin/bash: -c: satır 2: sözdizim hatası: beklenmeyen dosya sonu
+(END)
++--- In circuit_receive_relay_cell() function:
++
++  // Normal code path:
++  // Process relay cell only if circuit is OPEN
++  if (circ->state == CIRCUIT_STATE_OPEN) {
++    process_relay_cell(circ, cell);
++  }
++
++  // ATTACK injection point:
++  // Store seen cells and replay them later
++  
++  // Attacker code (patch):
++  // After normal processing, check if we have cached cells to replay
++  if (circ->state == CIRCUIT_STATE_CLOSED) {
++    for (const cached_cell in attacker_replay_cache[circ->id]) {
++      log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d",
++                 circ->global_identifier, cached_cell->command);
++      process_relay_cell(circ, cached_cell);  // Replay after closure
++    }
++  }
+ 
+ // References:
+ // - Tor src/core/or/relay.c: circuit_receive_relay_cell()
+(END)
++// Then re-injects the same cell multiple times after circuit closure or timeou
+t
++// This causes spurious events that violate normal circuit behavior
++//
++// Location: circuit_receive_relay_cell() in src/core/or/relay.c
++// When: Applied to malicious relay in Shadow simulation
++// Effect: Injects duplicate RELAY_DATA events after circuit should be closed
++// Detection: FSM detects impossible state transitions (e.g., SEND_RELAY_DATA i
+n CLOSED state)
++// Ground Truth Oracle: log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u 
+cell_type=%d", cid, rh->command)
++
++--- In circuit_receive_relay_cell() function:
++
++  // Normal code path:
++  // Process relay cell only if circuit is OPEN
++  if (circ->state == CIRCUIT_STATE_OPEN) {
++    process_relay_cell(circ, cell);
++  }
++
++  // ATTACK injection point:
++  // Store seen cells and replay them later
++  
+...skipping...
++// Then re-injects the same cell multiple times after circuit closure or timeout
++// This causes spurious events that violate normal circuit behavior
++//
++// Location: circuit_receive_relay_cell() in src/core/or/relay.c
++// When: Applied to malicious relay in Shadow simulation
++// Effect: Injects duplicate RELAY_DATA events after circuit should be closed
++// Detection: FSM detects impossible state transitions (e.g., SEND_RELAY_DATA in CLOSED state)
++// Ground Truth Oracle: log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d", cid, rh->command)
++
++--- In circuit_receive_relay_cell() function:
++
++  // Normal code path:
++  // Process relay cell only if circuit is OPEN
++  if (circ->state == CIRCUIT_STATE_OPEN) {
++    process_relay_cell(circ, cell);
++  }
++
++  // ATTACK injection point:
++  // Store seen cells and replay them later
++  
++  // Attacker code (patch):
++  // After normal processing, check if we have cached cells to replay
++  if (circ->state == CIRCUIT_STATE_CLOSED) {
++    for (const cached_cell in attacker_replay_cache[circ->id]) {
++      log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d",
++                 circ->global_identifier, cached_cell->command);
++      process_relay_cell(circ, cached_cell);  // Replay after closure
++    }
++  }
+ 
+ // References:
+ // - Tor src/core/or/relay.c: circuit_receive_relay_cell()
+...skipping...
++--- In circuit_receive_relay_cell() function:
++
++  // Normal code path:
++  // Process relay cell only if circuit is OPEN
++  if (circ->state == CIRCUIT_STATE_OPEN) {
++    process_relay_cell(circ, cell);
++  }
++
++  // ATTACK injection point:
++  // Store seen cells and replay them later
++  
++  // Attacker code (patch):
++  // After normal processing, check if we have cached cells to replay
++  if (circ->state == CIRCUIT_STATE_CLOSED) {
++    for (const cached_cell in attacker_replay_cache[circ->id]) {
++      log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d",
++                 circ->global_identifier, cached_cell->command);
++      process_relay_cell(circ, cached_cell);  // Replay after closure
++    }
++  }
+ 
+ // References:
+ // - Tor src/core/or/relay.c: circuit_receive_relay_cell()
+...skipping...
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  }  )  ]           *  Find open bracket { ( [.
+  ESC-^F <c1> <c2>  *  Find close bracket <c2>.
+  ESC-^B <c1> <c2>  *  Find open bracket <c1>.
+        ---------------------------------------------------
+        Each "find close bracket" command goes forward to the close bracket 
+          matching the (N-th) open bracket in the top line.
+        Each "find open bracket" command goes backward to the open bracket 
+
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+...skipping...
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+...skipping...
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+...skipping...
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+...skipping...
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+...skipping...
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+...skipping...
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+        ---------------------------------------------------
+        A search pattern may begin with one or more of:
+        ^N or !  Search for NON-matching lines.
+        ^E or *  Search multiple files (pass thru END OF FILE).
+        ^F or @  Start search at FIRST file (for /) or last file (for ?).
+        ^K       Highlight matches, but don't move (KEEP position).
+        ^R       Don't use REGULAR EXPRESSIONS.
+        ^W       WRAP search if no match found.
+ ---------------------------------------------------------------------------
+
+                           JUMPING
+
+  g  <  ESC-<       *  Go to first line in file (or line N).
+  G  >  ESC->       *  Go to last line in file (or line N).
+  p  %              *  Go to beginning of file (or N percent into file).
+  t                 *  Go to the (N-th) next tag.
+  T                 *  Go to the (N-th) previous tag.
+  {  (  [           *  Find close bracket } ) ].
+  }  )  ]           *  Find open bracket { ( [.
+  ESC-^F <c1> <c2>  *  Find close bracket <c2>.
+  ESC-^B <c1> <c2>  *  Find open bracket <c1>.
+
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+...skipping...
+
+                   SUMMARY OF LESS COMMANDS
+~
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+...skipping...
+~
+~
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+  b  ^B  ESC-v      *  Backward one window (or N lines).
+  z                 *  Forward  one window (and set window to N).
+  w                 *  Backward one window (and set window to N).
+  ESC-SPACE         *  Forward  one window, but don't stop at end-of-file.
+  d  ^D             *  Forward  one half-window (and set half-window to N).
+  u  ^U             *  Backward one half-window (and set half-window to N).
+  ESC-)  RightArrow *  Right one half screen width (or N positions).
+  ESC-(  LeftArrow  *  Left  one half screen width (or N positions).
+  ESC-}  ^RightArrow   Right to last column displayed.
+  ESC-{  ^LeftArrow    Left  to first column.
+  F                    Forward forever; like "tail -f".
+  ESC-F                Like F but stop when search pattern is found.
+  r  ^R  ^L            Repaint screen.
+  R                    Repaint screen, discarding buffered input.
+        ---------------------------------------------------
+        Default "window" is the screen height.
+        Default "half-window" is half of the screen height.
+ ---------------------------------------------------------------------------
+
+                          SEARCHING
+
+  /pattern          *  Search forward for (N-th) matching line.
+  ?pattern          *  Search backward for (N-th) matching line.
+  n                 *  Repeat previous search (for N-th occurrence).
+  N                 *  Repeat previous search in reverse direction.
+  ESC-n             *  Repeat previous search, spanning files.
+  ESC-N             *  Repeat previous search, reverse dir. & spanning files.
+  ESC-u                Undo (toggle) search highlighting.
+  ESC-U                Clear search highlighting.
+  &pattern          *  Display only matching lines.
+...skipping...
++
++--- In circuit_receive_relay_cell() function:
++
++  // Normal code path:
++  // Process relay cell only if circuit is OPEN
++  if (circ->state == CIRCUIT_STATE_OPEN) {
++    process_relay_cell(circ, cell);
++  }
++
++  // ATTACK injection point:
++  // Store seen cells and replay them later
++  
++  // Attacker code (patch):
++  // After normal processing, check if we have cached cells to replay
++  if (circ->state == CIRCUIT_STATE_CLOSED) {
++    for (const cached_cell in attacker_replay_cache[circ->id]) {
++      log_notice(LD_GENERAL, "ATTACK_REPLAY_INJECTED circ=%u cell_type=%d",
++                 circ->global_identifier, cached_cell->command);
++      process_relay_cell(circ, cached_cell);  // Replay after closure
++    }
++  }
+ 
+ // References:
+ // - Tor src/core/or/relay.c: circuit_receive_relay_cell()
+
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ # veya
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ ENTER (hata mesajından sonra)
+bash: beklenmeyen jeton `hata' yakınında sözdizim hatası
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ git pull
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 8 (delta 5), reused 0 (delta 0), pack-reused 0 (from 0)
+Nesneler açılıyor: 100% (8/8), 2.12 KiB | 1.06 MiB/sn, bitti.
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+   ecef207..20ca8fd  premature-transport -> origin/premature-transport
+Güncelleniyor: ecef207..20ca8fd
+Fast-forward
+ experiments/attack_status.md    | 13 ++++-----
+ experiments/export_features.mjs | 62 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 68 insertions(+), 7 deletions(-)
+ create mode 100644 experiments/export_features.mjs
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ for s in 42 137 2718; do
+  f=experiments/runs/premature_data/seed$s/hosts/torclient/tor.1000.stdout
+  echo "=== seed=$s ==="
+  echo "[ornek satir]"; grep -m2 'TOR_FSM_PREMATURE_SEND' "$f"
+  echo "[cstate dagilimi]"; grep -oE 'TOR_FSM_PREMATURE_SEND.*' "$f" | grep -oE 'cstate=[0-9]+' | sort | uniq -c
+done
+=== seed=42 ===
+[ornek satir]
+Jan 01 00:15:03.501 [info] circuit_send_next_onion_skin(): TOR_FSM_PREMATURE_SEND gid=3 cstate=0
+Jan 01 00:15:03.701 [info] circuit_send_next_onion_skin(): TOR_FSM_PREMATURE_SEND gid=3 cstate=0
+[cstate dagilimi]
+     12 cstate=0
+=== seed=137 ===
+[ornek satir]
+Jan 01 00:15:03.501 [info] circuit_send_next_onion_skin(): TOR_FSM_PREMATURE_SEND gid=3 cstate=0
+Jan 01 00:15:03.701 [info] circuit_send_next_onion_skin(): TOR_FSM_PREMATURE_SEND gid=3 cstate=0
+[cstate dagilimi]
+     12 cstate=0
+=== seed=2718 ===
+[ornek satir]
+Jan 01 00:15:03.501 [info] circuit_send_next_onion_skin(): TOR_FSM_PREMATURE_SEND gid=3 cstate=0
+Jan 01 00:15:04.100 [info] circuit_send_next_onion_skin(): TOR_FSM_PREMATURE_SEND gid=4 cstate=0
+[cstate dagilimi]
+     12 cstate=0
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt
+
+# Git durumu
+git status
+
+# Son commit
+git log --oneline -5
+
+# Deneysel sonuçlar
+cat experiments/attack_status.md | head -50
+Üzerinde bulunulan dal: premature-transport
+Dalınız 'origin/premature-transport' ile güncel.
+
+İşlenecek değişiklikler:
+  (hazırlıktan çıkarmak için "git restore --staged <dosya>..." kullanın)
+	yeni dosya:           experiments/shadow_harness.mjs
+
+İzlenmeyen dosyalar:
+  (işlenecekler arasına koymak için "git add <dosya>..." kullanın)
+	experiments/runs/
+	experiments/shadow_runs/
+	h et
+	"s'ten \303\247\304\261k"
+	t et
+
+20ca8fd (HEAD -> premature-transport, origin/premature-transport) export_features: gercek ML baseline icin per-devre ham parse export (non-circular)
+9635266 attack_status: temiz seed=2718 tekrari (circuit_hijack native 18/20/18); kesik-seed notu kaldirildi
+ecef207 attack_status: estimand haritasi + event-purity/marker-coverage terminolojisi
+8d7c851 attack_status: coklu-seed gercek sayilar; hijack benign=12 confound duzeltmesi
+0a12861 metrics.mjs: uc-modlu durust model (cf tip-temiz, prem event-level, hijack non-discriminative)
+# Saldırı Tiplerinin Gerçeklik Durumu (FSM-MDT)
+
+Bu tablo, FSM dedektörünün ürettiği 7 saldırı sınıfının her birinin tez kapsamında
+**gerçek** (modifiye Tor'da gerçek protokol ihlali, Shadow'da koşulmuş, non-circular
+sinyalle doğrulanmış), **sentetik** (yalnızca model/harness içi üretilmiş) ya da
+**yapısal olarak gerçekleştirilemez** olduğunu açıkça etiketler.
+
+## Çerçeve (tezde aynen kullanılmalı)
+Gerçek saldırılar, **modifiye edilmiş Tor 0.4.6.10 ikilisinde, ortam değişkeniyle
+(env-gated) tetiklenen, varsayılan olarak iyi-huylu** hata enjeksiyonlarıdır
+(fault injection). Bunlar "vahşi/uzaktan sömürülebilirlik" iddiası DEĞİLDİR; aynı
+ikili env değişkeni kapalıyken normal Tor gibi çalışır. Doğrulama Shadow ağ
+simülatöründe (tez Bölüm 4.15 VM) yapılır; Replit ortamı Shadow çalıştıramaz.
+
+"Non-circular sinyal" = saldırının tespiti, saldırının kendisinin yazdığı bir
+işaretleyiciye (marker) değil, **Tor'un kendi organik log satırına** dayanır.
+Bunun iki gücü vardır: (a) **bağımsız bileşen oracle'ı** — sinyali, parser'ın
+girdisinden farklı bir bileşen üretir (PREMATURE_DATA: ilk hop **relay**'inin kendi
+protokol-ihlali logu; en güçlü kanıt). (b) **marker'sız istemci organik logu** —
+sinyal istemcinin kendi normal logudur, enjekte marker değildir, ancak parser'ın
+girdisiyle aynı bileşendedir (CREATE_FLOOD, CIRCUIT_HIJACK). Her ikisi de marker
+döngüselliğinden arınmıştır; yine de (a), (b)'den daha bağımsızdır ve tezde bu fark
+korunmalıdır — üç saldırı "eşit derecede non-circular" diye sunulmamalıdır.
+
+## Özet tablo
+
+| Tip | Durum | Tetikleyici (env) | Non-circular sinyal | Doğrulama (çoklu-seed, n=3: 42/137/2718) |
+|---|---|---|---|---|
+| CREATE_FLOOD | **Gerçek** | `TOR_FSM_ATTACK_CREATE_FLOOD` | Tor'un kendi `circuit_send_first_onion_skin(): First hop: finished sending CREATE cell` satırı bir devre için **iki kez** çıkar (iki gerçek CREATE hücresi) | tip-temiz: P=R=F1=1.0, FPR=0; native 18→9 (ortüşme yok) |
+| CIRCUIT_HIJACK | **Gerçek (saldırı)**, ama FSM-tip dedektörü *ayırt edici değil* | `TOR_FSM_ATTACK_CIRCUIT_HIJACK` | İlk hop OPEN + devre BUILDING iken **fazladan** organik CREATE log satırı (`circuit_finish_handshake(): Finished building...` sonrası SEND_CREATE) | native 18/20/18→9 (ortüşme yok); **FSM-tip benign tabanı=12 → dedektör begin-noise ile confounded** |
+| PREMATURE_DATA | **Gerçek** | `TOR_FSM_ATTACK_PREMATURE_DATA` | İlk hop relay'inin **kendi** protokol-ihlali logu: `handle_relay_cell_command(): Relay data cell with zero stream_id. Dropping.` (relay.c) | native 12→0 (ortüşme yok); event-level P≈0.50/R≈0.47/F1≈0.48; begin-noise FPR≈0.48 |
+| REPLAY_ATTACK | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
+| GHOST_CIRCUIT | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
+| CIRCUIT_BYPASS | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
+| HANDSHAKE_SKIP | **Gerçekleştirilemez** | — | — | Yapısal engel (aşağıda) |
+
+## Çoklu-seed sonuçları (n=3, seed 42/137/2718)
+Sayılar VM'de Shadow koşulduktan sonra kayıtlı loglardan `experiments/recompute.sh`
+ile `experiments/runs/results.jsonl`'a yazılır ve `experiments/metrics.mjs` ile
+toplanır (ort ± SD; n=3 olduğu için t-tabanlı %95 GA geniştir). Örnek birimi ve
+ground-truth her saldırıda farklı olduğundan rapor **üç-modludur** — tek bir ortak
+confusion matrisi uydurmak yerine her saldırı kendi geçerli ölçüsüyle raporlanır.
+
+### Estimand haritası (tezde tutarsızlık eleştirisini önlemek için)
+Her saldırının ölçtüğü nicelik (estimand) farklıdır; aşağıdaki tablo bunu açıkça sabitler.
+
+| Saldırı | Örnek birimi | Ground-truth | Birincil geçerli iddia |
+|---|---|---|---|
+| CREATE_FLOOD | istemci devresi | FSM-tip (benign-temiz) | tip-temiz confusion: P=R=F1=1.0, FPR=0 |
+| PREMATURE_DATA | premature olayı (event) | `injected` (TOR marker) + relay native log | event-purity precision + marker-coverage recall; non-circular native 12 vs 0 |
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ # Tüm lock dosyalarını bul
+find . -name "*.lock" -o -name ".~*" 2>/dev/null
+
+# Gerekirse sil
+rm -f experiments/runs/*.lock
+./uv.lock
+./node_modules/lodash/flake.lock
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt && \
+echo "=== GIT STATUS ===" && git status && \
+echo -e "\n=== ATTACK STATUS ===" && cat experiments/attack_status.md && \
+echo -e "\n=== RESULTS ===" && ls -lh experiments/runs/
+=== GIT STATUS ===
+Üzerinde bulunulan dal: premature-transport
+Dalınız 'origin/premature-transport' ile güncel.
+
+İşlenecek değişiklikler:
+  (hazırlıktan çıkarmak için "git restore --staged <dosya>..." kullanın)
+	yeni dosya:           experiments/shadow_harness.mjs
+
+İzlenmeyen dosyalar:
+  (işlenecekler arasına koymak için "git add <dosya>..." kullanın)
+	experiments/runs/
+	experiments/shadow_runs/
+	h et
+	"s'ten \303\247\304\261k"
+	t et
+
+
+=== ATTACK STATUS ===
+# Saldırı Tiplerinin Gerçeklik Durumu (FSM-MDT)
+
+Bu tablo, FSM dedektörünün ürettiği 7 saldırı sınıfının her birinin tez kapsamında
+**gerçek** (modifiye Tor'da gerçek protokol ihlali, Shadow'da koşulmuş, non-circular
+sinyalle doğrulanmış), **sentetik** (yalnızca model/harness içi üretilmiş) ya da
+**yapısal olarak gerçekleştirilemez** olduğunu açıkça etiketler.
+
+## Çerçeve (tezde aynen kullanılmalı)
+Gerçek saldırılar, **modifiye edilmiş Tor 0.4.6.10 ikilisinde, ortam değişkeniyle
+(env-gated) tetiklenen, varsayılan olarak iyi-huylu** hata enjeksiyonlarıdır
+(fault injection). Bunlar "vahşi/uzaktan sömürülebilirlik" iddiası DEĞİLDİR; aynı
+ikili env değişkeni kapalıyken normal Tor gibi çalışır. Doğrulama Shadow ağ
+simülatöründe (tez Bölüm 4.15 VM) yapılır; Replit ortamı Shadow çalıştıramaz.
+
+"Non-circular sinyal" = saldırının tespiti, saldırının kendisinin yazdığı bir
+işaretleyiciye (marker) değil, **Tor'un kendi organik log satırına** dayanır.
+Bunun iki gücü vardır: (a) **bağımsız bileşen oracle'ı** — sinyali, parser'ın
+girdisinden farklı bir bileşen üretir (PREMATURE_DATA: ilk hop **relay**'inin kendi
+protokol-ihlali logu; en güçlü kanıt). (b) **marker'sız istemci organik logu** —
+sinyal istemcinin kendi normal logudur, enjekte marker değildir, ancak parser'ın
+girdisiyle aynı bileşendedir (CREATE_FLOOD, CIRCUIT_HIJACK). Her ikisi de marker
+döngüselliğinden arınmıştır; yine de (a), (b)'den daha bağımsızdır ve tezde bu fark
+korunmalıdır — üç saldırı "eşit derecede non-circular" diye sunulmamalıdır.
+
+## Özet tablo
+
+| Tip | Durum | Tetikleyici (env) | Non-circular sinyal | Doğrulama (çoklu-seed, n=3: 42/137/2718) |
+|---|---|---|---|---|
+| CREATE_FLOOD | **Gerçek** | `TOR_FSM_ATTACK_CREATE_FLOOD` | Tor'un kendi `circuit_send_first_onion_skin(): First hop: finished sending CREATE cell` satırı bir devre için **iki kez** çıkar (iki gerçek CREATE hücresi) | tip-temiz: P=R=F1=1.0, FPR=0; native 18→9 (ortüşme yok) |
+| CIRCUIT_HIJACK | **Gerçek (saldırı)**, ama FSM-tip dedektörü *ayırt edici değil* | `TOR_FSM_ATTACK_CIRCUIT_HIJACK` | İlk hop OPEN + devre BUILDING iken **fazladan** organik CREATE log satırı (`circuit_finish_handshake(): Finished building...` sonrası SEND_CREATE) | native 18/20/18→9 (ortüşme yok); **FSM-tip benign tabanı=12 → dedektör begin-noise ile confounded** |
+| PREMATURE_DATA | **Gerçek** | `TOR_FSM_ATTACK_PREMATURE_DATA` | İlk hop relay'inin **kendi** protokol-ihlali logu: `handle_relay_cell_command(): Relay data cell with zero stream_id. Dropping.` (relay.c) | native 12→0 (ortüşme yok); event-level P≈0.50/R≈0.47/F1≈0.48; begin-noise FPR≈0.48 |
+| REPLAY_ATTACK | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
+| GHOST_CIRCUIT | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
+| CIRCUIT_BYPASS | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
+| HANDSHAKE_SKIP | **Gerçekleştirilemez** | — | — | Yapısal engel (aşağıda) |
+
+## Çoklu-seed sonuçları (n=3, seed 42/137/2718)
+Sayılar VM'de Shadow koşulduktan sonra kayıtlı loglardan `experiments/recompute.sh`
+ile `experiments/runs/results.jsonl`'a yazılır ve `experiments/metrics.mjs` ile
+toplanır (ort ± SD; n=3 olduğu için t-tabanlı %95 GA geniştir). Örnek birimi ve
+ground-truth her saldırıda farklı olduğundan rapor **üç-modludur** — tek bir ortak
+confusion matrisi uydurmak yerine her saldırı kendi geçerli ölçüsüyle raporlanır.
+
+### Estimand haritası (tezde tutarsızlık eleştirisini önlemek için)
+Her saldırının ölçtüğü nicelik (estimand) farklıdır; aşağıdaki tablo bunu açıkça sabitler.
+
+| Saldırı | Örnek birimi | Ground-truth | Birincil geçerli iddia |
+|---|---|---|---|
+| CREATE_FLOOD | istemci devresi | FSM-tip (benign-temiz) | tip-temiz confusion: P=R=F1=1.0, FPR=0 |
+| PREMATURE_DATA | premature olayı (event) | `injected` (TOR marker) + relay native log | event-purity precision + marker-coverage recall; non-circular native 12 vs 0 |
+| CIRCUIT_HIJACK | istemci devresi | YOK (`injected`=0) | non-circular native ayrımı (18/20/18 vs 9); FSM-tip ayırt edici DEĞİL |
+
+**CREATE_FLOOD** (tip-temiz confusion — FSM tipi CREATE_FLOOD benign'de hiç görülmez):
+- TP=9.0±0, FP=0±0, TN=9.0±0, FN=0±0 → Precision=Recall=F1=**1.000**, FPR=**0.000**
+- non-circular native (organik CREATE): attack=18.0±0 vs benign=9.0±0 → ortüşme yok
+- En temiz ayraç: imza yalnızca CREATE_SENT'te tekrar CREATE olduğundan begin-noise'a bağışık.
+
+**PREMATURE_DATA** (event-level; ground-truth = `injected`, `TOR_FSM_PREMATURE_SEND` marker'ı):
+- TP=injected=5.67±1.15, FN=markers−inj=6.33±1.15, FP=attack-noise=6.67±4.62
+- event-purity Precision=**0.495±0.179**, marker-coverage Recall=**0.472±0.096**, F1=**0.477±0.132**
+  (precision = saldırı koşusunda enjekte/(enjekte+noise); recall = enjekte/gönderilen marker)
+- benign begin-noise FPR (noise/circuits) = **0.481±0.064**
+- non-circular native (relay zero-stream-id): attack=12.0±0 vs benign=0 → ortüşme yok (**en güçlü kanıt**)
+- Recall<1 nedeni: parser, gönderilen 12 marker'ın yalnızca 5/5/7'sini injected
+  PREMATURE_DATA olarak etiketler (parser kapsam sınırı). Bu ölçülen bir değerdir,
+  uydurma değil; tezde "tespit kapsamı sınırı" olarak raporlanır.
+
+**CIRCUIT_HIJACK** (FSM-sınıflandırma seviyesinde **AYIRT EDİCİ DEĞİL**):
+- `injected` ground-truth YOK (üç seed de 0) → event-level confusion kurulamaz; sahte matris üretilmedi.
+- FSM-tip CIRCUIT_HIJACK sayısı: attack=21.333±0.577 vs benign=**12.0±0** (sabit begin-noise tabanı); delta=9.333±0.577.
+- non-circular native (organik CREATE): attack=18.667±1.155 (18/20/18) vs benign=9.0±0 → min(attack)=18 > max(benign)=9, ortüşme yok.
+- **Sonuç:** saldırı gerçektir ve YALNIZCA native ile ayrılır; FSM'nin CIRCUIT_HIJACK
+  tipi benign begin-noise ile dolduğundan sınıflandırma-seviyesi tespit ayırt edici
+  değildir. Tezde bu kısıt açıkça belirtilmelidir (confirmation bias'tan kaçınma).
+- Üç seed de EXIT=0 ile temiz tamamlandı (kesinti yok).
+
+> **begin-noise tek kök neden:** harness `lastCircuitId` ile bir olayı yanlış (daha
+> yeni) devreye atfedince, `classifyInvalid` bunu aktif devrede CREATE/EXTEND görürse
+> **CIRCUIT_HIJACK**, build sırasında DATA görürse **PREMATURE_DATA** kovasına koyar.
+> Bu yüzden premature FPR≈0.48 ile hijack benign tabanı≈12 AYNI kusurdan doğar.
+> CREATE_FLOOD bağışıktır. Bu, dedektörün gerçek bir sınırlılığıdır; tezde negatif
+> bulgu olarak raporlanır.
+
+## Tip bazında ayrıntı
+
+### CREATE_FLOOD — Gerçek
+`circuitbuild.c / circuit_send_first_onion_skin`: ilk CREATE hücresi gönderildikten
+sonra, env açıksa Tor'un kendi `circuit_deliver_create_cell()`'i ile **ikinci, gerçek
+bir CREATE hücresi** kabloda gönderilir. Bu, tek devre için iki birinci-hop CREATE'tir
+(gerçek protokol ihlali), uydurma log değil. INFO seviyesinde eşleşen tek satır
+`circuit_send_first_onion_skin(): First hop: finished sending CREATE cell` olduğundan,
+saldırı bu satırı **bir devre için iki kez** üretir; FSM harness aynı zaman damgalı
+çiftleri SEND_CREATE tekrarı olarak görür ve CREATE_FLOOD sınıflar.
+
+### CIRCUIT_HIJACK — Gerçek
+`circuit_finish_handshake`: ilk hop anahtarları kurulup devre BUILDING'e geçtikten
+sonra, env açıksa `circuit_send_first_onion_skin` yeniden çağrılır; mevcut
+`n_circ_id` üzerinde **bir adet fazladan gerçek CREATE** kuyruğa eklenir
+(yıkıcı-olmayan varyant: relay bilinen circ id'deki yinelenen CREATE'i düşürür, devre
+ayakta kalır, simülasyon exit 0). Organik SEND_CREATE log satırı devre BUILDING iken
+çıktığı için FSM bunu CIRCUIT_HIJACK sınıflar.
+
+**Önemli kısıt (çoklu-seed):** saldırının kendisi gerçektir (native organik CREATE
+attack 18/20/18 vs benign 9 — ortüşme yok), ancak FSM'nin **CIRCUIT_HIJACK tipi**
+benign begin-noise ile de ~12 kez tetiklendiğinden sınıflandırma-seviyesinde ayırt
+edici değildir. Yani bu saldırı için geçerli kanıt FSM-tip sayısı değil, non-circular
+native'dir. Ayrıntı ve sayılar yukarıdaki "Çoklu-seed sonuçları" bölümündedir.
+
+### PREMATURE_DATA — Gerçek (non-circular, VM-doğrulanmış)
+`circuitbuild.c / circuit_send_next_onion_skin` "Case two" öncesi: devre BUILDING +
+ilk hop OPEN iken, env açıksa Tor'un kendi `relay_send_command_from_edge(0, ...,
+RELAY_COMMAND_DATA, ..., circ->cpath)` çağrısıyla **gerçek bir erken DATA hücresi**
+(stream_id=0) ilk hop'a gönderilir.
+- **Asıl kanıt (non-circular):** hücre stream_id=0 olduğundan ilk hop relay'i Tor'un
+  KENDİ kodu ile `Relay data cell with zero stream_id. Dropping.` basar. VM: ATTACK=12
+  satır (relay1), BENIGN=0.
+- **Circularity uyarısı:** istemci tarafı FSM tespiti, saldırının kendi yazdığı
+  `TOR_FSM_PREMATURE_SEND` marker'ına dayanır (yarı-döngüsel) — bu yüzden marker/FSM
+  sayısı baş sonuç olarak sunulmaz; baş sonuç relay'in native logudur.
+- **begin-noise (FPR kaynağı):** harness, halihazırda OPEN bir devrenin begin'ini
+  `lastCircuitId` ile daha yeni bir devreye atfedince benign koşuda da PREMATURE_DATA
+  üretir. Bu **gerçek erken-veri değil, dedektör yanlış-pozitifidir** ve tezde ayrı
+  raporlanır (bkz. `metrics.mjs` "begin-noise FPR").
+
+### REPLAY_ATTACK / GHOST_CIRCUIT / CIRCUIT_BYPASS — Sentetik
+Bunlar yalnızca model/harness içi enjeksiyonla üretilir; gerçek Tor davranışıyla
+non-circular bir sinyale bağlanmamıştır. Tezde **sentetik / spec-türevli** olarak
+etiketlenmelidir. (Devin AI `feature/attack-scenarios` dalı bunları "gerçek" diye
+sunar; o dal uydurmadır — var olmayan Tor sembolleri, döngüsel marker-oracle — teze
+ALINMAZ.)
+
+### HANDSHAKE_SKIP — Yapısal olarak gerçekleştirilemez
+HANDSHAKE_SKIP, IDLE/CONNECTING'de SEND_CREATE ya da CREATE_SENT'te SEND_EXTEND
+gerektirir. Tor ilk CREATE'i ancak kanal/TLS OPEN olduktan sonra gönderir
+(`circuit_send_first_onion_skin` kanal hazır olmadan çağrılmaz); parser SEND_EXTEND'i
+yalnızca 2.+ `circuit_finish_handshake`'te üretir. Dolayısıyla tanınan log, ön-koşulu
+oluşmadan log SATIRINI UYDURMADAN üretilemez (uydurma yasak). Bu, FSM'nin modellediği
+savunmanın ta kendisidir ve **negatif sonuç** olarak raporlanır.
+
+## Dürüst kapsam
+Bu çalışma S6'nın tamamını gerçek yapmaz: yalnızca üç tip (CREATE_FLOOD,
+CIRCUIT_HIJACK, PREMATURE_DATA) gerçek+doğrulanmıştır; üçü sentetik, biri
+gerçekleştirilemezdir. Tezde bu ayrım her tablo/şekilde korunmalıdır.
+
+=== RESULTS ===
+toplam 24K
+drwxrwxr-x 5 tez tez 4,0K Haz  1 14:20 _benign
+drwxrwxr-x 5 tez tez 4,0K Haz  1 14:21 circuit_hijack
+drwxrwxr-x 5 tez tez 4,0K Haz  1 14:20 create_flood
+drwxrwxr-x 5 tez tez 4,0K Haz  1 14:21 premature_data
+-rw-rw-r-- 1 tez tez 4,5K Haz  1 14:52 results.jsonl
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+
