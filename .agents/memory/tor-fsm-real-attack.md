@@ -141,3 +141,25 @@ compare each against the env-OFF benign baseline. The attack's signal = the viol
 is ~0 in benign and >0 under its flag (CREATE_FLOOD 0→9 verified; CIRCUIT_HIJACK benign=0).
 
 **Scope honesty:** this does NOT make all of S6 real — only the attack types actually verified.
+
+## /tmp/cf_test is volatile — rebuild from the Shadow tor example
+The Shadow working dir `/tmp/cf_test` (shadow_benign.yaml + conf/ + shadow.data.template) is wiped on
+VM reboot (tmpfs). There is NO backup elsewhere. Rebuild it from the pristine Shadow tor example at
+`~/shadow/examples/docs/tor` (has shadow.yaml, conf/, shadow.data.template with a torclient host).
+- The example's `conf/tor.common.torrc` ALREADY sets `Log info stdout` → torclient logs at INFO; no torrc edit needed for the harness.
+- Example uses `path: tor` (PATH = stock 0.4.6.10) for all relays/authority/exits; only torclient must be repointed to the patched binary `~/tor-0.4.6.10/src/app/tor`.
+- The env-gate design needs an empty `environment: {}` ONLY on torclient's tor process; the premature/attack
+  variant does `s/environment: {}/environment: { TOR_FSM_ATTACK_*: "1" }/` (tgen hosts have non-empty env, so they don't match).
+- Relative paths: shadow runs FROM cf_test; host runtime dir `cf_test/shadow.data.*/hosts/<h>/` resolves `../../../conf/` → `cf_test/conf/`, so conf/ MUST be copied into cf_test.
+- `experiments/premature_v2.sh` step 4 now auto-builds cf_test if missing (finds the example via `find $HOME -path '*examples/docs/tor/shadow.yaml' -not -path '*/build/*'`).
+
+## Devin AI `feature/attack-scenarios` branch = FABRICATED, do NOT use in thesis
+A parallel branch (Devin AI) adds `attacks/*.patch` + `attack_harness.mjs` claiming 4 "real" attacks
+(HANDSHAKE_SKIP, REPLAY_ATTACK, PREMATURE_DATA, CIRCUIT_BYPASS). All four patches are non-functional
+pseudo-code: they reference Tor symbols that DO NOT EXIST (`conn->tls_state`, `TLS_STATE_OPEN`,
+`circuit_send_create_cell`, `CONN_STATE_READY`, `relay_data_to_client`, `attacker_replay_cache`), use JS
+syntax (`for (const x in ...)`) inside a C patch, and have invalid hunk context (modify the file's comment
+header) so `git apply` fails. Detection is CIRCULAR: the only signal is an injected `log_notice("ATTACK_*")`
+that is both the "attack" and the "ground-truth oracle". This violates replit.md (plausible methodology +
+fabrication). It also claims-as-real exactly the two attacks proven NOT realizable here. Keep thesis honest:
+only CREATE_FLOOD + CIRCUIT_HIJACK are real; ignore this branch (PR #3, #4 are draft + "Devin Review: failure").

@@ -1,0 +1,50 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ echo "[template host dizinleri]"; ls /home/tez/shadow/examples/docs/tor/shadow.data.template/hosts; echo; echo "[torclient template dosyalari]"; ls -la /home/tez/shadow/examples/docs/tor/shadow.data.template/hosts/torclient 2>/dev/null || echo "torclient template dizini YOK"; echo; echo "[torclient torrc]"; cat /home/tez/shadow/examples/docs/tor/shadow.data.template/hosts/torclient/torrc 2>/dev/null; echo "--- torrc-defaults ---"; cat /home/tez/shadow/examples/docs/tor/shadow.data.template/hosts/torclient/torrc-defaults 2>/dev/null; echo; echo "[conf/tor.common.torrc]"; cat /home/tez/shadow/examples/docs/tor/conf/tor.common.torrc; echo "--- conf/tor.client.torrc ---"; cat /home/tez/shadow/examples/docs/tor/conf/tor.client.torrc
+[template host dizinleri]
+4uthority  exit2   relay2  relay4     torflowauthority
+exit1      relay1  relay3  torclient
+
+[torclient template dosyalari]
+toplam 12
+drwxrwxr-x  2 tez tez 4096 May 28 20:06 .
+drwxrwxr-x 11 tez tez 4096 May 28 20:06 ..
+-rw-rw-r--  1 tez tez    0 May 28 20:06 torrc
+-rw-rw-r--  1 tez tez   80 May 28 20:06 torrc-defaults
+
+[torclient torrc]
+--- torrc-defaults ---
+%include ../../../conf/tor.common.torrc
+%include ../../../conf/tor.client.torrc
+
+[conf/tor.common.torrc]
+DataDirectory .
+BandwidthRate 1024000
+BandwidthBurst 1024000
+DirServer 4uthority bridge v3ident=BA3FDA7CE3B41FBF9BB3615BE6ACD28D883E694B orport=9111 100.0.0.1:9112 A52C A5B5 6C64 D864 F6AE 43E5 6F29 ACBD 5706 DDA1
+TestingTorNetwork 1
+ServerDNSResolvConfFile ../../../conf/shadowresolv.conf
+ServerDNSTestAddresses 4uthority
+ServerDNSAllowBrokenConfig 1
+ServerDNSDetectHijacking 0
+AssumeReachable 1
+AuthDirTestReachability 0
+NumCPUs 1
+Log info stdout
+LogTimeGranularity 1
+HeartbeatPeriod 1
+SafeLogging 0
+ContactInfo https://github.com/shadow/shadow-plugin-tor/issues
+DisableDebuggerAttachment 0
+PathBiasUseThreshold 10000
+PathBiasCircThreshold 10000
+DoSCircuitCreationEnabled 0
+DoSConnectionEnabled 0
+DoSRefuseSingleHopClientRendezvous 0
+CircuitPriorityHalflife 30
+ControlPort 9051
+LearnCircuitBuildTimeout 0
+--- conf/tor.client.torrc ---
+ORPort 0
+DirPort 0
+ClientOnly 1
+SocksPort 127.0.0.1:9000
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
