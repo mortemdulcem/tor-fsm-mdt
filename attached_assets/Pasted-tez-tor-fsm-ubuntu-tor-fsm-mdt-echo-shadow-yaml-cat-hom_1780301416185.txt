@@ -1,0 +1,130 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ echo "===== shadow.yaml ====="; cat /home/tez/shadow/examples/docs/tor/shadow.yaml; echo "===== conf/ ====="; ls -la /home/tez/shadow/examples/docs/tor/conf; echo "===== patched tor ====="; ls -la ~/tor-0.4.6.10/src/app/tor
+===== shadow.yaml =====
+general:
+  stop_time: 30 min
+network:
+  graph:
+    type: gml
+    inline: |
+      graph [
+        directed 0
+        node [
+          id 0
+          host_bandwidth_down "1 Gbit"
+          host_bandwidth_up "1 Gbit"
+        ]
+        edge [
+          source 0
+          target 0
+          latency "50 ms"
+          jitter "0 ms"
+          packet_loss 0.0
+        ]
+      ]
+hosts:
+  fileserver:
+    network_node_id: 0
+    processes:
+    - path: tgen
+      # See https://shadow.github.io/docs/guide/compatibility_notes.html#libopenblas
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.server.graphml.xml
+      start_time: 1
+      expected_final_state: running
+  4uthority:
+    network_node_id: 0
+    ip_addr: 100.0.0.1
+    processes:
+    - path: tor
+      args: --Address 4uthority --Nickname 4uthority
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 1
+      expected_final_state: running
+  exit1:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit1 --Nickname exit1
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  exit2:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address exit2 --Nickname exit2
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay1:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay1 --Nickname relay1
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay2:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay2 --Nickname relay2
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay3:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay3 --Nickname relay3
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  relay4:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address relay4 --Nickname relay4
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 60
+      expected_final_state: running
+  client:
+    network_node_id: 0
+    processes:
+    - path: tgen
+      # See https://shadow.github.io/docs/guide/compatibility_notes.html#libopenblas
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.client.graphml.xml
+      start_time: 600
+  torclient:
+    network_node_id: 0
+    processes:
+    - path: tor
+      args: --Address torclient --Nickname torclient
+            --defaults-torrc torrc-defaults -f torrc
+      start_time: 900
+      expected_final_state: running
+    - path: tgen
+      # See https://shadow.github.io/docs/guide/compatibility_notes.html#libopenblas
+      environment: { OPENBLAS_NUM_THREADS: "1" }
+      args: ../../../conf/tgen.torclient.graphml.xml
+      start_time: 1500===== conf/ =====
+toplam 56
+drwxrwxr-x 2 tez tez 4096 May 28 20:06 .
+drwxrwxr-x 4 tez tez 4096 May 28 20:06 ..
+-rw-rw-r-- 1 tez tez   22 May 28 20:06 authgen.pw
+-rw-rw-r-- 1 tez tez   93 May 28 20:06 authgen.torrc
+-rw-rw-r-- 1 tez tez   21 May 28 20:06 shadowresolv.conf
+-rw-rw-r-- 1 tez tez 1141 May 28 20:06 tgen.client.graphml.xml
+-rw-rw-r-- 1 tez tez  414 May 28 20:06 tgen.server.graphml.xml
+-rw-rw-r-- 1 tez tez 1255 May 28 20:06 tgen.torclient.graphml.xml
+-rw-rw-r-- 1 tez tez  503 May 28 20:06 tor.authority.torrc
+-rw-rw-r-- 1 tez tez   57 May 28 20:06 tor.client.torrc
+-rw-rw-r-- 1 tez tez  807 May 28 20:06 tor.common.torrc
+-rw-rw-r-- 1 tez tez   24 May 28 20:06 tor.exit.torrc
+-rw-rw-r-- 1 tez tez   24 May 28 20:06 tor.non-exit.torrc
+-rw-rw-r-- 1 tez tez   46 May 28 20:06 tor.relay.torrc
+===== patched tor =====
+-rwxrwxr-x 1 tez tez 12759584 Haz  1 10:09 /home/tez/tor-0.4.6.10/src/app/tor
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+
