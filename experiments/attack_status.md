@@ -14,6 +14,13 @@ simülatöründe (tez Bölüm 4.15 VM) yapılır; Replit ortamı Shadow çalış
 
 "Non-circular sinyal" = saldırının tespiti, saldırının kendisinin yazdığı bir
 işaretleyiciye (marker) değil, **Tor'un kendi organik log satırına** dayanır.
+Bunun iki gücü vardır: (a) **bağımsız bileşen oracle'ı** — sinyali, parser'ın
+girdisinden farklı bir bileşen üretir (PREMATURE_DATA: ilk hop **relay**'inin kendi
+protokol-ihlali logu; en güçlü kanıt). (b) **marker'sız istemci organik logu** —
+sinyal istemcinin kendi normal logudur, enjekte marker değildir, ancak parser'ın
+girdisiyle aynı bileşendedir (CREATE_FLOOD, CIRCUIT_HIJACK). Her ikisi de marker
+döngüselliğinden arınmıştır; yine de (a), (b)'den daha bağımsızdır ve tezde bu fark
+korunmalıdır — üç saldırı "eşit derecede non-circular" diye sunulmamalıdır.
 
 ## Özet tablo
 
