@@ -262,3 +262,15 @@ header) so `git apply` fails. Detection is CIRCULAR: the only signal is an injec
 that is both the "attack" and the "ground-truth oracle". This violates replit.md (plausible methodology +
 fabrication). It also claims-as-real exactly the two attacks proven NOT realizable here. Keep thesis honest:
 only CREATE_FLOOD + CIRCUIT_HIJACK are real; ignore this branch (PR #3, #4 are draft + "Devin Review: failure").
+
+## ML baseline — deterministik veride dürüst değerlendirme dersi
+Shadow verisi deterministik: sınıf başına yalnız 8-11 eşsiz öznitelik vektörü, gerisi seed
+kopyası. **Ders:** seed-bazlı LOSO bu veride sızıntıyı ÖNLEMEZ (test vektörünün %83-97'si
+train'de birebir) → CV metrikleri dağıtım-içi/iyimser, genelleme değil. Güvenilir kanıt
+CV'den bağımsız **yapısal ayrılabilirlik**: sınıfların eşsiz vektör kümeleri örtüşmesi.
+- **Why:** create_flood ve circuit_hijack eşsiz vektörleri büyük ölçüde ortak (ikisi de
+  SEND_CREATE=2) ve benign ile sıfır örtüşür; premature benign'e en yakın. Bu, FSM bulgularını
+  (hijack ayırt edici değil; premature kapsam kaybı) bağımsız yöntemle teyit eder.
+- **How to apply:** Bu repoda ML metriği raporlarken önce eşsiz-vektör örtüşmesini ver; LOSO/CV
+  sayılarını "iyimser" etiketiyle sun; zayıf-etiket etkisini iki yönlü (denetimlide FN↑,
+  anomalide recall↑) belirt; FSM ile ortak confusion matrisi uydurma (birimler farklı).
