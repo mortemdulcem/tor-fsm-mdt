@@ -153,6 +153,21 @@ VM reboot (tmpfs). There is NO backup elsewhere. Rebuild it from the pristine Sh
 - Relative paths: shadow runs FROM cf_test; host runtime dir `cf_test/shadow.data.*/hosts/<h>/` resolves `../../../conf/` → `cf_test/conf/`, so conf/ MUST be copied into cf_test.
 - `experiments/premature_v2.sh` step 4 now auto-builds cf_test if missing (finds the example via `find $HOME -path '*examples/docs/tor/shadow.yaml' -not -path '*/build/*'`).
 
+## PREMATURE_DATA is structurally NOT realizable against real Tor (proven, not assumed)
+Attempted via env-gated hook in `circuituse.c` (premature-transport branch, `experiments/premature_v2.sh`):
+when a CONNECT stream attaches, scan for an origin general circuit in `CIRCUIT_STATE_BUILDING` whose
+last-hop `cpath->state == CPATH_STATE_OPEN`, then `link_apconn_to_circ` + `connection_ap_handshake_send_begin`.
+A `TOR_FSM_PREMATURE_PROBE` log counts candidates at each attach attempt.
+**Result (Shadow, patched tor 0.4.6.10):** probe fired 15x (env + patched binary confirmed effective), but
+EVERY attempt showed `building=0 building_cpath_open=0` (open=0..6). MARKER (actual early-begin) = 0.
+**Why:** Tor builds circuits proactively and only attaches a stream to an ALREADY-OPEN circuit; the instant a
+circuit's last hop cpath opens, the circuit transitions to OPEN — so "BUILDING with open last hop" is
+essentially unreachable by design. This IS the defense the FSM models (no data before CIRCUIT_READY).
+**Decision:** stop trying. PREMATURE_DATA stays a SIMULATED attack type in the thesis; report the negative
+result as evidence of Tor's defense. Real+verified attacks remain only CREATE_FLOOD + CIRCUIT_HIJACK.
+Separately: `cf_detect.mjs` imports `parseTorHostLog`/`runFsmOnAllCircuits` from `shadow_harness.mjs` but those
+export names don't exist → wrapper is broken; the harness itself is the working detector. Irrelevant when MARKER=0.
+
 ## Devin AI `feature/attack-scenarios` branch = FABRICATED, do NOT use in thesis
 A parallel branch (Devin AI) adds `attacks/*.patch` + `attack_harness.mjs` claiming 4 "real" attacks
 (HANDSHAKE_SKIP, REPLAY_ATTACK, PREMATURE_DATA, CIRCUIT_BYPASS). All four patches are non-functional
