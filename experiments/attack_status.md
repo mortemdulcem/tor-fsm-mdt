@@ -24,20 +24,53 @@ korunmalıdır — üç saldırı "eşit derecede non-circular" diye sunulmamal�
 
 ## Özet tablo
 
-| Tip | Durum | Tetikleyici (env) | Non-circular sinyal | Doğrulama (tek koşu) |
+| Tip | Durum | Tetikleyici (env) | Non-circular sinyal | Doğrulama (çoklu-seed, n=3: 42/137/2718) |
 |---|---|---|---|---|
-| CREATE_FLOOD | **Gerçek** | `TOR_FSM_ATTACK_CREATE_FLOOD` | Tor'un kendi `circuit_send_first_onion_skin(): First hop: finished sending CREATE cell` satırı bir devre için **iki kez** çıkar (iki gerçek CREATE hücresi) | attack=9 devre→9, benign=0 |
-| CIRCUIT_HIJACK | **Gerçek** | `TOR_FSM_ATTACK_CIRCUIT_HIJACK` | İlk hop OPEN + devre BUILDING iken **fazladan** organik CREATE log satırı (`circuit_finish_handshake(): Finished building...` sonrası SEND_CREATE) | attack=9 devre→9, benign=0 |
-| PREMATURE_DATA | **Gerçek** | `TOR_FSM_ATTACK_PREMATURE_DATA` | İlk hop relay'inin **kendi** protokol-ihlali logu: `handle_relay_cell_command(): Relay data cell with zero stream_id. Dropping.` (relay.c) | attack=12 satır/relay1, benign=0 |
+| CREATE_FLOOD | **Gerçek** | `TOR_FSM_ATTACK_CREATE_FLOOD` | Tor'un kendi `circuit_send_first_onion_skin(): First hop: finished sending CREATE cell` satırı bir devre için **iki kez** çıkar (iki gerçek CREATE hücresi) | tip-temiz: P=R=F1=1.0, FPR=0; native 18→9 (ortüşme yok) |
+| CIRCUIT_HIJACK | **Gerçek (saldırı)**, ama FSM-tip dedektörü *ayırt edici değil* | `TOR_FSM_ATTACK_CIRCUIT_HIJACK` | İlk hop OPEN + devre BUILDING iken **fazladan** organik CREATE log satırı (`circuit_finish_handshake(): Finished building...` sonrası SEND_CREATE) | native 18/20/16→9 (ortüşme yok); **FSM-tip benign tabanı=12 → dedektör begin-noise ile confounded** |
+| PREMATURE_DATA | **Gerçek** | `TOR_FSM_ATTACK_PREMATURE_DATA` | İlk hop relay'inin **kendi** protokol-ihlali logu: `handle_relay_cell_command(): Relay data cell with zero stream_id. Dropping.` (relay.c) | native 12→0 (ortüşme yok); event-level P≈0.50/R≈0.47/F1≈0.48; begin-noise FPR≈0.48 |
 | REPLAY_ATTACK | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
 | GHOST_CIRCUIT | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
 | CIRCUIT_BYPASS | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
 | HANDSHAKE_SKIP | **Gerçekleştirilemez** | — | — | Yapısal engel (aşağıda) |
 
-> Yukarıdaki doğrulama sayıları **tek koşudur** (varsayılan seed). Çoklu-seed
-> (42/137/2718) tekrar + ortalama±SD + güven aralığı için
-> `experiments/full_pipeline.sh` (VM) çalıştırılıp `experiments/metrics.mjs` ile
-> toplanır. Bu tablo, çoklu-seed sonuçları geldiğinde güncellenmelidir.
+## Çoklu-seed sonuçları (n=3, seed 42/137/2718)
+Sayılar VM'de Shadow koşulduktan sonra kayıtlı loglardan `experiments/recompute.sh`
+ile `experiments/runs/results.jsonl`'a yazılır ve `experiments/metrics.mjs` ile
+toplanır (ort ± SD; n=3 olduğu için t-tabanlı %95 GA geniştir). Örnek birimi ve
+ground-truth her saldırıda farklı olduğundan rapor **üç-modludur** — tek bir ortak
+confusion matrisi uydurmak yerine her saldırı kendi geçerli ölçüsüyle raporlanır.
+
+**CREATE_FLOOD** (tip-temiz confusion — FSM tipi CREATE_FLOOD benign'de hiç görülmez):
+- TP=9.0±0, FP=0±0, TN=9.0±0, FN=0±0 → Precision=Recall=F1=**1.000**, FPR=**0.000**
+- non-circular native (organik CREATE): attack=18.0±0 vs benign=9.0±0 → ortüşme yok
+- En temiz ayraç: imza yalnızca CREATE_SENT'te tekrar CREATE olduğundan begin-noise'a bağışık.
+
+**PREMATURE_DATA** (event-level; ground-truth = `injected`, `TOR_FSM_PREMATURE_SEND` marker'ı):
+- TP=injected=5.67±1.15, FN=markers−inj=6.33±1.15, FP=attack-noise=6.67±4.62
+- Precision=**0.495±0.179**, Recall=**0.472±0.096**, F1=**0.477±0.132**
+- benign begin-noise FPR (noise/circuits) = **0.481±0.064**
+- non-circular native (relay zero-stream-id): attack=12.0±0 vs benign=0 → ortüşme yok (**en güçlü kanıt**)
+- Recall<1 nedeni: parser, gönderilen 12 marker'ın yalnızca 5/5/7'sini injected
+  PREMATURE_DATA olarak etiketler (parser kapsam sınırı). Bu ölçülen bir değerdir,
+  uydurma değil; tezde "tespit kapsamı sınırı" olarak raporlanır.
+
+**CIRCUIT_HIJACK** (FSM-sınıflandırma seviyesinde **AYIRT EDİCİ DEĞİL**):
+- `injected` ground-truth YOK (üç seed de 0) → event-level confusion kurulamaz; sahte matris üretilmedi.
+- FSM-tip CIRCUIT_HIJACK sayısı: attack=21.0±1.0 vs benign=**12.0±0** (sabit begin-noise tabanı); delta=9.0±1.0.
+- non-circular native (organik CREATE): attack=18.0±2.0 (18/20/16) vs benign=9.0±0 → min(attack)=16 > max(benign)=9, ortüşme yok.
+- **Sonuç:** saldırı gerçektir ve YALNIZCA native ile ayrılır; FSM'nin CIRCUIT_HIJACK
+  tipi benign begin-noise ile dolduğundan sınıflandırma-seviyesi tespit ayırt edici
+  değildir. Tezde bu kısıt açıkça belirtilmelidir (confirmation bias'tan kaçınma).
+- **Sınır:** seed=2718 attack koşusu yarıda kesildi (8 devre, native=16, EXIT=1);
+  native yine ayırıyor ama temiz tam tekrar önerilir (sonucu değiştirmez).
+
+> **begin-noise tek kök neden:** harness `lastCircuitId` ile bir olayı yanlış (daha
+> yeni) devreye atfedince, `classifyInvalid` bunu aktif devrede CREATE/EXTEND görürse
+> **CIRCUIT_HIJACK**, build sırasında DATA görürse **PREMATURE_DATA** kovasına koyar.
+> Bu yüzden premature FPR≈0.48 ile hijack benign tabanı≈12 AYNI kusurdan doğar.
+> CREATE_FLOOD bağışıktır. Bu, dedektörün gerçek bir sınırlılığıdır; tezde negatif
+> bulgu olarak raporlanır.
 
 ## Tip bazında ayrıntı
 
@@ -57,6 +90,12 @@ sonra, env açıksa `circuit_send_first_onion_skin` yeniden çağrılır; mevcut
 (yıkıcı-olmayan varyant: relay bilinen circ id'deki yinelenen CREATE'i düşürür, devre
 ayakta kalır, simülasyon exit 0). Organik SEND_CREATE log satırı devre BUILDING iken
 çıktığı için FSM bunu CIRCUIT_HIJACK sınıflar.
+
+**Önemli kısıt (çoklu-seed):** saldırının kendisi gerçektir (native organik CREATE
+attack 18/20/16 vs benign 9 — ortüşme yok), ancak FSM'nin **CIRCUIT_HIJACK tipi**
+benign begin-noise ile de ~12 kez tetiklendiğinden sınıflandırma-seviyesinde ayırt
+edici değildir. Yani bu saldırı için geçerli kanıt FSM-tip sayısı değil, non-circular
+native'dir. Ayrıntı ve sayılar yukarıdaki "Çoklu-seed sonuçları" bölümündedir.
 
 ### PREMATURE_DATA — Gerçek (non-circular, VM-doğrulanmış)
 `circuitbuild.c / circuit_send_next_onion_skin` "Case two" öncesi: devre BUILDING +
