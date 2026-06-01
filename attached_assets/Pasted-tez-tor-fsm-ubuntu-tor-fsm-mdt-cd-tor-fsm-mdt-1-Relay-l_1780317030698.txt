@@ -1,0 +1,146 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt
+
+# 1. Relay log var mı?
+echo "=== RELAY LOG KONTROL ==="
+ls -lh experiments/runs/premature_data/seed42/hosts/relay1/tor.1000.stdout
+
+# 2. Kaç satır?
+wc -l experiments/runs/premature_data/seed42/hosts/relay1/tor.1000.stdout
+
+# 3. İçeriği (ilk 100 satır)
+head -100 experiments/runs/premature_data/seed42/hosts/relay1/tor.1000.stdout
+
+# 4. "ATTACK" marker'ı var mı?
+grep "ATTACK\|TOR_FSM" experiments/runs/premature_data/seed42/hosts/relay1/tor.1000.stdout | head -10
+=== RELAY LOG KONTROL ===
+-rw-r--r-- 1 tez tez 2,5M Haz  1 14:50 experiments/runs/premature_data/seed42/hosts/relay1/tor.1000.stdout
+14374 experiments/runs/premature_data/seed42/hosts/relay1/tor.1000.stdout
+Jan 01 00:01:00.000 [notice] Tor 0.4.6.10 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.0.2, Zlib 1.2.11, Liblzma 5.2.5, Libzstd 1.4.8 and Glibc 2.35 as libc.
+Jan 01 00:01:00.000 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jan 01 00:01:00.000 [notice] Read configuration file "/tmp/cf_test/shadow.data.premature_data.42/hosts/relay1/torrc-defaults".
+Jan 01 00:01:00.000 [notice] Read configuration file "/tmp/cf_test/shadow.data.premature_data.42/hosts/relay1/torrc".
+Jan 01 00:01:00.000 [notice] Processing configuration path "../../../conf/tor.common.torrc" at recursion level 1.
+Jan 01 00:01:00.000 [notice] Including configuration file "../../../conf/tor.common.torrc".
+Jan 01 00:01:00.000 [notice] Processing configuration path "../../../conf/tor.relay.torrc" at recursion level 1.
+Jan 01 00:01:00.000 [notice] Including configuration file "../../../conf/tor.relay.torrc".
+Jan 01 00:01:00.000 [notice] Processing configuration path "../../../conf/tor.non-exit.torrc" at recursion level 1.
+Jan 01 00:01:00.000 [notice] Including configuration file "../../../conf/tor.non-exit.torrc".
+Jan 01 00:01:00.000 [notice] Processing configuration path "../../../conf/tor.common.torrc" at recursion level 1.
+Jan 01 00:01:00.000 [notice] Including configuration file "../../../conf/tor.common.torrc".
+Jan 01 00:01:00.000 [notice] Processing configuration path "../../../conf/tor.relay.torrc" at recursion level 1.
+Jan 01 00:01:00.000 [notice] Including configuration file "../../../conf/tor.relay.torrc".
+Jan 01 00:01:00.000 [notice] Processing configuration path "../../../conf/tor.non-exit.torrc" at recursion level 1.
+Jan 01 00:01:00.000 [notice] Including configuration file "../../../conf/tor.non-exit.torrc".
+Jan 01 00:01:00.000 [warn] Path for DataDirectory (.) is relative and will resolve to /tmp/cf_test/shadow.data.premature_data.42/hosts/relay1/.. Is this what you wanted?
+Jan 01 00:01:00.000 [warn] Path for ServerDNSResolvConfFile (../../../conf/shadowresolv.conf) is relative and will resolve to /tmp/cf_test/shadow.data.premature_data.42/hosts/relay1/../../../conf/shadowresolv.conf. Is this what you wanted?
+Jan 01 00:01:00.000 [notice] Based on detected system memory, MaxMemInQueues is set to 5942 MB. You can override this by setting MaxMemInQueues by hand.
+Jan 01 00:01:00.000 [warn] ControlPort is open, but no authentication method has been configured.  This means that any program on your computer can reconfigure your Tor.  That's bad!  You should upgrade your Tor controller as soon as possible.
+Jan 01 00:01:00.000 [warn] You have used DirAuthority or AlternateDirAuthority to specify alternate directory authorities in your configuration. This is potentially dangerous: it can make you look different from all other Tor users, and hurt your anonymity. Even if you've specified the same authorities as Tor uses by default, the defaults could change in the future. Be sure you know what you're doing.
+Jan 01 00:01:00.000 [warn] TestingTorNetwork is set. This will make your node almost unusable in the public Tor network, and is therefore only advised if you are building a testing Tor network!
+Jan 01 00:01:00.000 [notice] Opening Control listener on 127.0.0.1:9051
+Jan 01 00:01:00.000 [notice] Opened Control listener connection (ready) on 127.0.0.1:9051
+Jan 01 00:01:00.000 [notice] Opening OR listener on 0.0.0.0:9111
+Jan 01 00:01:00.000 [notice] Opened OR listener connection (ready) on 0.0.0.0:9111
+Jan 01 00:01:00.000 [notice] Opening Directory listener on 0.0.0.0:9112
+Jan 01 00:01:00.000 [notice] Opened Directory listener connection (ready) on 0.0.0.0:9112
+Jan 01 00:01:00.000 [warn] Fixing permissions on directory .
+Jan 01 00:01:00.000 [warn] Fixing permissions on directory ./keys
+Jan 01 00:01:00.000 [warn] Your log may contain sensitive information - you disabled SafeLogging, and you're logging more than "notice". Don't log unless it serves an important reason. Overwrite the log afterwards.
+Jan 01 00:01:00.000 [info] options_commit_listener_transaction(): Recomputed OOS thresholds: ConnLimit 1000, ConnLimit_ 1048544, ConnLimit_high_thresh 1048480, ConnLimit_low_thresh 786408
+Jan 01 00:01:00.000 [info] crypto_openssl_late_init(): NOT using OpenSSL engine support.
+Jan 01 00:01:00.000 [notice] It appears that one of our engines has provided a replacement the OpenSSL RNG. Resetting it to the default implementation.
+Jan 01 00:01:00.000 [info] evaluate_evp_for_aes(): This version of OpenSSL has a known-good EVP counter-mode implementation. Using it.
+Jan 01 00:01:00.000 [notice] Not disabling debugger attaching for unprivileged users.
+Jan 01 00:01:00.000 [info] tor_lockfile_lock(): Locking "./lock"
+Jan 01 00:01:00.000 [info] or_state_load(): Initialized state
+Jan 01 00:01:00.000 [info] or_state_save(): Saved state to "./state"
+Jan 01 00:01:00.000 [info] check_private_dir(): Creating directory ./diff-cache
+Jan 01 00:01:00.000 [info] tor_addr_parse_mask_ports(): '*:*' expands into rules which apply to all IPv4 and IPv6 addresses. (Use accept/reject *4:* for IPv4 or accept[6]/reject[6] *6:* for IPv6.)
+Jan 01 00:01:00.000 [info] scheduler_kist_set_full_mode(): Setting KIST scheduler with kernel support (KIST mode)
+Jan 01 00:01:00.000 [info] cmux_ewma_set_options(): Enabled cell_ewma algorithm because of value in CircuitPriorityHalflife in configuration; scale factor is 0.793701 per 10 seconds
+Jan 01 00:01:00.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
+Jan 01 00:01:00.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
+Jan 01 00:01:00.000 [info] options_act_relay_stats(): Configured to measure hidden service statistics.
+Jan 01 00:01:00.000 [notice] Configured to measure statistics. Look for the *-stats files that will first be written to the data directory in 24 hours from now.
+Jan 01 00:01:00.000 [info] mark_my_descriptor_dirty(): Decided to publish new relay descriptor: config change
+Jan 01 00:01:00.000 [info] circpad_machine_client_hide_intro_circuits(): Registered client intro point hiding padding machine (0)
+Jan 01 00:01:00.000 [info] circpad_machine_relay_hide_intro_circuits(): Registered relay intro circuit hiding padding machine (0)
+Jan 01 00:01:00.000 [info] circpad_machine_client_hide_rend_circuits(): Registered client rendezvous circuit hiding padding machine (1)
+Jan 01 00:01:00.000 [info] circpad_machine_relay_hide_rend_circuits(): Registered relay rendezvous circuit hiding padding machine (1)
+Jan 01 00:01:00.000 [info] add_predicted_port(): New port prediction added. Will continue predictive circ building for 2327 more seconds.
+Jan 01 00:01:00.000 [info] init_keys(): Reading/making identity key "./keys/secret_id_key"...
+Jan 01 00:01:00.000 [info] read_file_to_str(): Could not open "./keys/ed25519_signing_secret_key": No such file or directory
+Jan 01 00:01:00.000 [info] read_file_to_str(): Could not open "./keys/ed25519_signing_public_key": No such file or directory
+Jan 01 00:01:00.000 [info] No key found in ./keys/ed25519_signing_secret_key.
+Jan 01 00:01:00.000 [notice] It looks like I need to generate and sign a new medium-term signing key, because I don't have one. To do that, I need to load (or create) the permanent master identity key. If the master identity key was not moved or encrypted with a passphrase, this will be done automatically and no further action is required. Otherwise, provide the necessary data using 'tor --keygen' to do it manually.
+Jan 01 00:01:00.000 [info] read_file_to_str(): Could not open "./keys/ed25519_master_id_secret_key": No such file or directory
+Jan 01 00:01:00.000 [info] read_file_to_str(): Could not open "./keys/ed25519_master_id_public_key": No such file or directory
+Jan 01 00:01:00.000 [info] init_keys(): Reading/making onion key "./keys/secret_onion_key"...
+Jan 01 00:01:00.000 [info] mark_my_descriptor_dirty(): Decided to publish new relay descriptor: set onion key
+Jan 01 00:01:00.000 [info] router_write_fingerprint(): Dumping fingerprint to "./fingerprint"...
+Jan 01 00:01:00.000 [notice] Your Tor server's identity key  fingerprint is 'relay1 3FB0BD7827C760FE7F9DD810FCB10322D63AB4CF'
+Jan 01 00:01:00.000 [info] router_write_fingerprint(): Dumping ed25519 identity to "./fingerprint-ed25519"...
+Jan 01 00:01:00.000 [info] read_file_to_str(): Could not open "./fingerprint-ed25519": No such file or directory
+Jan 01 00:01:00.000 [notice] Your Tor server's identity key ed25519 fingerprint is 'relay1 d1wYkMzCjeNP+/aDeHHgqyZSP/DNfLL+W1lF8Ow2vV0'
+Jan 01 00:01:00.000 [notice] Bootstrapped 0% (starting): Starting
+Jan 01 00:01:00.000 [info] read_file_to_str(): Could not open "./cached-certs": No such file or directory
+Jan 01 00:01:00.000 [info] tor_mmap_file(): Could not open "./cached-consensus" for mmap(): No such file or directory
+Jan 01 00:01:00.000 [info] tor_mmap_file(): Could not open "./unverified-consensus" for mmap(): No such file or directory
+Jan 01 00:01:00.000 [info] tor_mmap_file(): Could not open "./cached-microdesc-consensus" for mmap(): No such file or directory
+Jan 01 00:01:00.000 [info] tor_mmap_file(): Could not open "./unverified-microdesc-consensus" for mmap(): No such file or directory
+Jan 01 00:01:00.000 [info] tor_mmap_file(): Could not open "./cached-microdescs" for mmap(): No such file or directory
+Jan 01 00:01:00.000 [info] read_file_to_str(): Could not open "./cached-microdescs.new": No such file or directory
+Jan 01 00:01:00.000 [info] microdesc_cache_reload(): Reloaded microdescriptor cache. Found 0 descriptors.
+Jan 01 00:01:00.000 [info] tor_mmap_file(): Could not open "./cached-descriptors" for mmap(): No such file or directory
+Jan 01 00:01:00.000 [info] tor_mmap_file(): Could not open "./cached-extrainfo" for mmap(): No such file or directory
+Jan 01 00:01:00.000 [notice] Starting with guard context "default"
+Jan 01 00:01:00.000 [info] sampled_guards_update_from_consensus(): Not updating the sample guard set; we have no reasonably live consensus.
+Jan 01 00:01:00.000 [info] first_reachable_filtered_entry_guard(): Trying to sample a reachable guard: We know of 0 in the USABLE_FILTERED set.
+Jan 01 00:01:00.000 [info] first_reachable_filtered_entry_guard():   (That isn't enough. Trying to expand the sample.)
+Jan 01 00:01:00.000 [info] entry_guards_expand_sample(): Not expanding the sample guard set; we have no reasonably live consensus.
+Jan 01 00:01:00.000 [info] first_reachable_filtered_entry_guard():   (After filters [b], we have 0 guards to consider.)
+Jan 01 00:01:00.000 [info] I learned some more directory information, but not enough to build a circuit: We have no usable consensus.
+Jan 01 00:01:00.000 [info] configure_nameservers(): Parsing resolver configuration in '../../../conf/shadowresolv.conf'
+Jan 01 00:01:00.000 [info] eventdns: Parsing resolv.conf file ../../../conf/shadowresolv.conf
+Jan 01 00:01:00.000 [info] eventdns: Added nameserver 127.0.0.1:53 as 0x555556420980
+Jan 01 00:01:00.000 [info] eventdns: Setting maximum allowed timeouts to 255
+Jan 01 00:01:00.000 [info] eventdns: Setting maximum inflight requests to 8192
+Jan 01 00:01:00.000 [info] eventdns: Setting timeout to 5
+Jan 01 00:01:00.000 [info] eventdns: Setting retries to 3
+Jan 01 00:01:00.000 [info] run_tor_main_loop(): Systemd NOTIFY_SOCKET not present.
+Jan 01 00:01:00.000 [info] consdiffmgr_rescan_flavor_(): No 'most recent' ns consensus found; not making diffs
+Jan 01 00:01:00.000 [info] consdiffmgr_rescan_flavor_(): No 'most recent' microdesc consensus found; not making diffs
+Jan 01 00:01:01.000 [info] update_consensus_networkstatus_downloads(): Launching ns standard networkstatus consensus download.
+Jan 01 00:01:01.000 [info] router_pick_directory_server(): No reachable router entries for dirservers. Trying them all again.
+Jan 01 00:01:01.000 [info] directory_pick_generic_dirserver(): No router found for consensus network-status fetch; falling back to dirserver list.
+Jan 01 00:01:01.000 [info] directory_send_command(): Downloading consensus from 100.0.0.1:9112 using /tor/status-vote/current/consensus/BA3FDA.z
+Jan 01 00:01:01.000 [info] update_consensus_networkstatus_downloads(): Launching microdesc standard networkstatus consensus download.
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ for s in 42 137 2718; do
+  echo "=== seed=$s ==="
+  echo "[hangi dosyada]"; grep -rl 'zero stream_id' experiments/runs/premature_data/seed$s/hosts/ 2>/dev/null
+  echo "[attack toplam]";  grep -rh 'zero stream_id' experiments/runs/premature_data/seed$s/hosts/ 2>/dev/null | wc -l
+  echo "[benign toplam]";  grep -rh 'zero stream_id' experiments/runs/_benign/seed$s/hosts/ 2>/dev/null | wc -l
+done
+=== seed=42 ===
+[hangi dosyada]
+experiments/runs/premature_data/seed42/hosts/relay2/tor.1000.stdout
+[attack toplam]
+12
+[benign toplam]
+0
+=== seed=137 ===
+[hangi dosyada]
+experiments/runs/premature_data/seed137/hosts/relay2/tor.1000.stdout
+[attack toplam]
+12
+[benign toplam]
+0
+=== seed=2718 ===
+[hangi dosyada]
+experiments/runs/premature_data/seed2718/hosts/relay4/tor.1000.stdout
+[attack toplam]
+12
+[benign toplam]
+0
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+
