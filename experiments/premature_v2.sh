@@ -41,7 +41,26 @@ echo "parser kontrol:"; grep -n "lastReadyCircuitId\|pendingPrematureGid\|TOR_FS
 
 # ---------------------------------------------------------------------------
 say "4) Shadow yaml hazirligi"
-if [ ! -d "$CFT" ]; then echo "HATA: $CFT yok"; exit 1; fi
+# cf_test yoksa veya benign yaml eksikse Shadow tor orneginden otomatik kur.
+if [ ! -d "$CFT" ] || [ ! -f "$CFT/shadow_benign.yaml" ]; then
+  echo "cf_test/shadow_benign.yaml yok -> Shadow tor orneginden kuruluyor"
+  EX="$(dirname "$(find "$HOME" -type f -path '*examples/docs/tor/shadow.yaml' -not -path '*/build/*' 2>/dev/null | head -1)")"
+  if [ -z "$EX" ] || [ ! -f "$EX/shadow.yaml" ]; then echo "HATA: Shadow tor ornegi bulunamadi"; exit 1; fi
+  PB="$TORSRC/src/app/tor"
+  if [ ! -x "$PB" ]; then echo "HATA: patch'li tor binary yok: $PB"; exit 1; fi
+  mkdir -p "$CFT"
+  cp -r "$EX/conf" "$CFT/"
+  cp -r "$EX/shadow.data.template" "$CFT/"
+  cp "$EX/shadow.yaml" "$CFT/shadow_benign.yaml"
+  # torclient'in tor surecini patch'li binary'ye yonlendir + bos environment ekle
+  # (premature varyanti bu bos environment'a attack env var'ini yazacak)
+  PB="$PB" perl -0777 -pi -e 's/(\n  torclient:\n.*?\n    - path: )tor\n/$1$ENV{PB}\n      environment: {}\n/s' "$CFT/shadow_benign.yaml"
+  if grep -q "environment: {}" "$CFT/shadow_benign.yaml"; then
+    echo "shadow_benign.yaml kuruldu (kaynak: $EX, torclient -> $PB)"
+  else
+    echo "HATA: torclient tor sureci duzenlenemedi (yaml yapisi degismis olabilir)"; exit 1
+  fi
+fi
 cd "$CFT"
 if [ ! -f shadow_benign.yaml ]; then echo "HATA: shadow_benign.yaml yok"; exit 1; fi
 if [ ! -f shadow_premature.yaml ]; then
