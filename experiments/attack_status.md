@@ -41,6 +41,15 @@ toplanır (ort ± SD; n=3 olduğu için t-tabanlı %95 GA geniştir). Örnek bir
 ground-truth her saldırıda farklı olduğundan rapor **üç-modludur** — tek bir ortak
 confusion matrisi uydurmak yerine her saldırı kendi geçerli ölçüsüyle raporlanır.
 
+### Estimand haritası (tezde tutarsızlık eleştirisini önlemek için)
+Her saldırının ölçtüğü nicelik (estimand) farklıdır; aşağıdaki tablo bunu açıkça sabitler.
+
+| Saldırı | Örnek birimi | Ground-truth | Birincil geçerli iddia |
+|---|---|---|---|
+| CREATE_FLOOD | istemci devresi | FSM-tip (benign-temiz) | tip-temiz confusion: P=R=F1=1.0, FPR=0 |
+| PREMATURE_DATA | premature olayı (event) | `injected` (TOR marker) + relay native log | event-purity precision + marker-coverage recall; non-circular native 12 vs 0 |
+| CIRCUIT_HIJACK | istemci devresi | YOK (`injected`=0) | non-circular native ayrımı (18/20/16 vs 9); FSM-tip ayırt edici DEĞİL |
+
 **CREATE_FLOOD** (tip-temiz confusion — FSM tipi CREATE_FLOOD benign'de hiç görülmez):
 - TP=9.0±0, FP=0±0, TN=9.0±0, FN=0±0 → Precision=Recall=F1=**1.000**, FPR=**0.000**
 - non-circular native (organik CREATE): attack=18.0±0 vs benign=9.0±0 → ortüşme yok
@@ -48,7 +57,8 @@ confusion matrisi uydurmak yerine her saldırı kendi geçerli ölçüsüyle rap
 
 **PREMATURE_DATA** (event-level; ground-truth = `injected`, `TOR_FSM_PREMATURE_SEND` marker'ı):
 - TP=injected=5.67±1.15, FN=markers−inj=6.33±1.15, FP=attack-noise=6.67±4.62
-- Precision=**0.495±0.179**, Recall=**0.472±0.096**, F1=**0.477±0.132**
+- event-purity Precision=**0.495±0.179**, marker-coverage Recall=**0.472±0.096**, F1=**0.477±0.132**
+  (precision = saldırı koşusunda enjekte/(enjekte+noise); recall = enjekte/gönderilen marker)
 - benign begin-noise FPR (noise/circuits) = **0.481±0.064**
 - non-circular native (relay zero-stream-id): attack=12.0±0 vs benign=0 → ortüşme yok (**en güçlü kanıt**)
 - Recall<1 nedeni: parser, gönderilen 12 marker'ın yalnızca 5/5/7'sini injected
