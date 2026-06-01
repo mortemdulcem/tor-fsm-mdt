@@ -62,6 +62,13 @@ function group(lines) {
   return byAttack;
 }
 
+// Per-circuit isaret sayisi: benzersiz devre (varsa) yoksa ihlal sayisi; her
+// halde [0, circuits] araligina KISILIR (bir devre tipte en fazla 1 kez sayilir).
+const flagOf = (r) => {
+  const f = r.flaggedCircuits != null ? r.flaggedCircuits : r.flagged;
+  return Math.min(Math.max(0, f), r.circuits);
+};
+
 // --- CREATE_FLOOD / CIRCUIT_HIJACK: standart confusion matrix -----------------
 function confusionStd(bySeed) {
   const out = { precision: [], recall: [], f1: [], fpr: [],
@@ -69,8 +76,9 @@ function confusionStd(bySeed) {
   for (const seed of Object.keys(bySeed)) {
     const a = bySeed[seed].attack, b = bySeed[seed].benign;
     if (!a || !b) continue;
-    const TP = a.flagged, FN = Math.max(0, a.circuits - a.flagged);
-    const FP = b.flagged, TN = Math.max(0, b.circuits - b.flagged);
+    const fa = flagOf(a), fb = flagOf(b);
+    const TP = fa, FN = Math.max(0, a.circuits - fa);
+    const FP = fb, TN = Math.max(0, b.circuits - fb);
     const prec = div(TP, TP + FP), rec = div(TP, TP + FN), fpr = div(FP, FP + TN);
     const f1 = div(2 * prec * rec, prec + rec);
     out.tp.push(TP); out.fn.push(FN); out.fp.push(FP); out.tn.push(TN);
@@ -92,7 +100,9 @@ function prematureStats(bySeed) {
     out.injected.push(a.prem_injected ?? 0);
     out.noiseBen.push(b.prem_noise ?? 0);
     out.fprNoise.push(div(b.prem_noise ?? 0, b.circuits));
-    out.markerRecall.push(div(a.prem_injected ?? 0, a.native || 0));
+    // marker recall = FSM'in yakaladigi enjekte / saldirinin GERCEKTEN gonderdigi
+    // marker (TOR_FSM_PREMATURE_SEND grep). markers yoksa native'e duser (uyari).
+    out.markerRecall.push(div(a.prem_injected ?? 0, (a.markers || a.native) || 0));
   }
   return out;
 }
