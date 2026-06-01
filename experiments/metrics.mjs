@@ -1,22 +1,28 @@
-// Coklu-seed non-circular tespit metrikleri toplayicisi.
+// Coklu-seed gercek-saldiri metrikleri toplayicisi (UC-MODLU, durust).
 //
-// Girdi: experiments/runs/results.jsonl (full_pipeline.sh uretir). Her satir bir
-// Shadow kosusu: {attack, seed, scenario:"attack"|"benign", circuits, flagged,
-// native, [prem_injected, prem_noise], types}.
+// Girdi: experiments/runs/results.jsonl (full_pipeline.sh / recompute.sh uretir).
+// Her satir bir Shadow kosusu:
+//   {attack, seed, scenario:"attack"|"benign", circuits, flagged, injected, noise,
+//    native, markers, types, [prem_injected, prem_noise]}
 //
-// Cikti: her gercek saldiri icin
-//   - CREATE_FLOOD / CIRCUIT_HIJACK: per-seed confusion matrix (TP/FP/TN/FN) ve
-//     precision/recall/F1/FPR; seedler arasi ortalama ± SD ± %95 t-GA (kucuk n).
-//   - PREMATURE_DATA: non-circular native sinyal (relay zero-stream-id) attack vs
-//     benign; dedektor begin-noise FPR (durust yanlis-pozitif orani); marker-tabanli
-//     recall AYRICA ve "yari-dongusel" uyarisiyla.
+// Saldiri basina FARKLI rapor — cunku ground-truth her saldirida ayni degil:
 //
-// Metodoloji (durust): ornek birimi = istemci devresi. Etiket = senaryo (attack=+,
-// benign=-). Tahmin = FSM dedektorunun o tipi isaretlemesi. Uc saldiri da dedektoru
-// saldirinin urettigi olaya gore tetikledigi icin recall yapisal olarak yuksek
-// beklenir; bilimsel olarak ayirt edici nicelik benign uzerindeki YANLIS-POZITIF
-// oranidir (ozellikle PREMATURE begin-noise). PREMATURE icin istemci-tarafi TP
-// marker'a dayanir (dongusel) -> non-circular kanit relay'in native logudur.
+//   create_flood  : FSM tipi CREATE_FLOOD yalnizca saldirida olusur (benign=0).
+//                   Tip-temiz confusion matrix (TP/FP/TN/FN, precision/recall/F1/FPR).
+//
+//   premature_data: ihlal nesnesinde injected=true (TOR_FSM_PREMATURE_SEND marker'i
+//                   parser tarafindan etiketlenir) -> EVENT-LEVEL confusion:
+//                     TP = injected (gercek premature, tespit edildi)
+//                     FP = attack.noise (begin-noise PREMATURE yanlis-pozitifi)
+//                     FN = markers - injected (gonderilen ama FSM-etiketlenmeyen)
+//                   Ayrica benign begin-noise FPR ve non-circular native (12 vs 0).
+//
+//   circuit_hijack: injected=0 (parser bu hook'u etiketlemiyor) VE benign'de sabit
+//                   ~12 CIRCUIT_HIJACK taban-gurultusu (begin-noise normal 3-hop
+//                   devrelerdeki EXTEND/CREATE'i aktif devreye yanlis-atfeder).
+//                   -> FSM-siniflandirma SEVIYESINDE AYIRT EDICI DEGIL. Sahte temiz
+//                   matris URETILMEZ; sayilar + delta + non-circular native (organik
+//                   CREATE) raporlanir; ayrilabilirlik native uzerinden gosterilir.
 //
 // Kullanim:  node experiments/metrics.mjs [results.jsonl]
 //            node experiments/metrics.mjs --selftest
@@ -51,6 +57,14 @@ function aggLine(label, arr) {
   return `    ${label}: ort=${fmt(m)} ± ${fmt(s)} (n=${arr.length})${ci}`;
 }
 
+// non-circular native ayrilabilirlik: attack min ile benign max ortusur mu?
+function sepLine(atk, ben) {
+  if (!atk.length || !ben.length) return "    ayrilabilirlik: (veri yok)";
+  const mnA = Math.min(...atk), mxB = Math.max(...ben);
+  return `    ayrilabilirlik: attack min=${mnA} vs benign max=${mxB} -> ` +
+    (mnA > mxB ? "ORTUSME YOK (esikle ayrilabilir)" : "ORTUSME VAR (ayrilamaz)");
+}
+
 // --- gruplama ----------------------------------------------------------------
 function group(lines) {
   const byAttack = {};
@@ -62,114 +76,155 @@ function group(lines) {
   return byAttack;
 }
 
-// Per-circuit isaret sayisi: benzersiz devre (varsa) yoksa ihlal sayisi; her
-// halde [0, circuits] araligina KISILIR (bir devre tipte en fazla 1 kez sayilir).
-const flagOf = (r) => {
-  const f = r.flaggedCircuits != null ? r.flaggedCircuits : r.flagged;
-  return Math.min(Math.max(0, f), r.circuits);
-};
-
-// --- CREATE_FLOOD / CIRCUIT_HIJACK: standart confusion matrix -----------------
-function confusionStd(bySeed) {
-  const out = { precision: [], recall: [], f1: [], fpr: [],
-    tp: [], fp: [], fn: [], tn: [], nativeAtk: [], nativeBen: [] };
-  for (const seed of Object.keys(bySeed)) {
-    const a = bySeed[seed].attack, b = bySeed[seed].benign;
+// --- create_flood: tip-temiz confusion (benign hedef-tip = 0 beklenir) --------
+function createFloodStats(bySeed) {
+  const o = { tp: [], fn: [], fp: [], tn: [], precision: [], recall: [], f1: [],
+    fpr: [], nativeAtk: [], nativeBen: [], benCount: [] };
+  for (const s of Object.keys(bySeed)) {
+    const a = bySeed[s].attack, b = bySeed[s].benign;
     if (!a || !b) continue;
-    const fa = flagOf(a), fb = flagOf(b);
-    const TP = fa, FN = Math.max(0, a.circuits - fa);
-    const FP = fb, TN = Math.max(0, b.circuits - fb);
+    const TP = Math.min(a.flagged, a.circuits), FN = Math.max(0, a.circuits - TP);
+    const FP = Math.min(b.flagged, b.circuits), TN = Math.max(0, b.circuits - FP);
     const prec = div(TP, TP + FP), rec = div(TP, TP + FN), fpr = div(FP, FP + TN);
-    const f1 = div(2 * prec * rec, prec + rec);
-    out.tp.push(TP); out.fn.push(FN); out.fp.push(FP); out.tn.push(TN);
-    out.precision.push(prec); out.recall.push(rec); out.f1.push(f1); out.fpr.push(fpr);
-    out.nativeAtk.push(a.native); out.nativeBen.push(b.native);
+    o.tp.push(TP); o.fn.push(FN); o.fp.push(FP); o.tn.push(TN);
+    o.precision.push(prec); o.recall.push(rec); o.f1.push(div(2 * prec * rec, prec + rec));
+    o.fpr.push(fpr);
+    o.nativeAtk.push(a.native); o.nativeBen.push(b.native); o.benCount.push(b.flagged);
   }
-  return out;
+  return o;
 }
 
-// --- PREMATURE_DATA: non-circular native + begin-noise FPR --------------------
+// --- premature_data: event-level (injected ground-truth) ---------------------
 function prematureStats(bySeed) {
-  const out = { nativeAtk: [], nativeBen: [], fprNoise: [], markerRecall: [],
-    injected: [], noiseBen: [] };
-  for (const seed of Object.keys(bySeed)) {
-    const a = bySeed[seed].attack, b = bySeed[seed].benign;
+  const o = { tp: [], fn: [], precision: [], recall: [], f1: [], fprBen: [],
+    injected: [], noiseAtk: [], markers: [], nativeAtk: [], nativeBen: [] };
+  for (const s of Object.keys(bySeed)) {
+    const a = bySeed[s].attack, b = bySeed[s].benign;
     if (!a || !b) continue;
-    out.nativeAtk.push(a.native);
-    out.nativeBen.push(b.native);
-    out.injected.push(a.prem_injected ?? 0);
-    out.noiseBen.push(b.prem_noise ?? 0);
-    out.fprNoise.push(div(b.prem_noise ?? 0, b.circuits));
-    // marker recall = FSM'in yakaladigi enjekte / saldirinin GERCEKTEN gonderdigi
-    // marker (TOR_FSM_PREMATURE_SEND grep). markers yoksa native'e duser (uyari).
-    out.markerRecall.push(div(a.prem_injected ?? 0, (a.markers || a.native) || 0));
+    const inj = a.injected ?? a.prem_injected ?? 0;
+    const noiseA = a.noise ?? a.prem_noise ?? 0;
+    const noiseB = b.noise ?? b.prem_noise ?? 0;
+    const mk = a.markers || 0;
+    const TP = inj, FN = Math.max(0, mk - inj);
+    const prec = div(TP, TP + noiseA);       // attack-kosusunda dogru premature orani
+    const rec = div(TP, mk || (TP + FN));    // gonderilen marker'in ne kadari etiketlendi
+    o.tp.push(TP); o.fn.push(FN);
+    o.precision.push(prec); o.recall.push(rec); o.f1.push(div(2 * prec * rec, prec + rec));
+    o.fprBen.push(div(noiseB, b.circuits));  // benign begin-noise yanlis-pozitif orani
+    o.injected.push(inj); o.noiseAtk.push(noiseA); o.markers.push(mk);
+    o.nativeAtk.push(a.native); o.nativeBen.push(b.native);
   }
-  return out;
+  return o;
+}
+
+// --- circuit_hijack: confounded (event-level ground-truth yok) ----------------
+function hijackStats(bySeed) {
+  const o = { atkCount: [], benCount: [], delta: [], injected: [],
+    nativeAtk: [], nativeBen: [] };
+  for (const s of Object.keys(bySeed)) {
+    const a = bySeed[s].attack, b = bySeed[s].benign;
+    if (!a || !b) continue;
+    o.atkCount.push(a.flagged); o.benCount.push(b.flagged);
+    o.delta.push(a.flagged - b.flagged); o.injected.push(a.injected ?? 0);
+    o.nativeAtk.push(a.native); o.nativeBen.push(b.native);
+  }
+  return o;
 }
 
 // --- rapor -------------------------------------------------------------------
 function report(byAttack) {
-  const lines = [];
-  lines.push("=== Coklu-seed gercek-saldiri metrikleri (non-circular) ===\n");
+  const L = [];
+  L.push("=== Coklu-seed gercek-saldiri metrikleri (non-circular, uc-modlu) ===\n");
   for (const attack of Object.keys(byAttack).sort()) {
     const bySeed = byAttack[attack];
     const seeds = Object.keys(bySeed);
-    lines.push(`# ${attack}  (seed: ${seeds.join(", ")} | n=${seeds.length})`);
-    if (attack === "premature_data") {
+    L.push(`# ${attack}  (seed: ${seeds.join(", ")} | n=${seeds.length})`);
+
+    if (attack === "create_flood") {
+      const c = createFloodStats(bySeed);
+      const benClean = c.benCount.every((x) => x === 0);
+      L.push(`  [tip-temiz confusion — FSM tipi CREATE_FLOOD benign'de ${benClean ? "GORULMEZ (ayrac)" : "GORULDU (uyari!)"}]`);
+      L.push(aggLine("TP", c.tp)); L.push(aggLine("FN", c.fn));
+      L.push(aggLine("FP", c.fp)); L.push(aggLine("TN", c.tn));
+      L.push(aggLine("Precision", c.precision));
+      L.push(aggLine("Recall   ", c.recall));
+      L.push(aggLine("F1       ", c.f1));
+      L.push(aggLine("FPR      ", c.fpr));
+      L.push("  [non-circular] organik CREATE log satiri (attack vs benign):");
+      L.push(aggLine("ATTACK", c.nativeAtk)); L.push(aggLine("BENIGN", c.nativeBen));
+      L.push(sepLine(c.nativeAtk, c.nativeBen));
+
+    } else if (attack === "premature_data") {
       const p = prematureStats(bySeed);
-      lines.push("  [non-circular] Tor native relay logu (zero-stream-id) satir sayisi:");
-      lines.push(aggLine("ATTACK", p.nativeAtk));
-      lines.push(aggLine("BENIGN", p.nativeBen));
-      lines.push("  [dedektor FPR] begin-noise yanlis-pozitif (benign): noise/circuits:");
-      lines.push(aggLine("FPR", p.fprNoise));
-      lines.push("  [yari-dongusel — uyari] marker-tabanli recall = injected/markers:");
-      lines.push(aggLine("recall*", p.markerRecall));
-      lines.push("    * marker saldirinin kendi yazdigi sinyaldir; bas sonuc DEGIL.");
+      L.push("  [event-level confusion — ground-truth: injected (TOR marker)]");
+      L.push(aggLine("TP=injected", p.tp));
+      L.push(aggLine("FN=markers-inj", p.fn));
+      L.push(aggLine("FP=attack-noise", p.noiseAtk));
+      L.push(aggLine("Precision", p.precision));
+      L.push(aggLine("Recall   ", p.recall));
+      L.push(aggLine("F1       ", p.f1));
+      L.push("    not: recall = FSM-etiketli injected / gonderilen marker; parser");
+      L.push("    kapsami sinirli oldugu icin <1 (gonderilenin hepsi etiketlenmez).");
+      L.push("  [benign begin-noise FPR] noise/circuits:");
+      L.push(aggLine("FPR", p.fprBen));
+      L.push("  [non-circular] Tor native relay logu (zero-stream-id):");
+      L.push(aggLine("ATTACK", p.nativeAtk)); L.push(aggLine("BENIGN", p.nativeBen));
+      L.push(sepLine(p.nativeAtk, p.nativeBen));
+
+    } else if (attack === "circuit_hijack") {
+      const h = hijackStats(bySeed);
+      const injZero = h.injected.every((x) => x === 0);
+      L.push("  [UYARI] FSM-siniflandirma seviyesinde AYIRT EDICI DEGIL:");
+      L.push(`    - injected ground-truth ${injZero ? "YOK (hepsi 0)" : "var"}; event-level confusion kurulamaz.`);
+      L.push("    - benign'de sabit begin-noise taban-gurultusu (asagidaki BENIGN sayisi).");
+      L.push("  [FSM hedef-tip ihlal sayisi] CIRCUIT_HIJACK:");
+      L.push(aggLine("ATTACK", h.atkCount)); L.push(aggLine("BENIGN", h.benCount));
+      L.push(aggLine("delta=atk-ben", h.delta));
+      L.push("  [non-circular] organik CREATE log satiri (attack vs benign):");
+      L.push(aggLine("ATTACK", h.nativeAtk)); L.push(aggLine("BENIGN", h.nativeBen));
+      L.push(sepLine(h.nativeAtk, h.nativeBen));
+      L.push("    sonuc: ayrim YALNIZCA non-circular native ile mumkun; FSM-tip degil.");
+
     } else {
-      const c = confusionStd(bySeed);
-      lines.push("  [confusion matrix — devre bazli, seed ortalamasi]");
-      lines.push(aggLine("TP", c.tp));
-      lines.push(aggLine("FN", c.fn));
-      lines.push(aggLine("FP", c.fp));
-      lines.push(aggLine("TN", c.tn));
-      lines.push(aggLine("Precision", c.precision));
-      lines.push(aggLine("Recall   ", c.recall));
-      lines.push(aggLine("F1       ", c.f1));
-      lines.push(aggLine("FPR      ", c.fpr));
-      lines.push("  [non-circular] organik CREATE log satir sayisi (attack vs benign):");
-      lines.push(aggLine("ATTACK", c.nativeAtk));
-      lines.push(aggLine("BENIGN", c.nativeBen));
+      L.push("  (taninmayan saldiri — atlandi)");
     }
-    lines.push("");
+    L.push("");
   }
-  return lines.join("\n");
+  return L.join("\n");
 }
 
 // --- selftest (formul dogrulamasi; GERCEK VERI DEGIL) ------------------------
 function selftest() {
   const data = [
-    { attack: "create_flood", seed: 1, scenario: "attack", circuits: 10, flagged: 10, native: 20 },
-    { attack: "create_flood", seed: 1, scenario: "benign", circuits: 10, flagged: 0, native: 10 },
-    { attack: "create_flood", seed: 2, scenario: "attack", circuits: 8, flagged: 8, native: 16 },
-    { attack: "create_flood", seed: 2, scenario: "benign", circuits: 8, flagged: 0, native: 8 },
-    { attack: "premature_data", seed: 1, scenario: "attack", circuits: 10, flagged: 11, native: 12, prem_injected: 5, prem_noise: 6 },
-    { attack: "premature_data", seed: 1, scenario: "benign", circuits: 9, flagged: 9, native: 0, prem_injected: 0, prem_noise: 9 },
+    // create_flood: benign-temiz -> precision=recall=F1=1, FPR=0
+    { attack: "create_flood", seed: 1, scenario: "attack", circuits: 10, flagged: 10, injected: 0, noise: 10, native: 20 },
+    { attack: "create_flood", seed: 1, scenario: "benign", circuits: 10, flagged: 0, injected: 0, noise: 0, native: 10 },
+    { attack: "create_flood", seed: 2, scenario: "attack", circuits: 8, flagged: 8, injected: 0, noise: 8, native: 16 },
+    { attack: "create_flood", seed: 2, scenario: "benign", circuits: 8, flagged: 0, injected: 0, noise: 0, native: 8 },
+    // premature: TP=inj=5, FN=markers-inj=7, FP=noiseAtk=6, prec=5/11, rec=5/12
+    { attack: "premature_data", seed: 1, scenario: "attack", circuits: 10, flagged: 11, injected: 5, noise: 6, native: 12, markers: 12 },
+    { attack: "premature_data", seed: 1, scenario: "benign", circuits: 9, flagged: 9, injected: 0, noise: 9, native: 0, markers: 0 },
+    // circuit_hijack: injected=0, benign baseline>0
+    { attack: "circuit_hijack", seed: 1, scenario: "attack", circuits: 9, flagged: 21, injected: 0, noise: 21, native: 18 },
+    { attack: "circuit_hijack", seed: 1, scenario: "benign", circuits: 9, flagged: 12, injected: 0, noise: 12, native: 9 },
   ];
   const g = group(data);
-  const c = confusionStd(g.create_flood);
+  const c = createFloodStats(g.create_flood);
   const p = prematureStats(g.premature_data);
+  const h = hijackStats(g.circuit_hijack);
   const assert = (cond, msg) => { if (!cond) { console.error("FAIL:", msg); process.exit(1); } };
-  // create_flood: her seed icin TP=flagged, FN=0, FP=0, recall=1, fpr=0
-  assert(JSON.stringify(c.tp) === JSON.stringify([10, 8]), "tp");
-  assert(JSON.stringify(c.fn) === JSON.stringify([0, 0]), "fn");
-  assert(JSON.stringify(c.fp) === JSON.stringify([0, 0]), "fp");
-  assert(mean(c.recall) === 1, "recall=1");
-  assert(mean(c.fpr) === 0, "fpr=0");
-  assert(mean(c.precision) === 1, "precision=1");
-  // premature: native attack=12 benign=0; FPR=9/9=1; markerRecall=5/12
+  // create_flood
+  assert(JSON.stringify(c.tp) === JSON.stringify([10, 8]), "cf tp");
+  assert(mean(c.precision) === 1 && mean(c.recall) === 1 && mean(c.fpr) === 0, "cf clean");
+  // premature
+  assert(p.tp[0] === 5 && p.fn[0] === 7, "prem tp/fn");
+  assert(Math.abs(p.precision[0] - 5 / 11) < 1e-9, "prem precision 5/11");
+  assert(Math.abs(p.recall[0] - 5 / 12) < 1e-9, "prem recall 5/12");
+  assert(Math.abs(p.fprBen[0] - 9 / 9) < 1e-9, "prem benign fpr 9/9");
   assert(p.nativeAtk[0] === 12 && p.nativeBen[0] === 0, "prem native");
-  assert(p.fprNoise[0] === 1, "prem fpr 9/9");
-  assert(Math.abs(p.markerRecall[0] - 5 / 12) < 1e-9, "prem marker recall");
+  // hijack
+  assert(h.atkCount[0] === 21 && h.benCount[0] === 12 && h.delta[0] === 9, "hijack counts");
+  assert(h.injected.every((x) => x === 0), "hijack injected=0");
   console.log("selftest PASS (formul dogrulamasi; bu sayilar gercek veri degildir)");
 }
 
@@ -183,7 +238,7 @@ if (args.includes("--selftest")) {
   try {
     text = readFileSync(path, "utf8");
   } catch {
-    console.error(`results bulunamadi: ${path}\nOnce VM'de: bash experiments/full_pipeline.sh`);
+    console.error(`results bulunamadi: ${path}\nOnce VM'de: bash experiments/full_pipeline.sh (veya recompute.sh)`);
     process.exit(2);
   }
   const lines = text.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => JSON.parse(l));

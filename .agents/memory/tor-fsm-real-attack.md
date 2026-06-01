@@ -149,6 +149,31 @@ v3 succeeds via a DIFFERENT, genuine path: inject the early cell from WITHIN cir
 - Files live on `premature-transport` branch: full_pipeline.sh, detect_json.mjs, metrics.mjs,
   attack_status.md (the gerçek/sentetik/gerçekleştirilemez classification table for the thesis).
 
+## Multi-seed RESULT corrects earlier single-run claims — three-mode honest metrics
+Single-run notes below saying "CIRCUIT_HIJACK benign=0" are WRONG/misleading; the 3-seed
+(42/137/2718) recompute over the SAVED logs shows a different, honest picture.
+- **injected-tag asymmetry (root fact):** the violation object has NO circuit id and only
+  PREMATURE carries `injected:true` (the parser tags only the `TOR_FSM_PREMATURE_SEND`
+  marker). create_flood and circuit_hijack runs have `injected=0` for ALL seeds — the
+  parser never tags their hooks. So event-level ground-truth exists ONLY for premature.
+- **begin-noise has TWO faces (same single bug):** `lastCircuitId` mis-attribution routes a
+  benign event onto a newer circuit; `classifyInvalid` then files it as CIRCUIT_HIJACK
+  (CREATE/EXTEND on active circuit) OR PREMATURE_DATA (DATA during build). Hence benign
+  produces ~12 CIRCUIT_HIJACK AND ~5 PREMATURE per run. CREATE_FLOOD is immune (its
+  signature is duplicate CREATE only in CREATE_SENT).
+- **Three honest report modes (metrics.mjs branches by attack name):**
+  - create_flood = tip-temiz confusion: benign CREATE_FLOOD=0 always → P=R=F1=1.0, FPR=0;
+    native organic CREATE 18 vs 9.
+  - premature = event-level using injected: TP=injected(5/5/7), FP=attack.noise, FN=markers−injected
+    → P≈0.50, R≈0.47, F1≈0.48; benign begin-noise FPR≈0.48; native 12 vs 0 (headline).
+  - circuit_hijack = NON-discriminative at FSM level: injected=0, benign baseline=12 (cannot
+    build a clean confusion → DO NOT fabricate one). Attack is still REAL but provable ONLY
+    via non-circular native (attack 18/20/16 vs benign 9, no overlap). Report counts+native.
+- **`recompute.sh`** regenerates results.jsonl from the saved `experiments/runs/<attack>/seed<seed>/`
+  + `_benign/` logs WITHOUT rerunning Shadow — use it to re-aggregate after metrics changes.
+- **Caveat:** seed=2718 circuit_hijack attack run was interrupted (8 circuits, native=16, EXIT=1);
+  native still separates so it doesn't change the verdict, but a clean full re-run is preferable.
+
 ## NOT genuinely realizable: HANDSHAKE_SKIP (structural blocker)
 - **HANDSHAKE_SKIP** needs SEND_CREATE in IDLE/CONNECTING or SEND_EXTEND in CREATE_SENT. Tor sends the
   first CREATE only AFTER the channel/TLS is OPEN (circuit_send_first_onion_skin is gated on channel

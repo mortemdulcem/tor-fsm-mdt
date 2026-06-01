@@ -1,0 +1,45 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt && git pull
+bash experiments/recompute.sh
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 8 (delta 5), reused 0 (delta 0), pack-reused 0 (from 0)
+Nesneler açılıyor: 100% (8/8), 2.17 KiB | 1.08 MiB/sn, bitti.
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+   df1630f..e5a8997  premature-transport -> origin/premature-transport
+Güncelleniyor: df1630f..e5a8997
+Fast-forward
+ experiments/detect_json.mjs |  9 +++++--
+ experiments/recompute.sh    | 61 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 68 insertions(+), 2 deletions(-)
+ create mode 100644 experiments/recompute.sh
+    create_flood seed=42: native attack=18 benign=9
+    circuit_hijack seed=42: native attack=18 benign=9
+    premature_data seed=42: native attack=12 benign=0
+    create_flood seed=137: native attack=18 benign=9
+    circuit_hijack seed=137: native attack=20 benign=9
+    premature_data seed=137: native attack=12 benign=0
+    create_flood seed=2718: native attack=18 benign=9
+    circuit_hijack seed=2718: native attack=16 benign=9
+    premature_data seed=2718: native attack=12 benign=0
+results.jsonl satir sayisi: 18
+--- injected/noise (hedef-tip) ozet ---
+create_flood seed=42 attack: flagged=9 injected=0 noise=9 native=18
+create_flood seed=42 benign: flagged=0 injected=0 noise=0 native=9
+circuit_hijack seed=42 attack: flagged=21 injected=0 noise=21 native=18
+circuit_hijack seed=42 benign: flagged=12 injected=0 noise=12 native=9
+premature_data seed=42 attack: flagged=17 injected=5 noise=12 native=12
+premature_data seed=42 benign: flagged=5 injected=0 noise=5 native=0
+create_flood seed=137 attack: flagged=9 injected=0 noise=9 native=18
+create_flood seed=137 benign: flagged=0 injected=0 noise=0 native=9
+circuit_hijack seed=137 attack: flagged=22 injected=0 noise=22 native=20
+circuit_hijack seed=137 benign: flagged=12 injected=0 noise=12 native=9
+premature_data seed=137 attack: flagged=9 injected=5 noise=4 native=12
+premature_data seed=137 benign: flagged=4 injected=0 noise=4 native=0
+create_flood seed=2718 attack: flagged=9 injected=0 noise=9 native=18
+create_flood seed=2718 benign: flagged=0 injected=0 noise=0 native=9
+circuit_hijack seed=2718 attack: flagged=20 injected=0 noise=20 native=16
+circuit_hijack seed=2718 benign: flagged=12 injected=0 noise=12 native=9
+premature_data seed=2718 attack: flagged=11 injected=7 noise=4 native=12
+premature_data seed=2718 benign: flagged=4 injected=0 noise=4 native=0
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
