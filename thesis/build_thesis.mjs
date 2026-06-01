@@ -23,6 +23,7 @@ const fext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiment
 const fval = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions_validated.json"), "utf8"));
 const gext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/g_extensions.json"), "utf8"));
 const fourCell = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/shadow_results_4cell.json"), "utf8"));
+const ml = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/ml_baseline_results.json"), "utf8"));
 const fvalBy = Object.fromEntries(fval.comparisons.filter(v => v.B === "B2_GreedySC").map(v => [v.metric, v]));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
@@ -34,6 +35,9 @@ const fmt = (x, d = 3) => isFinite(x) ? x.toFixed(d) : "—";
 const f4 = (x) => x == null ? "N/A" : (typeof x === "object" ? `${x.mean.toFixed(4)} ± ${x.sd.toFixed(4)}` : Number(x).toFixed(4));
 const sig = (p) => p < 0.001 ? "&lt;.001" : p.toFixed(4);
 const stars = (p) => p < 0.001 ? "***" : p < 0.01 ? "**" : p < 0.05 ? "*" : "";
+// ML mean±sd (3 ondalık) ve yüzde-mean yardımcıları
+const ms = (o) => `${o.mean.toFixed(3)} ± ${o.sd.toFixed(3)}`;
+const mpct = (o) => `${(o.mean * 100).toFixed(1)}%`;
 
 // ---------- Atıflar (IEEE) — 20 doğrulanmış kaynak (Literatur_Notlari ile bire bir) ----------
 const REFS = [
@@ -210,9 +214,13 @@ istatistiksel anlamlı üstünlüğü doğrular (p &lt; .001; Cohen d ∈ [3.6, 
 (i) Tor devre protokolü için yayımlanmış ilk tam δ-matrisini, (ii) ${totalInvalid} geçersiz
 ikilinin saldırı vektörü ve şiddet etiketiyle programatik sınıflandırmasını,
 (iii) referans bir MDT implementasyonunu ve (iv) sayısal olarak doğrulanmış üç-katmanlı
-karşılaştırmayı sunar.</p>
+karşılaştırmayı sunar. Ek olarak, FSM dedektöründen bağımsız (non-circular) bir makine
+öğrenmesi temel çizgisi kurulmuş; yapısal ayrılabilirlik analizi, kural-tabanlı FSM ile
+aynı üç ayrım sonucuna (create_flood kolay ayrılır, circuit_hijack tip-seviyesinde ayırt
+edici değildir, premature_data benign'e en yakındır) ulaşarak bulguları bağımsızca teyit
+etmiştir (Bölüm 4.17).</p>
 <p><b>Anahtar kelimeler:</b> Tor, anonim ağ, sonlu durum makinesi, model-driven testing,
-protokol state fuzzing, güvenlik testi, geçiş kapsamı.</p>
+protokol state fuzzing, güvenlik testi, geçiş kapsamı, makine öğrenmesi temel çizgisi.</p>
 
 <h2>Abstract</h2>
 <p>This work formally models the circuit life-cycle of the Tor anonymous network protocol
@@ -232,9 +240,15 @@ of ${pct(stats.B3_MDT.itdr.mean)}. Welch t-tests confirm statistical superiority
 baselines (p &lt; .001; Cohen's d ∈ [3.6, 15.4]). Contributions: (i) the first published
 complete δ-matrix for the Tor circuit protocol, (ii) a programmatic classification of all
 ${totalInvalid} invalid pairs into attack vectors with severity labels, (iii) a reference
-MDT implementation, and (iv) a numerically validated three-way baseline comparison.</p>
+MDT implementation, and (iv) a numerically validated three-way baseline comparison.
+In addition, an independent (non-circular) machine-learning baseline — using only raw
+behavioural event counts, never the FSM violation label — converges, through a
+cross-validation-independent structural-separability analysis, on the same three
+discrimination outcomes as the rule-based FSM (create_flood is cleanly separable,
+circuit_hijack is not type-level discriminative, premature_data is closest to benign),
+independently corroborating the findings (Section 4.17).</p>
 <p><b>Keywords:</b> Tor, anonymous network, finite-state machine, model-driven testing,
-protocol state fuzzing, security testing, transition coverage.</p>
+protocol state fuzzing, security testing, transition coverage, machine-learning baseline.</p>
 
 <div class="pagebreak"></div>
 
@@ -269,6 +283,15 @@ protocol state fuzzing, security testing, transition coverage.</p>
   <div class="lvl2"><span>4.6 Detection Latency Ölçümü</span><span></span></div>
   <div class="lvl2"><span>4.7 Bütçe-Kapsama Eğrisi</span><span></span></div>
   <div class="lvl2"><span>4.8 Rule-Based Detector Karşılaştırması (B0)</span><span></span></div>
+  <div class="lvl2"><span>4.9 Bootstrap Güven Aralıkları ve Post-hoc Güç Analizi</span><span></span></div>
+  <div class="lvl2"><span>4.10 Stream Alt-FSM Modeli ve Deneysel Karşılaştırma</span><span></span></div>
+  <div class="lvl2"><span>4.11 D-grubu: Bağımsız Oracle, Genişletilmiş SLR ve Cross-Language Latency</span><span></span></div>
+  <div class="lvl2"><span>4.12 E-grubu: Gerçek Tor Kaynak Kodundan Statik FSM Çıkarımı</span><span></span></div>
+  <div class="lvl2"><span>4.13 F-grubu: N=100 Yeniden Koşu, A-priori Güç Analizi, BCa Bootstrap</span><span></span></div>
+  <div class="lvl2"><span>4.14 G-grubu: Angluin L* Algoritmasının Implementasyonu</span><span></span></div>
+  <div class="lvl2"><span>4.15 Bağımsız VM Ortamında Reproducibility Doğrulaması (C5)</span><span></span></div>
+  <div class="lvl2"><span>4.16 Ampirik Doğrulamanın Bir Model Hatasını Yakalaması: 2-hop → 3-hop FSM Düzeltmesi</span><span></span></div>
+  <div class="lvl2"><span>4.17 Makine Öğrenmesi Temel Çizgisi: Bağımsız (Non-circular) Doğrulama</span><span></span></div>
   <div class="lvl1"><span>5. Görselleştirme</span><span></span></div>
   <div class="lvl1"><span>6. Sonuç ve Gelecek Çalışmalar</span><span></span></div>
   <div class="lvl2"><span>6.1 Katkıların Yeniden Değerlendirilmesi</span><span></span></div>
@@ -331,6 +354,11 @@ sistematik literatür taraması (SLR, bkz. Bölüm 2) ile teyit edilmiştir.</p>
   yanlış-pozitif oranını
   ${f4(fourCell.cells.v1_2hop.benign.fpr)} → ${f4(fourCell.cells.v1_3hop.benign.fpr)}
   düşürürken recall = 1.0000 korunmuştur (bkz. Bölüm 4.16).</li>
+  <li>FSM dedektöründen <b>bağımsız (non-circular) bir makine öğrenmesi temel
+  çizgisi</b>: yalnızca ham davranış sayımlarını (FSM ihlal etiketi olmadan)
+  kullanan ML, çapraz-doğrulamadan bağımsız yapısal ayrılabilirlik analiziyle
+  kural-tabanlı FSM ile aynı üç ayrım sonucuna yakınsayarak bulguları bağımsızca
+  teyit eder (bkz. Bölüm 4.17).</li>
 </ol>
 
 <h3>1.4 Tezin Yapısı</h3>
@@ -1256,6 +1284,122 @@ ağda gözlemlenmiş saldırı tabanlı bir saha çalışması iddiası taşıma
 
 <div class="pagebreak"></div>
 
+<!-- ====================== BÖLÜM 4.17 — ML Temel Çizgisi (non-circular) ====================== -->
+<h3>4.17 Makine Öğrenmesi Temel Çizgisi: Bağımsız (Non-circular) Doğrulama</h3>
+<p>Önceki bölümlerdeki tüm sonuçlar, FSM δ-matrisinden türetilen <i>kural tabanlı</i>
+bir dedektöre dayanır. Bu bölüm, FSM dedektöründen <b>bağımsız</b> bir makine
+öğrenmesi (ML) temel çizgisi kurarak aynı bulgulara ayrı bir yöntemle ulaşılıp
+ulaşılamayacağını sınar. Öznitelikler, devre başına yalnızca <i>ham davranış
+sayımlarıdır</i> (${ml.data.n_features} öznitelik: ${ml.data.features.filter(f=>f!=="n_events").length}
+olay-tipi sayısı + toplam olay sayısı); <b>FSM ihlal etiketi öznitelik olarak
+kullanılmaz</b> &mdash; bu, modelin dedektörün çıktısını taklit etmesini önler
+(non-circular). Veri, Bölüm 4.15'teki ${ml.data.n_seeds} seed-deterministik Shadow
+koşumundan toplanan ${ml.data.n_circuits} devredir (benign ${ml.data.counts.benign},
+create_flood ${ml.data.counts.create_flood}, circuit_hijack
+${ml.data.counts.circuit_hijack}, premature_data ${ml.data.counts.premature_data}).
+Tüm sayılar <code>experiments/ml_baseline.py</code> çıktısından
+(<code>ml_baseline_results.json</code>) üretilmiştir; elle girilmemiştir.</p>
+
+<p class="no-indent"><b>Metodolojik uyarı (önce okunmalı).</b> Veri deterministik
+olduğundan sınıf başına yalnızca az sayıda <i>eşsiz</i> öznitelik vektörü vardır
+(benign ${ml.structural.unique_per_class.benign}, create_flood
+${ml.structural.unique_per_class.create_flood}, circuit_hijack
+${ml.structural.unique_per_class.circuit_hijack}, premature_data
+${ml.structural.unique_per_class.premature_data}); gerisi seed'ler arası birebir
+kopyadır. Bu nedenle <b>seed-bazlı Leave-One-Seed-Out (LOSO) çapraz-doğrulama
+sızıntıyı önlemez</b>: foldlarda test vektörlerinin
+${(ml.structural.loso_dup[String(ml.data.seeds[2])].ratio*100).toFixed(1)}%&ndash;${(ml.structural.loso_dup[String(ml.data.seeds[1])].ratio*100).toFixed(1)}%
+kadarı (seed bazında: ${ml.data.seeds.map(s=>`seed ${s} ${ml.structural.loso_dup[String(s)].dup}/${ml.structural.loso_dup[String(s)].total}`).join(", ")})
+train kümesinde birebir bulunur. Dolayısıyla aşağıdaki CV metrikleri
+<i>iyimserdir</i> (dağıtım-içi/in-distribution) ve genelleme kanıtı olarak
+okunmamalıdır. Bu sınırlamadan <b>bağımsız</b> asıl kanıt, aşağıdaki yapısal
+ayrılabilirliktir.</p>
+
+<p class="no-indent"><b>(a) Yapısal ayrılabilirlik (çapraz-doğrulamadan bağımsız).</b>
+Sınıfların eşsiz öznitelik vektörlerinin örtüşmesi, hangi CV kullanılırsa
+kullanılsın değişmeyen yapısal bir gerçektir (Tablo 4.17a).</p>
+<p class="no-indent"><b>Tablo 4.17a.</b> Sınıflar-arası ortak eşsiz öznitelik vektörü sayısı.</p>
+<table style="border-collapse:collapse;font-size:9pt;margin:6pt 0;">
+<tr><th style="padding:3pt 8pt;border:1px solid #999;text-align:left;">Sınıf çifti</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">Ortak eşsiz vektör</th></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">create_flood ∩ circuit_hijack</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;"><b>${ml.structural.overlap.create_flood__circuit_hijack.inter}</b> (|cf|=${ml.structural.overlap.create_flood__circuit_hijack.na}, |ch|=${ml.structural.overlap.create_flood__circuit_hijack.nb})</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">premature_data ∩ benign</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.structural.overlap.premature_data__benign.inter} (|pd|=${ml.structural.overlap.premature_data__benign.na}, |bn|=${ml.structural.overlap.premature_data__benign.nb})</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">create_flood ∩ benign</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;"><b>${ml.structural.overlap.create_flood__benign.inter}</b></td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">circuit_hijack ∩ benign</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;"><b>${ml.structural.overlap.circuit_hijack__benign.inter}</b></td></tr>
+</table>
+<p class="no-indent">Bu yapısal gerçekten üç sonuç çıkar: (1) create_flood ve
+circuit_hijack eşsiz vektörleri büyük ölçüde ortaktır
+(${ml.structural.overlap.create_flood__circuit_hijack.inter}/${ml.structural.overlap.create_flood__circuit_hijack.na}
+ve ${ml.structural.overlap.create_flood__circuit_hijack.inter}/${ml.structural.overlap.create_flood__circuit_hijack.nb});
+ikisi de <code>SEND_CREATE=2</code> imzası taşıdığından sayım-seviyesinde ayırt
+edilemezler. Bu, FSM bulgusu <i>"CIRCUIT_HIJACK FSM-tip seviyesinde ayırt edici
+değildir"</i> ile birebir tutarlıdır. (2) create_flood ve circuit_hijack benign
+ile <b>hiç</b> ortak eşsiz vektör paylaşmaz (0); bu, denetimli modelin bu iki tipte
+recall = 1.0 vermesinin sızıntıdan bağımsız yapısal nedenidir. (3) premature benign
+ile ${ml.structural.overlap.premature_data__benign.inter} eşsiz vektör paylaşır,
+benign'e en yakın ve en zor ayrılan sınıftır.</p>
+
+<p class="no-indent"><b>(b) Denetimli, denetimsiz ve çok-sınıflı sonuçlar (LOSO, iyimser).</b>
+Tablo 4.17b üç paradigmanın özetini verir. Değerler yukarıdaki sızıntı uyarısı
+nedeniyle dağıtım-içi okunmalıdır.</p>
+<p class="no-indent"><b>Tablo 4.17b.</b> ML temel çizgisi metrikleri (ortalama ± SD, ${ml.data.n_seeds} fold LOSO).</p>
+<table style="border-collapse:collapse;font-size:9pt;margin:6pt 0;">
+<tr><th style="padding:3pt 8pt;border:1px solid #999;text-align:left;">Model</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">Precision</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">Recall</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">F1</th></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli LogReg (benign vs. saldırı)</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.supervised.precision)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.supervised.recall)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.supervised.f1)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimsiz IsolationForest (yalnız benign'e fit)</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.unsupervised.precision)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.unsupervised.recall)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.unsupervised.f1)}</td></tr>
+</table>
+<p class="no-indent">Denetimli modelde saldırı tipi bazında recall: create_flood
+${ms(ml.supervised.per_attack_recall.create_flood)}, circuit_hijack
+${ms(ml.supervised.per_attack_recall.circuit_hijack)}, premature_data
+<b>${ms(ml.supervised.per_attack_recall.premature_data)}</b>. create_flood ve
+circuit_hijack kusursuz yakalanır (benign ile sıfır örtüşme); premature neredeyse
+hiç yakalanmaz çünkü çoğu devre sayım-seviyesinde benign'e benzer ve zayıf etiketle
+eğitilen model bunları benign tarafına atar (yanlış-negatif şişer). Bu, FSM
+tarafındaki <i>premature recall ≈ 0.47 kapsam kaybıyla aynı yöndedir</i>.
+Denetimsiz anomali modeli tersine premature'ı tam yakalar
+(${ms(ml.unsupervised.per_attack_recall.premature_data)}; BUILDING sırasında fazladan
+<code>SEND_RELAY_DATA</code> benign'e göre anomaliktir) ama create_flood/hijack'in
+bir kısmını kaçırır (${ms(ml.unsupervised.per_attack_recall.create_flood)} /
+${ms(ml.unsupervised.per_attack_recall.circuit_hijack)}). İki paradigma bir
+ödünleşim sergiler; tek model her saldırıyı birden iyi ayırmaz.</p>
+<p class="no-indent">Çok-sınıflı LogReg ortalama doğruluğu
+<b>${ms(ml.multiclass.accuracy)}</b>'dir. Karışıklık matrisi (Tablo 4.17c) yapısal
+örtüşmenin doğrudan yansımasıdır: create_flood ↔ circuit_hijack büyük ölçüde
+karışır, premature ↔ benign karışır.</p>
+<p class="no-indent"><b>Tablo 4.17c.</b> Çok-sınıflı karışıklık matrisi (satır = gerçek, sütun = tahmin; ${ml.data.n_seeds} fold toplamı).</p>
+<table style="border-collapse:collapse;font-size:9pt;margin:6pt 0;">
+<tr><th style="padding:3pt 8pt;border:1px solid #999;"></th>${ml.multiclass.labels.map(l=>`<th style="padding:3pt 8pt;border:1px solid #999;">${l}</th>`).join("")}</tr>
+${ml.multiclass.confusion.map((row,i)=>`<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>${ml.multiclass.labels[i]}</b></td>${row.map((c,j)=>`<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;${i===j?"background:#eef;font-weight:bold;":""}">${c}</td>`).join("")}</tr>`).join("\n")}
+</table>
+
+<p class="no-indent"><b>(c) FSM ile ilişki (adil çerçeve).</b> ML temel çizgisi ile FSM
+dedektörü <i>aynı birimlerde değildir</i> (FSM üç-modlu raporlama: tip-temiz
+confusion / event-purity / native ayrım — bkz. Bölüm 4.16 ve Ek B; ML burada
+devre-seviyesi sınıflandırma yapar). Bu nedenle tek bir ortak karışıklık tablosu
+<b>uydurulmamıştır</b>. Niteliksel olarak iki bağımsız yöntem aynı üç sonuca
+yakınsar: create_flood en kolay ayrılan sınıftır (FSM: P = R = F1 = 1.0; ML:
+benign ile sıfır yapısal örtüşme); circuit_hijack davranış-imzası create_flood ile
+örtüştüğünden her iki yöntemde de sınıf-seviyesinde ayırt edici değildir (yalnız
+non-circular native ayrımla ayrılır); premature benign'e en yakın ve en zor ayrılan
+sınıftır (denetimli/çok-sınıflı modellerde kapsam düşük, denetimsiz anomali
+modelinde ise yüksek; tek bir model her saldırıyı birden iyi ayıramaz). Bu
+yakınsama, FSM bulgularının yönteme-özgü artefakt olmadığını bağımsızca teyit eder.</p>
+
+<div class="pagebreak"></div>
+
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->
 <h2>5. Görselleştirme</h2>
 
@@ -1270,7 +1414,7 @@ ağda gözlemlenmiş saldırı tabanlı bir saha çalışması iddiası taşıma
 <h2>6. Sonuç ve Gelecek Çalışmalar</h2>
 
 <h3>6.1 Katkıların Yeniden Değerlendirilmesi</h3>
-<p>Bölüm 1.3'te altı katkı listelenmiş, bu tezde hepsi gerçekleştirilmiştir:</p>
+<p>Bölüm 1.3'te yedi katkı listelenmiş, bu tezde hepsi gerçekleştirilmiştir:</p>
 <ul>
   <li><b>Katkı 1 (tam δ-matrisi):</b> Ek A'da ${totalValid} geçerli ikili tek tablo olarak
   verilmiştir; literatürde benzer bir derleme mevcut değildir (G1).</li>
@@ -1297,6 +1441,15 @@ ağda gözlemlenmiş saldırı tabanlı bir saha çalışması iddiası taşıma
   ${f4(fourCell.cells.v1_2hop.replay_attack.f1)} → ${f4(fourCell.cells.v1_3hop.replay_attack.f1)}
   iyileştirmiş, recall = 1.0000 korunmuştur. Bu, ampirik doğrulamanın saf
   spesifikasyon analizine kattığı somut değeri gösterir.</li>
+  <li><b>Katkı 7 (bağımsız ML temel çizgisi):</b> Bölüm 4.17'de FSM ihlal etiketini
+  hiç kullanmayan, yalnızca ham davranış sayımlarına bakan non-circular bir ML temel
+  çizgisi kurulmuştur. Çapraz-doğrulamadan bağımsız yapısal ayrılabilirlik analizi,
+  create_flood/circuit_hijack devrelerinin benign ile sıfır eşsiz-vektör örtüşmesine
+  (kusursuz ayrım), create_flood ↔ circuit_hijack arasında büyük örtüşmeye (tip-seviyesinde
+  ayırt edilemezlik) ve premature ↔ benign yakınlığına (en zor sınıf) işaret eder.
+  Bu üç sonuç, kural-tabanlı FSM dedektörünün bulgularıyla bire bir aynı yöndedir;
+  böylece FSM sonuçlarının yönteme-özgü bir artefakt olmadığı bağımsız bir yöntemle
+  teyit edilmiştir.</li>
 </ul>
 
 <h3>6.2 Sınırlılıklar</h3>
@@ -1407,6 +1560,19 @@ tamamlanabilir.</p>
   classifyInvalid hot path'inin gcc -O3 C portu eklenmiş, aynı probelarda
   ortalama ${(dext.cLatency.comparison.probes.reduce((a,p)=>a+p.speedup_x,0)/3).toFixed(0)}× hızlanma
   ölçülmüştür. Tam Tor C/Rust relay portu hâlâ kapsam dışıdır.</li>
+  <li><b>ML temel çizgisi küçük-n + deterministik veri (Bölüm 4.17).</b> ML baseline
+  ${ml.data.n_circuits} devre ve ${ml.data.n_seeds} seed üzerinde kurulmuştur; sınıf
+  başına yalnızca ${ml.structural.unique_per_class.benign}&ndash;${ml.structural.unique_per_class.circuit_hijack}
+  eşsiz öznitelik vektörü vardır. Seed-bazlı LOSO çapraz-doğrulama sızıntıyı önlemez
+  (test vektörlerinin ${(ml.structural.loso_dup[String(ml.data.seeds[2])].ratio*100).toFixed(1)}%&ndash;${(ml.structural.loso_dup[String(ml.data.seeds[1])].ratio*100).toFixed(1)}%
+  kadarı train'de birebir bulunur); bu nedenle CV metrikleri <i>dağıtım-içi/iyimserdir</i>,
+  genelleme tahmini değildir. Asıl güvenilir kanıt CV'den bağımsız yapısal
+  ayrılabilirliktir. Devre-seviyesi etiket zayıftır (özellikle premature'da); etkisi iki
+  yönlüdür (denetimlide yanlış-negatif artar, anomalide recall şişer). Öznitelikler yalnız
+  sayım-seviyesindedir; sıra/zamanlama (n-gram, olaylar-arası gecikme) modellenmemiştir.
+  Out-of-distribution genelleme için grup-temelli/deduplikasyon sonrası değerlendirme veya
+  çok daha fazla eşsiz örüntülü veri gerekir (gelecek iş; bkz. Bölüm 6.3). ML baseline,
+  FSM'nin <i>yerine</i> değil bağımsız bir teyit olarak sunulmuştur.</li>
 </ul>
 
 <h3>6.3 Gelecek Çalışmalar</h3>
