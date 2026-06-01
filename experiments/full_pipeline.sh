@@ -132,6 +132,7 @@ for seed in $SEEDS; do
       perl -pi -e "s/environment: \\{\\}/environment: { $ev: \"1\" }/" "shadow_$attack.yaml"
     )
     set_seed "$CFT/shadow_$attack.yaml" "$seed"
+    grep -q "$ev" "$CFT/shadow_$attack.yaml" || { echo "  UYARI: $ev yaml'a islenemedi -> $attack seed=$seed ATLANIYOR"; continue; }
     ( cd "$CFT"
       rm -rf "shadow.data.$attack.$seed"
       ~/.local/bin/shadow -d "shadow.data.$attack.$seed" $TPL "shadow_$attack.yaml" > "s_$attack.$seed.log" 2>&1
@@ -145,12 +146,15 @@ for seed in $SEEDS; do
     BEN="$BHOSTS/torclient/tor.1000.stdout"
     NAT_A="$(native_count "$attack" "$AHOSTS")"
     NAT_B="$(native_count "$attack" "$BHOSTS")"
+    # premature: saldirinin GERCEKTEN gonderdigi marker sayisi (recall paydasi)
+    MRK_A=0
+    [ "$attack" = premature_data ] && [ -f "$ATK" ] && MRK_A="$(grep -ch 'TOR_FSM_PREMATURE_SEND' "$ATK" 2>/dev/null || echo 0)"
 
     if [ -f "$ATK" ]; then
-      npx tsx experiments/detect_json.mjs --attack "$attack" --scenario attack --seed "$seed" --log "$ATK" --native "$NAT_A" >> "$RESULTS"
+      npx tsx experiments/detect_json.mjs --attack "$attack" --scenario attack --seed "$seed" --log "$ATK" --native "$NAT_A" --markers "$MRK_A" >> "$RESULTS"
     else echo "  UYARI: attack log yok: $ATK"; fi
     if [ -f "$BEN" ]; then
-      npx tsx experiments/detect_json.mjs --attack "$attack" --scenario benign --seed "$seed" --log "$BEN" --native "$NAT_B" >> "$RESULTS"
+      npx tsx experiments/detect_json.mjs --attack "$attack" --scenario benign --seed "$seed" --log "$BEN" --native "$NAT_B" --markers 0 >> "$RESULTS"
     else echo "  UYARI: benign log yok: $BEN"; fi
     echo "    $attack seed=$seed: native attack=$NAT_A benign=$NAT_B"
   done
