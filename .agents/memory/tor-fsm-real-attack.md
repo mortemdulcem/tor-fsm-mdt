@@ -168,11 +168,11 @@ Single-run notes below saying "CIRCUIT_HIJACK benign=0" are WRONG/misleading; th
     → P≈0.50, R≈0.47, F1≈0.48; benign begin-noise FPR≈0.48; native 12 vs 0 (headline).
   - circuit_hijack = NON-discriminative at FSM level: injected=0, benign baseline=12 (cannot
     build a clean confusion → DO NOT fabricate one). Attack is still REAL but provable ONLY
-    via non-circular native (attack 18/20/16 vs benign 9, no overlap). Report counts+native.
+    via non-circular native (attack 18/20/18 vs benign 9, no overlap). Report counts+native.
 - **`recompute.sh`** regenerates results.jsonl from the saved `experiments/runs/<attack>/seed<seed>/`
   + `_benign/` logs WITHOUT rerunning Shadow — use it to re-aggregate after metrics changes.
-- **Caveat:** seed=2718 circuit_hijack attack run was interrupted (8 circuits, native=16, EXIT=1);
-  native still separates so it doesn't change the verdict, but a clean full re-run is preferable.
+- **Resolved:** the earlier seed=2718 circuit_hijack interruption was re-run clean — all 3 seeds now
+  EXIT=0, native attack=18/20/18 (mean 18.667±1.155), FSM-tip 21.333±0.577. No interrupted-run caveat.
 
 ## NOT genuinely realizable: HANDSHAKE_SKIP (structural blocker)
 - **HANDSHAKE_SKIP** needs SEND_CREATE in IDLE/CONNECTING or SEND_EXTEND in CREATE_SENT. Tor sends the
