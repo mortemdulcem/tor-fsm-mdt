@@ -64,6 +64,9 @@ Her saldırının ölçtüğü nicelik (estimand) farklıdır; aşağıdaki tabl
 - Recall<1 nedeni: parser, gönderilen 12 marker'ın yalnızca 5/5/7'sini injected
   PREMATURE_DATA olarak etiketler (parser kapsam sınırı). Bu ölçülen bir değerdir,
   uydurma değil; tezde "tespit kapsamı sınırı" olarak raporlanır.
+- **Payda doğrulaması:** kayıtlı loglarda üç seed de 12/12 marker `cstate=0`
+  (CIRCUIT_STATE_BUILDING) → markerların tamamı gerçek BUILDING-anı premature gönderim;
+  payda (=marker) doğrudur, recall<1 bir payda artefaktı değil gerçek tespit-kapsamı kaybıdır.
 
 **CIRCUIT_HIJACK** (FSM-sınıflandırma seviyesinde **AYIRT EDİCİ DEĞİL**):
 - `injected` ground-truth YOK (üç seed de 0) → event-level confusion kurulamaz; sahte matris üretilmedi.

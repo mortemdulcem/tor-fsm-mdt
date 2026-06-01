@@ -102,8 +102,10 @@ v3 succeeds via a DIFFERENT, genuine path: inject the early cell from WITHIN cir
 - **Harness wiring:** `TOR_FSM_PREMATURE_SEND gid=N` → push `{event:"SEND_RELAY_DATA", injected:true,
   attackType:"PREMATURE_DATA"}` onto circuits[N]. FSM: BUILDING × SEND_RELAY_DATA → PREMATURE_DATA (HIGH).
 - **Marker run (Shadow, env-gated, same binary):** marker fired 12× (gids 3,4,...); FSM detector
-  INJECTED PREMATURE_DATA = 5 in attack, 0 in benign. 12 markers→5 injected because a circuit's later
-  circuit_send_next_onion_skin calls happen when it is already READY (not a violation). begin-noise
+  INJECTED PREMATURE_DATA = 5/5/7 across seeds, 0 in benign. **VERIFIED on saved logs (2026-06-01):
+  ALL 12 markers/seed are cstate=0 (BUILDING)** — so every marker is a real premature send and the
+  recall denominator (=markers) is sound. The 12→5/5/7 gap is GENUINE FSM/parser coverage loss, NOT
+  non-violation READY-state calls (earlier hypothesis was WRONG; do not refine denominator). begin-noise
   (lastCircuitId mis-attribution) is ~6 attack / ~9 benign in BOTH runs — report SEPARATELY.
 - **CIRCULARITY CAVEAT (important, user-flagged):** the marker-based FSM detection above is SEMI-CIRCULAR
   — the same patch that sends the cell ALSO emits the `TOR_FSM_PREMATURE_SEND` marker the detector keys
