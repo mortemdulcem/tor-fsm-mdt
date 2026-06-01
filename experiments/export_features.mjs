@@ -45,11 +45,20 @@ function add(scenario, attack, seed, file) {
       raw && typeof raw === "object" && !Array.isArray(raw) ? Object.keys(raw).slice(0, 10) : "(dizi/diger)");
     shapeLogged = true;
   }
-  const list = toCircuitList(raw);
-  for (const c of list) {
-    dataset.push({ scenario, attack, seed: Number(seed), circuit: c });
+  // raw = { gid: <olay dizisi> }; gid'i KORU (devre kimligi).
+  const entries =
+    raw instanceof Map
+      ? Array.from(raw.entries())
+      : Array.isArray(raw)
+        ? raw.map((c, i) => [String(i), c])
+        : Object.entries(raw);
+  let n = 0;
+  for (const [gid, circ] of entries) {
+    const events = toCircuitList(circ); // devre de dizi/nesne olabilir
+    dataset.push({ scenario, attack, seed: Number(seed), gid, events });
+    n++;
   }
-  console.log(`  ${scenario}/${attack} seed=${seed}: ${list.length} devre`);
+  console.log(`  ${scenario}/${attack} seed=${seed}: ${n} devre`);
 }
 
 for (const seed of SEEDS) {
@@ -57,25 +66,41 @@ for (const seed of SEEDS) {
   for (const a of ATTACKS) add("attack", a, seed, logPath(a, seed));
 }
 
-// --- sekil tanitimi (uydurma alan adi kullanmamak icin gercek anahtarlari bas) ---
-if (dataset.length) {
-  const c0 = dataset[0].circuit;
-  console.log("\n--- ornek devre anahtarlari ---", Object.keys(c0));
-  const tkey = ["transitions", "events", "history", "trace", "seq"].find(
-    (k) => Array.isArray(c0[k])
-  );
-  if (tkey) {
-    const t0 = c0[tkey][0];
-    console.log(`--- '${tkey}' uzunlugu ---`, c0[tkey].length);
-    console.log(`--- '${tkey}'[0] anahtarlari ---`, t0 ? Object.keys(t0) : "(bos)");
-    console.log(`--- '${tkey}'[0] ornek ---`, JSON.stringify(t0));
-  } else {
-    console.log("--- transition dizisi anahtari bulunamadi; tum devre ornegi: ---");
-    console.log(JSON.stringify(c0).slice(0, 600));
-  }
+// --- olay-tipi alfabesi (tum devrelerin birlesimi) ---
+const evType = (e) => (e && (e.event ?? e.type ?? e.name)) || "UNK";
+const alphabet = [...new Set(dataset.flatMap((d) => d.events.map(evType)))].sort();
+
+function tsMs(t) {
+  // "Jan 01 00:15:01.401" -> gun ici ms (yalnizca sure farki icin)
+  const m = /(\d\d):(\d\d):(\d\d)\.(\d+)/.exec(String(t || ""));
+  if (!m) return null;
+  return ((+m[1] * 60 + +m[2]) * 60 + +m[3]) * 1000 + +m[4];
 }
 
+// --- CSV: devre basina non-circular oznitelikler (olay sayilari + uzunluk + sure) ---
+const cols = ["scenario", "attack", "seed", "gid", "n_events", "dur_ms", ...alphabet];
+const rows = [cols.join(",")];
+for (const d of dataset) {
+  const counts = Object.fromEntries(alphabet.map((a) => [a, 0]));
+  let tmin = Infinity, tmax = -Infinity;
+  for (const e of d.events) {
+    counts[evType(e)]++;
+    const ms = tsMs(e.timestamp);
+    if (ms != null) { if (ms < tmin) tmin = ms; if (ms > tmax) tmax = ms; }
+  }
+  const dur = tmax >= tmin ? tmax - tmin : 0;
+  rows.push([
+    d.scenario, d.attack, d.seed, d.gid, d.events.length, dur,
+    ...alphabet.map((a) => counts[a]),
+  ].join(","));
+}
+writeFileSync("experiments/ml_features.csv", rows.join("\n") + "\n");
+
+// ham veri de saklansin (yuksek-sadakat; istege bagli)
 writeFileSync("experiments/ml_dataset.json", JSON.stringify(dataset));
-console.log(
-  `\nyazildi: experiments/ml_dataset.json (${dataset.length} devre, ${SEEDS.length} seed)`
-);
+
+console.log("\n--- olay-tipi alfabesi ---", alphabet.join(" "));
+console.log(`yazildi: experiments/ml_features.csv (${dataset.length} devre, ${cols.length} sutun)`);
+console.log(`yazildi: experiments/ml_dataset.json (${dataset.length} devre, ${SEEDS.length} seed)`);
+console.log("\n--- ml_features.csv (ilk 6 satir) ---");
+console.log(rows.slice(0, 6).join("\n"));
