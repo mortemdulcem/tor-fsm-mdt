@@ -41,10 +41,50 @@ print(df.groupby(["scenario","attack"]).size().to_string())
 ben = df[df.scenario=="benign"]
 uniq_ben = ben[FEATS].drop_duplicates().shape[0]
 print(f"\nbenign devre: {len(ben)} satir, {uniq_ben} essiz oznitelik vektoru "
-      f"-> {len(ben)-uniq_ben} kopya (seed'ler arasi tekrar) = LOSO gerekcesi")
+      f"-> {len(ben)-uniq_ben} kopya (seed'ler arasi tekrar; deterministik Shadow)")
 
 y_bin = (df["scenario"]=="attack").astype(int).values
 X = df[FEATS].values
+
+# ---------------------------------------------------------------------------
+# 0) YAPISAL AYRILABILIRLIK (CV'siz) — sizinti tartismasindan bagimsiz gercek
+#    Deterministik veri -> az sayida essiz vektor. Sinif-arasi ortusme dogrudan
+#    olculur; bu, herhangi bir CV/sizintidan ETKILENMEYEN yapisal bir olcudur.
+# ---------------------------------------------------------------------------
+print("\n" + "="*72)
+print("0) YAPISAL AYRILABILIRLIK (CV yok; deterministik veri gercegi)")
+print("="*72)
+def vset(mask):
+    return set(map(tuple, X[mask.values].astype(float)))
+sets = {}
+for (sc_, at_), g in df.groupby(["scenario","attack"]):
+    m = (df["scenario"]==sc_) & (df["attack"]==at_)
+    sets[at_] = vset(m)
+    print(f"  {at_:16s}: {m.sum():2d} devre -> {len(sets[at_]):2d} essiz vektor")
+def overlap(a, b):
+    A, B = sets[a], sets[b]
+    inter = A & B
+    return len(inter), len(A), len(B)
+for a, b in [("create_flood","circuit_hijack"), ("premature_data","benign"),
+             ("create_flood","benign"), ("circuit_hijack","benign")]:
+    i, na, nb = overlap(a, b)
+    print(f"  ortusme {a} ∩ {b}: {i} essiz vektor ortak "
+          f"(|{a}|={na}, |{b}|={nb})")
+print("  -> create_flood ve circuit_hijack essiz vektorleri buyuk olcude AYNI kumede;")
+print("     bu, hangi CV kullanilirsa kullanilsin degismeyen yapisal bir gercektir.")
+
+# fold-ici kopya ortusme orani (LOSO'nun sizintiyi NE KADAR onleyemedigi)
+print("\n  LOSO fold-ici kopya ortusme (test vektorunun train'de birebir bulunma orani):")
+for test_seed in seeds:
+    tr = (df["seed"]!=test_seed).values
+    te = (df["seed"]==test_seed).values
+    trset = set(map(tuple, X[tr].astype(float)))
+    terows = list(map(tuple, X[te].astype(float)))
+    dup = sum(1 for r in terows if r in trset)
+    print(f"    test seed={test_seed}: {dup}/{len(terows)} "
+          f"({dup/len(terows):.1%}) test vektoru train'de mevcut")
+print("  -> LOSO sizintiyi ONLEMEZ; asagidaki CV metrikleri IYIMSERDIR "
+      "(dagitim-ici/in-distribution), genelleme olarak okunmamalidir.")
 
 # ---------------------------------------------------------------------------
 # 1) DENETIMLI: LogisticRegression, LOSO CV
