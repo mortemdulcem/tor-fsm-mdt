@@ -85,23 +85,42 @@ LINE ORDER, not wall-clock.
 - Minor hardening (defensive only; run already exits 0 since circuit is OPEN→n_chan non-null):
   add `circ->base_.n_chan` to the gate condition; append_cell_to_circuit_queue return is ignored.
 
-## NOT genuinely realizable: HANDSHAKE_SKIP & PREMATURE_DATA (structural blockers)
+## PREMATURE_DATA — NOW REALIZED via v3 build-path hook (supersedes the v2 "not realizable" verdict below)
+The v2 STREAM-ATTACH approach (hook in circuituse.c when an app stream attaches) is genuinely
+unreachable — see the v2 section lower in this file; keep that as the negative result for THAT path.
+v3 succeeds via a DIFFERENT, genuine path: inject the early cell from WITHIN circuit construction.
+- **Hook:** `circuitbuild.c` `circuit_send_next_onion_skin()`, right after the asserts at the top
+  (line ~935 `tor_assert(circ->base_.state == CIRCUIT_STATE_BUILDING)` GUARANTEES BUILDING here),
+  BEFORE the `if (hop)` "Case two" block. Gated by `getenv("TOR_FSM_ATTACK_PREMATURE_DATA")` AND
+  `hop` (a non-first hop exists). Sends a REAL early DATA cell with Tor's own function:
+  `relay_send_command_from_edge(0, TO_CIRCUIT(circ), RELAY_COMMAND_DATA, "premature", 9, circ->cpath)`
+  then `log_info(LD_CIRC, "TOR_FSM_PREMATURE_SEND gid=%u cstate=%d", circ->global_identifier, circ->base_.state)`.
+  `relay.h` already included (circuitbuild.c line ~52); compiles clean on VM Tor 0.4.6.10.
+- **cstate=0 == CIRCUIT_STATE_BUILDING** (printed value; the line-935 assert proves BUILDING). The
+  marker's `gid` = `global_identifier` = the harness's circuit key, so the event attributes to the
+  right circuit.
+- **Harness wiring:** `TOR_FSM_PREMATURE_SEND gid=N` → push `{event:"SEND_RELAY_DATA", injected:true,
+  attackType:"PREMATURE_DATA"}` onto circuits[N]. FSM: BUILDING × SEND_RELAY_DATA → PREMATURE_DATA (HIGH).
+- **VERIFIED RESULT (Shadow, env-gated, same binary):** marker fired 12× (gids 3,4,...); detector
+  INJECTED PREMATURE_DATA = 5 in attack, 0 in benign. 12 markers→5 injected because a circuit's later
+  circuit_send_next_onion_skin calls happen when it is already READY (not a violation). begin-noise
+  (lastCircuitId mis-attribution) is ~6 attack / ~9 benign in BOTH runs — report SEPARATELY, it is not
+  the signal. Success criterion met: INJECTED attack>0, benign=0.
+- **Non-circular:** the BUILDING state is derived from the line-935 assert + log line order, independent
+  of Tor's own circuit_finish_handshake logs; `injected:true` separates it from begin-noise. Same
+  legitimacy framing as CREATE_FLOOD/CIRCUIT_HIJACK: fault-injected real protocol violation in MODIFIED
+  Tor, env-gated, benign-by-default — NOT a claim that a stock client or remote attacker emits this.
+- **THREE attacks now real+verified: CREATE_FLOOD, CIRCUIT_HIJACK, PREMATURE_DATA.** Files on
+  premature-transport branch: experiments/premature_v3.sh (+ premature_detect.mjs).
+
+## NOT genuinely realizable: HANDSHAKE_SKIP (structural blocker)
 - **HANDSHAKE_SKIP** needs SEND_CREATE in IDLE/CONNECTING or SEND_EXTEND in CREATE_SENT. Tor sends the
   first CREATE only AFTER the channel/TLS is OPEN (circuit_send_first_onion_skin is gated on channel
   ready); parser emits SEND_EXTEND only on the 2nd+ circuit_finish_handshake (after hop1 RECV_CREATED).
   So the recognized log can't appear before its prerequisite without FABRICATING the log line (forbidden).
-- **PREMATURE_DATA** needs SEND_RELAY_DATA in CREATE_SENT/CIRCUIT_BUILDING. But Tor sends RELAY_BEGIN
-  only after circuit OPEN: `connection_ap_handshake_attach_chosen_circuit` has
-  `tor_assert(circ->base_.state == CIRCUIT_STATE_OPEN)` and `connection_ap_supports_optimistic_data`
-  returns 0 unless `on_circuit->state == CIRCUIT_STATE_OPEN`. (Tor "optimistic data" = don't wait for
-  exit CONNECTED; it is NOT begin-before-circuit-open.) So a genuine client never emits premature data.
-- **Benign PREMATURE_DATA:21 is a PARSER ARTIFACT**, not real premature data: begin for an already-OPEN
-  circuit gets attributed to a more-recently-created circuit via `lastCircuitId` (its FSM still early).
-  Report this as a detector limitation / FPR source, NOT as detected premature data.
-- **Why CREATE_FLOOD/CIRCUIT_HIJACK ARE realizable but these two are not:** a duplicate CREATE rides an
-  already-OPEN channel (real transmittable cell, relay drops it). HANDSHAKE_SKIP/PREMATURE_DATA require
-  emitting a cell BEFORE its prerequisite exists — Tor's layering forbids transmit, so only a fake log
-  or parser-attribution gaming could fake them. Decision: keep both SYNTHETIC, clearly labeled.
+- **Benign PREMATURE_DATA begin-noise is a PARSER ARTIFACT**, not real premature data: begin for an
+  already-OPEN circuit gets attributed to a more-recently-created circuit via `lastCircuitId` (its FSM
+  still early). Report this as a detector limitation / FPR source, separate from the injected signal.
 
 ## Extending to other attack types (same env-gate pattern, benign-by-default)
 - **CIRCUIT_HIJACK (CRITICAL) — DONE & VERIFIED (non-destructive variant, run exits 0).**
@@ -153,7 +172,9 @@ VM reboot (tmpfs). There is NO backup elsewhere. Rebuild it from the pristine Sh
 - Relative paths: shadow runs FROM cf_test; host runtime dir `cf_test/shadow.data.*/hosts/<h>/` resolves `../../../conf/` → `cf_test/conf/`, so conf/ MUST be copied into cf_test.
 - `experiments/premature_v2.sh` step 4 now auto-builds cf_test if missing (finds the example via `find $HOME -path '*examples/docs/tor/shadow.yaml' -not -path '*/build/*'`).
 
-## PREMATURE_DATA is structurally NOT realizable against real Tor (proven, not assumed)
+## v2 STREAM-ATTACH path is NOT realizable (SUPERSEDED by v3 build-path hook above — keep as negative result for THIS path only)
+NOTE: this section is the negative result for the STREAM-ATTACH approach only. PREMATURE_DATA IS
+realized via the v3 build-path hook (see the v3 section earlier). Do not read this as "PREMATURE_DATA impossible".
 Attempted via env-gated hook in `circuituse.c` (premature-transport branch, `experiments/premature_v2.sh`):
 when a CONNECT stream attaches, scan for an origin general circuit in `CIRCUIT_STATE_BUILDING` whose
 last-hop `cpath->state == CPATH_STATE_OPEN`, then `link_apconn_to_circ` + `connection_ap_handshake_send_begin`.
