@@ -27,7 +27,7 @@ korunmalıdır — üç saldırı "eşit derecede non-circular" diye sunulmamal�
 | Tip | Durum | Tetikleyici (env) | Non-circular sinyal | Doğrulama (çoklu-seed, n=3: 42/137/2718) |
 |---|---|---|---|---|
 | CREATE_FLOOD | **Gerçek** | `TOR_FSM_ATTACK_CREATE_FLOOD` | Tor'un kendi `circuit_send_first_onion_skin(): First hop: finished sending CREATE cell` satırı bir devre için **iki kez** çıkar (iki gerçek CREATE hücresi) | tip-temiz: P=R=F1=1.0, FPR=0; native 18→9 (ortüşme yok) |
-| CIRCUIT_HIJACK | **Gerçek (saldırı)**, ama FSM-tip dedektörü *ayırt edici değil* | `TOR_FSM_ATTACK_CIRCUIT_HIJACK` | İlk hop OPEN + devre BUILDING iken **fazladan** organik CREATE log satırı (`circuit_finish_handshake(): Finished building...` sonrası SEND_CREATE) | native 18/20/16→9 (ortüşme yok); **FSM-tip benign tabanı=12 → dedektör begin-noise ile confounded** |
+| CIRCUIT_HIJACK | **Gerçek (saldırı)**, ama FSM-tip dedektörü *ayırt edici değil* | `TOR_FSM_ATTACK_CIRCUIT_HIJACK` | İlk hop OPEN + devre BUILDING iken **fazladan** organik CREATE log satırı (`circuit_finish_handshake(): Finished building...` sonrası SEND_CREATE) | native 18/20/18→9 (ortüşme yok); **FSM-tip benign tabanı=12 → dedektör begin-noise ile confounded** |
 | PREMATURE_DATA | **Gerçek** | `TOR_FSM_ATTACK_PREMATURE_DATA` | İlk hop relay'inin **kendi** protokol-ihlali logu: `handle_relay_cell_command(): Relay data cell with zero stream_id. Dropping.` (relay.c) | native 12→0 (ortüşme yok); event-level P≈0.50/R≈0.47/F1≈0.48; begin-noise FPR≈0.48 |
 | REPLAY_ATTACK | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
 | GHOST_CIRCUIT | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
@@ -48,7 +48,7 @@ Her saldırının ölçtüğü nicelik (estimand) farklıdır; aşağıdaki tabl
 |---|---|---|---|
 | CREATE_FLOOD | istemci devresi | FSM-tip (benign-temiz) | tip-temiz confusion: P=R=F1=1.0, FPR=0 |
 | PREMATURE_DATA | premature olayı (event) | `injected` (TOR marker) + relay native log | event-purity precision + marker-coverage recall; non-circular native 12 vs 0 |
-| CIRCUIT_HIJACK | istemci devresi | YOK (`injected`=0) | non-circular native ayrımı (18/20/16 vs 9); FSM-tip ayırt edici DEĞİL |
+| CIRCUIT_HIJACK | istemci devresi | YOK (`injected`=0) | non-circular native ayrımı (18/20/18 vs 9); FSM-tip ayırt edici DEĞİL |
 
 **CREATE_FLOOD** (tip-temiz confusion — FSM tipi CREATE_FLOOD benign'de hiç görülmez):
 - TP=9.0±0, FP=0±0, TN=9.0±0, FN=0±0 → Precision=Recall=F1=**1.000**, FPR=**0.000**
@@ -67,13 +67,12 @@ Her saldırının ölçtüğü nicelik (estimand) farklıdır; aşağıdaki tabl
 
 **CIRCUIT_HIJACK** (FSM-sınıflandırma seviyesinde **AYIRT EDİCİ DEĞİL**):
 - `injected` ground-truth YOK (üç seed de 0) → event-level confusion kurulamaz; sahte matris üretilmedi.
-- FSM-tip CIRCUIT_HIJACK sayısı: attack=21.0±1.0 vs benign=**12.0±0** (sabit begin-noise tabanı); delta=9.0±1.0.
-- non-circular native (organik CREATE): attack=18.0±2.0 (18/20/16) vs benign=9.0±0 → min(attack)=16 > max(benign)=9, ortüşme yok.
+- FSM-tip CIRCUIT_HIJACK sayısı: attack=21.333±0.577 vs benign=**12.0±0** (sabit begin-noise tabanı); delta=9.333±0.577.
+- non-circular native (organik CREATE): attack=18.667±1.155 (18/20/18) vs benign=9.0±0 → min(attack)=18 > max(benign)=9, ortüşme yok.
 - **Sonuç:** saldırı gerçektir ve YALNIZCA native ile ayrılır; FSM'nin CIRCUIT_HIJACK
   tipi benign begin-noise ile dolduğundan sınıflandırma-seviyesi tespit ayırt edici
   değildir. Tezde bu kısıt açıkça belirtilmelidir (confirmation bias'tan kaçınma).
-- **Sınır:** seed=2718 attack koşusu yarıda kesildi (8 devre, native=16, EXIT=1);
-  native yine ayırıyor ama temiz tam tekrar önerilir (sonucu değiştirmez).
+- Üç seed de EXIT=0 ile temiz tamamlandı (kesinti yok).
 
 > **begin-noise tek kök neden:** harness `lastCircuitId` ile bir olayı yanlış (daha
 > yeni) devreye atfedince, `classifyInvalid` bunu aktif devrede CREATE/EXTEND görürse
@@ -102,7 +101,7 @@ ayakta kalır, simülasyon exit 0). Organik SEND_CREATE log satırı devre BUILD
 çıktığı için FSM bunu CIRCUIT_HIJACK sınıflar.
 
 **Önemli kısıt (çoklu-seed):** saldırının kendisi gerçektir (native organik CREATE
-attack 18/20/16 vs benign 9 — ortüşme yok), ancak FSM'nin **CIRCUIT_HIJACK tipi**
+attack 18/20/18 vs benign 9 — ortüşme yok), ancak FSM'nin **CIRCUIT_HIJACK tipi**
 benign begin-noise ile de ~12 kez tetiklendiğinden sınıflandırma-seviyesinde ayırt
 edici değildir. Yani bu saldırı için geçerli kanıt FSM-tip sayısı değil, non-circular
 native'dir. Ayrıntı ve sayılar yukarıdaki "Çoklu-seed sonuçları" bölümündedir.
