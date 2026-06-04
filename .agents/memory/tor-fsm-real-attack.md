@@ -294,12 +294,21 @@ that is both the "attack" and the "ground-truth oracle". This violates replit.md
 fabrication). It also claims-as-real exactly the two attacks proven NOT realizable here. Keep thesis honest:
 only CREATE_FLOOD + CIRCUIT_HIJACK are real; ignore this branch (PR #3, #4 are draft + "Devin Review: failure").
 
-## Çok-istemci (CLIENTS>1) native confusion — veri YOK, sayı raporlanmaz
-- Pipeline çok-istemci'yi DESTEKLER (detect_json `--client`, metrics `byAttack[attack][seed][client][scenario]`),
-  ama **geçerli çok-istemci Shadow verisi üretilmedi**: kayıtlı `CLIENTS=4` denemesinde ek istemciler
-  (`torclient2/3/4`) Shadow'da `Normal(1)`/`StoppedByShadow` ile düştü (attached_assets devin logu, ~28 May 2026).
-  Replit Shadow çalıştıramaz. **Ders:** 4.16 native confusion sayıları tek-istemci (CLIENTS=1, n=3 seed) kalır;
-  çok-istemci sayısı uydurma yasak → "raporlanmaz, gelecek iş" diye yazılır.
+## Çok-istemci (CLIENTS>1) ÇÖZÜLDÜ — gerçek veri var ama ÇEŞİTLİLİK DÜŞÜK (n korelasyonlu)
+- **Eski hata kök-neden + fix:** ek istemciler (`torclient2/3/4`) Shadow'da `EXIT=1 "Unable to open torrc"`
+  ile düşüyordu çünkü Shadow her host'un dosyalarını `shadow.data.template/hosts/<host>/` altından kopyalar;
+  make_clients.py YAML'a host EKLER ama template host DİZİNİNİ oluşturmaz. Fix: full_pipeline.sh artık
+  CLIENTS>1 iken `template/hosts/torclient` → `torclientK` idempotent `cp -rn` yapar. (multiclient-vm dalı.)
+- **Sonuç (CLIENTS=4, SEEDS=42/137/2718, hepsi EXIT=0, GERÇEK veri):** results.jsonl=72 satır; ml=109 devre.
+  AMA ek istemciler ilk istemciyle neredeyse BİREBİR aynı (native create_flood/hijack 18/9, ±0.000).
+- **DÜRÜSTLÜK (kritik):** `n=12` örnekleri BAĞIMSIZ DEĞİL — 4 kopya × 3 seed, yüksek korelasyon. Tezde
+  "12 bağımsız tekrar" demek veya ±0.000 dar GA'yı hassasiyet kanıtı gibi sunmak YASAK. Doğru ifade:
+  "çok-istemci gerçek Shadow verisidir, fakat deterministik ortamda istemciler ~özdeş devre üretir →
+  eklenen örnek çeşitliliği sınırlı". Çok-istemci bilimsel SONUÇLARI DEĞİŞTİRMEZ (tek-istemciyle birebir);
+  yalnız sağlamlık/robustness teyidi olarak kullanılabilir.
+- **ML (109 devre, gerçek koşu):** benign 27 satır/8 eşsiz vektör; LOSO sızıntısı %86-94 (betik yazar →
+  CV iyimser). LogReg F1=0.82 (premature recall 0.07); IsolationForest F1=0.79 (premature recall 1.0);
+  çok-sınıflı acc=0.53; create_flood↔circuit_hijack karışır. Önceki tek-istemci bulgularıyla birebir tutarlı.
 - **Run-level vs event-level örnek-boyutu kuralı (çok-istemci yapıldığında):** create_flood/circuit_hijack native +
   premature event-level confusion = **per-client** (n=seed×istemci). Ama premature relay-side **native** (zero-stream-id)
   ilk hop relay logudur → **KOŞUM-SEVİYESİ** (n=seed); recompute.sh ek istemci satırlarına `native=null` yazar,
