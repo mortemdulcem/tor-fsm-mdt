@@ -1,0 +1,43 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd /home/tez/tor-fsm-mdt
+echo "=== torclient2 (BAŞARISIZ) son 30 satır ==="
+tail -30 experiments/runs/create_flood/seed42/hosts/torclient2/tor.1000.stdout 2>/dev/null || echo "(dosya yok)"
+echo "=== torclient (ÇALIŞAN) son 8 satır — karşılaştırma ==="
+tail -8 experiments/runs/create_flood/seed42/hosts/torclient/tor.1000.stdout 2>/dev/null
+echo "=== Shadow sim log: süreç çıkış nedenleri ==="
+grep -iE "torclient2|error|stopped|Normal\(|exited" /tmp/cf_test/s_create_flood.42.log 2>/dev/null | tail -25 || echo "(sim log /tmp'de yok)"
+=== torclient2 (BAŞARISIZ) son 30 satır ===
+Jan 01 00:15:00.000 [notice] Tor 0.4.6.10 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.0.2, Zlib 1.2.11, Liblzma N/A, Libzstd N/A and Glibc 2.35 as libc.
+Jan 01 00:15:00.000 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jan 01 00:15:00.000 [warn] Unable to open configuration file "/tmp/cf_test/shadow.data.create_flood.42/hosts/torclient2/torrc".
+Jan 01 00:15:00.000 [err] Reading config failed--see warnings above.
+=== torclient (ÇALIŞAN) son 8 satır — karşılaştırma ===
+Jan 01 00:29:58.000 [notice] While bootstrapping, fetched this many bytes: 1602 (consensus network-status fetch); 1496 (authority cert fetch); 1731 (microdescriptor fetch)
+Jan 01 00:29:58.000 [notice] While not bootstrapping, fetched this many bytes: 695 (consensus network-status fetch)
+Jan 01 00:29:58.000 [notice] Average packaged cell fullness: 79.650%. TLS write overhead: 4%
+Jan 01 00:29:59.000 [notice] Heartbeat: Tor's uptime is 0:14 hours, with 7 circuits open. I've sent 10.45 MB and received 10.57 MB. I've received 10 connections on IPv4 and 0 on IPv6. I've made 4 connections with IPv4 and 0 with IPv6.
+Jan 01 00:29:59.000 [notice] While bootstrapping, fetched this many bytes: 1602 (consensus network-status fetch); 1496 (authority cert fetch); 1731 (microdescriptor fetch)
+Jan 01 00:29:59.000 [notice] While not bootstrapping, fetched this many bytes: 695 (consensus network-status fetch)
+Jan 01 00:29:59.000 [notice] Average packaged cell fullness: 79.650%. TLS write overhead: 4%
+Jan 01 00:29:59.067 [info] channelpadding_send_padding_cell_for_callback(): Sending netflow keepalive on 3 to 11.0.0.5:9111 ID=d1wYkMzCjeNP+/aDeHHgqyZSP/DNfLL+W1lF8Ow2vV0 RSA_ID=3FB0BD7827C760FE7F9DD810FCB10322D63AB4CF (3FB0BD7827C760FE7F9DD810FCB10322D63AB4CF) after 4312 ms. Delta 0ms
+=== Shadow sim log: süreç çıkış nedenleri ===
+00:00:05.563785 [21960:shadow-worker] 00:15:00.000000000 [ERROR] [torclient3:11.0.0.11] [process.rs:1557] [shadow_rs::host::process] process 'torclient3.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'torclient3.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:05.564292 [21961:shadow-worker] 00:15:00.000000000 [ERROR] [torclient4:11.0.0.12] [process.rs:1557] [shadow_rs::host::process] process 'torclient4.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'torclient4.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:05.564607 [21959:shadow-worker] 00:15:00.000000000 [ERROR] [torclient2:11.0.0.10] [process.rs:1557] [shadow_rs::host::process] process 'torclient2.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'torclient2.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:09.780633 [21960:shadow-worker] 00:30:00.000000000 [ERROR] [torclient4:11.0.0.12] [process.rs:1557] [shadow_rs::host::process] process 'torclient4.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+Error: process 'torclient4.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+00:00:09.794414 [21959:shadow-worker] 00:30:00.000000000 [ERROR] [torclient3:11.0.0.11] [process.rs:1557] [shadow_rs::host::process] process 'torclient3.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+Error: process 'torclient3.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+00:00:09.795606 [21960:shadow-worker] 00:30:00.000000000 [ERROR] [torclient2:11.0.0.10] [process.rs:1557] [shadow_rs::host::process] process 'torclient2.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+Error: process 'torclient2.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+00:00:09.811576 [21946:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export] Failed to run the simulation
+Error: Failed to run the simulation
+00:00:09.811846 [21946:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export] 
+Error: 
+00:00:09.812108 [21946:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export] Caused by:
+Error: Caused by:
+00:00:09.812368 [21946:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export]     6 managed processes in unexpected final state
+Error:     6 managed processes in unexpected final state
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
