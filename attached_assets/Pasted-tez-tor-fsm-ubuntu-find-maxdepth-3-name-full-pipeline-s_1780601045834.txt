@@ -1,0 +1,366 @@
+tez@tor-fsm-ubuntu:~$ find ~ -maxdepth 3 -name "full_pipeline.sh" 2>/dev/null
+/home/tez/tor-fsm-mdt/experiments/full_pipeline.sh
+tez@tor-fsm-ubuntu:~$ cd /home/tez/tor-fsm-mdt
+git pull
+remote: Enumerating objects: 36, done.
+remote: Counting objects: 100% (30/30), done.
+remote: Compressing objects: 100% (28/28), done.
+remote: Total 36 (delta 18), reused 2 (delta 2), pack-reused 6 (from 1)
+Nesneler açılıyor: 100% (36/36), 582.18 KiB | 1.17 MiB/sn, bitti.
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+   3adf675..2ded718  premature-transport -> origin/premature-transport
+Güncelleniyor: 3adf675..2ded718
+Fast-forward
+ experiments/ml_baseline.py           | 253 +++++++++++++++++++++++++++++++++++
+ experiments/ml_baseline_results.json | 171 +++++++++++++++++++++++
+ experiments/ml_baseline_results.md   | 139 +++++++++++++++++++
+ thesis/Tez_Taslagi.pdf               | Bin 1243735 -> 1315794 bytes
+ thesis/build_thesis.mjs              | 176 +++++++++++++++++++++++-
+ thesis/thesis.html                   | 175 +++++++++++++++++++++++-
+ 6 files changed, 904 insertions(+), 10 deletions(-)
+ create mode 100644 experiments/ml_baseline.py
+ create mode 100644 experiments/ml_baseline_results.json
+ create mode 100644 experiments/ml_baseline_results.md
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ CLIENTS=4 SEEDS="42 137 2718" bash experiments/full_pipeline.sh
+
+=== 0) On kosullar ===
+  [var]  create_flood hook'u kaynakta mevcut
+  [var]  circuit_hijack hook'u kaynakta mevcut
+  [var]  premature_data hook'u kaynakta mevcut
+
+=== 1) Tor build (tek sefer) ===
+
+=== 2) Harness'i import-guvenli + export'lu yap (idempotent) ===
+
+=== 3) cf_test (Shadow calisma dizini) hazirligi ===
+cf_test yok -> Shadow tor orneginden kuruluyor
+shadow_benign.yaml kuruldu (kaynak: /home/tez/shadow/examples/docs/tor)
+
+=== 4) Coklu-seed kosular ===
+--- seed=42 ---
+  BENIGN seed=42 EXIT=0
+  ATTACK create_flood seed=42 EXIT=0
+npm notice
+npm notice New major version of npm available! 10.9.7 -> 11.16.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.16.0
+npm notice To update run: npm install -g npm@11.16.0
+npm notice
+    create_flood seed=42: native attack=18 benign=9
+  ATTACK circuit_hijack seed=42 EXIT=0
+    circuit_hijack seed=42: native attack=18 benign=9
+  ATTACK premature_data seed=42 EXIT=0
+    premature_data seed=42: native attack=12 benign=0
+--- seed=137 ---
+  BENIGN seed=137 EXIT=0
+  ATTACK create_flood seed=137 EXIT=0
+    create_flood seed=137: native attack=18 benign=9
+  ATTACK circuit_hijack seed=137 EXIT=0
+    circuit_hijack seed=137: native attack=20 benign=9
+  ATTACK premature_data seed=137 EXIT=0
+    premature_data seed=137: native attack=12 benign=0
+--- seed=2718 ---
+  BENIGN seed=2718 EXIT=0
+  ATTACK create_flood seed=2718 EXIT=0
+    create_flood seed=2718: native attack=18 benign=9
+  ATTACK circuit_hijack seed=2718 EXIT=0
+    circuit_hijack seed=2718: native attack=18 benign=9
+  ATTACK premature_data seed=2718 EXIT=0
+    premature_data seed=2718: native attack=12 benign=0
+
+=== 5) Metrikler ===
+results.jsonl satir sayisi: 18
+=== Coklu-seed gercek-saldiri metrikleri (non-circular, uc-modlu) ===
+
+# circuit_hijack  (seed: 42, 137, 2718 | n=3)
+  [UYARI] FSM-siniflandirma seviyesinde AYIRT EDICI DEGIL:
+    - injected ground-truth YOK (hepsi 0); event-level confusion kurulamaz.
+    - benign'de sabit begin-noise taban-gurultusu (asagidaki BENIGN sayisi).
+  [FSM hedef-tip ihlal sayisi] CIRCUIT_HIJACK:
+    ATTACK: ort=21.333 ± 0.577 (n=3), %95 GA [19.899, 22.768]
+    BENIGN: ort=12.000 ± 0.000 (n=3), %95 GA [12.000, 12.000]
+    delta=atk-ben: ort=9.333 ± 0.577 (n=3), %95 GA [7.899, 10.768]
+  [non-circular] organik CREATE log satiri (attack vs benign):
+    ATTACK: ort=18.667 ± 1.155 (n=3), %95 GA [15.798, 21.535]
+    BENIGN: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+    ayrilabilirlik: attack min=18 vs benign max=9 -> ORTUSME YOK (esikle ayrilabilir)
+    sonuc: ayrim YALNIZCA non-circular native ile mumkun; FSM-tip degil.
+
+# create_flood  (seed: 42, 137, 2718 | n=3)
+  [tip-temiz confusion — FSM tipi CREATE_FLOOD benign'de GORULMEZ (ayrac)]
+    TP: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+    FN: ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+    FP: ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+    TN: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+    Precision: ort=1.000 ± 0.000 (n=3), %95 GA [1.000, 1.000]
+    Recall   : ort=1.000 ± 0.000 (n=3), %95 GA [1.000, 1.000]
+    F1       : ort=1.000 ± 0.000 (n=3), %95 GA [1.000, 1.000]
+    FPR      : ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+  [non-circular] organik CREATE log satiri (attack vs benign):
+    ATTACK: ort=18.000 ± 0.000 (n=3), %95 GA [18.000, 18.000]
+    BENIGN: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+    ayrilabilirlik: attack min=18 vs benign max=9 -> ORTUSME YOK (esikle ayrilabilir)
+
+# premature_data  (seed: 42, 137, 2718 | n=3)
+  [event-level confusion — ground-truth: injected (TOR marker)]
+    TP=injected: ort=5.667 ± 1.155 (n=3), %95 GA [2.798, 8.535]
+    FN=markers-inj: ort=6.333 ± 1.155 (n=3), %95 GA [3.465, 9.202]
+    FP=attack-noise: ort=6.667 ± 4.619 (n=3), %95 GA [-4.808, 18.141]
+    Precision: ort=0.495 ± 0.179 (n=3), %95 GA [0.051, 0.940]
+    Recall   : ort=0.472 ± 0.096 (n=3), %95 GA [0.233, 0.711]
+    F1       : ort=0.477 ± 0.132 (n=3), %95 GA [0.149, 0.804]
+    not: recall = FSM-etiketli injected / gonderilen marker; parser
+    kapsami sinirli oldugu icin <1 (gonderilenin hepsi etiketlenmez).
+  [benign begin-noise FPR] noise/circuits:
+    FPR: ort=0.481 ± 0.064 (n=3), %95 GA [0.322, 0.641]
+  [non-circular] Tor native relay logu (zero-stream-id):
+    ATTACK: ort=12.000 ± 0.000 (n=3), %95 GA [12.000, 12.000]
+    BENIGN: ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+    ayrilabilirlik: attack min=12 vs benign max=0 -> ORTUSME YOK (esikle ayrilabilir)
+
+
+=== BITTI ===
+Kalici loglar: experiments/runs/<attack>/seed<seed>/  ve  experiments/runs/_benign/seed<seed>/
+Ham sonuc:    experiments/runs/results.jsonl
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd /home/tez/tor-fsm-mdt
+git branch --show-current
+grep -c 'client=$client' experiments/full_pipeline.sh
+git log --oneline -1
+git log --oneline origin/main -1 2>/dev/null || echo "origin/main yok"
+git status -s
+premature-transport
+0
+2ded718 (HEAD -> premature-transport, origin/premature-transport) tez: Bolum 4.17 bagimsiz ML temel cizgisi (non-circular) entegrasyonu + TOC/1.3/6.1/6.2.2 tutarlilik; LOSO sizinti dururstlugu
+14ddba2 (origin/main, origin/HEAD, main) fix: Tor version string typo and README client count
+?? experiments/ml_dataset.json
+?? experiments/runs/
+?? experiments/shadow_runs/
+?? "h et"
+?? "s'ten \303\247\304\261k"
+?? "t et"
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd /home/tez/tor-fsm-mdt
+git fetch origin multiclient-vm
+git checkout origin/multiclient-vm -- experiments/full_pipeline.sh experiments/make_clients.py experiments/detect_json.mjs experiments/metrics.mjs
+remote: Enumerating objects: 240, done.
+remote: Counting objects: 100% (240/240), done.
+remote: Compressing objects: 100% (106/106), done.
+remote: Total 240 (delta 132), reused 240 (delta 132), pack-reused 0 (from 0)
+Nesneler alınıyor: 100% (240/240), 4.25 MiB | 1.79 MiB/sn, bitti.
+Farklar çözülüyor: 100% (132/132), 9 yerel nesneyle tamamlandı.
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+ * branch            multiclient-vm -> FETCH_HEAD
+ * [yeni dal]        multiclient-vm -> origin/multiclient-vm
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ grep -c 'client=$client' experiments/full_pipeline.sh
+ls experiments/make_clients.py
+1
+experiments/make_clients.py
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ CLIENTS=4 SEEDS="42 137 2718" bash experiments/full_pipeline.sh
+
+=== 0) On kosullar ===
+  CLIENTS=4 -> her kosuya torclient2..torclient4 eklenecek (yalniz ML yolu)
+  [var]  create_flood hook'u kaynakta mevcut
+  [var]  circuit_hijack hook'u kaynakta mevcut
+  [var]  premature_data hook'u kaynakta mevcut
+
+=== 1) Tor build (tek sefer) ===
+
+=== 2) Harness'i import-guvenli + export'lu yap (idempotent) ===
+
+=== 3) cf_test (Shadow calisma dizini) hazirligi ===
+
+=== 4) Coklu-seed kosular ===
+--- seed=42 ---
+  make_clients: shadow_seed.yaml -> 4 istemci (torclient..torclient4)
+  BENIGN seed=42 EXIT=1
+  make_clients: shadow_create_flood.yaml -> 4 istemci (torclient..torclient4)
+  ATTACK create_flood seed=42 EXIT=1
+    create_flood seed=42 client=torclient: native attack=18 benign=9
+    create_flood seed=42 client=torclient2: native attack=0
+0 benign=0
+0
+    create_flood seed=42 client=torclient3: native attack=0
+0 benign=0
+0
+    create_flood seed=42 client=torclient4: native attack=0
+0 benign=0
+0
+  make_clients: shadow_circuit_hijack.yaml -> 4 istemci (torclient..torclient4)
+  ATTACK circuit_hijack seed=42 EXIT=1
+    circuit_hijack seed=42 client=torclient: native attack=18 benign=9
+    circuit_hijack seed=42 client=torclient2: native attack=0
+0 benign=0
+0
+    circuit_hijack seed=42 client=torclient3: native attack=0
+0 benign=0
+0
+    circuit_hijack seed=42 client=torclient4: native attack=0
+0 benign=0
+0
+  make_clients: shadow_premature_data.yaml -> 4 istemci (torclient..torclient4)
+  ATTACK premature_data seed=42 EXIT=1
+    premature_data seed=42 client=torclient: native attack=12 benign=0
+    premature_data seed=42 client=torclient2: native attack=null benign=null
+    premature_data seed=42 client=torclient3: native attack=null benign=null
+    premature_data seed=42 client=torclient4: native attack=null benign=null
+--- seed=137 ---
+  make_clients: shadow_seed.yaml -> 4 istemci (torclient..torclient4)
+  BENIGN seed=137 EXIT=1
+  make_clients: shadow_create_flood.yaml -> 4 istemci (torclient..torclient4)
+  ATTACK create_flood seed=137 EXIT=1
+    create_flood seed=137 client=torclient: native attack=18 benign=9
+    create_flood seed=137 client=torclient2: native attack=0
+0 benign=0
+0
+    create_flood seed=137 client=torclient3: native attack=0
+0 benign=0
+0
+    create_flood seed=137 client=torclient4: native attack=0
+0 benign=0
+0
+  make_clients: shadow_circuit_hijack.yaml -> 4 istemci (torclient..torclient4)
+  ATTACK circuit_hijack seed=137 EXIT=1
+    circuit_hijack seed=137 client=torclient: native attack=20 benign=9
+    circuit_hijack seed=137 client=torclient2: native attack=0
+0 benign=0
+0
+    circuit_hijack seed=137 client=torclient3: native attack=0
+0 benign=0
+0
+    circuit_hijack seed=137 client=torclient4: native attack=0
+0 benign=0
+0
+  make_clients: shadow_premature_data.yaml -> 4 istemci (torclient..torclient4)
+  ATTACK premature_data seed=137 EXIT=1
+    premature_data seed=137 client=torclient: native attack=12 benign=0
+    premature_data seed=137 client=torclient2: native attack=null benign=null
+    premature_data seed=137 client=torclient3: native attack=null benign=null
+    premature_data seed=137 client=torclient4: native attack=null benign=null
+--- seed=2718 ---
+  make_clients: shadow_seed.yaml -> 4 istemci (torclient..torclient4)
+  BENIGN seed=2718 EXIT=1
+  make_clients: shadow_create_flood.yaml -> 4 istemci (torclient..torclient4)
+  ATTACK create_flood seed=2718 EXIT=1
+    create_flood seed=2718 client=torclient: native attack=18 benign=9
+    create_flood seed=2718 client=torclient2: native attack=0
+0 benign=0
+0
+    create_flood seed=2718 client=torclient3: native attack=0
+0 benign=0
+0
+    create_flood seed=2718 client=torclient4: native attack=0
+0 benign=0
+0
+  make_clients: shadow_circuit_hijack.yaml -> 4 istemci (torclient..torclient4)
+  ATTACK circuit_hijack seed=2718 EXIT=1
+    circuit_hijack seed=2718 client=torclient: native attack=18 benign=9
+    circuit_hijack seed=2718 client=torclient2: native attack=0
+0 benign=0
+0
+    circuit_hijack seed=2718 client=torclient3: native attack=0
+0 benign=0
+0
+    circuit_hijack seed=2718 client=torclient4: native attack=0
+0 benign=0
+0
+  make_clients: shadow_premature_data.yaml -> 4 istemci (torclient..torclient4)
+  ATTACK premature_data seed=2718 EXIT=1
+    premature_data seed=2718 client=torclient: native attack=12 benign=0
+    premature_data seed=2718 client=torclient2: native attack=null benign=null
+    premature_data seed=2718 client=torclient3: native attack=null benign=null
+    premature_data seed=2718 client=torclient4: native attack=null benign=null
+
+=== 5) Metrikler ===
+results.jsonl satir sayisi: 72
+=== Coklu-seed gercek-saldiri metrikleri (non-circular, uc-modlu) ===
+
+# circuit_hijack  (seed: 42, 137, 2718 | istemci: 4 (torclient, torclient2, torclient3, torclient4) | n=12)
+  [UYARI] FSM-siniflandirma seviyesinde AYIRT EDICI DEGIL:
+    - injected ground-truth YOK (hepsi 0); event-level confusion kurulamaz.
+    - benign'de sabit begin-noise taban-gurultusu (asagidaki BENIGN sayisi).
+  [FSM hedef-tip ihlal sayisi] CIRCUIT_HIJACK:
+    ATTACK: ort=5.333 ± 9.652 (n=12), %95 GA [-0.799, 11.466]
+    BENIGN: ort=3.000 ± 5.427 (n=12), %95 GA [-0.448, 6.448]
+    delta=atk-ben: ort=2.333 ± 4.228 (n=12), %95 GA [-0.353, 5.020]
+  [non-circular] organik CREATE log satiri (attack vs benign):
+    ATTACK: ort=18.667 ± 1.155 (n=3), %95 GA [15.798, 21.535]
+    BENIGN: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+    ayrilabilirlik: attack min=18 vs benign max=9 -> ORTUSME YOK (esikle ayrilabilir)
+    sonuc: ayrim YALNIZCA non-circular native ile mumkun; FSM-tip degil.
+
+# create_flood  (seed: 42, 137, 2718 | istemci: 4 (torclient, torclient2, torclient3, torclient4) | n=12)
+  [tip-temiz confusion — FSM tipi CREATE_FLOOD benign'de GORULMEZ (ayrac)]
+    TP: ort=2.250 ± 4.070 (n=12), %95 GA [-0.336, 4.836]
+    FN: ort=0.000 ± 0.000 (n=12), %95 GA [0.000, 0.000]
+    FP: ort=0.000 ± 0.000 (n=12), %95 GA [0.000, 0.000]
+    TN: ort=2.250 ± 4.070 (n=12), %95 GA [-0.336, 4.836]
+    Precision: ort=0.250 ± 0.452 (n=12), %95 GA [-0.037, 0.537]
+    Recall   : ort=0.250 ± 0.452 (n=12), %95 GA [-0.037, 0.537]
+    F1       : ort=0.250 ± 0.452 (n=12), %95 GA [-0.037, 0.537]
+    FPR      : ort=0.000 ± 0.000 (n=12), %95 GA [0.000, 0.000]
+  [non-circular] organik CREATE log satiri (attack vs benign):
+    ATTACK: ort=18.000 ± 0.000 (n=3), %95 GA [18.000, 18.000]
+    BENIGN: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+    ayrilabilirlik: attack min=18 vs benign max=9 -> ORTUSME YOK (esikle ayrilabilir)
+
+# premature_data  (seed: 42, 137, 2718 | istemci: 4 (torclient, torclient2, torclient3, torclient4) | n=12)
+  [coklu-istemci] event-level confusion 4 istemci x 3 seed uzerinden (n=12 orneklem).
+    not: relay-side native (zero-stream-id) KOSUM-SEVIYESIDIR (tek
+    istemciye atfedilemez) -> kosum basina bir kez sayilir (asagidaki n).
+  [event-level confusion — ground-truth: injected (TOR marker)]
+    TP=injected: ort=1.417 ± 2.610 (n=12), %95 GA [-0.241, 3.075]
+    FN=markers-inj: ort=1.583 ± 2.906 (n=12), %95 GA [-0.263, 3.430]
+    FP=attack-noise: ort=1.667 ± 3.601 (n=12), %95 GA [-0.622, 3.955]
+    Precision: ort=0.124 ± 0.237 (n=12), %95 GA [-0.027, 0.274]
+    Recall   : ort=0.118 ± 0.217 (n=12), %95 GA [-0.020, 0.256]
+    F1       : ort=0.119 ± 0.223 (n=12), %95 GA [-0.022, 0.261]
+    not: recall = FSM-etiketli injected / gonderilen marker; parser
+    kapsami sinirli oldugu icin <1 (gonderilenin hepsi etiketlenmez).
+  [benign begin-noise FPR] noise/circuits:
+    FPR: ort=0.120 ± 0.219 (n=12), %95 GA [-0.019, 0.260]
+  [non-circular] Tor native relay logu (zero-stream-id):
+    ATTACK: ort=12.000 ± 0.000 (n=3), %95 GA [12.000, 12.000]
+    BENIGN: ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+    ayrilabilirlik: attack min=12 vs benign max=0 -> ORTUSME YOK (esikle ayrilabilir)
+
+
+=== 6) ML temel cizgisi yenileme (export_features + ml_baseline) ===
+  [parse sekli] Object; ust anahtarlar: [
+  '1', '2', '3',
+  '4', '5', '6',
+  '7', '8', '9'
+]
+  benign/benign seed=42: 9 devre
+  attack/create_flood seed=42: 9 devre
+  attack/circuit_hijack seed=42: 9 devre
+  attack/premature_data seed=42: 9 devre
+  benign/benign seed=137: 9 devre
+  attack/create_flood seed=137: 9 devre
+  attack/circuit_hijack seed=137: 10 devre
+  attack/premature_data seed=137: 9 devre
+  benign/benign seed=2718: 9 devre
+  attack/create_flood seed=2718: 9 devre
+  attack/circuit_hijack seed=2718: 9 devre
+  attack/premature_data seed=2718: 9 devre
+
+--- olay-tipi alfabesi --- CIRCUIT_CLOSED CONNECT RECV_CREATED RECV_EXTENDED SEND_CREATE SEND_DESTROY SEND_EXTEND SEND_RELAY_DATA TLS_OK
+yazildi: experiments/ml_features.csv (109 devre, 15 sutun)
+yazildi: experiments/ml_dataset.json (109 devre, 3 seed)
+
+--- ml_features.csv (ilk 6 satir) ---
+scenario,attack,seed,gid,n_events,dur_ms,CIRCUIT_CLOSED,CONNECT,RECV_CREATED,RECV_EXTENDED,SEND_CREATE,SEND_DESTROY,SEND_EXTEND,SEND_RELAY_DATA,TLS_OK
+benign,benign,42,1,8,69050,1,1,1,0,1,1,0,2,1
+benign,benign,42,2,7,61329,1,1,1,0,1,1,0,1,1
+benign,benign,42,3,6,701,0,1,1,1,1,0,1,0,1
+benign,benign,42,4,10,600,0,1,1,3,1,0,3,0,1
+benign,benign,42,5,8,600,0,1,1,2,1,0,2,0,1
+Traceback (most recent call last):
+  File "/home/tez/tor-fsm-mdt/experiments/ml_baseline.py", line 22, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+  UYARI: ml_baseline.py basarisiz (pandas/sklearn kurulu mu?)
+
+=== BITTI ===
+Kalici loglar:   experiments/runs/<attack>/seed<seed>/  ve  experiments/runs/_benign/seed<seed>/
+Ham sonuc:       experiments/runs/results.jsonl
+ML oznitelik:    experiments/ml_features.csv
+ML sonuc (4.17): experiments/ml_baseline_results.json
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
