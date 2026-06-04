@@ -146,6 +146,21 @@ SVG uydurma yerine bu gerçek ekran görüntülerini base64 ile göm (HTML+PDF k
   (2048 MB / 1 işlemci / 25 GB) — fiili konfigle (8192/4/50) çelişir; provisioning kanıtı diye
   KULLANMA. Kanıt için "Ayrıntılar/detay" görünümünü kullan (gerçek değerleri gösterir).
 
+## Tor günlük kaynakları + kaynakça sayı kısıtı
+- **İki Tor sayfasını karıştırma:** (1) `metrics.torproject.org/web-server-logs.html` =
+  Tor'un WEB sitelerinin sanitize Apache HTTP erişim logları (web trafiği) — devre/hücre/FSM
+  verisi DEĞİL; FSM analizine konamaz. (2) `support.torproject.org/.../reading-tor-logs/` =
+  kendi Tor istemcinin NOTICE/WARN logunu okuma rehberi (Bootstrapped %, handshake, "Failed to
+  find node for hop 0... Discarding this circuit"); izin GEREKMEZ, kendi sürecinin çıktısı.
+- **İzin/etik kısıtı yalnızca CANLI Tor ağında aktif saldırı/deney içindir** — log okumak için değil.
+  Bu yüzden deneyler Shadow simülasyonunda; FSM Σ olayları gerçek Tor log fazlarına dayandırılır (3.1).
+- **Kaynakça kısıtı:** tez metni "20 birincil kaynak" (kümeler 6+...+3=20) der ve numaralı IEEE
+  kaynakça tam 20'dir. SLR-dışı teknik dokümanları (Tor doc sayfaları) numaralı kaynakçaya EKLEME —
+  "20" iddiasını bozar; metin-içi çevrimiçi kaynak (URL) olarak ver, tor-spec'i mevcut [19] ile atıfla.
+- **İntegrite uyarısı:** tez `experiments/shadow_harness.mjs`'e 3 yerde atıf yapar ama dosya YOK
+  (gerçek dosyalar: detect_json.mjs, tor_static_fsm.mjs, full_pipeline.sh). Native/çok-istemci
+  görevleri merge olunca harness adını doğrula; uydurma dosya atfı replit.md'ye aykırı.
+
 ## Multi-seed metrics pipeline (full_pipeline.sh + metrics.mjs + detect_json.mjs)
 - **Patch files are NOT clean `patch -p1` diffs.** `create_flood.patch` is a near-clean unified diff,
   but `circuit_hijack.patch` and `premature_data.patch` are PROSE + partial/truncated hunks

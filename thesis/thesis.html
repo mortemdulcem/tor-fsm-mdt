@@ -358,6 +358,34 @@ modellenmiştir:</p>
 </ul>
 <p>Tam δ matrisi Ek A'da, görsel ısı haritası Şekil 2'de verilmiştir.</p>
 
+<p><b>Σ'nın gerçek Tor günlüğüne dayanması.</b> Olay alfabesi keyfi seçilmemiştir;
+çalışan bir Tor istemcisinin ürettiği günlük (log) ve protokol olaylarına dayanır.
+Tor Project'in resmî günlük rehberi (Tor Project, &ldquo;Reading Tor logs,&rdquo;
+<code>support.torproject.org/tor-browser/encountering-issues/reading-tor-logs/</code>,
+erişim Haz. 2026), bir istemcinin NOTICE/WARN seviyesinde ürettiği faz satırlarını
+belgeler. Örneğin <code>Bootstrapped 10%: Finishing handshake with directory server</code>
+satırı CONNECTING&rarr;TLS_HANDSHAKE geçişine, <code>Bootstrapped 85%: Finishing
+handshake with first hop</code> satırı CREATE_SENT/CIRCUIT_BUILDING fazına,
+<code>[WARN] Failed to find node for hop 0 of our path. Discarding this circuit.</code>
+satırı ise başarısız/iptal edilmiş devre kurulumuna (ERROR ve devre düşürme)
+karşılık gelir. Bu kaba fazların altındaki hücre-seviyesi olaylar (CREATE/CREATED,
+EXTEND/EXTENDED, RELAY_DATA, DESTROY) tor-spec [19] tarafından tanımlanır ve
+çalışan bir Tor sürecinin control-port CIRC/STREAM olayları ile INFO-seviyesi
+günlükleri üzerinden gözlemlenir; Bölüm 4.15'teki VM/Shadow ortamında bu tip gerçek
+günlükler üretilmiştir. Böylece FSM olay sözlüğü, gerçek Tor günlük semantiğine
+birebir izlenebilir.</p>
+
+<p class="no-indent"><i>Kapsam notu (günlük veri kaynakları).</i> Tor Metrics
+tarafından yayımlanan <i>web sunucu günlükleri</i> (Tor Project, &ldquo;Tor Web
+Server Logs,&rdquo; <code>metrics.torproject.org/web-server-logs.html</code>, erişim
+Haz. 2026), Tor Project web sitelerine yapılan HTTP isteklerinin gizlilik-duyarlı
+(Apache biçimli) erişim günlükleridir; yani web trafiğidir, Tor devre/hücre verisi
+değildir. Bu nedenle FSM geçersiz-geçiş tespiti için uygun bir kaynak oluşturmaz ve
+bu çalışmada kullanılmamıştır. Ayrıca devre-seviyesi günlüğe erişmek için dış izin
+gerekmez: yukarıdaki satırlar kendi çalıştırdığımız Tor sürecinin kendi çıktısıdır.
+İzin/etik kısıtı yalnızca <i>canlı</i> Tor ağı üzerinde aktif saldırı/deney
+çalıştırmaya ilişkindir; deneyler bu nedenle Shadow simülasyonunda yürütülmüştür.</p>
+
 <h3>3.2 Saldırı Sınıflandırıcı</h3>
 <p>Invalid kümesindeki her ikili, deterministik bir <code>classifyInvalid(state, event)</code>
 fonksiyonu (kod referansı: <code>server/fsm.ts</code>, 64–204. satırlar) ile yedi ana
