@@ -61,7 +61,9 @@ native_count() {
     premature_data)
       grep -rh "Relay data cell with zero stream_id" "$hostsdir" 2>/dev/null | wc -l ;;
     create_flood|circuit_hijack)
-      grep -ch "First hop: finished sending" "$hostsdir/$client/tor.1000.stdout" 2>/dev/null || echo 0 ;;
+      local f="$hostsdir/$client/tor.1000.stdout"
+      if [ -f "$f" ]; then grep -ch "First hop: finished sending" "$f" 2>/dev/null || true
+      else echo 0; fi ;;
   esac
 }
 
@@ -136,6 +138,20 @@ if [ ! -d "$CFT" ] || [ ! -f "$CFT/shadow_benign.yaml" ]; then
   echo "shadow_benign.yaml kuruldu (kaynak: $EX)"
 fi
 TPL=""; [ -d "$CFT/shadow.data.template" ] && TPL="--template-directory shadow.data.template"
+
+# Coklu-istemci: Shadow her host'un dosyalarini template/hosts/<host>/ altindan
+# kopyalar. make_clients.py yaml'a torclient2..N ekler ama template'te o dizinleri
+# OLUSTURMAZ -> klon istemciler kendi 'torrc'larini bulamaz, tor "Reading config
+# failed" ile EXIT=1 verir (Shadow: 'managed processes in unexpected final state').
+# Cozum: torclient template host dizinini (torrc + torrc-defaults) her klon icin
+# birebir cogalt. tgen graphml conf/'ta paylasimli (../../../conf) -> ek kopya gerekmez.
+if [ "$CLIENTS" -gt 1 ] && [ -d "$CFT/shadow.data.template/hosts/torclient" ]; then
+  for k in $(seq 2 "$CLIENTS"); do
+    dst="$CFT/shadow.data.template/hosts/torclient$k"
+    [ -d "$dst" ] || cp -r "$CFT/shadow.data.template/hosts/torclient" "$dst"
+  done
+  echo "  template: torclient2..torclient$CLIENTS host dizinleri hazirlandi (torrc kopyalandi)"
+fi
 
 # ---------------------------------------------------------------------------
 say "4) Coklu-seed kosular"
