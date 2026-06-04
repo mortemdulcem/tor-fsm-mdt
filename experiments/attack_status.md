@@ -51,14 +51,22 @@ Deney hattı (`full_pipeline.sh` / `recompute.sh` + `detect_json.mjs --client` +
 seed×istemci'ye çıkar. Bu yol öncelikle 4.17 ML çeşitliliği içindir; native
 confusion'a (bu bölüm) istemci ayrı örnek boyutu olarak katılabilir.
 
-Ancak **çok-istemci için gerçek (valid) Shadow verisi henüz üretilmemiştir**:
+**Çok-istemci koşumu yapıldı (sağlamlık kontrolü), ama çeşitlilik düşük:**
 - Shadow yalnızca VM'de çalışır (Replit ortamı koşamaz; bkz. Çerçeve).
-- Kayıtlı `CLIENTS=4` topoloji denemesinde ek istemciler (`torclient2/3/4`) Shadow'da
-  `Normal(1)` / `StoppedByShadow` ile düştü; geçerli per-client log üretmedi.
-  Topoloji düzeltilip temiz bir VM koşumu yapılana kadar çok-istemci sayıları
-  **raporlanmaz** (uydurma veri yasak).
-- Dolayısıyla bu bölümün native confusion sayıları tek-istemci kalır; çok-istemci
-  genişlemesi gelecek iştir (geçerli VM koşumu + `metrics.mjs` çıktısı bekler).
+- Önceki `CLIENTS=4` denemesinde ek istemciler (`torclient2/3/4`) `EXIT=1
+  "Unable to open torrc"` ile düşüyordu; kök neden: Shadow her host'un dosyalarını
+  `shadow.data.template/hosts/<host>/` altından kopyalar, `make_clients.py` YAML'a
+  host ekler ama template host dizinini oluşturmazdı. `full_pipeline.sh` artık
+  CLIENTS>1 iken bu dizini idempotent kopyalar → düzeltildi.
+- Düzeltme sonrası `CLIENTS=4`, seed 42/137/2718 koşusu **başarılıdır** (tüm süreçler
+  `EXIT=0`; gerçek Shadow verisi; `results.jsonl`=72 satır). Ancak deterministik
+  ortamda ek istemciler birincil istemciyle neredeyse **özdeş** devreler üretti
+  (native CREATE_FLOOD/CIRCUIT_HIJACK istemciler arası ±0,000). Yani `n=12` örneklem
+  **bağımsız değil yüksek korelasyonludur** (4 kopya × 3 seed).
+- **Bu nedenle birincil sayılar tek-istemci (n=3) kalır**; çok-istemci yalnızca bir
+  sağlamlık teyididir (yapısal ve ML bulguları tek-istemciyle birebir aynı çıktı).
+  `n=12`'yi bağımsız tekrar gibi sunmak ve ±0,000 dar aralığı hassasiyet kanıtı
+  saymak yanıltıcı olacağından yapılmaz (uydurma/yanıltıcı sunum yasak).
 
 **Örnek-boyutu kuralı (çok-istemci için, koşum yapıldığında geçerli olacak):**
 - `create_flood` / `circuit_hijack` native + tip-temiz confusion: **per-client**

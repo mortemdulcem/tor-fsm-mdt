@@ -1661,11 +1661,18 @@ eşlik eden non-circular native confusion sonuçlarının (CREATE_FLOOD tip-temi
 PREMATURE_DATA event-level, CIRCUIT_HIJACK native; ayrıntı için Ek B /
 <code>experiments/attack_status.md</code>) tamamı <i>tek-istemci</i>
 (<code>CLIENTS=1</code>) koşumundan gelir; örnek boyutu seed sayısıdır (n = 3).
-Deney hattı çok-istemci koşumu (<code>CLIENTS&gt;1</code>; her ek <code>torclient*</code>
-host'u ayrı bir örnek) desteklese de, bu genişleme için <i>geçerli</i> bir Shadow
-verisi henüz üretilmemiştir (kayıtlı <code>CLIENTS=4</code> denemesinde ek istemciler
-düştü; bu ortam Shadow çalıştıramaz) — bu yüzden çok-istemci sayıları
-<b>raporlanmaz</b> (gelecek iş, bkz. Bölüm 6.3). Çok-istemci koşumu yapıldığında
+Deney hattı çok-istemci koşumunu (<code>CLIENTS&gt;1</code>; her ek <code>torclient*</code>
+host'u ayrı bir örnek) destekler ve bu genişleme bir <b>sağlamlık (robustness)
+kontrolü</b> olarak <code>CLIENTS=4</code> ile üç seed (42/137/2718) üzerinde
+başarıyla koşulmuştur (tüm süreçler <code>EXIT=0</code>; gerçek Shadow verisi).
+Ancak deterministik ortamda ek istemciler birincil istemciyle neredeyse <i>özdeş</i>
+devreler üretmiştir (istemciler arası native CREATE_FLOOD/CIRCUIT_HIJACK sayıları
+±0,000); dolayısıyla ortaya çıkan n = 12 örneklem <b>bağımsız değil yüksek
+korelasyonludur</b> (4 kopya × 3 seed). Bu nedenle birincil sonuçlar tek-istemci
+(n = 3) olarak korunur; çok-istemci yalnızca bir sağlamlık teyidi sayılır — yapısal
+ve ML bulguları tek-istemciyle birebir aynı kalmıştır (Bölüm 4.17). Çok-istemci
+örneklemini bağımsız tekrar gibi sunmak ve oradaki dar güven aralıklarını (±0,000)
+bir hassasiyet kanıtı saymak yanıltıcı olacağından bu yapılmaz. Çok-istemci koşumunda
 örnek-boyutu kuralı şudur: CREATE_FLOOD/CIRCUIT_HIJACK native ve PREMATURE_DATA
 <i>event-level</i> confusion <b>per-client</b> ölçülür (n = seed × istemci); buna
 karşılık PREMATURE_DATA <i>relay-side native</i> (zero-stream-id) sinyali
@@ -1689,7 +1696,10 @@ koşumundan toplanan 109 devredir (benign 27,
 create_flood 27, circuit_hijack
 28, premature_data 27).
 Tüm sayılar <code>experiments/ml_baseline.py</code> çıktısından
-(<code>ml_baseline_results.json</code>) üretilmiştir; elle girilmemiştir.</p>
+(<code>ml_baseline_results.json</code>) üretilmiştir; elle girilmemiştir.
+Bu tablo <b>birincil olarak tek-istemci (<code>CLIENTS=1</code>)</b> koşumundan
+raporlanır; çok-istemci (<code>CLIENTS=4</code>) koşumu yalnızca bir sağlamlık
+doğrulamasıdır ve birincil ML bulgularını değiştirmemiştir (bkz. Bölüm 4.16).</p>
 
 <p class="no-indent"><b>Metodolojik uyarı (önce okunmalı).</b> Veri deterministik
 olduğundan sınıf başına yalnızca az sayıda <i>eşsiz</i> öznitelik vektörü vardır
@@ -2089,9 +2099,13 @@ tamamlanabilir.</p>
   artık çok-istemci (<code>CLIENTS=</code>) parametresini de destekler; ek istemci
   koşumları yalnız bu ML yolunu besler (non-circular native confusion Bölüm 4.16
   birincil istemcide değişmeden kalır) ve <code>ml_features.csv</code> ile
-  <code>ml_baseline_results.json</code>'u uçtan uca yeniler. Bu koşumlar Shadow
-  gerektirir (bu ortamda çalışmaz; sentetik örnek eklenmemiştir — gelecek iş, bkz.
-  Bölüm 6.3). ML baseline,
+  <code>ml_baseline_results.json</code>'u uçtan uca yeniler. Bu çok-istemci koşumu
+  bu çalışmada bir sağlamlık kontrolü olarak yürütülmüştür (<code>CLIENTS=4</code> ×
+  3 seed; Bölüm 4.16), ancak deterministik ortamda istemciler birbirine ~özdeş
+  devreler ürettiğinden eklenen çeşitlilik sınırlı kalmış ve bulguları
+  değiştirmemiştir; gerçek örüntü çeşitliliği için farklı topoloji/zamanlama
+  gerekir (Shadow'a bağlıdır, bu ortamda çalışmaz; sentetik örnek eklenmemiştir —
+  gelecek iş, bkz. Bölüm 6.3). ML baseline,
   FSM'nin <i>yerine</i> değil bağımsız bir teyit olarak sunulmuştur.</li>
 </ul>
 
