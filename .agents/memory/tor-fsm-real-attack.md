@@ -130,6 +130,16 @@ v3 succeeds via a DIFFERENT, genuine path: inject the early cell from WITHIN cir
 - **Status: THREE attacks real+verified (native-log, non-circular): CREATE_FLOOD, CIRCUIT_HIJACK,
   PREMATURE_DATA.** Files on premature-transport branch: experiments/premature_v3.sh (+ premature_detect.mjs).
 
+## Tez figürleri: kullanıcının GERÇEK VM ekran görüntülerini kullan (uydurma diyagram değil)
+Kullanıcı VM kanıtını `attached_assets/`'e ekran görüntüsü olarak gönderiyor (git-tracked).
+**Ders:** "görsel yok" demeden önce `ls attached_assets/` ile bak; VM/Shadow figürlerinde
+SVG uydurma yerine bu gerçek ekran görüntülerini base64 ile göm (HTML+PDF kendine yeterli).
+- En temiz VM ortam görseli: VirtualBox Yöneticisi "Güç Kapalı" detay görünümü (overlay yok).
+- **Sürüm tuzağı (tutarlılık):** VirtualBox misafir-OS *tür etiketi* "Ubuntu 22.10 (Kinetic Kudu)"
+  görünür ama fiilen kurulan ISO `ubuntu-22.04.5-desktop-amd64.iso` → sistem **Ubuntu 22.04.5 LTS**.
+  Metinde 22.04(.5) yaz, etiketin yalnızca VBox ayarı olduğunu açıkla; figürle metin çelişmesin.
+- VM gerçek konfig (ekrandan): 8192 MB RAM, 4 vCPU, EFI, VMSVGA 16 MB, 50 GB VDI, Intel PRO/1000 NAT.
+
 ## Multi-seed metrics pipeline (full_pipeline.sh + metrics.mjs + detect_json.mjs)
 - **Patch files are NOT clean `patch -p1` diffs.** `create_flood.patch` is a near-clean unified diff,
   but `circuit_hijack.patch` and `premature_data.patch` are PROSE + partial/truncated hunks

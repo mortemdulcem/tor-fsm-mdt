@@ -58,32 +58,13 @@ if (!classifyCode || !pipelineCode) {
   throw new Error("Kod parçası bulunamadı (kaynak dosya değişmiş olabilir); tez derlenmedi.");
 }
 
-// ---------- Akademik ortam/topoloji diyagramları (Bölüm 4.15'te belgelenmiş kurulumun görselleştirmesi) ----------
-const vmEnvSvg = `<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica,Arial,sans-serif">
-  <rect x="6" y="6" width="708" height="288" rx="6" fill="#eef1f5" stroke="#333" stroke-width="1.5"/>
-  <text x="20" y="26" font-size="12.5" font-weight="bold" fill="#222">Oracle VirtualBox 7.0 — hipervizör (bağımsız host makine)</text>
-  <rect x="26" y="38" width="668" height="248" rx="5" fill="#ffffff" stroke="#444" stroke-width="1.2"/>
-  <text x="40" y="56" font-size="11.5" font-weight="bold" fill="#1a3a5c">Misafir OS: Ubuntu 22.04 LTS (Jammy) — 4 vCPU · 8 GB RAM · 50 GB sanal disk</text>
-  <rect x="42" y="70" width="150" height="64" rx="4" fill="#f4f8ff" stroke="#2b5d8a"/>
-  <text x="117" y="96" font-size="11" font-weight="bold" text-anchor="middle">Shadow 3.3.0</text>
-  <text x="117" y="112" font-size="9" fill="#555" text-anchor="middle">discrete-event</text>
-  <text x="117" y="124" font-size="9" fill="#555" text-anchor="middle">ağ simülatörü</text>
-  <rect x="204" y="70" width="150" height="64" rx="4" fill="#f4f8ff" stroke="#2b5d8a"/>
-  <text x="279" y="96" font-size="11" font-weight="bold" text-anchor="middle">Tor 0.4.6.10</text>
-  <text x="279" y="116" font-size="9" fill="#555" text-anchor="middle">gerçek tor binary</text>
-  <rect x="366" y="70" width="150" height="64" rx="4" fill="#f4f8ff" stroke="#2b5d8a"/>
-  <text x="441" y="96" font-size="11" font-weight="bold" text-anchor="middle">tgen</text>
-  <text x="441" y="116" font-size="9" fill="#555" text-anchor="middle">trafik üreteci</text>
-  <rect x="528" y="70" width="150" height="64" rx="4" fill="#f4f8ff" stroke="#2b5d8a"/>
-  <text x="603" y="96" font-size="11" font-weight="bold" text-anchor="middle">Node.js 22</text>
-  <text x="603" y="116" font-size="9" fill="#555" text-anchor="middle">FSM analiz harness</text>
-  <rect x="42" y="150" width="636" height="44" rx="4" fill="#fbf6ec" stroke="#9a6b1f"/>
-  <text x="360" y="170" font-size="10.5" font-weight="bold" text-anchor="middle">9-host kanonik topoloji (examples/tor/minimal)</text>
-  <text x="360" y="186" font-size="9.5" fill="#555" text-anchor="middle">1 dir-auth + 4 non-exit relay + 2 exit relay + 1 doğrudan istemci + 1 tor istemci</text>
-  <rect x="42" y="206" width="636" height="44" rx="4" fill="#eef7ee" stroke="#2e7d32"/>
-  <text x="360" y="226" font-size="10.5" font-weight="bold" text-anchor="middle">seed-deterministik koşum {42, 137, 2718}</text>
-  <text x="360" y="242" font-size="9.5" fill="#555" text-anchor="middle">shadow_results.json → git diff ile bit-bit reproducibility</text>
-</svg>`;
+// ---------- Akademik ortam görseli: GERÇEK VM ekran görüntüsü (kullanıcının VM'inden) ----------
+// Oracle VirtualBox Yöneticisi'nde tor-fsm-ubuntu VM yapılandırması; base64 ile gömülür
+// (HTML+PDF kendine yeterli olsun). Uydurma diyagram DEĞİL, gerçek ekran görüntüsü.
+const vmShotPath = path.resolve(__dirname, "../attached_assets/image_1779974022701.png");
+const vmShotB64 = (await fs.readFile(vmShotPath)).toString("base64");
+const vmShotImg = `<img src="data:image/png;base64,${vmShotB64}" alt="Oracle VirtualBox Yöneticisi — tor-fsm-ubuntu VM yapılandırması (8192 MB RAM, 4 vCPU, EFI, ubuntu-22.04.5-desktop-amd64.iso, 50 GB VDI, NAT)" style="max-width:100%;height:auto;border:1px solid #999;"/>`;
+// ---------- Topoloji şeması (mantıksal diyagram; ekran görüntüsü değil) ----------
 const vmTopoSvg = `<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica,Arial,sans-serif">
   <rect x="290" y="12" width="140" height="40" rx="4" fill="#fbf6ec" stroke="#9a6b1f"/>
   <text x="360" y="37" font-size="10.5" font-weight="bold" text-anchor="middle">Directory Authority (×1)</text>
@@ -234,6 +215,7 @@ const html = `<!doctype html>
   pre.algo { background: #f4f4f4; border: 1px solid #ccc; padding: 8pt 10pt; font-size: 9pt; line-height: 1.4; white-space: pre-wrap; page-break-inside: avoid; font-family: "Courier New", monospace; }
   .fig { text-align: center; margin: 8pt 0 16pt; page-break-inside: avoid; }
   .fig svg { max-width: 100%; height: auto; }
+  .fig img { max-width: 100%; height: auto; }
   .fig .cap { font-size: 9.5pt; color: #444; margin-top: 4pt; }
   code { font-family: "Courier New", monospace; font-size: 10pt; background: #f0f0f0; padding: 0 3pt; }
   .ref-list { font-size: 10pt; }
@@ -1202,8 +1184,12 @@ tekrarlanmıştır. Bu, Hacettepe Üniversitesi BYZ 658 ders gereksinimlerinden
 <ul>
   <li><b>Hipervizör:</b> Oracle VirtualBox 7.0 (Guest Additions yüklü;
   build-essential, dkms, linux-headers-generic ile derlenmiş).</li>
-  <li><b>Misafir işletim sistemi:</b> Ubuntu 22.04 LTS (Jammy Jellyfish);
-  8 GB RAM, 4 vCPU, 50 GB sanal disk.</li>
+  <li><b>Misafir işletim sistemi:</b> Ubuntu 22.04.5 LTS
+  (<code>ubuntu-22.04.5-desktop-amd64.iso</code>'dan kurulu); 8 GB RAM (8192 MB),
+  4 vCPU, 50 GB sanal disk (VDI), EFI etkin, NAT ağı.
+  <i>(Not: Şekil 4.15a'da VirtualBox'ın misafir-OS tür etiketi "Ubuntu 22.10
+  (Kinetic Kudu)" olarak görünür; bu yalnızca VirtualBox ayar etiketidir —
+  fiilen kurulan sistem, takılı ISO'dan Ubuntu 22.04.5 LTS'tir.)</i></li>
   <li><b>Simülatör:</b> Shadow 3.3.0 (kaynaktan derlenmiş; clang, libclang-dev,
   llvm-dev, Rust toolchain ile).</li>
   <li><b>Tor:</b> sürüm 0.4.6.10 (Ubuntu apt paketi; Shadow 3.3.0 ile uyumlu
@@ -1213,12 +1199,14 @@ tekrarlanmıştır. Bu, Hacettepe Üniversitesi BYZ 658 ders gereksinimlerinden
   <code>experiments/shadow_harness.mjs</code>.</li>
 </ul>
 
-<div class="fig">${vmEnvSvg}<div class="cap"><b>Şekil 4.15a.</b> Bağımsız reproducibility
-doğrulamasının deney ortamı yığını: Oracle VirtualBox 7.0 hipervizörü üzerinde
-Ubuntu 22.04 LTS misafir işletim sistemi (4 vCPU, 8 GB RAM, 50 GB disk); içinde
-Shadow 3.3.0 + Tor 0.4.6.10 + tgen + Node.js 22 analiz hattı, 9-host kanonik
-topoloji ve seed-deterministik koşum. Tüm sürümler yukarıdaki test ortamı
-listesinden alınmıştır; diyagram bu metni görselleştirir, yeni bilgi içermez.</div></div>
+<div class="fig">${vmShotImg}<div class="cap"><b>Şekil 4.15a.</b> Bağımsız reproducibility
+doğrulamasında kullanılan sanal makinenin Oracle VirtualBox Yöneticisi
+ekran görüntüsü (<code>tor-fsm-ubuntu</code>): 8192 MB ana bellek, 4 işlemci,
+EFI etkin, iç içe sayfalama + KVM yarı-sanallaştırma hızlandırma; takılı kurulum
+ortamı <code>ubuntu-22.04.5-desktop-amd64.iso</code>, 50 GB <code>tor-fsm-ubuntu.vdi</code>
+sabit diski ve Intel PRO/1000 MT (NAT) ağ bağdaştırıcısı. Üstteki misafir-OS tür
+etiketi "Ubuntu 22.10 (Kinetic Kudu)" bir VirtualBox ayar etiketidir; fiilen
+kurulan sistem takılı ISO'dan Ubuntu 22.04.5 LTS'tir.</div></div>
 
 <p class="no-indent"><b>Deney protokolü.</b> Repodaki harness komut satırından
 çalıştırılmış; üç senaryo (<i>benign</i>, <i>replay_attack</i>,
