@@ -1310,10 +1310,15 @@ kopyadır. Bu nedenle <b>seed-bazlı Leave-One-Seed-Out (LOSO) çapraz-doğrulam
 sızıntıyı önlemez</b>: foldlarda test vektörlerinin
 ${(ml.structural.loso_dup[String(ml.data.seeds[2])].ratio*100).toFixed(1)}%&ndash;${(ml.structural.loso_dup[String(ml.data.seeds[1])].ratio*100).toFixed(1)}%
 kadarı (seed bazında: ${ml.data.seeds.map(s=>`seed ${s} ${ml.structural.loso_dup[String(s)].dup}/${ml.structural.loso_dup[String(s)].total}`).join(", ")})
-train kümesinde birebir bulunur. Dolayısıyla aşağıdaki CV metrikleri
+train kümesinde birebir bulunur. Dolayısıyla seed-bazlı CV metrikleri
 <i>iyimserdir</i> (dağıtım-içi/in-distribution) ve genelleme kanıtı olarak
-okunmamalıdır. Bu sınırlamadan <b>bağımsız</b> asıl kanıt, aşağıdaki yapısal
-ayrılabilirliktir.</p>
+okunmamalıdır. Bu sızıntıyı tamamen kaldırmak için sonuçlar ayrıca, grubun
+<i>eşsiz öznitelik vektörü</i> olduğu <b>sızıntısız GroupKFold</b> ile yeniden
+hesaplanmış ve iyimser LOSO ile yan yana sunulmuştur (kısım (b), Tablo 4.17d);
+toplam ${ml.structural.dedup.n_unique_vectors} eşsiz vektörün
+${ml.structural.dedup.pure}'i tek-sınıf, ${ml.structural.dedup.shared}'u
+sınıflar-arası paylaşımlıdır. Bu sınırlamadan <b>bağımsız</b> asıl kanıt ise
+aşağıdaki yapısal ayrılabilirliktir.</p>
 
 <p class="no-indent"><b>(a) Yapısal ayrılabilirlik (çapraz-doğrulamadan bağımsız).</b>
 Sınıfların eşsiz öznitelik vektörlerinin örtüşmesi, hangi CV kullanılırsa
@@ -1343,9 +1348,10 @@ recall = 1.0 vermesinin sızıntıdan bağımsız yapısal nedenidir. (3) premat
 ile ${ml.structural.overlap.premature_data__benign.inter} eşsiz vektör paylaşır,
 benign'e en yakın ve en zor ayrılan sınıftır.</p>
 
-<p class="no-indent"><b>(b) Denetimli, denetimsiz ve çok-sınıflı sonuçlar (LOSO, iyimser).</b>
-Tablo 4.17b üç paradigmanın özetini verir. Değerler yukarıdaki sızıntı uyarısı
-nedeniyle dağıtım-içi okunmalıdır.</p>
+<p class="no-indent"><b>(b) Denetimli, denetimsiz ve çok-sınıflı sonuçlar (LOSO iyimser vs. sızıntısız).</b>
+Tablo 4.17b üç paradigmanın LOSO özetini verir; bu değerler yukarıdaki sızıntı
+uyarısı nedeniyle dağıtım-içi okunmalıdır. Tablo 4.17d ise aynı modelleri
+sızıntısız GroupKFold ile (grup = eşsiz öznitelik vektörü) yeniden hesaplar.</p>
 <p class="no-indent"><b>Tablo 4.17b.</b> ML temel çizgisi metrikleri (ortalama ± SD, ${ml.data.n_seeds} fold LOSO).</p>
 <table style="border-collapse:collapse;font-size:9pt;margin:6pt 0;">
 <tr><th style="padding:3pt 8pt;border:1px solid #999;text-align:left;">Model</th>
@@ -1384,6 +1390,71 @@ karışır, premature ↔ benign karışır.</p>
 <tr><th style="padding:3pt 8pt;border:1px solid #999;"></th>${ml.multiclass.labels.map(l=>`<th style="padding:3pt 8pt;border:1px solid #999;">${l}</th>`).join("")}</tr>
 ${ml.multiclass.confusion.map((row,i)=>`<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>${ml.multiclass.labels[i]}</b></td>${row.map((c,j)=>`<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;${i===j?"background:#eef;font-weight:bold;":""}">${c}</td>`).join("")}</tr>`).join("\n")}
 </table>
+
+<p class="no-indent"><b>Sızıntısız değerlendirme (GroupKFold).</b> Yukarıdaki LOSO
+metrikleri, test vektörlerinin büyük kısmı train'de birebir bulunduğundan
+iyimserdir. Sızıntıyı tamamen kaldırmak için aynı modeller, grubun <i>eşsiz
+öznitelik vektörü</i> olduğu ${ml.leakfree.multiclass.k_folds}-katlı GroupKFold ile
+yeniden değerlendirilmiştir: aynı vektör (seed kopyaları dâhil) train ve test'e
+<b>birlikte düşemez</b>, böylece kopya-sızıntısı sıfıra iner (kod içi doğrulama:
+0/${ml.data.n_circuits} test vektörü train'de). Tahminler fold-dışı (out-of-fold)
+havuzlanıp metrikler tek bir sızıntısız bölme üzerinden hesaplanır. Tablo 4.17d
+iki değerlendirmeyi yan yana verir.</p>
+<p class="no-indent"><b>Tablo 4.17d.</b> İyimser LOSO vs. sızıntısız GroupKFold (grup = eşsiz öznitelik vektörü, K = ${ml.leakfree.multiclass.k_folds}).</p>
+<table style="border-collapse:collapse;font-size:9pt;margin:6pt 0;">
+<tr><th style="padding:3pt 8pt;border:1px solid #999;text-align:left;">Metrik</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">LOSO (iyimser)</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">Sızıntısız (GroupKFold)</th></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — Precision</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.precision.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.precision)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — Recall</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.recall.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.recall)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — F1</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.f1.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.f1)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimsiz — F1</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.unsupervised.f1.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.unsupervised.f1)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Çok-sınıflı — Accuracy</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.multiclass.accuracy.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.multiclass.accuracy)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli recall — create_flood</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.per_attack_recall.create_flood.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.per_attack_recall.create_flood)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli recall — circuit_hijack</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.per_attack_recall.circuit_hijack.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.per_attack_recall.circuit_hijack)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli recall — premature_data</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.per_attack_recall.premature_data.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.per_attack_recall.premature_data)}</td></tr>
+</table>
+<p class="no-indent">Karşılaştırmanın yorumu: sızıntı kaldırıldığında <b>tablo
+çökmiyor</b>. Denetimli model create_flood ve circuit_hijack'i sızıntısız bölmede
+de kusursuz yakalar (recall ${fmt(ml.leakfree.supervised.per_attack_recall.create_flood)}
+/ ${fmt(ml.leakfree.supervised.per_attack_recall.circuit_hijack)}); bu, ayrımın
+ezberden değil gerçek bir öznitelik sinyalinden (<code>SEND_CREATE=2</code>) geldiğini
+gösterir — çünkü model, hiç görmediği eşsiz vektörleri bile bu sayım üzerinden doğru
+sınıflar. Buna karşılık precision ${ml.supervised.precision.mean.toFixed(3)}'ten
+${fmt(ml.leakfree.supervised.precision)}'e <i>düşer</i> (bazı benign devreler artık
+yanlış-pozitif olur): sızıntı kaldırılınca kaybolan tek şey, train'deki birebir benign
+kopyalarının yarattığı yapay mükemmel precision'dır. premature recall sızıntısız bölmede
+de düşük kalır (${ml.supervised.per_attack_recall.premature_data.mean.toFixed(3)} &rarr;
+${fmt(ml.leakfree.supervised.per_attack_recall.premature_data)}); zayıf-etiketli ve
+benign'e en yakın sınıf olduğundan ne LOSO ne de sızıntısız değerlendirme onu kurtarır.
+Çok-sınıflı doğruluk neredeyse değişmez (${ml.multiclass.accuracy.mean.toFixed(3)} &rarr;
+${fmt(ml.leakfree.multiclass.accuracy)}). Özetle <b>sızıntı, ayrılabilirlik
+sonuçlarının niteliğini değiştirmez</b>; yalnızca precision'daki iyimser şişmeyi açıklar.
+Bu, yapısal ayrılabilirlik bulgusunu (kısım (a)) bağımsız bir değerlendirme şemasıyla
+doğrular.</p>
+
+<p class="no-indent"><b>Veri çeşitliliği (dürüst sınır).</b> Daha fazla eşsiz örüntü,
+ancak VM üzerinde ek seed/senaryo ile yeni Shadow koşumları gerektirir; Shadow bu
+ortamda (Bölüm 4.15) çalıştırılamadığından mevcut veri ${ml.data.n_seeds} seed ile
+sınırlıdır ve sentetik örnek <b>eklenmemiştir</b>. Sızıntısız değerlendirme bu nedenle
+veriyi çoğaltmak yerine, mevcut veriyi doğru (gruplanmış) bölerek dürüst genelleme
+kanıtı sağlar.</p>
 
 <p class="no-indent"><b>(c) FSM ile ilişki (adil çerçeve).</b> ML temel çizgisi ile FSM
 dedektörü <i>aynı birimlerde değildir</i> (FSM üç-modlu raporlama: tip-temiz
@@ -1566,12 +1637,20 @@ tamamlanabilir.</p>
   eşsiz öznitelik vektörü vardır. Seed-bazlı LOSO çapraz-doğrulama sızıntıyı önlemez
   (test vektörlerinin ${(ml.structural.loso_dup[String(ml.data.seeds[2])].ratio*100).toFixed(1)}%&ndash;${(ml.structural.loso_dup[String(ml.data.seeds[1])].ratio*100).toFixed(1)}%
   kadarı train'de birebir bulunur); bu nedenle CV metrikleri <i>dağıtım-içi/iyimserdir</i>,
-  genelleme tahmini değildir. Asıl güvenilir kanıt CV'den bağımsız yapısal
-  ayrılabilirliktir. Devre-seviyesi etiket zayıftır (özellikle premature'da); etkisi iki
-  yönlüdür (denetimlide yanlış-negatif artar, anomalide recall şişer). Öznitelikler yalnız
-  sayım-seviyesindedir; sıra/zamanlama (n-gram, olaylar-arası gecikme) modellenmemiştir.
-  Out-of-distribution genelleme için grup-temelli/deduplikasyon sonrası değerlendirme veya
-  çok daha fazla eşsiz örüntülü veri gerekir (gelecek iş; bkz. Bölüm 6.3). ML baseline,
+  genelleme tahmini değildir. Bu sızıntı, grubun eşsiz öznitelik vektörü olduğu
+  <b>sızıntısız GroupKFold</b> ile giderilmiş ve metrikler iyimser LOSO ile yan yana
+  raporlanmıştır (Tablo 4.17d; kopya-sızıntısı 0/${ml.data.n_circuits} olarak doğrulandı).
+  Sonuç: ayrılabilirlik sonuçları nitelik olarak değişmez (create_flood/circuit_hijack
+  recall sızıntısız bölmede de ${fmt(ml.leakfree.supervised.per_attack_recall.create_flood)};
+  precision ${ml.supervised.precision.mean.toFixed(3)}&rarr;${fmt(ml.leakfree.supervised.precision)}
+  düşerek yalnız iyimser şişme açığa çıkar; çok-sınıflı doğruluk
+  ${ml.multiclass.accuracy.mean.toFixed(3)}&rarr;${fmt(ml.leakfree.multiclass.accuracy)}).
+  Asıl güvenilir kanıt yine CV'den bağımsız yapısal ayrılabilirliktir. Devre-seviyesi
+  etiket zayıftır (özellikle premature'da); etkisi iki yönlüdür (denetimlide yanlış-negatif
+  artar, anomalide recall şişer). Öznitelikler yalnız sayım-seviyesindedir; sıra/zamanlama
+  (n-gram, olaylar-arası gecikme) modellenmemiştir. Daha fazla eşsiz örüntülü veri için
+  VM üzerinde ek seed/senaryo ile yeni Shadow koşumları gerekir (Shadow bu ortamda
+  çalışmaz; sentetik örnek eklenmemiştir — gelecek iş, bkz. Bölüm 6.3). ML baseline,
   FSM'nin <i>yerine</i> değil bağımsız bir teyit olarak sunulmuştur.</li>
 </ul>
 

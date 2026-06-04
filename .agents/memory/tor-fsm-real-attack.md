@@ -274,3 +274,11 @@ CV'den bağımsız **yapısal ayrılabilirlik**: sınıfların eşsiz vektör k�
 - **How to apply:** Bu repoda ML metriği raporlarken önce eşsiz-vektör örtüşmesini ver; LOSO/CV
   sayılarını "iyimser" etiketiyle sun; zayıf-etiket etkisini iki yönlü (denetimlide FN↑,
   anomalide recall↑) belirt; FSM ile ortak confusion matrisi uydurma (birimler farklı).
+- **Sızıntısız değerlendirme eklendi (GroupKFold, grup=eşsiz vektör):** LOSO yan yana sunulur.
+  Kritik dürüst bulgu: sızıntı kaldırılınca tablo ÇÖKMEZ — create_flood/hijack recall hâlâ 1.0
+  (ayrım gerçek SEND_CREATE=2 sinyalinden, ezberden değil); precision 1.0→~0.95 DÜŞER (kaybolan
+  tek şey train'deki birebir benign kopyalarının yarattığı yapay precision); premature recall
+  yine ~0.04; çok-sınıflı accuracy ~0.54→~0.55 sabit. **Why:** task #2 sızıntı endişesini
+  giderdi; sonuç ayrılabilirlik niteliğini değiştirmiyor, sadece iyimser precision şişmesini
+  açıklıyor. Data çoğaltma Shadow gerektirir (Replit'te çalışmaz) → sentetik EKLENMEDİ, dürüstçe
+  sınır yazıldı. Sayılar ml_baseline_results.json["leakfree"]'den; tez Tablo 4.17d + 6.2.2.

@@ -72,6 +72,11 @@
         "total": 36,
         "ratio": 0.8333333333333334
       }
+    },
+    "dedup": {
+      "n_unique_vectors": 28,
+      "pure": 18,
+      "shared": 10
     }
   },
   "supervised": {
@@ -167,5 +172,64 @@
         8
       ]
     ]
+  },
+  "leakfree": {
+    "supervised": {
+      "per_attack_recall": {
+        "create_flood": 1.0,
+        "circuit_hijack": 1.0,
+        "premature_data": 0.037037037037037035
+      },
+      "precision": 0.9491525423728814,
+      "recall": 0.6829268292682927,
+      "f1": 0.7943262411347518
+    },
+    "unsupervised": {
+      "per_attack_recall": {
+        "create_flood": 0.7407407407407407,
+        "circuit_hijack": 0.7857142857142857,
+        "premature_data": 1.0
+      },
+      "precision": 0.71875,
+      "recall": 0.8414634146341463,
+      "f1": 0.7752808988764045
+    },
+    "multiclass": {
+      "k_folds": 5,
+      "n_unique_vectors": 28,
+      "accuracy": 0.5504587155963303,
+      "labels": [
+        "benign",
+        "create_flood",
+        "circuit_hijack",
+        "premature_data"
+      ],
+      "confusion": [
+        [
+          20,
+          0,
+          0,
+          7
+        ],
+        [
+          0,
+          17,
+          10,
+          0
+        ],
+        [
+          0,
+          15,
+          13,
+          0
+        ],
+        [
+          17,
+          0,
+          0,
+          10
+        ]
+      ]
+    }
   }
 }
