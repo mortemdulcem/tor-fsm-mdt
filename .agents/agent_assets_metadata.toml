@@ -54,3 +54,9 @@ id = "rEH9VflRHWGQ3kavw1qvI"
 uri = "file://paper/Tor_FSM_Makale_Template.docx"
 type = "word_document"
 title = "Tor FSM Makale — Hoca Template'ine Uygun Final (.docx)"
+
+[[outputs]]
+id = "Milo76A6hruR6iQmWYWSw"
+uri = "file://thesis/Tor_FSM_Tez.docx"
+type = "word_document"
+title = "Tor FSM Tezi — Tam (Word, eksiksiz)"
