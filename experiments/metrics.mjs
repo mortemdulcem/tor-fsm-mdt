@@ -47,6 +47,10 @@ const ci95 = (a) => {
 };
 const div = (a, b) => (b === 0 ? 0 : a / b);
 const fmt = (x, d = 3) => (Number.isFinite(x) ? x.toFixed(d) : "n/a");
+// native nullable olabilir (premature: relay-side kosum-seviyesi -> yalniz birinci
+// istemci satirinda gercek deger, digerlerinde null). null'lari atla ki kosum-basina
+// tek deger sayilsin (tekrar etmesin, GA suni daralmasin).
+const pushNat = (arr, v) => { if (v != null) arr.push(v); };
 
 function aggLine(label, arr) {
   if (!arr.length) return `    ${label}: (veri yok)`;
@@ -66,14 +70,44 @@ function sepLine(atk, ben) {
 }
 
 // --- gruplama ----------------------------------------------------------------
+// Coklu-istemci (CLIENTS>1): her istemci AYRI bir ornek boyutudur. Eskiden
+// byAttack[attack][seed][scenario] tek satira yaziliyordu -> ek istemci satirlari
+// birbirinin uzerine yazardi. Simdi istemci de anahtar:
+//   byAttack[attack][seed][client][scenario]
+// Boylece N istemci = N kat ornek; uzerine-yazma yok. Eski satirlarda client alani
+// yoksa "torclient" varsayilir -> tek-istemci sonuclari birebir korunur.
 function group(lines) {
   const byAttack = {};
   for (const r of lines) {
+    const client = r.client || "torclient";
     (byAttack[r.attack] ??= {});
     (byAttack[r.attack][r.seed] ??= {});
-    byAttack[r.attack][r.seed][r.scenario] = r;
+    (byAttack[r.attack][r.seed][client] ??= {});
+    byAttack[r.attack][r.seed][client][r.scenario] = r;
   }
   return byAttack;
+}
+
+// byAttack[attack] = {seed: {client: {scenario: r}}} -> her (seed,client) cifti bir
+// orneklem: {"<seed>/<client>": {attack, benign}}. Istatistik fonksiyonlari bu
+// duz yapinin uzerinde calisir (eski {seed: {scenario}} ile ayni erisim sekli).
+function samplesOf(bySeedClient) {
+  const out = {};
+  for (const seed of Object.keys(bySeedClient)) {
+    for (const client of Object.keys(bySeedClient[seed])) {
+      out[`${seed}/${client}`] = bySeedClient[seed][client];
+    }
+  }
+  return out;
+}
+
+// bir attack icin benzersiz istemci adlari (basliklarda gostermek icin)
+function clientsOf(bySeedClient) {
+  const set = new Set();
+  for (const seed of Object.keys(bySeedClient)) {
+    for (const client of Object.keys(bySeedClient[seed])) set.add(client);
+  }
+  return [...set].sort();
 }
 
 // --- create_flood: tip-temiz confusion (benign hedef-tip = 0 beklenir) --------
@@ -89,7 +123,7 @@ function createFloodStats(bySeed) {
     o.tp.push(TP); o.fn.push(FN); o.fp.push(FP); o.tn.push(TN);
     o.precision.push(prec); o.recall.push(rec); o.f1.push(div(2 * prec * rec, prec + rec));
     o.fpr.push(fpr);
-    o.nativeAtk.push(a.native); o.nativeBen.push(b.native); o.benCount.push(b.flagged);
+    pushNat(o.nativeAtk, a.native); pushNat(o.nativeBen, b.native); o.benCount.push(b.flagged);
   }
   return o;
 }
@@ -112,7 +146,7 @@ function prematureStats(bySeed) {
     o.precision.push(prec); o.recall.push(rec); o.f1.push(div(2 * prec * rec, prec + rec));
     o.fprBen.push(div(noiseB, b.circuits));  // benign begin-noise yanlis-pozitif orani
     o.injected.push(inj); o.noiseAtk.push(noiseA); o.markers.push(mk);
-    o.nativeAtk.push(a.native); o.nativeBen.push(b.native);
+    pushNat(o.nativeAtk, a.native); pushNat(o.nativeBen, b.native);
   }
   return o;
 }
@@ -126,7 +160,7 @@ function hijackStats(bySeed) {
     if (!a || !b) continue;
     o.atkCount.push(a.flagged); o.benCount.push(b.flagged);
     o.delta.push(a.flagged - b.flagged); o.injected.push(a.injected ?? 0);
-    o.nativeAtk.push(a.native); o.nativeBen.push(b.native);
+    pushNat(o.nativeAtk, a.native); pushNat(o.nativeBen, b.native);
   }
   return o;
 }
@@ -136,9 +170,16 @@ function report(byAttack) {
   const L = [];
   L.push("=== Coklu-seed gercek-saldiri metrikleri (non-circular, uc-modlu) ===\n");
   for (const attack of Object.keys(byAttack).sort()) {
-    const bySeed = byAttack[attack];
-    const seeds = Object.keys(bySeed);
-    L.push(`# ${attack}  (seed: ${seeds.join(", ")} | n=${seeds.length})`);
+    const bySeedClient = byAttack[attack];
+    const seeds = Object.keys(bySeedClient);
+    const clients = clientsOf(bySeedClient);
+    // her (seed,client) cifti bir orneklem -> istatistikler bu duz yapi uzerinde.
+    const bySeed = samplesOf(bySeedClient);
+    const n = Object.keys(bySeed).length;
+    const clientInfo = clients.length > 1
+      ? ` | istemci: ${clients.length} (${clients.join(", ")})`
+      : "";
+    L.push(`# ${attack}  (seed: ${seeds.join(", ")}${clientInfo} | n=${n})`);
 
     if (attack === "create_flood") {
       const c = createFloodStats(bySeed);
@@ -156,6 +197,11 @@ function report(byAttack) {
 
     } else if (attack === "premature_data") {
       const p = prematureStats(bySeed);
+      if (clients.length > 1) {
+        L.push(`  [coklu-istemci] event-level confusion ${clients.length} istemci x ${seeds.length} seed uzerinden (n=${n} orneklem).`);
+        L.push("    not: relay-side native (zero-stream-id) KOSUM-SEVIYESIDIR (tek");
+        L.push("    istemciye atfedilemez) -> kosum basina bir kez sayilir (asagidaki n).");
+      }
       L.push("  [event-level confusion — ground-truth: injected (TOR marker)]");
       L.push(aggLine("TP=injected", p.tp));
       L.push(aggLine("FN=markers-inj", p.fn));
@@ -209,9 +255,10 @@ function selftest() {
     { attack: "circuit_hijack", seed: 1, scenario: "benign", circuits: 9, flagged: 12, injected: 0, noise: 12, native: 9 },
   ];
   const g = group(data);
-  const c = createFloodStats(g.create_flood);
-  const p = prematureStats(g.premature_data);
-  const h = hijackStats(g.circuit_hijack);
+  // client alani olmayan satirlar "torclient" altinda gruplanmali (geriye uyumluluk)
+  const c = createFloodStats(samplesOf(g.create_flood));
+  const p = prematureStats(samplesOf(g.premature_data));
+  const h = hijackStats(samplesOf(g.circuit_hijack));
   const assert = (cond, msg) => { if (!cond) { console.error("FAIL:", msg); process.exit(1); } };
   // create_flood
   assert(JSON.stringify(c.tp) === JSON.stringify([10, 8]), "cf tp");
@@ -225,6 +272,42 @@ function selftest() {
   // hijack
   assert(h.atkCount[0] === 21 && h.benCount[0] === 12 && h.delta[0] === 9, "hijack counts");
   assert(h.injected.every((x) => x === 0), "hijack injected=0");
+
+  // --- coklu-istemci boyutu (CLIENTS>1) ---
+  // Ayni veriye 2. istemci ekle: client alanli satirlar uzerine-yazilmamali ve
+  // her (seed,client) ayri orneklem olmali.
+  const mc = [
+    // create_flood seed=1: torclient (10/10) + torclient2 (6/6) -> 2 orneklem
+    { attack: "create_flood", seed: 1, client: "torclient",  scenario: "attack", circuits: 10, flagged: 10, injected: 0, noise: 10, native: 20 },
+    { attack: "create_flood", seed: 1, client: "torclient",  scenario: "benign", circuits: 10, flagged: 0,  injected: 0, noise: 0,  native: 10 },
+    { attack: "create_flood", seed: 1, client: "torclient2", scenario: "attack", circuits: 6,  flagged: 6,  injected: 0, noise: 6,  native: 12 },
+    { attack: "create_flood", seed: 1, client: "torclient2", scenario: "benign", circuits: 6,  flagged: 0,  injected: 0, noise: 0,  native: 6  },
+    // premature seed=1: 2 istemci, her biri kendi event-level; native YALNIZ
+    // torclient'ta (relay-side kosum-seviyesi), torclient2'de null.
+    { attack: "premature_data", seed: 1, client: "torclient",  scenario: "attack", circuits: 10, flagged: 11, injected: 5, noise: 6, native: 12,   markers: 12 },
+    { attack: "premature_data", seed: 1, client: "torclient",  scenario: "benign", circuits: 9,  flagged: 9,  injected: 0, noise: 9, native: 0,    markers: 0 },
+    { attack: "premature_data", seed: 1, client: "torclient2", scenario: "attack", circuits: 8,  flagged: 7,  injected: 3, noise: 4, native: null, markers: 8 },
+    { attack: "premature_data", seed: 1, client: "torclient2", scenario: "benign", circuits: 8,  flagged: 8,  injected: 0, noise: 8, native: null, markers: 0 },
+  ];
+  const gmc = group(mc);
+  const cmc = createFloodStats(samplesOf(gmc.create_flood));
+  const pmc = prematureStats(samplesOf(gmc.premature_data));
+  // uzerine-yazma yok: iki istemci -> iki create_flood orneklem
+  assert(cmc.tp.length === 2 && JSON.stringify(cmc.tp) === JSON.stringify([10, 6]), "mc cf 2 ornek");
+  assert(clientsOf(gmc.create_flood).length === 2, "mc cf 2 istemci");
+  // premature event-level iki istemci -> iki TP orneklemi
+  assert(pmc.tp.length === 2 && JSON.stringify(pmc.tp) === JSON.stringify([5, 3]), "mc prem 2 ornek");
+  // native null'lar atlandi: kosum basina tek deger (torclient: 12 / benign 0)
+  assert(pmc.nativeAtk.length === 1 && pmc.nativeAtk[0] === 12, "mc prem native run-level");
+  assert(pmc.nativeBen.length === 1 && pmc.nativeBen[0] === 0, "mc prem native benign");
+
+  // --- geriye uyumluluk: client'siz veri == client="torclient" ile ayni sayilar ---
+  const withClient = data.map((r) => ({ ...r, client: "torclient" }));
+  const gWith = group(withClient);
+  const cWith = createFloodStats(samplesOf(gWith.create_flood));
+  assert(JSON.stringify(cWith.tp) === JSON.stringify(c.tp) &&
+         JSON.stringify(cWith.precision) === JSON.stringify(c.precision),
+         "geriye uyumluluk: client=torclient ayni sayilar");
   console.log("selftest PASS (formul dogrulamasi; bu sayilar gercek veri degildir)");
 }
 

@@ -23,10 +23,14 @@
 #   iken her kosuya torclient2..N host'lari eklenir; her host Shadow'da AYRI bir
 #   RNG akisi alir (general.seed + host adi) -> farkli yol secimi/zamanlama ->
 #   gercekten farkli devreler (sentetik DEGIL; gercek Shadow kosusu uretir).
-#   Ek istemci loglari yalnizca ML yolunu (Bolum 4.17: export_features.mjs +
-#   ml_baseline.py) besler; non-circular native confusion (Bolum 4.16:
-#   detect_json/metrics) birincil 'torclient' (client1) uzerinde DEGISMEDEN
-#   kalir -> dogrulanmis 4.16 sonuclari tutarli kalsin diye.
+#   Ek istemci loglari HEM ML yolunu (Bolum 4.17: export_features.mjs +
+#   ml_baseline.py) HEM DE non-circular native confusion'i (Bolum 4.16:
+#   detect_json/metrics) besler: her istemci ayri bir ornek satiri uretir
+#   (--client) ve metrics.mjs istemciyi ayri ornek boyutu olarak gruplar
+#   (byAttack[attack][seed][client][scenario]) -> uzerine-yazma yok, daha cok ornek.
+#   CLIENTS=1'de davranis birebir eskisi gibidir (geriye uyumlu).
+#   ISTISNA: premature relay-side native (zero-stream-id) KOSUM-SEVIYESIDIR (tek
+#   istemciye atfedilemez) -> yalniz birinci istemci satirina yazilir, digerleri null.
 set -u
 
 TORSRC="${TORSRC:-$HOME/tor-0.4.6.10}"
@@ -47,16 +51,27 @@ env_of()   { case "$1" in create_flood) echo TOR_FSM_ATTACK_CREATE_FLOOD;; circu
 hookid_of(){ case "$1" in create_flood) echo TOR_FSM_ATTACK_CREATE_FLOOD;; circuit_hijack) echo TOR_FSM_ATTACK_CIRCUIT_HIJACK;; premature_data) echo TOR_FSM_PREMATURE_SEND;; esac; }
 
 # Bir host log agacinda saldiriya ozgu native (non-circular) sinyali say.
-#   premature: relay'in kendi protokol logu (tum hostlar)
-#   create_flood/circuit_hijack: istemcinin organik CREATE log satiri (torclient)
+#   premature: relay'in kendi protokol logu (TUM hostlar) -> KOSUM-SEVIYESI; tek
+#              istemciye atfedilemez (asagida yalniz birinci istemci satirina yazilir).
+#   create_flood/circuit_hijack: istemcinin organik CREATE log satiri (per-client).
+# $3 = istemci host adi (cf/hijack icin o istemcinin stdout'u; premature'da yok sayilir).
 native_count() {
-  local attack="$1" hostsdir="$2"
+  local attack="$1" hostsdir="$2" client="${3:-torclient}"
   case "$attack" in
     premature_data)
       grep -rh "Relay data cell with zero stream_id" "$hostsdir" 2>/dev/null | wc -l ;;
     create_flood|circuit_hijack)
-      grep -ch "First hop: finished sending" "$hostsdir/torclient/tor.1000.stdout" 2>/dev/null || echo 0 ;;
+      grep -ch "First hop: finished sending" "$hostsdir/$client/tor.1000.stdout" 2>/dev/null || echo 0 ;;
   esac
+}
+
+# Bir hosts dizinindeki istemci host adlarini sirali listele (torclient, torclient2, ...).
+list_clients() {
+  local d="$1"
+  [ -d "$d" ] || { echo "torclient"; return 0; }
+  local found
+  found="$(find "$d" -maxdepth 1 -type d -name 'torclient*' -printf '%f\n' 2>/dev/null | sort -V)"
+  [ -n "$found" ] && echo "$found" || echo "torclient"
 }
 
 # Shadow yaml'ina seed yaz (general.seed). Yapidan bagimsiz, idempotent.
@@ -166,21 +181,38 @@ for seed in $SEEDS; do
     mkdir -p "$RUNS/$attack/seed$seed"
     cp -r "$AHOSTS" "$RUNS/$attack/seed$seed/" 2>/dev/null || true
 
-    ATK="$AHOSTS/torclient/tor.1000.stdout"
-    BEN="$BHOSTS/torclient/tor.1000.stdout"
-    NAT_A="$(native_count "$attack" "$AHOSTS")"
-    NAT_B="$(native_count "$attack" "$BHOSTS")"
-    # premature: saldirinin GERCEKTEN gonderdigi marker sayisi (recall paydasi)
-    MRK_A=0
-    [ "$attack" = premature_data ] && [ -f "$ATK" ] && MRK_A="$(grep -ch 'TOR_FSM_PREMATURE_SEND' "$ATK" 2>/dev/null || echo 0)"
+    # Coklu-istemci: her torclient* host'u AYRI bir ornek (4.16 confusion + 4.17 ML).
+    # premature relay-native KOSUM-SEVIYESI -> yalniz birinci istemci satirina yazilir
+    # (digerleri --native null); detect_json/metrics null'u atlar (GA suni daralmaz).
+    CLIST="$(list_clients "$AHOSTS")"
+    ci=0
+    for client in $CLIST; do
+      ci=$((ci + 1))
+      ATK="$AHOSTS/$client/tor.1000.stdout"
+      BEN="$BHOSTS/$client/tor.1000.stdout"
+      if [ "$attack" = premature_data ]; then
+        if [ "$ci" -eq 1 ]; then
+          NAT_A="$(native_count "$attack" "$AHOSTS" "$client")"
+          NAT_B="$(native_count "$attack" "$BHOSTS" "$client")"
+        else
+          NAT_A=null; NAT_B=null   # relay-native kosum-seviyesi: tekrar sayma
+        fi
+      else
+        NAT_A="$(native_count "$attack" "$AHOSTS" "$client")"
+        NAT_B="$(native_count "$attack" "$BHOSTS" "$client")"
+      fi
+      # premature: bu istemcinin GERCEKTEN gonderdigi marker sayisi (recall paydasi)
+      MRK_A=0
+      [ "$attack" = premature_data ] && [ -f "$ATK" ] && MRK_A="$(grep -ch 'TOR_FSM_PREMATURE_SEND' "$ATK" 2>/dev/null || echo 0)"
 
-    if [ -f "$ATK" ]; then
-      npx tsx experiments/detect_json.mjs --attack "$attack" --scenario attack --seed "$seed" --log "$ATK" --native "$NAT_A" --markers "$MRK_A" >> "$RESULTS"
-    else echo "  UYARI: attack log yok: $ATK"; fi
-    if [ -f "$BEN" ]; then
-      npx tsx experiments/detect_json.mjs --attack "$attack" --scenario benign --seed "$seed" --log "$BEN" --native "$NAT_B" --markers 0 >> "$RESULTS"
-    else echo "  UYARI: benign log yok: $BEN"; fi
-    echo "    $attack seed=$seed: native attack=$NAT_A benign=$NAT_B"
+      if [ -f "$ATK" ]; then
+        npx tsx experiments/detect_json.mjs --attack "$attack" --scenario attack --seed "$seed" --client "$client" --log "$ATK" --native "$NAT_A" --markers "$MRK_A" >> "$RESULTS"
+      else echo "  UYARI: attack log yok: $ATK"; fi
+      if [ -f "$BEN" ]; then
+        npx tsx experiments/detect_json.mjs --attack "$attack" --scenario benign --seed "$seed" --client "$client" --log "$BEN" --native "$NAT_B" --markers 0 >> "$RESULTS"
+      else echo "  UYARI: benign log yok: $BEN"; fi
+      echo "    $attack seed=$seed client=$client: native attack=$NAT_A benign=$NAT_B"
+    done
   done
 done
 

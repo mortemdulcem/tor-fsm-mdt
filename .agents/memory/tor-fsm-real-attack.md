@@ -348,3 +348,17 @@ live ONLY on the VM; export_features.mjs regenerates them (writes ml_dataset.jso
   export_features tüm `torclient*` loglarını okur, gid'i host'la önekler) besler; native/4.16
   detect_json+metrics birincil torclient'te kalır (metrics `byAttack[atk][seed][scenario]` üzerine
   yazıyor → istemci başına ayrı satır 4.16'yı bozardı). `CLIENTS=1` tam geriye uyumlu (varsayılan).
+
+## 4.16 native confusion now multi-client (detect_json --client + metrics seed×client)
+detect_json.mjs emits a `client` field; metrics.mjs groups `byAttack[attack][seed][client][scenario]`
+and flattens each (seed,client) into one sample — N clients = N× samples for 4.16 (no overwrite).
+CLIENTS=1 reproduces old numbers byte-for-byte (missing `client` defaults to "torclient").
+- **Premature native is RUN-LEVEL, not per-client.** The non-circular signal (relay "Relay data cell
+  with zero stream_id") is logged by relays and cannot be attributed to one torclient. So the pipeline
+  passes the run-global native only on the FIRST client's row and `--native null` for the rest;
+  metrics.mjs skips null natives (helper `pushNat`) so it's counted ONCE per run.
+  **Why:** replicating the same native across "independent" client samples would fake-shrink the CI.
+  Event-level confusion (injected/noise/markers) IS per-client, so premature native (n=seeds) and
+  premature event-level (n=seeds×clients) legitimately report different n in the same block.
+- create_flood/circuit_hijack native ("First hop: finished sending") IS per-client (grep that client's
+  own tor.1000.stdout). full_pipeline.sh + recompute.sh share `list_clients` + `native_count <a> <dir> <client>`.

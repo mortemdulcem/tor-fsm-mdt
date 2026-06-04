@@ -7,9 +7,14 @@
 // Native (non-circular) sayim grep ile pipeline tarafindan hesaplanip --native
 // ile gecirilir; burada degistirilmeden ciktiya yazilir.
 //
+// Coklu-istemci (CLIENTS>1): her istemci ayri bir ornek -> --client ile host adi
+// (torclient, torclient2, ...) gecirilir ve ciktiya yazilir; metrics.mjs istemciyi
+// ayri ornek boyutu olarak gruplar. --client verilmezse "torclient" varsayilir
+// (tek-istemci geriye-uyumluluk: 4.16 sayilari birebir korunur).
+//
 // Kullanim:
 //   tsx experiments/detect_json.mjs --attack premature_data --scenario attack \
-//       --seed 42 --log <tor.1000.stdout> --native 12
+//       --seed 42 --client torclient --log <tor.1000.stdout> --native 12
 
 import { readFileSync } from "node:fs";
 import { parseTorHostLog, runFsmOnAllCircuits } from "./shadow_harness.mjs";
@@ -22,8 +27,16 @@ function arg(name, def) {
 const attack = arg("attack");
 const scenario = arg("scenario");
 const seed = Number(arg("seed", "0"));
+const client = arg("client", "torclient");
 const log = arg("log");
-const native = Number(arg("native", "0"));
+// native nullable olabilir: premature'da relay-side native KOSUM-SEVIYESINDEdir
+// (tek istemciye atfedilemez) -> pipeline yalniz birinci istemciye gercek deger,
+// digerlerine "null" gecirir. metrics.mjs null native'leri toplamada atlar.
+const nativeArg = arg("native", "0");
+const native =
+  nativeArg == null || nativeArg === "" || nativeArg === "null"
+    ? null
+    : Number(nativeArg);
 const markers = Number(arg("markers", "0"));
 
 const TYPE = {
@@ -62,6 +75,7 @@ const flaggedCircuits = flaggedCircuitsSet.size > 0 ? flaggedCircuitsSet.size : 
 const out = {
   attack,
   seed,
+  client,                        // istemci host adi (coklu-istemci ornek boyutu)
   scenario,
   circuits: fsm.circuitCount,
   flagged: target.length,        // ihlal olayi sayisi
