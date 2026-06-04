@@ -61,9 +61,12 @@ if (!classifyCode || !pipelineCode) {
 // ---------- Akademik ortam görseli: GERÇEK VM ekran görüntüsü (kullanıcının VM'inden) ----------
 // Oracle VirtualBox Yöneticisi'nde tor-fsm-ubuntu VM yapılandırması; base64 ile gömülür
 // (HTML+PDF kendine yeterli olsun). Uydurma diyagram DEĞİL, gerçek ekran görüntüsü.
-const vmShotPath = path.resolve(__dirname, "../attached_assets/image_1779974022701.png");
-const vmShotB64 = (await fs.readFile(vmShotPath)).toString("base64");
-const vmShotImg = `<img src="data:image/png;base64,${vmShotB64}" alt="Oracle VirtualBox Yöneticisi — tor-fsm-ubuntu VM yapılandırması (8192 MB RAM, 4 vCPU, EFI, ubuntu-22.04.5-desktop-amd64.iso, 50 GB VDI, NAT)" style="max-width:100%;height:auto;border:1px solid #999;"/>`;
+// Akademik kullanım için ekran görüntüleri masaüstü/taskbar/tarayıcı öğelerinden
+// arındırılarak VirtualBox penceresine kırpılmıştır (thesis/assets/).
+const vmConfigB64 = (await fs.readFile(path.resolve(__dirname, "assets/vm_config.png"))).toString("base64");
+const vmShotImg = `<img src="data:image/png;base64,${vmConfigB64}" alt="Oracle VirtualBox Yöneticisi — tor-fsm-ubuntu VM yapılandırması (8192 MB RAM, 4 vCPU, EFI, ubuntu-22.04.5-desktop-amd64.iso, 50 GB VDI, NAT)" style="max-width:100%;height:auto;border:1px solid #999;"/>`;
+const vmRunB64 = (await fs.readFile(path.resolve(__dirname, "assets/vm_running.png"))).toString("base64");
+const vmRunImg = `<img src="data:image/png;base64,${vmRunB64}" alt="tor-fsm-ubuntu VM çalışırken — Oracle VirtualBox penceresinde Ubuntu önyükleme ekranı" style="max-width:100%;height:auto;border:1px solid #999;"/>`;
 // ---------- Topoloji şeması (mantıksal diyagram; ekran görüntüsü değil) ----------
 const vmTopoSvg = `<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica,Arial,sans-serif">
   <rect x="290" y="12" width="140" height="40" rx="4" fill="#fbf6ec" stroke="#9a6b1f"/>
@@ -1208,6 +1211,12 @@ sabit diski ve Intel PRO/1000 MT (NAT) ağ bağdaştırıcısı. Üstteki misafi
 etiketi "Ubuntu 22.10 (Kinetic Kudu)" bir VirtualBox ayar etiketidir; fiilen
 kurulan sistem takılı ISO'dan Ubuntu 22.04.5 LTS'tir.</div></div>
 
+<div class="fig">${vmRunImg}<div class="cap"><b>Şekil 4.15b.</b> Aynı sanal makinenin
+çalışır durumdaki ekran görüntüsü: VirtualBox pencere başlığında
+<code>tor-fsm-ubuntu [Çalışıyor]</code> ibaresi ve misafir sistemin Ubuntu önyükleme
+ekranı görülmektedir. Bu görsel, ortamın yalnızca tanımlanmış değil fiilen
+çalıştırılmış olduğunu belgeler.</div></div>
+
 <p class="no-indent"><b>Deney protokolü.</b> Repodaki harness komut satırından
 çalıştırılmış; üç senaryo (<i>benign</i>, <i>replay_attack</i>,
 <i>circuit_bypass</i>) her biri üç sabit seed ({42, 137, 2718}) ile, toplam
@@ -1218,7 +1227,7 @@ kurulan sistem takılı ISO'dan Ubuntu 22.04.5 LTS'tir.</div></div>
 repoda commit edilmiş referans dosyayla <code>git diff</code> ile birebir
 karşılaştırılmıştır.</p>
 
-<div class="fig">${vmTopoSvg}<div class="cap"><b>Şekil 4.15b.</b> Shadow'un kanonik
+<div class="fig">${vmTopoSvg}<div class="cap"><b>Şekil 4.15c.</b> Shadow'un kanonik
 <code>examples/tor/minimal</code> şablonuyla aynı 9-host topoloji: bir directory
 authority, dört non-exit relay (R1–R4) ile iki exit relay (E1–E2) içeren relay
 düzlemi ve iki istemci (bir tor istemcisi, bir doğrudan istemci). Düğüm rolleri

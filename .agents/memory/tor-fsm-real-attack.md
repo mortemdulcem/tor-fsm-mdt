@@ -139,6 +139,12 @@ SVG uydurma yerine bu gerçek ekran görüntülerini base64 ile göm (HTML+PDF k
   görünür ama fiilen kurulan ISO `ubuntu-22.04.5-desktop-amd64.iso` → sistem **Ubuntu 22.04.5 LTS**.
   Metinde 22.04(.5) yaz, etiketin yalnızca VBox ayarı olduğunu açıkla; figürle metin çelişmesin.
 - VM gerçek konfig (ekrandan): 8192 MB RAM, 4 vCPU, EFI, VMSVGA 16 MB, 50 GB VDI, Intel PRO/1000 NAT.
+- **Akademik temizlik:** ham 1920×1080 ekran görüntüleri masaüstü/taskbar/tarayıcı/Replit/kişisel
+  öğeler içerir; teze koymadan önce ImageMagick (`magick ... -crop WxH+X+Y +repage`) ile yalnızca
+  VirtualBox penceresine kırp. Kırpılmışları `thesis/assets/` altında tut, base64 göm.
+- **Sihirbaz-tuzağı:** "Sanal donanımı belirle" yeni-VM sihirbazı görseli VARSAYILANLARI gösterir
+  (2048 MB / 1 işlemci / 25 GB) — fiili konfigle (8192/4/50) çelişir; provisioning kanıtı diye
+  KULLANMA. Kanıt için "Ayrıntılar/detay" görünümünü kullan (gerçek değerleri gösterir).
 
 ## Multi-seed metrics pipeline (full_pipeline.sh + metrics.mjs + detect_json.mjs)
 - **Patch files are NOT clean `patch -p1` diffs.** `create_flood.patch` is a near-clean unified diff,
