@@ -73,6 +73,20 @@ confusion'a (bu bölüm) istemci ayrı örnek boyutu olarak katılabilir.
   **ML temel çizgisi (4.17) ise çok-istemci veri setini (CLIENTS=4 × 3 seed, 433 devre)
   birincil alır**, çünkü orada çeşitlilik gerçekten artar (yukarıdaki ayrım).
 
+**Reprodüksiyon (4.17 ML) — commit'li ve birebir yeniden üretilebilir:**
+- Çok-istemci öznitelik CSV'si (`experiments/ml_features_multiclient.csv`, 433 devre ×
+  38 sütun; n-gram `bg_*` + zamanlama `t_*` + `seq_setup_before_data`) artık **repoya
+  commit'lidir**. Ham Shadow olay dizileri yalnızca VM'de kalır (full_pipeline.sh
+  CLIENTS=4 ile üretilir), fakat bunlardan türetilen öznitelik tablosu commit'li
+  olduğundan kanonik JSON sıfırdan yeniden üretilebilir.
+- `python3 experiments/ml_baseline.py` → `experiments/ml_baseline_results.json`'u
+  **birebir** üretir (varsayılan girdi = çok-istemci CSV). JSON içine script-türevli
+  `provenance` bloğu yazılır (kaynak CSV, sha256, satır/sütun, ngram bayrağı).
+- **Tekrarüretilebilirlik koruması:** tek-istemci/sayım-only CSV
+  (`experiments/ml_features.csv`, 109 devre, n-gram yok) ile çalıştırıldığında script
+  kanonik JSON'a yazmayı **reddeder** (sessiz veri bozulmasını önler); tek-istemci
+  karşılaştırma için `ML_FEATURES_CSV`/`ML_RESULTS_JSON` ile ayrı dosyaya yazılır.
+
 **Örnek-boyutu kuralı (çok-istemci için, koşum yapıldığında geçerli olacak):**
 - `create_flood` / `circuit_hijack` native + tip-temiz confusion: **per-client**
   ölçülür (her istemcinin kendi organik CREATE logu) → örnek boyutu **n = seed×istemci**.

@@ -292,7 +292,7 @@ syntax (`for (const x in ...)`) inside a C patch, and have invalid hunk context 
 header) so `git apply` fails. Detection is CIRCULAR: the only signal is an injected `log_notice("ATTACK_*")`
 that is both the "attack" and the "ground-truth oracle". This violates replit.md (plausible methodology +
 fabrication). It also claims-as-real exactly the two attacks proven NOT realizable here. Keep thesis honest:
-only CREATE_FLOOD + CIRCUIT_HIJACK are real; ignore this branch (PR #3, #4 are draft + "Devin Review: failure").
+only CREATE_FLOOD + CIRCUIT_HIJACK are real; ignore this fabricated branch (it never compiled/ran).
 
 ## GÜNCEL KARAR (çok-istemci = ML birincil; n-gram VM'de mevcut ve ayrımı iyileştirir)
 Bu, aşağıdaki iki bölümdeki (Çok-istemci ÇEŞİTLİLİK DÜŞÜK + dur_ms-only AYRIM SINIRLI)
@@ -352,21 +352,34 @@ CV'den bağımsız **yapısal ayrılabilirlik**: sınıfların eşsiz vektör k�
   sızıntı endişesini giderdi; sonuç ayrılabilirlik niteliğini değiştirmiyor, sadece iyimser precision şişmesini
   açıklıyor. Data çoğaltma Shadow gerektirir (Replit'te çalışmaz) → sentetik EKLENMEDİ, dürüstçe
   sınır yazıldı. Sayılar ml_baseline_results.json["leakfree"]'den; tez Tablo 4.17d + 6.2.2.
-## ML seq/timing features — workspace lacks raw sequences (VM-only)
-ml_features.csv (count-level + real dur_ms) is the ONLY per-circuit data in the Replit repo.
-Raw ORDERED event sequences w/ per-event timestamps (needed for n-gram + inter-event delay)
-live ONLY on the VM; export_features.mjs regenerates them (writes ml_dataset.json + CSV).
-- **n-gram/timing extraction** added to export_features.mjs (bigrams bg_*, inter-event gap
-  mean/med/max t_*, t_first_data_ms, seq_setup_before_data) and ml_baseline.py section 5
-  (after the leak-free GroupKFold section 4) auto-detects these columns (count-only vs
-  count+seq+timing LOSO compare). Absent in committed CSV → script honestly runs dur_ms-only
-  and reports "ngram_available:false".
+## ML reproducibility — multi-client feature CSV is now COMMITTED (loop closed)
+The 433-circuit × 38-col multi-client feature table (n-gram bg_*, inter-event gap t_*,
+t_first_data_ms, seq_setup_before_data) is committed as `experiments/ml_features_multiclient.csv`
+and is the DEFAULT input of ml_baseline.py. So `python3 experiments/ml_baseline.py` reproduces
+the canonical `ml_baseline_results.json` BIT-FOR-BIT (verified: two local runs identical; matches
+the prior VM-pasted values exactly, except the leak-free GroupKFold block — see below).
+- **Raw ORDERED event sequences still live ONLY on the VM** (export_features.mjs regenerates the
+  CSV via full_pipeline.sh CLIENTS=4); committing the *derived feature table* is what makes the
+  JSON reproducible without the VM. The single-client count-only `ml_features.csv` (109 rows, no
+  n-gram) is kept only for the count-only-vs-enhanced comparison.
+- **Silent-clobber guard (the rejection that forced this):** running ml_baseline.py on the
+  single-client/count-only CSV used to silently overwrite the 433-circuit JSON with 109-circuit
+  numbers. ml_baseline.py now REFUSES to write the canonical JSON when n-gram cols are absent
+  (raise SystemExit); use ML_FEATURES_CSV / ML_RESULTS_JSON to redirect. It also writes a
+  script-derived `provenance` block (source_csv, sha256, rows, cols, ngram_available).
+- **leak-free GroupKFold block is version-sensitive, NOT seed-broken:** IsolationForest already
+  has random_state=0 and the run is locally deterministic, but `results.leakfree.unsupervised`
+  (and multiclass confusion) differ between VM and local sklearn/numpy — the group split (group =
+  unique feature vector) is ordering-sensitive across versions. Plain LOSO sections are stable.
+  **Why it doesn't break the thesis:** build_thesis.mjs reads every number from the JSON; prose
+  only interprets leakfree.SUPERVISED (unchanged: cf/ch recall=1.0, premature≈0) + multiclass
+  accuracy, while leakfree.unsupervised feeds only one table f1 cell. Always commit the JSON
+  produced in the *build environment* so thesis numbers match a local rerun.
 - **Why dur_ms-only is misleading:** adding a continuous/noisy timing feature (dur_ms) mechanically
   drops unique-vector OVERLAP (every circuit vector becomes near-unique) WITHOUT changing recall —
   NOT real separation. So `improved` is gated on recall/accuracy gain, and overlap-drop only counts
-  when discrete n-gram/seq columns exist. Current real result: dur_ms changes nothing (AYRIM SINIRLI).
-- **How to apply:** real n-gram/inter-event comparison numbers must come from a VM CSV regen; thesis
-  Bölüm 4.17(d) reads ml.sequence_timing and writes the honest "pending VM" branch when ngram absent.
+  when discrete n-gram/seq columns exist. With real n-gram now present: cf↔ch confusion→0,
+  acc 0.600→0.908, premature recall 0.102→0.694 (real improvement, not dur_ms artifact).
 
 - **Çeşitlilik darboğazı seed DEĞİL topolojidir.** Veri deterministik olduğundan sadece `SEEDS=`
   eklemek çoğunlukla kopya vektör üretir (modest unique-vector kazancı). Gerçek örüntü çeşitliliği

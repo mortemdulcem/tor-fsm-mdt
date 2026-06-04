@@ -1824,19 +1824,19 @@ iki değerlendirmeyi yan yana verir.</p>
 <th style="padding:3pt 8pt;border:1px solid #999;">Sızıntısız (GroupKFold)</th></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — Precision</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.996</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.952</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.948</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — Recall</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.702</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.674</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.671</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — F1</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.823</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.789</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.786</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimsiz — F1</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.770</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.700</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.842</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Çok-sınıflı — Accuracy</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.600</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.480</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.478</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli recall — create_flood</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">1.000</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">1.000</td></tr>
@@ -1845,7 +1845,7 @@ iki değerlendirmeyi yan yana verir.</p>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">1.000</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli recall — premature_data</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.102</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.019</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.009</td></tr>
 </table>
 <p class="no-indent">Karşılaştırmanın yorumu: sızıntı kaldırıldığında <b>tablo
 çökmiyor</b>. Denetimli model create_flood ve circuit_hijack'i sızıntısız bölmede
@@ -1854,17 +1854,30 @@ de kusursuz yakalar (recall 1.000
 ezberden değil gerçek bir öznitelik sinyalinden (<code>SEND_CREATE=2</code>) geldiğini
 gösterir — çünkü model, hiç görmediği eşsiz vektörleri bile bu sayım üzerinden doğru
 sınıflar. Buna karşılık precision 0.996'ten
-0.952'e <i>düşer</i> (bazı benign devreler artık
+0.948'e <i>düşer</i> (bazı benign devreler artık
 yanlış-pozitif olur): sızıntı kaldırılınca kaybolan tek şey, train'deki birebir benign
 kopyalarının yarattığı yapay mükemmel precision'dır. premature recall sızıntısız bölmede
 de düşük kalır (0.102 &rarr;
-0.019); zayıf-etiketli ve
+0.009); zayıf-etiketli ve
 benign'e en yakın sınıf olduğundan ne LOSO ne de sızıntısız değerlendirme onu kurtarır.
 Çok-sınıflı doğruluk neredeyse değişmez (0.600 &rarr;
-0.480). Özetle <b>sızıntı, ayrılabilirlik
+0.478). Özetle <b>sızıntı, ayrılabilirlik
 sonuçlarının niteliğini değiştirmez</b>; yalnızca precision'daki iyimser şişmeyi açıklar.
 Bu, yapısal ayrılabilirlik bulgusunu (kısım (a)) bağımsız bir değerlendirme şemasıyla
 doğrular.</p>
+
+<p class="no-indent"><b>Sürüm-duyarlılığı (yöntemsel not).</b> Sızıntısız GroupKFold
+bölmesinde grup birimi <i>eşsiz öznitelik vektörü</i> olduğundan, bölme sırası
+sayısal kütüphane sürümüne (scikit-learn / NumPy) duyarlıdır; bu nedenle yalnızca
+<b>denetimsiz (IsolationForest) sızıntısız F1 değeri</b> (yukarıdaki tabloda tek
+hücre) farklı ortamlarda küçük oynama gösterebilir. Yukarıda yorumlanan denetimli
+sonuçlar (create_flood / circuit_hijack recall = 1.000
+/ 1.000; premature düşük) ve
+çok-sınıflı doğruluk (0.478) bu oynamadan
+etkilenmez ve raporlanan tüm sayılar derleme ortamında birebir yeniden üretilmiştir.
+Bu değerleri üreten ortamın sürümleri (Python / scikit-learn / NumPy / pandas)
+şeffaflık için <code>experiments/ml_baseline_results.json</code> içindeki
+<code>provenance.versions</code> alanına yazılır.</p>
 
 <p class="no-indent"><b>Veri çeşitliliği (dürüst sınır).</b> Daha fazla eşsiz örüntü,
 ancak VM üzerinde ek seed/senaryo ile yeni Shadow koşumları gerektirir; Shadow bu
@@ -2106,9 +2119,9 @@ tamamlanabilir.</p>
   raporlanmıştır (Tablo 4.17d; kopya-sızıntısı 0/433 olarak doğrulandı).
   Sonuç: ayrılabilirlik sonuçları nitelik olarak değişmez (create_flood/circuit_hijack
   recall sızıntısız bölmede de 1.000;
-  precision 0.996&rarr;0.952
+  precision 0.996&rarr;0.948
   düşerek yalnız iyimser şişme açığa çıkar; çok-sınıflı doğruluk
-  0.600&rarr;0.480).
+  0.600&rarr;0.478).
   Asıl güvenilir kanıt yine CV'den bağımsız yapısal ayrılabilirliktir. Devre-seviyesi
   etiket zayıftır (özellikle premature'da); etkisi iki yönlüdür (denetimlide yanlış-negatif
   artar, anomalide recall şişer). Sayım-seviyesi özniteliklere ek olarak <b>sıra

@@ -6,7 +6,12 @@ Amac: FSM kural-tabanli dedektorune karsi, SADECE ham davranis ozniteliklerini
 (olay-tipi sayilari + olay sayisi) kullanan jenerik ML temel cizgisi. Oznitelikler
 FSM ihlal etiketi ICERMEZ -> non-circular.
 
-Veri: experiments/ml_features.csv (109 devre, 3 seed, 4 senaryo).
+Veri (BIRINCIL): experiments/ml_features_multiclient.csv (433 devre = 4 istemci x
+3 seed x senaryolar; n-gram bg_* + zamanlama t_* sutunlu). Bu CSV bir VM artefaktidir
+(ham Shadow olay dizileri yalnizca VM'de; full_pipeline.sh CLIENTS=4 ile uretilir),
+ama dogrudan commit'lidir -> `python3 experiments/ml_baseline.py` kanonik JSON'u
+birebir yeniden uretir. Tek-istemci/sayim-only karsilastirma icin commit'li
+experiments/ml_features.csv (109 devre) ML_FEATURES_CSV ile verilebilir.
 Etiket (zayif): run senaryosu. SINIRLILIK: saldiri kosusunda her devre fiilen
 saldirili olmayabilir (ozellikle premature) -> etiket gurultusu; metrikler bu yuzden
 muhafazakar (FN'i sisirir). Asagida acikca raporlanir.
@@ -19,9 +24,11 @@ DAGITIM-ICI/IYIMSERDIR; asil guvenilir kanit CV'den bagimsiz yapisal ayrilabilir
 """
 import json
 import os
+import sys
 import hashlib
 import numpy as np
 import pandas as pd
+import sklearn
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
@@ -35,7 +42,7 @@ from sklearn.model_selection import GroupKFold
 # Kanonik JSON'u tek-istemci CSV ile uretmek bilimsel olarak yanlis olur -> asagidaki
 # tekrarliuretilebilirlik korumasi bunu engeller.
 CANONICAL_JSON = "experiments/ml_baseline_results.json"
-CSV = os.environ.get("ML_FEATURES_CSV", "experiments/ml_features.csv")
+CSV = os.environ.get("ML_FEATURES_CSV", "experiments/ml_features_multiclient.csv")
 JSON_OUT = os.environ.get("ML_RESULTS_JSON", CANONICAL_JSON)
 with open(CSV, "rb") as _fh:
     _CSV_BYTES = _fh.read()
@@ -546,6 +553,21 @@ if _is_canonical and not NGRAM_AVAILABLE:
         "  - Tek-istemci ciktiyi ayri yaz: ML_RESULTS_JSON=experiments/ml_baseline_results.single_client.json python3 experiments/ml_baseline.py"
     )
 
+# Ek shape guard (kanonik yazim): n-gram'li ama YANLIS/bozuk bir CSV de kanonik
+# JSON'u bozabilir. Beklenen kanonik shape (433x38) disinda yazimi reddet. Mesru bir
+# yeniden-uretim (ör. VM'de farkli istemci/devre sayisi) icin ALLOW_CANONICAL_RESHAPE=1.
+_EXP_ROWS, _EXP_COLS = 433, 38
+_allow_reshape = os.environ.get("ALLOW_CANONICAL_RESHAPE", "0") == "1"
+if _is_canonical and not _allow_reshape and (len(df) != _EXP_ROWS or df.shape[1] != _EXP_COLS):
+    raise SystemExit(
+        f"[REPRODUCIBILITY GUARD] Kanonik CSV shape beklenenden farkli: "
+        f"{len(df)}x{df.shape[1]} (beklenen {_EXP_ROWS}x{_EXP_COLS}, {CSV}).\n"
+        "Kanonik experiments/ml_baseline_results.json uzerine yazilmadi.\n"
+        "  - Bilincli yeniden-uretim ise:  ALLOW_CANONICAL_RESHAPE=1 python3 experiments/ml_baseline.py\n"
+        "  - Aksi halde dogru kanonik CSV'yi (experiments/ml_features_multiclient.csv) kullanin "
+        "veya ML_RESULTS_JSON ile ayri dosyaya yazin."
+    )
+
 # Provenance: script-turevli; tezde n_circuits == source_rows degismezligi dogrulanir.
 results["provenance"] = {
     "source_csv": CSV,
@@ -554,6 +576,12 @@ results["provenance"] = {
     "source_cols": int(df.shape[1]),
     "ngram_available": bool(NGRAM_AVAILABLE),
     "generated_by": "experiments/ml_baseline.py",
+    "versions": {
+        "python": sys.version.split()[0],
+        "numpy": np.__version__,
+        "sklearn": sklearn.__version__,
+        "pandas": pd.__version__,
+    },
 }
 
 # ---------------------------------------------------------------------------

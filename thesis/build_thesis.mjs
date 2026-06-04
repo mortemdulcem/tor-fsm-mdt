@@ -1612,6 +1612,19 @@ sonuçlarının niteliğini değiştirmez</b>; yalnızca precision'daki iyimser 
 Bu, yapısal ayrılabilirlik bulgusunu (kısım (a)) bağımsız bir değerlendirme şemasıyla
 doğrular.</p>
 
+<p class="no-indent"><b>Sürüm-duyarlılığı (yöntemsel not).</b> Sızıntısız GroupKFold
+bölmesinde grup birimi <i>eşsiz öznitelik vektörü</i> olduğundan, bölme sırası
+sayısal kütüphane sürümüne (scikit-learn / NumPy) duyarlıdır; bu nedenle yalnızca
+<b>denetimsiz (IsolationForest) sızıntısız F1 değeri</b> (yukarıdaki tabloda tek
+hücre) farklı ortamlarda küçük oynama gösterebilir. Yukarıda yorumlanan denetimli
+sonuçlar (create_flood / circuit_hijack recall = ${fmt(ml.leakfree.supervised.per_attack_recall.create_flood)}
+/ ${fmt(ml.leakfree.supervised.per_attack_recall.circuit_hijack)}; premature düşük) ve
+çok-sınıflı doğruluk (${fmt(ml.leakfree.multiclass.accuracy)}) bu oynamadan
+etkilenmez ve raporlanan tüm sayılar derleme ortamında birebir yeniden üretilmiştir.
+Bu değerleri üreten ortamın sürümleri (Python / scikit-learn / NumPy / pandas)
+şeffaflık için <code>experiments/ml_baseline_results.json</code> içindeki
+<code>provenance.versions</code> alanına yazılır.</p>
+
 <p class="no-indent"><b>Veri çeşitliliği (dürüst sınır).</b> Daha fazla eşsiz örüntü,
 ancak VM üzerinde ek seed/senaryo ile yeni Shadow koşumları gerektirir; Shadow bu
 ortamda (Bölüm 4.15) çalıştırılamadığından mevcut veri ${ml.data.n_seeds} seed ile
