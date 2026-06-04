@@ -60,3 +60,9 @@ id = "Milo76A6hruR6iQmWYWSw"
 uri = "file://thesis/Tor_FSM_Tez.docx"
 type = "word_document"
 title = "Tor FSM Tezi — Tam (Word, eksiksiz)"
+
+[[outputs]]
+id = "it0dDfRxi12jkWcr0MLdL"
+uri = "file://thesis/Tor_FSM_Calisma.docx"
+type = "word_document"
+title = "Tor FSM Çalışması — Tam Metin (Template uyumlu, 8 bölüm)"
