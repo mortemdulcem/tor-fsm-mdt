@@ -48,3 +48,9 @@ id = "nszqODd5UVnmdw_VMMWB-"
 uri = "file://experiments/b_extensions.json"
 type = "unspecified"
 title = "B grubu ham veri (Wilcoxon + latency + bütçe + rule-based)"
+
+[[outputs]]
+id = "rEH9VflRHWGQ3kavw1qvI"
+uri = "file://paper/Tor_FSM_Makale_Template.docx"
+type = "word_document"
+title = "Tor FSM Makale — Hoca Template'ine Uygun Final (.docx)"
