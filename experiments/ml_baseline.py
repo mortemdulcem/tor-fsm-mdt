@@ -19,6 +19,7 @@ DAGITIM-ICI/IYIMSERDIR; asil guvenilir kanit CV'den bagimsiz yapisal ayrilabilir
 """
 import json
 import os
+import hashlib
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
@@ -27,8 +28,17 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import precision_recall_fscore_support, confusion_matrix
 from sklearn.model_selection import GroupKFold
 
-CSV = "experiments/ml_features.csv"
-JSON_OUT = "experiments/ml_baseline_results.json"
+# Girdi/cikti parametrize: tezin BIRINCIL ML verisi cok-istemci (CLIENTS=4 x 3 seed,
+# 433 devre, n-gram bg_* / zamanlama t_* sutunlu) CSV'dir. Ham Shadow olay dizileri
+# yalnizca VM'de oldugundan bu CSV bir VM artefaktidir (full_pipeline.sh CLIENTS=4 ile
+# uretilir). Commit'li experiments/ml_features.csv ise tek-istemci/sayim-only (109 satir).
+# Kanonik JSON'u tek-istemci CSV ile uretmek bilimsel olarak yanlis olur -> asagidaki
+# tekrarliuretilebilirlik korumasi bunu engeller.
+CANONICAL_JSON = "experiments/ml_baseline_results.json"
+CSV = os.environ.get("ML_FEATURES_CSV", "experiments/ml_features.csv")
+JSON_OUT = os.environ.get("ML_RESULTS_JSON", CANONICAL_JSON)
+with open(CSV, "rb") as _fh:
+    _CSV_BYTES = _fh.read()
 df = pd.read_csv(CSV)
 
 # Tez (build_thesis.mjs) bu dosyadan okur; tum sayilar buradan uretilir, elle girilmez.
@@ -521,9 +531,38 @@ results["sequence_timing"] = {
 }
 
 # ---------------------------------------------------------------------------
+# Tekrarliuretilebilirlik korumasi: kanonik JSON, cok-istemci n-gram (VM) verisidir.
+# Sayim-only / tek-istemci bir CSV (n-gram sutunlari yok) ile kanonik dosyanin
+# UZERINE YAZMAYI reddet -> sessiz veri bozulmasini (silent downgrade) onler.
+# ---------------------------------------------------------------------------
+_is_canonical = os.path.abspath(JSON_OUT) == os.path.abspath(CANONICAL_JSON)
+if _is_canonical and not NGRAM_AVAILABLE:
+    raise SystemExit(
+        "[REPRODUCIBILITY GUARD] Girdi CSV'de n-gram (bg_*) sutunlari YOK "
+        f"({CSV}, {len(df)} satir, sayim-only/tek-istemci).\n"
+        "Kanonik experiments/ml_baseline_results.json cok-istemci n-gram (VM) "
+        "artefaktidir; uzerine yazilmadi.\n"
+        "  - Cok-istemci CSV ile uret:  ML_FEATURES_CSV=<433-satir CSV> python3 experiments/ml_baseline.py\n"
+        "  - Tek-istemci ciktiyi ayri yaz: ML_RESULTS_JSON=experiments/ml_baseline_results.single_client.json python3 experiments/ml_baseline.py"
+    )
+
+# Provenance: script-turevli; tezde n_circuits == source_rows degismezligi dogrulanir.
+results["provenance"] = {
+    "source_csv": CSV,
+    "source_csv_sha256": hashlib.sha256(_CSV_BYTES).hexdigest(),
+    "source_rows": int(len(df)),
+    "source_cols": int(df.shape[1]),
+    "ngram_available": bool(NGRAM_AVAILABLE),
+    "generated_by": "experiments/ml_baseline.py",
+}
+
+# ---------------------------------------------------------------------------
 # JSON cikti — tez (build_thesis.mjs) bu dosyadan okur. Tum sayilar yukaridaki
 # gercek kosumdan gelir; elle girilmez.
 # ---------------------------------------------------------------------------
 with open(JSON_OUT, "w", encoding="utf-8") as fh:
     json.dump(results, fh, ensure_ascii=False, indent=2)
 print(f"\n[OK] sonuclar JSON'a yazildi -> {JSON_OUT}")
+print(f"[PROVENANCE] kaynak={CSV} satir={len(df)} sutun={df.shape[1]} "
+      f"ngram={'EVET' if NGRAM_AVAILABLE else 'HAYIR'} "
+      f"sha256={results['provenance']['source_csv_sha256'][:12]}...")
