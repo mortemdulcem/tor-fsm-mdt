@@ -278,7 +278,7 @@ CV'den bağımsız **yapısal ayrılabilirlik**: sınıfların eşsiz vektör k�
   Kritik dürüst bulgu: sızıntı kaldırılınca tablo ÇÖKMEZ — create_flood/hijack recall hâlâ 1.0
   (ayrım gerçek SEND_CREATE=2 sinyalinden, ezberden değil); precision 1.0→~0.95 DÜŞER (kaybolan
   tek şey train'deki birebir benign kopyalarının yarattığı yapay precision); premature recall
-  yine ~0.04; çok-sınıflı accuracy ~0.54→~0.55 sabit. **Why:** task #2 sızıntı endişesini
-  giderdi; sonuç ayrılabilirlik niteliğini değiştirmiyor, sadece iyimser precision şişmesini
+  yine ~0.04; çok-sınıflı accuracy ~0.54→~0.55 sabit. **Why:** sızıntısız GroupKFold değerlendirmesi
+  sızıntı endişesini giderdi; sonuç ayrılabilirlik niteliğini değiştirmiyor, sadece iyimser precision şişmesini
   açıklıyor. Data çoğaltma Shadow gerektirir (Replit'te çalışmaz) → sentetik EKLENMEDİ, dürüstçe
   sınır yazıldı. Sayılar ml_baseline_results.json["leakfree"]'den; tez Tablo 4.17d + 6.2.2.

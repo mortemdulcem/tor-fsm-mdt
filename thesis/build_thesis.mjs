@@ -39,6 +39,72 @@ const stars = (p) => p < 0.001 ? "***" : p < 0.01 ? "**" : p < 0.05 ? "*" : "";
 const ms = (o) => `${o.mean.toFixed(3)} ± ${o.sd.toFixed(3)}`;
 const mpct = (o) => `${(o.mean * 100).toFixed(1)}%`;
 
+// ---------- Kod parçaları: gerçek kaynak dosyalardan BİREBİR okunur (uydurma yok) ----------
+const escHtml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+// İçerik-çapalı blok çıkarımı: hem başlangıç hem bitiş bir metin imine bağlanır,
+// böylece kaynak dosyada satır kayması olsa bile alıntı bağlam dışı kalmaz.
+const sliceBetween = (src, startNeedle, endNeedle) => {
+  const lines = src.split("\n");
+  const i = lines.findIndex((l) => l.includes(startNeedle));
+  if (i < 0) return "";
+  const j = lines.findIndex((l, k) => k > i && l.includes(endNeedle));
+  return j < 0 ? "" : lines.slice(i, j).join("\n").replace(/\s+$/, "");
+};
+const fsmSrc = await fs.readFile(path.resolve(__dirname, "../server/fsm.ts"), "utf8");
+const classifyCode = sliceBetween(fsmSrc, "export function classifyInvalid(", 'if (state === "CLOSING")');
+const pipelineSrc = await fs.readFile(path.resolve(__dirname, "../experiments/full_pipeline.sh"), "utf8");
+const pipelineCode = sliceBetween(pipelineSrc, "for seed in $SEEDS; do", "for attack in $ACTIVE");
+if (!classifyCode || !pipelineCode) {
+  throw new Error("Kod parçası bulunamadı (kaynak dosya değişmiş olabilir); tez derlenmedi.");
+}
+
+// ---------- Akademik ortam/topoloji diyagramları (Bölüm 4.15'te belgelenmiş kurulumun görselleştirmesi) ----------
+const vmEnvSvg = `<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica,Arial,sans-serif">
+  <rect x="6" y="6" width="708" height="288" rx="6" fill="#eef1f5" stroke="#333" stroke-width="1.5"/>
+  <text x="20" y="26" font-size="12.5" font-weight="bold" fill="#222">Oracle VirtualBox 7.0 — hipervizör (bağımsız host makine)</text>
+  <rect x="26" y="38" width="668" height="248" rx="5" fill="#ffffff" stroke="#444" stroke-width="1.2"/>
+  <text x="40" y="56" font-size="11.5" font-weight="bold" fill="#1a3a5c">Misafir OS: Ubuntu 22.04 LTS (Jammy) — 4 vCPU · 8 GB RAM · 50 GB sanal disk</text>
+  <rect x="42" y="70" width="150" height="64" rx="4" fill="#f4f8ff" stroke="#2b5d8a"/>
+  <text x="117" y="96" font-size="11" font-weight="bold" text-anchor="middle">Shadow 3.3.0</text>
+  <text x="117" y="112" font-size="9" fill="#555" text-anchor="middle">discrete-event</text>
+  <text x="117" y="124" font-size="9" fill="#555" text-anchor="middle">ağ simülatörü</text>
+  <rect x="204" y="70" width="150" height="64" rx="4" fill="#f4f8ff" stroke="#2b5d8a"/>
+  <text x="279" y="96" font-size="11" font-weight="bold" text-anchor="middle">Tor 0.4.6.10</text>
+  <text x="279" y="116" font-size="9" fill="#555" text-anchor="middle">gerçek tor binary</text>
+  <rect x="366" y="70" width="150" height="64" rx="4" fill="#f4f8ff" stroke="#2b5d8a"/>
+  <text x="441" y="96" font-size="11" font-weight="bold" text-anchor="middle">tgen</text>
+  <text x="441" y="116" font-size="9" fill="#555" text-anchor="middle">trafik üreteci</text>
+  <rect x="528" y="70" width="150" height="64" rx="4" fill="#f4f8ff" stroke="#2b5d8a"/>
+  <text x="603" y="96" font-size="11" font-weight="bold" text-anchor="middle">Node.js 22</text>
+  <text x="603" y="116" font-size="9" fill="#555" text-anchor="middle">FSM analiz harness</text>
+  <rect x="42" y="150" width="636" height="44" rx="4" fill="#fbf6ec" stroke="#9a6b1f"/>
+  <text x="360" y="170" font-size="10.5" font-weight="bold" text-anchor="middle">9-host kanonik topoloji (examples/tor/minimal)</text>
+  <text x="360" y="186" font-size="9.5" fill="#555" text-anchor="middle">1 dir-auth + 4 non-exit relay + 2 exit relay + 1 doğrudan istemci + 1 tor istemci</text>
+  <rect x="42" y="206" width="636" height="44" rx="4" fill="#eef7ee" stroke="#2e7d32"/>
+  <text x="360" y="226" font-size="10.5" font-weight="bold" text-anchor="middle">seed-deterministik koşum {42, 137, 2718}</text>
+  <text x="360" y="242" font-size="9.5" fill="#555" text-anchor="middle">shadow_results.json → git diff ile bit-bit reproducibility</text>
+</svg>`;
+const vmTopoSvg = `<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica,Arial,sans-serif">
+  <rect x="290" y="12" width="140" height="40" rx="4" fill="#fbf6ec" stroke="#9a6b1f"/>
+  <text x="360" y="37" font-size="10.5" font-weight="bold" text-anchor="middle">Directory Authority (×1)</text>
+  <line x1="360" y1="52" x2="360" y2="90" stroke="#9a6b1f" stroke-dasharray="4 3"/>
+  <text x="368" y="74" font-size="8.5" fill="#9a6b1f">konsensüs</text>
+  <rect x="70" y="90" width="580" height="78" rx="5" fill="#f4f8ff" stroke="#2b5d8a"/>
+  <text x="360" y="108" font-size="10.5" font-weight="bold" text-anchor="middle">Relay düzlemi: 4 non-exit relay + 2 exit relay</text>
+  <circle cx="150" cy="138" r="15" fill="#d6e6f5" stroke="#2b5d8a"/><text x="150" y="142" font-size="8.5" text-anchor="middle">R1</text>
+  <circle cx="230" cy="138" r="15" fill="#d6e6f5" stroke="#2b5d8a"/><text x="230" y="142" font-size="8.5" text-anchor="middle">R2</text>
+  <circle cx="310" cy="138" r="15" fill="#d6e6f5" stroke="#2b5d8a"/><text x="310" y="142" font-size="8.5" text-anchor="middle">R3</text>
+  <circle cx="390" cy="138" r="15" fill="#d6e6f5" stroke="#2b5d8a"/><text x="390" y="142" font-size="8.5" text-anchor="middle">R4</text>
+  <circle cx="490" cy="138" r="15" fill="#f5d6d6" stroke="#a83232"/><text x="490" y="142" font-size="8.5" text-anchor="middle">E1</text>
+  <circle cx="570" cy="138" r="15" fill="#f5d6d6" stroke="#a83232"/><text x="570" y="142" font-size="8.5" text-anchor="middle">E2</text>
+  <rect x="90" y="198" width="170" height="40" rx="4" fill="#eef7ee" stroke="#2e7d32"/>
+  <text x="175" y="223" font-size="10.5" font-weight="bold" text-anchor="middle">Tor istemci (×1)</text>
+  <rect x="460" y="198" width="170" height="40" rx="4" fill="#eef7ee" stroke="#2e7d32"/>
+  <text x="545" y="223" font-size="10.5" font-weight="bold" text-anchor="middle">Doğrudan istemci (×1)</text>
+  <line x1="175" y1="198" x2="220" y2="168" stroke="#2e7d32"/>
+  <line x1="545" y1="198" x2="500" y2="168" stroke="#2e7d32"/>
+</svg>`;
+
 // ---------- Atıflar (IEEE) — 20 doğrulanmış kaynak (Literatur_Notlari ile bire bir) ----------
 const REFS = [
   { id: 1, txt: 'R. Dingledine, N. Mathewson and P. Syverson, "Tor: The Second-Generation Onion Router," in <i>Proc. 13th USENIX Security Symposium</i>, 2004, pp. 303–320.' },
@@ -510,6 +576,11 @@ CREATE_FLOOD. Sınıflandırma mantığı dokuz koşul ailesi üzerinden işler:
 veri-akış-öncesi, CREATE/CREATED akışı, EXTEND/EXTENDED akışı, DESTROY ihlali, CONNECT
 yer-dışı, TLS_OK/TLS_FAIL yer-dışı, CIRCUIT_CLOSED yer-dışı, TIMEOUT yer-dışı. Her ikiliye
 LOW/MEDIUM/HIGH/CRITICAL şiddet etiketi atanır. Kategorilerin nicel dağılımı Ek B'dedir.</p>
+
+<p class="no-indent"><b>Kod 3.1.</b> Sınıflandırıcının çekirdek dalı — devre hazır olmadan
+gerçekleşen veri akışı ihlalleri (kaynak: <code>server/fsm.ts</code>, derleme anında
+dosyadan birebir okunur).</p>
+<pre class="algo">${escHtml(classifyCode)}</pre>
 
 <h3>3.3 MDT Motoru — Algoritma 1</h3>
 <pre class="algo">Algoritma 1: Model-Driven Test (BFS-tabanlı)
@@ -1142,6 +1213,13 @@ tekrarlanmıştır. Bu, Hacettepe Üniversitesi BYZ 658 ders gereksinimlerinden
   <code>experiments/shadow_harness.mjs</code>.</li>
 </ul>
 
+<div class="fig">${vmEnvSvg}<div class="cap"><b>Şekil 4.15a.</b> Bağımsız reproducibility
+doğrulamasının deney ortamı yığını: Oracle VirtualBox 7.0 hipervizörü üzerinde
+Ubuntu 22.04 LTS misafir işletim sistemi (4 vCPU, 8 GB RAM, 50 GB disk); içinde
+Shadow 3.3.0 + Tor 0.4.6.10 + tgen + Node.js 22 analiz hattı, 9-host kanonik
+topoloji ve seed-deterministik koşum. Tüm sürümler yukarıdaki test ortamı
+listesinden alınmıştır; diyagram bu metni görselleştirir, yeni bilgi içermez.</div></div>
+
 <p class="no-indent"><b>Deney protokolü.</b> Repodaki harness komut satırından
 çalıştırılmış; üç senaryo (<i>benign</i>, <i>replay_attack</i>,
 <i>circuit_bypass</i>) her biri üç sabit seed ({42, 137, 2718}) ile, toplam
@@ -1151,6 +1229,26 @@ tekrarlanmıştır. Bu, Hacettepe Üniversitesi BYZ 658 ders gereksinimlerinden
 şablonuyla aynı yapı). Üretilen <code>shadow_results.json</code> dosyası,
 repoda commit edilmiş referans dosyayla <code>git diff</code> ile birebir
 karşılaştırılmıştır.</p>
+
+<div class="fig">${vmTopoSvg}<div class="cap"><b>Şekil 4.15b.</b> Shadow'un kanonik
+<code>examples/tor/minimal</code> şablonuyla aynı 9-host topoloji: bir directory
+authority, dört non-exit relay (R1–R4) ile iki exit relay (E1–E2) içeren relay
+düzlemi ve iki istemci (bir tor istemcisi, bir doğrudan istemci). Düğüm rolleri
+ve sayıları yukarıdaki deney protokolünde belirtildiği gibidir.</div></div>
+
+<p class="no-indent"><b>Çalıştırma — nasıl yapıldı.</b> Bu bölümdeki (C5) reproducibility
+koşumu, yukarıda listelenen harness ile üç senaryo (<i>benign</i>, <i>replay_attack</i>,
+<i>circuit_bypass</i>) üzerinde yürütülmüştür. Aynı VM ortamı, gerçek-saldırı
+deneyleri (<i>create_flood</i>, <i>circuit_hijack</i>, <i>premature_data</i>;
+bkz. Bölüm 4.16–4.17) için de kullanılır: repo kökünden <code>bash experiments/full_pipeline.sh</code>
+betiği her sabit seed için önce bir <i>benign</i>, ardından kaynak hook'u VM'de mevcut
+olan her saldırı için bir <i>attack</i> Shadow koşusu yürütür ve host loglarını kalıcı
+<code>experiments/runs/</code> dizinine kopyalar. Aşağıdaki Kod 4.15, bu betiğin çok-seed
+döngüsünü — VM üzerinde seed-deterministik Shadow koşumunun nasıl sürüldüğünü —
+örneklemek için gösterir (derleme anında dosyadan birebir okunur):</p>
+<p class="no-indent"><b>Kod 4.15.</b> VM'de çok-seed Shadow koşum döngüsü; gerçek-saldırı
+deneyleri için kullanılır (kaynak: <code>experiments/full_pipeline.sh</code>).</p>
+<pre class="algo">${escHtml(pipelineCode)}</pre>
 
 <p class="no-indent"><b>Sonuç — bit bit eşleşme.</b> İki dosya arasındaki
 <i>tek farklar</i> şunlardır:</p>
