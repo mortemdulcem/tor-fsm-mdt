@@ -282,3 +282,19 @@ CV'den bağımsız **yapısal ayrılabilirlik**: sınıfların eşsiz vektör k�
   sızıntı endişesini giderdi; sonuç ayrılabilirlik niteliğini değiştirmiyor, sadece iyimser precision şişmesini
   açıklıyor. Data çoğaltma Shadow gerektirir (Replit'te çalışmaz) → sentetik EKLENMEDİ, dürüstçe
   sınır yazıldı. Sayılar ml_baseline_results.json["leakfree"]'den; tez Tablo 4.17d + 6.2.2.
+
+## ML seq/timing features — workspace lacks raw sequences (VM-only)
+ml_features.csv (count-level + real dur_ms) is the ONLY per-circuit data in the Replit repo.
+Raw ORDERED event sequences w/ per-event timestamps (needed for n-gram + inter-event delay)
+live ONLY on the VM; export_features.mjs regenerates them (writes ml_dataset.json + CSV).
+- **n-gram/timing extraction** added to export_features.mjs (bigrams bg_*, inter-event gap
+  mean/med/max t_*, t_first_data_ms, seq_setup_before_data) and ml_baseline.py section 5
+  (after the leak-free GroupKFold section 4) auto-detects these columns (count-only vs
+  count+seq+timing LOSO compare). Absent in committed CSV → script honestly runs dur_ms-only
+  and reports "ngram_available:false".
+- **Why dur_ms-only is misleading:** adding a continuous/noisy timing feature (dur_ms) mechanically
+  drops unique-vector OVERLAP (every circuit vector becomes near-unique) WITHOUT changing recall —
+  NOT real separation. So `improved` is gated on recall/accuracy gain, and overlap-drop only counts
+  when discrete n-gram/seq columns exist. Current real result: dur_ms changes nothing (AYRIM SINIRLI).
+- **How to apply:** real n-gram/inter-event comparison numbers must come from a VM CSV regen; thesis
+  Bölüm 4.17(d) reads ml.sequence_timing and writes the honest "pending VM" branch when ngram absent.

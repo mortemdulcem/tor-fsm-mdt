@@ -231,5 +231,112 @@
         ]
       ]
     }
+  },
+  "sequence_timing": {
+    "ngram_available": false,
+    "timing_feats": [
+      "dur_ms"
+    ],
+    "seq_feat_count": 0,
+    "count_only": {
+      "n_features": 10,
+      "supervised": {
+        "precision": {
+          "mean": 1.0,
+          "sd": 0.0
+        },
+        "recall": {
+          "mean": 0.6948853615520282,
+          "sd": 0.020415938100159153
+        },
+        "f1": {
+          "mean": 0.8198067632850242,
+          "sd": 0.01431452404833724
+        }
+      },
+      "per_attack_recall": {
+        "create_flood": {
+          "mean": 1.0,
+          "sd": 0.0
+        },
+        "circuit_hijack": {
+          "mean": 1.0,
+          "sd": 0.0
+        },
+        "premature_data": {
+          "mean": 0.07407407407407407,
+          "sd": 0.05237828008789241
+        }
+      },
+      "multiclass_accuracy": {
+        "mean": 0.5415415415415415,
+        "sd": 0.01981880868190526
+      },
+      "flood_hijack_confusion": {
+        "cf_correct": 19,
+        "cf_to_hj": 8,
+        "hj_correct": 10,
+        "hj_to_cf": 18
+      },
+      "overlap": {
+        "create_flood__circuit_hijack": 8,
+        "premature_data__benign": 2
+      }
+    },
+    "enhanced": {
+      "n_features": 11,
+      "supervised": {
+        "precision": {
+          "mean": 1.0,
+          "sd": 0.0
+        },
+        "recall": {
+          "mean": 0.6948853615520282,
+          "sd": 0.020415938100159153
+        },
+        "f1": {
+          "mean": 0.8198067632850242,
+          "sd": 0.01431452404833724
+        }
+      },
+      "per_attack_recall": {
+        "create_flood": {
+          "mean": 1.0,
+          "sd": 0.0
+        },
+        "circuit_hijack": {
+          "mean": 1.0,
+          "sd": 0.0
+        },
+        "premature_data": {
+          "mean": 0.07407407407407407,
+          "sd": 0.05237828008789241
+        }
+      },
+      "multiclass_accuracy": {
+        "mean": 0.5510510510510511,
+        "sd": 0.04565404142796028
+      },
+      "flood_hijack_confusion": {
+        "cf_correct": 11,
+        "cf_to_hj": 16,
+        "hj_correct": 21,
+        "hj_to_cf": 7
+      },
+      "overlap": {
+        "create_flood__circuit_hijack": 6,
+        "premature_data__benign": 1
+      }
+    },
+    "delta": {
+      "per_attack_recall": {
+        "create_flood": 0.0,
+        "circuit_hijack": 0.0,
+        "premature_data": 0.0
+      },
+      "multiclass_accuracy": 0.009509509509509573,
+      "flood_hijack_overlap": 2
+    },
+    "improved": false
   }
 }

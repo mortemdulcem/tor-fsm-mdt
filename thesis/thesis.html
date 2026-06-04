@@ -1827,6 +1827,33 @@ sınıftır (denetimli/çok-sınıflı modellerde kapsam düşük, denetimsiz an
 modelinde ise yüksek; tek bir model her saldırıyı birden iyi ayıramaz). Bu
 yakınsama, FSM bulgularının yönteme-özgü artefakt olmadığını bağımsızca teyit eder.</p>
 
+<p class="no-indent"><b>(d) Sıra (n-gram) ve zamanlama temelli öznitelikler.</b>
+Sayım-seviyesi öznitelikler olay <i>sırasını</i> ve <i>olaylar-arası gecikmeyi</i>
+yitirir; bu da create_flood ↔ circuit_hijack tip-ayrımını ve premature kapsamını
+sınırlar (Tablo 4.17c). Bu öznitelikler <code>experiments/export_features.mjs</code>'te
+ham olay dizilerinden çıkarılır (bigram <code>bg_*</code>; olaylar-arası gecikme
+ortalama/medyan/maks <code>t_*</code>; ilk veri hücresine kadar geçen süre ve veri
+öncesi tamamlanan kurulum olayı sayısı), aynı LOSO protokolüyle sayım-only modelle
+karşılaştırılır. Tüm değerler <code>ml_baseline_results.json</code>'dan üretilmiştir.</p><p class="no-indent"><b>Dürüst sınırlılık.</b> Bu derlemede kullanılan
+commit'li öznitelik tablosu yalnızca <i>sayım-seviyesi</i> sütunları ve gerçek toplam
+süre (<code>dur_ms</code>) içerir; n-gram (<code>bg_*</code>) ve olaylar-arası gecikme
+(<code>t_*</code>) sütunları, ham Shadow olay dizilerini barındıran VM'de
+<code>export_features.mjs</code> ile CSV yeniden üretildiğinde devreye girer (kod hazırdır).
+Mevcut veriyle test edilebilen tek zamanlama özniteliği <code>dur_ms</code>'tir ve onu
+eklemek saldırı-tipi recall'unu değiştirmemiştir: create_flood
+1.000 ± 0.000 → 1.000 ± 0.000,
+circuit_hijack 1.000 ± 0.000 →
+1.000 ± 0.000, premature_data
+0.074 ± 0.052 → 0.074 ± 0.052;
+çok-sınıflı doğruluk 0.542 ± 0.020 → 0.551 ± 0.046
+(Δ +0.010, SD içinde). Yapısal eşsiz-vektör örtüşmesi
+(create_flood ∩ circuit_hijack) 8 →
+6 düşmüştür; ancak bu düşüş büyük ölçüde
+<code>dur_ms</code>'nin sürekli/gürültülü olmasından kaynaklanır (her devre vektörünü
+neredeyse eşsizleştirir) ve gerçek sınıf-ayrımı sayılmaz. <b>Sonuç:</b> mevcut
+veriyle <i>ayrım hâlâ sınırlıdır</i>; n-gram ve olaylar-arası gecikme özniteliklerinin
+asıl katkısı, VM'de yeniden üretilen tam öznitelik tablosuyla raporlanacaktır.</p>
+
 <div class="pagebreak"></div>
 
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->

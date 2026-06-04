@@ -1567,6 +1567,67 @@ sınıftır (denetimli/çok-sınıflı modellerde kapsam düşük, denetimsiz an
 modelinde ise yüksek; tek bir model her saldırıyı birden iyi ayıramaz). Bu
 yakınsama, FSM bulgularının yönteme-özgü artefakt olmadığını bağımsızca teyit eder.</p>
 
+${(() => {
+  const st = ml.sequence_timing;
+  if (!st) return "";
+  const co = st.count_only, en = st.enhanced;
+  const r = (o) => `${o.mean.toFixed(3)} ± ${o.sd.toFixed(3)}`;
+  const sgn = (x) => `${x >= 0 ? "+" : ""}${x.toFixed(3)}`;
+  const head = `<p class="no-indent"><b>(d) Sıra (n-gram) ve zamanlama temelli öznitelikler.</b>
+Sayım-seviyesi öznitelikler olay <i>sırasını</i> ve <i>olaylar-arası gecikmeyi</i>
+yitirir; bu da create_flood ↔ circuit_hijack tip-ayrımını ve premature kapsamını
+sınırlar (Tablo 4.17c). Bu öznitelikler <code>experiments/export_features.mjs</code>'te
+ham olay dizilerinden çıkarılır (bigram <code>bg_*</code>; olaylar-arası gecikme
+ortalama/medyan/maks <code>t_*</code>; ilk veri hücresine kadar geçen süre ve veri
+öncesi tamamlanan kurulum olayı sayısı), aynı LOSO protokolüyle sayım-only modelle
+karşılaştırılır. Tüm değerler <code>ml_baseline_results.json</code>'dan üretilmiştir.</p>`;
+
+  if (!st.ngram_available) {
+    return head + `<p class="no-indent"><b>Dürüst sınırlılık.</b> Bu derlemede kullanılan
+commit'li öznitelik tablosu yalnızca <i>sayım-seviyesi</i> sütunları ve gerçek toplam
+süre (<code>dur_ms</code>) içerir; n-gram (<code>bg_*</code>) ve olaylar-arası gecikme
+(<code>t_*</code>) sütunları, ham Shadow olay dizilerini barındıran VM'de
+<code>export_features.mjs</code> ile CSV yeniden üretildiğinde devreye girer (kod hazırdır).
+Mevcut veriyle test edilebilen tek zamanlama özniteliği <code>dur_ms</code>'tir ve onu
+eklemek saldırı-tipi recall'unu değiştirmemiştir: create_flood
+${r(co.per_attack_recall.create_flood)} → ${r(en.per_attack_recall.create_flood)},
+circuit_hijack ${r(co.per_attack_recall.circuit_hijack)} →
+${r(en.per_attack_recall.circuit_hijack)}, premature_data
+${r(co.per_attack_recall.premature_data)} → ${r(en.per_attack_recall.premature_data)};
+çok-sınıflı doğruluk ${r(co.multiclass_accuracy)} → ${r(en.multiclass_accuracy)}
+(Δ ${sgn(st.delta.multiclass_accuracy)}, SD içinde). Yapısal eşsiz-vektör örtüşmesi
+(create_flood ∩ circuit_hijack) ${co.overlap.create_flood__circuit_hijack} →
+${en.overlap.create_flood__circuit_hijack} düşmüştür; ancak bu düşüş büyük ölçüde
+<code>dur_ms</code>'nin sürekli/gürültülü olmasından kaynaklanır (her devre vektörünü
+neredeyse eşsizleştirir) ve gerçek sınıf-ayrımı sayılmaz. <b>Sonuç:</b> mevcut
+veriyle <i>ayrım hâlâ sınırlıdır</i>; n-gram ve olaylar-arası gecikme özniteliklerinin
+asıl katkısı, VM'de yeniden üretilen tam öznitelik tablosuyla raporlanacaktır.</p>`;
+  }
+
+  const verdict = st.improved
+    ? `Sıra/zamanlama öznitelikleri <b>ayrımı iyileştirmiştir</b>`
+    : `Sıra/zamanlama öznitelikleri eklenince de <b>ayrım hâlâ sınırlıdır</b> (anlamlı iyileşme yok)`;
+  return head + `<p class="no-indent">${st.timing_feats.length} zamanlama özniteliği ve
+${st.seq_feat_count} sıra (n-gram/sıra) sütunu eklenmiştir (toplam
+${co.n_features} → ${en.n_features} öznitelik). Saldırı-tipi recall (sayım-only →
+genişletilmiş): create_flood ${r(co.per_attack_recall.create_flood)} →
+${r(en.per_attack_recall.create_flood)}, circuit_hijack
+${r(co.per_attack_recall.circuit_hijack)} → ${r(en.per_attack_recall.circuit_hijack)}
+(Δ ${sgn(st.delta.per_attack_recall.circuit_hijack)}), premature_data
+${r(co.per_attack_recall.premature_data)} → ${r(en.per_attack_recall.premature_data)}
+(Δ ${sgn(st.delta.per_attack_recall.premature_data)}); çok-sınıflı doğruluk
+${r(co.multiclass_accuracy)} → ${r(en.multiclass_accuracy)}
+(Δ ${sgn(st.delta.multiclass_accuracy)}). create_flood ↔ circuit_hijack karışması
+(doğru/karışan): sayım-only cf=${co.flood_hijack_confusion.cf_correct}/hj-karışan
+${co.flood_hijack_confusion.cf_to_hj}, hj=${co.flood_hijack_confusion.hj_correct}/cf-karışan
+${co.flood_hijack_confusion.hj_to_cf}; genişletilmiş cf=${en.flood_hijack_confusion.cf_correct}/${en.flood_hijack_confusion.cf_to_hj},
+hj=${en.flood_hijack_confusion.hj_correct}/${en.flood_hijack_confusion.hj_to_cf}.
+Yapısal eşsiz-vektör örtüşmesi create_flood ∩ circuit_hijack
+${co.overlap.create_flood__circuit_hijack} → ${en.overlap.create_flood__circuit_hijack},
+premature_data ∩ benign ${co.overlap.premature_data__benign} →
+${en.overlap.premature_data__benign}. <b>Sonuç:</b> ${verdict}.</p>`;
+})()}
+
 <div class="pagebreak"></div>
 
 <!-- ====================== BÖLÜM 5: GÖRSELLEŞTIRME ====================== -->

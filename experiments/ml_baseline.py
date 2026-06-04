@@ -359,6 +359,168 @@ print("\n(Yorum: GroupKFold ile ayni vektor train/test'e birlikte dusmez; "
       "ezberden -ne kadarinin gercek sinyalden- geldigini gosterir.)")
 
 # ---------------------------------------------------------------------------
+# 5) SIRA (n-gram) + ZAMANLAMA OZNITELIKLERI — sayim-only ile KARSILASTIRMA
+#    Amac: create_flood<->circuit_hijack tip-ayrimi ve premature recall'i,
+#    olay SIRASI (bigram, bg_*) ve OLAYLAR-ARASI ZAMANLAMA (t_*, dur_ms) ile
+#    iyilesiyor mu? Ayni LOSO protokolu iki oznitelik kumesine uygulanir.
+#    NOT: n-gram/olaylar-arasi gecikme sutunlari yalnizca export_features.mjs'in
+#    GUNCEL surumuyle (ham olay dizilerinden) uretilen CSV'de bulunur. Commit'li
+#    sayim-seviyesi CSV'de bunlar yoksa yalnizca dur_ms (gercek toplam sure)
+#    zamanlama ozniteligi test edilir ve durum durustce raporlanir.
+# ---------------------------------------------------------------------------
+print("\n" + "="*72)
+print("5) SIRA (n-gram) + ZAMANLAMA OZNITELIKLERI vs SAYIM-ONLY (LOSO)")
+print("="*72)
+
+TIMING_FEATS = [c for c in ["dur_ms", "t_gap_mean", "t_gap_max", "t_gap_med",
+                            "t_first_data_ms"] if c in df.columns]
+SEQ_FEATS = [c for c in df.columns if c.startswith("bg_")] \
+            + [c for c in ["seq_setup_before_data"] if c in df.columns]
+NGRAM_AVAILABLE = len(SEQ_FEATS) > 0
+
+def eval_featset(feat_cols):
+    """Verilen oznitelik listesiyle LOSO: ikili recall (tip bazinda),
+    cok-sinifli accuracy + flood/hijack karismasi, yapisal essiz-vektor ortusme."""
+    Xf = df[feat_cols].values.astype(float)
+    # ikili denetimli per-attack recall
+    per = {a: [] for a in attacks}
+    sup = []
+    for test_seed in seeds:
+        tr = (df["seed"] != test_seed).values
+        te = (df["seed"] == test_seed).values
+        scl = StandardScaler().fit(Xf[tr])
+        clf = LogisticRegression(max_iter=3000, class_weight="balanced")
+        clf.fit(scl.transform(Xf[tr]), y_bin[tr])
+        pred = clf.predict(scl.transform(Xf[te]))
+        p, r, f, _ = precision_recall_fscore_support(
+            y_bin[te], pred, average="binary", zero_division=0)
+        sup.append((p, r, f))
+        dte = df[te].reset_index(drop=True)
+        for a in attacks:
+            m = (dte["attack"] == a).values
+            if m.sum():
+                per[a].append(pred[m].mean())
+    sup = np.array(sup)
+    # cok-sinifli
+    cms_ = np.zeros((len(labels), len(labels)))
+    accs_ = []
+    for test_seed in seeds:
+        tr = (df["seed"] != test_seed).values
+        te = (df["seed"] == test_seed).values
+        scl = StandardScaler().fit(Xf[tr])
+        clf = LogisticRegression(max_iter=4000, class_weight="balanced")
+        clf.fit(scl.transform(Xf[tr]), ymc[tr])
+        pred = clf.predict(scl.transform(Xf[te]))
+        accs_.append((pred == ymc[te]).mean())
+        cms_ += confusion_matrix(ymc[te], pred, labels=labels)
+    # yapisal essiz-vektor ortusme (bu oznitelik kumesinde)
+    def vset_f(mask):
+        return set(map(tuple, Xf[mask]))
+    sets_f = {}
+    for at_ in ["benign", "create_flood", "circuit_hijack", "premature_data"]:
+        m = (df["scenario"] == "benign").values if at_ == "benign" \
+            else (df["attack"] == at_).values
+        sets_f[at_] = vset_f(m)
+    def ov(a, b):
+        return len(sets_f[a] & sets_f[b])
+    return {
+        "n_features": int(len(feat_cols)),
+        "supervised": {
+            "precision": {"mean": float(sup[:, 0].mean()), "sd": float(sup[:, 0].std())},
+            "recall": {"mean": float(sup[:, 1].mean()), "sd": float(sup[:, 1].std())},
+            "f1": {"mean": float(sup[:, 2].mean()), "sd": float(sup[:, 2].std())},
+        },
+        "per_attack_recall": {
+            a: {"mean": float(np.mean(per[a])), "sd": float(np.std(per[a]))}
+            for a in attacks},
+        "multiclass_accuracy": {"mean": float(np.mean(accs_)), "sd": float(np.std(accs_))},
+        "flood_hijack_confusion": {
+            "cf_correct": int(cms_[ci, ci]), "cf_to_hj": int(cms_[ci, hj]),
+            "hj_correct": int(cms_[hj, hj]), "hj_to_cf": int(cms_[hj, ci])},
+        "overlap": {
+            "create_flood__circuit_hijack": int(ov("create_flood", "circuit_hijack")),
+            "premature_data__benign": int(ov("premature_data", "benign"))},
+    }
+
+count_only = eval_featset(FEATS)
+enhanced_cols = FEATS + TIMING_FEATS + SEQ_FEATS
+enhanced = eval_featset(enhanced_cols)
+
+print(f"  sayim-only oznitelik: {count_only['n_features']} | "
+      f"genisletilmis: {enhanced['n_features']} "
+      f"(+zamanlama {TIMING_FEATS}, +n-gram/sira {len(SEQ_FEATS)} sutun)")
+if not NGRAM_AVAILABLE:
+    print("  [DURUST UYARI] CSV'de n-gram (bg_*) / olaylar-arasi gecikme sutunlari YOK.")
+    print("  Yalnizca dur_ms (gercek toplam sure) zamanlama ozniteligi test edildi.")
+    print("  Tam n-gram + olaylar-arasi gecikme karsilastirmasi icin CSV'yi VM'de")
+    print("  guncel export_features.mjs ile yeniden uret (ham olay dizileri orada).")
+
+print("\n  saldiri tipi bazinda recall (sayim-only -> genisletilmis):")
+for a in attacks:
+    b = count_only["per_attack_recall"][a]["mean"]
+    e = enhanced["per_attack_recall"][a]["mean"]
+    print(f"    {a:16s}: {b:.3f} -> {e:.3f}  (delta {e-b:+.3f})")
+print("\n  cok-sinifli accuracy: "
+      f"{count_only['multiclass_accuracy']['mean']:.3f} -> "
+      f"{enhanced['multiclass_accuracy']['mean']:.3f}  "
+      f"(delta {enhanced['multiclass_accuracy']['mean']-count_only['multiclass_accuracy']['mean']:+.3f})")
+print("  create_flood<->circuit_hijack karismasi (cf->hj, hj->cf):")
+print(f"    sayim-only : cf_dogru={count_only['flood_hijack_confusion']['cf_correct']} "
+      f"cf->hj={count_only['flood_hijack_confusion']['cf_to_hj']} | "
+      f"hj_dogru={count_only['flood_hijack_confusion']['hj_correct']} "
+      f"hj->cf={count_only['flood_hijack_confusion']['hj_to_cf']}")
+print(f"    genisletil.: cf_dogru={enhanced['flood_hijack_confusion']['cf_correct']} "
+      f"cf->hj={enhanced['flood_hijack_confusion']['cf_to_hj']} | "
+      f"hj_dogru={enhanced['flood_hijack_confusion']['hj_correct']} "
+      f"hj->cf={enhanced['flood_hijack_confusion']['hj_to_cf']}")
+print("  yapisal essiz-vektor ortusme (dusmesi = daha iyi ayrim):")
+print(f"    create_flood ∩ circuit_hijack: "
+      f"{count_only['overlap']['create_flood__circuit_hijack']} -> "
+      f"{enhanced['overlap']['create_flood__circuit_hijack']}")
+print(f"    premature_data ∩ benign      : "
+      f"{count_only['overlap']['premature_data__benign']} -> "
+      f"{enhanced['overlap']['premature_data__benign']}")
+
+# Iyilesme var mi? Asil olcut RECALL/accuracy kazanci (anlamli, model-seviyesi).
+# UYARI: yapisal essiz-vektor ortusme dususu, SUREKLI + gurultulu dur_ms gibi bir
+# oznitelik eklenince MEKANIK olarak dusebilir (her vektor neredeyse essizlesir);
+# bu gercek sinif-ayrimi DEGILDIR. Bu yuzden ortusme-dususunu ancak n-gram/sira
+# (ayrik) oznitelikler mevcutsa iyilesme kaniti sayariz.
+hj_gain = (enhanced["per_attack_recall"]["circuit_hijack"]["mean"]
+           - count_only["per_attack_recall"]["circuit_hijack"]["mean"])
+pm_gain = (enhanced["per_attack_recall"]["premature_data"]["mean"]
+           - count_only["per_attack_recall"]["premature_data"]["mean"])
+acc_gain = (enhanced["multiclass_accuracy"]["mean"]
+            - count_only["multiclass_accuracy"]["mean"])
+ovl_drop = (count_only["overlap"]["create_flood__circuit_hijack"]
+            - enhanced["overlap"]["create_flood__circuit_hijack"])
+improved = bool(hj_gain > 0.05 or pm_gain > 0.05 or acc_gain > 0.05
+                or (NGRAM_AVAILABLE and ovl_drop > 0))
+print(f"\n  -> iyilesme tespiti: hijack_recall delta={hj_gain:+.3f}, "
+      f"premature_recall delta={pm_gain:+.3f}, accuracy delta={acc_gain:+.3f}, "
+      f"flood/hijack ortusme dususu={ovl_drop}")
+if not NGRAM_AVAILABLE and ovl_drop > 0:
+    print("     (ortusme dususu dur_ms gurultusu kaynakli olabilir -> iyilesme sayilmadi)")
+print(f"     SONUC: {'IYILESME VAR' if improved else 'AYRIM HALA SINIRLI (anlamli iyilesme yok)'}")
+
+results["sequence_timing"] = {
+    "ngram_available": NGRAM_AVAILABLE,
+    "timing_feats": TIMING_FEATS,
+    "seq_feat_count": int(len(SEQ_FEATS)),
+    "count_only": count_only,
+    "enhanced": enhanced,
+    "delta": {
+        "per_attack_recall": {
+            a: float(enhanced["per_attack_recall"][a]["mean"]
+                     - count_only["per_attack_recall"][a]["mean"]) for a in attacks},
+        "multiclass_accuracy": float(enhanced["multiclass_accuracy"]["mean"]
+                                     - count_only["multiclass_accuracy"]["mean"]),
+        "flood_hijack_overlap": int(ovl_drop),
+    },
+    "improved": improved,
+}
+
+# ---------------------------------------------------------------------------
 # JSON cikti — tez (build_thesis.mjs) bu dosyadan okur. Tum sayilar yukaridaki
 # gercek kosumdan gelir; elle girilmez.
 # ---------------------------------------------------------------------------
