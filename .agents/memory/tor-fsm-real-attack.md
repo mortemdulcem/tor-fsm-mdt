@@ -282,7 +282,6 @@ CV'den bağımsız **yapısal ayrılabilirlik**: sınıfların eşsiz vektör k�
   sızıntı endişesini giderdi; sonuç ayrılabilirlik niteliğini değiştirmiyor, sadece iyimser precision şişmesini
   açıklıyor. Data çoğaltma Shadow gerektirir (Replit'te çalışmaz) → sentetik EKLENMEDİ, dürüstçe
   sınır yazıldı. Sayılar ml_baseline_results.json["leakfree"]'den; tez Tablo 4.17d + 6.2.2.
-
 ## ML seq/timing features — workspace lacks raw sequences (VM-only)
 ml_features.csv (count-level + real dur_ms) is the ONLY per-circuit data in the Replit repo.
 Raw ORDERED event sequences w/ per-event timestamps (needed for n-gram + inter-event delay)
@@ -298,3 +297,23 @@ live ONLY on the VM; export_features.mjs regenerates them (writes ml_dataset.jso
   when discrete n-gram/seq columns exist. Current real result: dur_ms changes nothing (AYRIM SINIRLI).
 - **How to apply:** real n-gram/inter-event comparison numbers must come from a VM CSV regen; thesis
   Bölüm 4.17(d) reads ml.sequence_timing and writes the honest "pending VM" branch when ngram absent.
+
+- **Çeşitlilik darboğazı seed DEĞİL topolojidir.** Veri deterministik olduğundan sadece `SEEDS=`
+  eklemek çoğunlukla kopya vektör üretir (modest unique-vector kazancı). Gerçek örüntü çeşitliliği
+  için VM'de farklı SENARYO gerek (daha çok istemci/devre, tgen akış sayısı, topoloji) — Replit'te
+  yapılamaz, sentetik yasak. **Why:** ML kanıtını "daha çeşitli veri" ile güçlendirme görevi bu
+  yüzden VM-bloklu; analiz tarafı (ml_baseline.py) tamamen veri-güdümlü, genişletilmiş veriyi kod
+  değişikliği olmadan yutar. **How to apply:** full_pipeline.sh artık adım 6'da export_features +
+  ml_baseline'ı zincirler → VM'de `SEEDS="..." bash experiments/full_pipeline.sh` tek komutta
+  ml_features.csv + ml_baseline_results.json'ı yeniler; tez sayıları JSON'dan otomatik gelir.
+- **Çok-istemci kaldıracı UYGULANDI (`CLIENTS=` parametresi).** Diversity için en temiz yol: her ek
+  torclient host'u Shadow'da AYRI RNG akışı (general.seed + host adı) alır → farklı yol/zamanlama →
+  gerçekten farklı devreler (sentetik DEĞİL). `experiments/make_clients.py` (bağımsızlıksız, saf
+  metin — PyYAML VM'de de yok) tek `torclient` blok'unu N'e çoğaltır. **KRİTİK:** yalnız host
+  başlığı + `--Address/--Nickname` değişir; tgen `tgen.torclient.graphml.xml` yolu ASLA
+  rename edilmez (içinde "torclient" geçer ama hepsi paylaşır). Attack env perl `s/environment:
+  {}/.../` zaten satır-satır çalışır → tüm istemciler env-gate alır; tgen `{ OPENBLAS... }` boş
+  `{}` olmadığı için dokunulmaz. **Kapsam (önemli):** ek istemciler yalnız ML yolunu (4.17:
+  export_features tüm `torclient*` loglarını okur, gid'i host'la önekler) besler; native/4.16
+  detect_json+metrics birincil torclient'te kalır (metrics `byAttack[atk][seed][scenario]` üzerine
+  yazıyor → istemci başına ayrı satır 4.16'yı bozardı). `CLIENTS=1` tam geriye uyumlu (varsayılan).

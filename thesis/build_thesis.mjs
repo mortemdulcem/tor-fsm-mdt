@@ -1807,9 +1807,22 @@ tamamlanabilir.</p>
   Asıl güvenilir kanıt yine CV'den bağımsız yapısal ayrılabilirliktir. Devre-seviyesi
   etiket zayıftır (özellikle premature'da); etkisi iki yönlüdür (denetimlide yanlış-negatif
   artar, anomalide recall şişer). Öznitelikler yalnız sayım-seviyesindedir; sıra/zamanlama
-  (n-gram, olaylar-arası gecikme) modellenmemiştir. Daha fazla eşsiz örüntülü veri için
-  VM üzerinde ek seed/senaryo ile yeni Shadow koşumları gerekir (Shadow bu ortamda
-  çalışmaz; sentetik örnek eklenmemiştir — gelecek iş, bkz. Bölüm 6.3). ML baseline,
+  (n-gram, olaylar-arası gecikme) modellenmemiştir. <b>Eşsiz örüntü çeşitliliğini
+  artırmanın doğru yolu yeni seed değil yeni senaryodur.</b> Veri deterministik
+  olduğundan aynı topolojide yalnızca yeni seed eklemek çoğunlukla birebir kopya
+  öznitelik vektörü üretir (yukarıdaki LOSO kopya oranı
+  ${(ml.structural.loso_dup[String(ml.data.seeds[2])].ratio*100).toFixed(1)}%&ndash;${(ml.structural.loso_dup[String(ml.data.seeds[1])].ratio*100).toFixed(1)}%
+  bunu doğrudan gösterir); örüntü sayısını gerçekten artırmak için <i>farklı seed
+  değil farklı senaryo</i> gerekir: çok-istemci (her istemci Shadow'da ayrı bir RNG
+  akışı alır → farklı yol seçimi/zamanlama → gerçekten farklı devreler), istemci
+  başına daha çok devre, veya farklı topoloji/zamanlama. Bu amaçla deney hattı
+  (<code>experiments/full_pipeline.sh</code>) çok-seed (<code>SEEDS=</code>) yanında
+  artık çok-istemci (<code>CLIENTS=</code>) parametresini de destekler; ek istemci
+  koşumları yalnız bu ML yolunu besler (non-circular native confusion Bölüm 4.16
+  birincil istemcide değişmeden kalır) ve <code>ml_features.csv</code> ile
+  <code>ml_baseline_results.json</code>'u uçtan uca yeniler. Bu koşumlar Shadow
+  gerektirir (bu ortamda çalışmaz; sentetik örnek eklenmemiştir — gelecek iş, bkz.
+  Bölüm 6.3). ML baseline,
   FSM'nin <i>yerine</i> değil bağımsız bir teyit olarak sunulmuştur.</li>
 </ul>
 

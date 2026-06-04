@@ -14,15 +14,30 @@
 #
 # Repo kokunden VM'de:  bash experiments/full_pipeline.sh
 # Seedleri degistir:    SEEDS="42 137 2718" bash experiments/full_pipeline.sh
+# Coklu-istemci (ML cesitliligi): CLIENTS=4 SEEDS="42 137 2718" bash experiments/full_pipeline.sh
+#
+# CLIENTS hakkinda (ONEMLI, durust kapsam):
+#   Deterministik veride yalniz YENI SEED eklemek cogunlukla birebir kopya
+#   ozellik vektoru uretir (LOSO dup ~%83-97). Gercek ornek-cesitliligi icin
+#   FARKLI SENARYO gerekir; en temiz kaldirac COKLU ISTEMCI'dir. CLIENTS>1
+#   iken her kosuya torclient2..N host'lari eklenir; her host Shadow'da AYRI bir
+#   RNG akisi alir (general.seed + host adi) -> farkli yol secimi/zamanlama ->
+#   gercekten farkli devreler (sentetik DEGIL; gercek Shadow kosusu uretir).
+#   Ek istemci loglari yalnizca ML yolunu (Bolum 4.17: export_features.mjs +
+#   ml_baseline.py) besler; non-circular native confusion (Bolum 4.16:
+#   detect_json/metrics) birincil 'torclient' (client1) uzerinde DEGISMEDEN
+#   kalir -> dogrulanmis 4.16 sonuclari tutarli kalsin diye.
 set -u
 
 TORSRC="${TORSRC:-$HOME/tor-0.4.6.10}"
 CB="$TORSRC/src/core/or/circuitbuild.c"
 CFT="${CFT:-/tmp/cf_test}"               # Shadow calisma dizini (gecici scratch)
 HARNESS="experiments/shadow_harness.mjs"
+MKCLIENTS="experiments/make_clients.py"  # coklu-istemci yaml uretici (CLIENTS>1)
 RUNS="experiments/runs"                   # KALICI cikti (repo disk)
 RESULTS="$RUNS/results.jsonl"
 SEEDS="${SEEDS:-42 137 2718}"
+CLIENTS="${CLIENTS:-1}"                   # ML cesitliligi icin istemci sayisi (>=1)
 ATTACKS="create_flood circuit_hijack premature_data"
 
 say() { printf '\n=== %s ===\n' "$1"; }
@@ -66,6 +81,10 @@ say "0) On kosullar"
 [ -f "$CB" ] || { echo "HATA: $CB yok (TORSRC dogru mu?)"; exit 1; }
 [ -f "$HARNESS" ] || { echo "HATA: $HARNESS yok (repo kokunden calistir)"; exit 1; }
 command -v python3 >/dev/null || { echo "HATA: python3 gerekli (seed icin)"; exit 1; }
+case "$CLIENTS" in ''|*[!0-9]*) echo "HATA: CLIENTS pozitif tam sayi olmali (su an: '$CLIENTS')"; exit 1;; esac
+[ "$CLIENTS" -ge 1 ] || { echo "HATA: CLIENTS >= 1 olmali"; exit 1; }
+[ "$CLIENTS" -eq 1 ] || [ -f "$MKCLIENTS" ] || { echo "HATA: CLIENTS>1 icin $MKCLIENTS gerekli"; exit 1; }
+[ "$CLIENTS" -gt 1 ] && echo "  CLIENTS=$CLIENTS -> her kosuya torclient2..torclient$CLIENTS eklenecek (yalniz ML yolu)"
 
 # Hangi saldirilarin hook'u kaynakta var?
 ACTIVE=""
@@ -114,6 +133,8 @@ for seed in $SEEDS; do
   ( cd "$CFT"
     # benign: tek kosu/seed (env yok)
     cp shadow_benign.yaml "shadow_seed.yaml"
+    # coklu-istemci: torclient2..N ekle (benign env {} korunur)
+    [ "$CLIENTS" -gt 1 ] && python3 "$REPO/$MKCLIENTS" "shadow_seed.yaml" "$CLIENTS"
   )
   set_seed "$CFT/shadow_seed.yaml" "$seed"
   ( cd "$CFT"
@@ -129,6 +150,9 @@ for seed in $SEEDS; do
     ev="$(env_of "$attack")"
     ( cd "$CFT"
       cp shadow_benign.yaml "shadow_$attack.yaml"
+      # coklu-istemci: torclient2..N ekle (env perl'inden ONCE; tum istemcilerin
+      # 'environment: {}' satiri ayni env-gate'e cevrilsin)
+      [ "$CLIENTS" -gt 1 ] && python3 "$REPO/$MKCLIENTS" "shadow_$attack.yaml" "$CLIENTS"
       perl -pi -e "s/environment: \\{\\}/environment: { $ev: \"1\" }/" "shadow_$attack.yaml"
     )
     set_seed "$CFT/shadow_$attack.yaml" "$seed"
@@ -165,6 +189,26 @@ say "5) Metrikler"
 echo "results.jsonl satir sayisi: $(wc -l < "$RESULTS")"
 node experiments/metrics.mjs "$RESULTS"
 
+# ---------------------------------------------------------------------------
+# 6) ML temel cizgisi (Bolum 4.17) — bu kosumdaki KALICI loglardan ucdan-uca
+#    yenile. Boylece yeni seed/senaryo eklenince ml_features.csv +
+#    ml_baseline_results.json otomatik guncellenir (manuel adim kalmaz).
+#    Sentetik veri URETILMEZ: export_features yalniz $RUNS altindaki gercek
+#    Shadow loglarini okur; bir seed'in logu yoksa o seed atlanir.
+say "6) ML temel cizgisi yenileme (export_features + ml_baseline)"
+if [ -f experiments/export_features.mjs ]; then
+  SEEDS="$SEEDS" node experiments/export_features.mjs || echo "  UYARI: export_features basarisiz"
+  if command -v python3 >/dev/null && [ -f experiments/ml_baseline.py ]; then
+    python3 experiments/ml_baseline.py || echo "  UYARI: ml_baseline.py basarisiz (pandas/sklearn kurulu mu?)"
+  else
+    echo "  ATLA: python3/ml_baseline.py yok -> ml_baseline_results.json guncellenmedi"
+  fi
+else
+  echo "  ATLA: export_features.mjs yok"
+fi
+
 say "BITTI"
-echo "Kalici loglar: $RUNS/<attack>/seed<seed>/  ve  $RUNS/_benign/seed<seed>/"
-echo "Ham sonuc:    $RESULTS"
+echo "Kalici loglar:   $RUNS/<attack>/seed<seed>/  ve  $RUNS/_benign/seed<seed>/"
+echo "Ham sonuc:       $RESULTS"
+echo "ML oznitelik:    experiments/ml_features.csv"
+echo "ML sonuc (4.17): experiments/ml_baseline_results.json"

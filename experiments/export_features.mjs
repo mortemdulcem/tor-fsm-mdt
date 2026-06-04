@@ -9,15 +9,27 @@
 // Replit'te); boylece ozellikler non-circular kalir (FSM ihlal etiketleri
 // kullanilmaz, yalnizca ham gozlemlenen transition davranisi).
 
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { parseTorHostLog } from "./shadow_harness.mjs";
 
 const SEEDS = (process.env.SEEDS || "42 137 2718").trim().split(/\s+/);
 const ATTACKS = ["create_flood", "circuit_hijack", "premature_data"];
 const RUNS = "experiments/runs";
 
-const logPath = (sub, seed) =>
-  `${RUNS}/${sub}/seed${seed}/hosts/torclient/tor.1000.stdout`;
+// Coklu-istemci destegi: tek bir kosuda torclient, torclient2, ... host'lari
+// olabilir (full_pipeline.sh CLIENTS>1). HER istemcinin logunu ayri okuruz ve
+// gid'i host adiyla onekleriz (torclient2:5) -> istemciler-arasi gid cakismasi
+// olmaz. Tek-istemci kosularda yalniz "torclient" bulunur (geriye uyumlu).
+const hostsDir = (sub, seed) => `${RUNS}/${sub}/seed${seed}/hosts`;
+const clientLogs = (sub, seed) => {
+  const dir = hostsDir(sub, seed);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((h) => /^torclient\d*$/.test(h))
+    .sort()
+    .map((h) => ({ host: h, file: `${dir}/${h}/tor.1000.stdout` }))
+    .filter((x) => existsSync(x.file));
+};
 
 const dataset = [];
 let shapeLogged = false;
@@ -33,37 +45,41 @@ function toCircuitList(circuits) {
   return [];
 }
 
-function add(scenario, attack, seed, file) {
-  if (!existsSync(file)) {
-    console.log(`  atla (log yok): ${file}`);
+function add(scenario, attack, seed, sub) {
+  const clients = clientLogs(sub, seed);
+  if (clients.length === 0) {
+    console.log(`  atla (log yok): ${hostsDir(sub, seed)}/torclient*/tor.1000.stdout`);
     return;
   }
-  const raw = parseTorHostLog(readFileSync(file, "utf8"), "torclient");
-  if (!shapeLogged) {
-    const ctor = raw && raw.constructor ? raw.constructor.name : typeof raw;
-    console.log(`  [parse sekli] ${ctor}; ust anahtarlar:`,
-      raw && typeof raw === "object" && !Array.isArray(raw) ? Object.keys(raw).slice(0, 10) : "(dizi/diger)");
-    shapeLogged = true;
-  }
-  // raw = { gid: <olay dizisi> }; gid'i KORU (devre kimligi).
-  const entries =
-    raw instanceof Map
-      ? Array.from(raw.entries())
-      : Array.isArray(raw)
-        ? raw.map((c, i) => [String(i), c])
-        : Object.entries(raw);
   let n = 0;
-  for (const [gid, circ] of entries) {
-    const events = toCircuitList(circ); // devre de dizi/nesne olabilir
-    dataset.push({ scenario, attack, seed: Number(seed), gid, events });
-    n++;
+  for (const { host, file } of clients) {
+    const raw = parseTorHostLog(readFileSync(file, "utf8"), host);
+    if (!shapeLogged) {
+      const ctor = raw && raw.constructor ? raw.constructor.name : typeof raw;
+      console.log(`  [parse sekli] ${ctor}; ust anahtarlar:`,
+        raw && typeof raw === "object" && !Array.isArray(raw) ? Object.keys(raw).slice(0, 10) : "(dizi/diger)");
+      shapeLogged = true;
+    }
+    // raw = { gid: <olay dizisi> }; gid'i KORU + host onekle (cakisma onleme).
+    const entries =
+      raw instanceof Map
+        ? Array.from(raw.entries())
+        : Array.isArray(raw)
+          ? raw.map((c, i) => [String(i), c])
+          : Object.entries(raw);
+    for (const [gid, circ] of entries) {
+      const events = toCircuitList(circ); // devre de dizi/nesne olabilir
+      dataset.push({ scenario, attack, seed: Number(seed), gid: `${host}:${gid}`, events });
+      n++;
+    }
   }
-  console.log(`  ${scenario}/${attack} seed=${seed}: ${n} devre`);
+  const hosts = clients.map((c) => c.host).join(",");
+  console.log(`  ${scenario}/${attack} seed=${seed}: ${n} devre (${clients.length} istemci: ${hosts})`);
 }
 
 for (const seed of SEEDS) {
-  add("benign", "benign", seed, logPath("_benign", seed));
-  for (const a of ATTACKS) add("attack", a, seed, logPath(a, seed));
+  add("benign", "benign", seed, "_benign");
+  for (const a of ATTACKS) add("attack", a, seed, a);
 }
 
 // --- olay-tipi alfabesi (tum devrelerin birlesimi) ---
