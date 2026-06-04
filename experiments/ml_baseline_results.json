@@ -1,6 +1,6 @@
 {
   "data": {
-    "n_circuits": 109,
+    "n_circuits": 433,
     "n_seeds": 3,
     "seeds": [
       42,
@@ -21,62 +21,62 @@
     ],
     "n_features": 10,
     "counts": {
-      "benign": 27,
-      "create_flood": 27,
-      "circuit_hijack": 28,
-      "premature_data": 27
+      "benign": 108,
+      "create_flood": 109,
+      "circuit_hijack": 108,
+      "premature_data": 108
     }
   },
   "structural": {
     "unique_per_class": {
       "circuit_hijack": 11,
-      "create_flood": 9,
-      "premature_data": 10,
-      "benign": 8
+      "create_flood": 18,
+      "premature_data": 12,
+      "benign": 11
     },
     "overlap": {
       "create_flood__circuit_hijack": {
-        "inter": 8,
-        "na": 9,
+        "inter": 9,
+        "na": 18,
         "nb": 11
       },
       "premature_data__benign": {
-        "inter": 2,
-        "na": 10,
-        "nb": 8
+        "inter": 3,
+        "na": 12,
+        "nb": 11
       },
       "create_flood__benign": {
         "inter": 0,
-        "na": 9,
-        "nb": 8
+        "na": 18,
+        "nb": 11
       },
       "circuit_hijack__benign": {
         "inter": 0,
         "na": 11,
-        "nb": 8
+        "nb": 11
       }
     },
     "loso_dup": {
       "42": {
-        "dup": 34,
-        "total": 36,
-        "ratio": 0.9444444444444444
+        "dup": 140,
+        "total": 144,
+        "ratio": 0.9722222222222222
       },
       "137": {
-        "dup": 36,
-        "total": 37,
-        "ratio": 0.972972972972973
+        "dup": 143,
+        "total": 145,
+        "ratio": 0.9862068965517241
       },
       "2718": {
-        "dup": 30,
-        "total": 36,
-        "ratio": 0.8333333333333334
+        "dup": 133,
+        "total": 144,
+        "ratio": 0.9236111111111112
       }
     },
     "dedup": {
-      "n_unique_vectors": 28,
-      "pure": 18,
-      "shared": 10
+      "n_unique_vectors": 40,
+      "pure": 28,
+      "shared": 12
     }
   },
   "supervised": {
@@ -90,55 +90,55 @@
         "sd": 0.0
       },
       "premature_data": {
-        "mean": 0.07407407407407407,
-        "sd": 0.05237828008789241
+        "mean": 0.10185185185185185,
+        "sd": 0.013094570021973102
       }
     },
     "precision": {
-      "mean": 1.0,
-      "sd": 0.0
+      "mean": 0.9957264957264957,
+      "sd": 0.0060436477024491024
     },
     "recall": {
-      "mean": 0.6948853615520282,
-      "sd": 0.020415938100159153
+      "mean": 0.7015233888322573,
+      "sd": 0.005127110873354679
     },
     "f1": {
-      "mean": 0.8198067632850242,
-      "sd": 0.01431452404833724
+      "mean": 0.8230961664779953,
+      "sd": 0.0026366989784206442
     }
   },
   "unsupervised": {
     "per_attack_recall": {
       "create_flood": {
-        "mean": 0.7777777777777777,
-        "sd": 0.09072184232530289
+        "mean": 0.7164664664664665,
+        "sd": 0.10391926013035052
       },
       "circuit_hijack": {
-        "mean": 0.7518518518518519,
-        "sd": 0.036664796061524715
+        "mean": 0.6944444444444443,
+        "sd": 0.06000685831859132
       },
       "premature_data": {
-        "mean": 1.0,
-        "sd": 0.0
+        "mean": 0.8240740740740741,
+        "sd": 0.026189140043946214
       }
     },
     "precision": {
-      "mean": 0.7498207885304659,
-      "sd": 0.01758830701990724
+      "mean": 0.8005256694462194,
+      "sd": 0.017797281339679272
     },
     "recall": {
-      "mean": 0.8421516754850087,
-      "sd": 0.04267567418893424
+      "mean": 0.7447615811530185,
+      "sd": 0.06268512018251018
     },
     "f1": {
-      "mean": 0.7931034482758621,
-      "sd": 0.028155054514749183
+      "mean": 0.7695073078736444,
+      "sd": 0.024086970740560154
     }
   },
   "multiclass": {
     "accuracy": {
-      "mean": 0.5415415415415415,
-      "sd": 0.01981880868190526
+      "mean": 0.6004948914431673,
+      "sd": 0.027442942001097835
     },
     "labels": [
       "benign",
@@ -148,28 +148,28 @@
     ],
     "confusion": [
       [
-        22,
+        91,
         0,
         0,
-        5
+        17
       ],
       [
         0,
-        19,
-        8,
+        65,
+        44,
         0
       ],
       [
         0,
-        18,
-        10,
+        57,
+        51,
         0
       ],
       [
-        19,
+        55,
         0,
         0,
-        8
+        53
       ]
     ]
   },
@@ -178,26 +178,26 @@
       "per_attack_recall": {
         "create_flood": 1.0,
         "circuit_hijack": 1.0,
-        "premature_data": 0.037037037037037035
+        "premature_data": 0.018518518518518517
       },
-      "precision": 0.9491525423728814,
-      "recall": 0.6829268292682927,
-      "f1": 0.7943262411347518
+      "precision": 0.9521739130434783,
+      "recall": 0.6738461538461539,
+      "f1": 0.7891891891891892
     },
     "unsupervised": {
       "per_attack_recall": {
-        "create_flood": 0.7407407407407407,
-        "circuit_hijack": 0.7857142857142857,
+        "create_flood": 0.5321100917431193,
+        "circuit_hijack": 0.49074074074074076,
         "premature_data": 1.0
       },
-      "precision": 0.71875,
-      "recall": 0.8414634146341463,
-      "f1": 0.7752808988764045
+      "precision": 0.7275747508305648,
+      "recall": 0.6738461538461539,
+      "f1": 0.6996805111821086
     },
     "multiclass": {
       "k_folds": 5,
-      "n_unique_vectors": 28,
-      "accuracy": 0.5504587155963303,
+      "n_unique_vectors": 40,
+      "accuracy": 0.48036951501154734,
       "labels": [
         "benign",
         "create_flood",
@@ -206,52 +206,56 @@
       ],
       "confusion": [
         [
-          20,
+          80,
           0,
           0,
-          7
+          28
         ],
         [
           0,
-          17,
-          10,
+          65,
+          44,
           0
         ],
         [
           0,
-          15,
-          13,
+          57,
+          51,
           0
         ],
         [
-          17,
+          96,
           0,
           0,
-          10
+          12
         ]
       ]
     }
   },
   "sequence_timing": {
-    "ngram_available": false,
+    "ngram_available": true,
     "timing_feats": [
-      "dur_ms"
+      "dur_ms",
+      "t_gap_mean",
+      "t_gap_max",
+      "t_gap_med",
+      "t_first_data_ms"
     ],
-    "seq_feat_count": 0,
+    "seq_feat_count": 19,
     "count_only": {
       "n_features": 10,
       "supervised": {
         "precision": {
-          "mean": 1.0,
-          "sd": 0.0
+          "mean": 0.9957264957264957,
+          "sd": 0.0060436477024491024
         },
         "recall": {
-          "mean": 0.6948853615520282,
-          "sd": 0.020415938100159153
+          "mean": 0.7015233888322573,
+          "sd": 0.005127110873354679
         },
         "f1": {
-          "mean": 0.8198067632850242,
-          "sd": 0.01431452404833724
+          "mean": 0.8230961664779953,
+          "sd": 0.0026366989784206442
         }
       },
       "per_attack_recall": {
@@ -264,39 +268,39 @@
           "sd": 0.0
         },
         "premature_data": {
-          "mean": 0.07407407407407407,
-          "sd": 0.05237828008789241
+          "mean": 0.10185185185185185,
+          "sd": 0.013094570021973102
         }
       },
       "multiclass_accuracy": {
-        "mean": 0.5415415415415415,
-        "sd": 0.01981880868190526
+        "mean": 0.6004948914431673,
+        "sd": 0.027442942001097835
       },
       "flood_hijack_confusion": {
-        "cf_correct": 19,
-        "cf_to_hj": 8,
-        "hj_correct": 10,
-        "hj_to_cf": 18
+        "cf_correct": 65,
+        "cf_to_hj": 44,
+        "hj_correct": 51,
+        "hj_to_cf": 57
       },
       "overlap": {
-        "create_flood__circuit_hijack": 8,
-        "premature_data__benign": 2
+        "create_flood__circuit_hijack": 9,
+        "premature_data__benign": 3
       }
     },
     "enhanced": {
-      "n_features": 11,
+      "n_features": 34,
       "supervised": {
         "precision": {
           "mean": 1.0,
           "sd": 0.0
         },
         "recall": {
-          "mean": 0.6948853615520282,
-          "sd": 0.020415938100159153
+          "mean": 0.8984596217012119,
+          "sd": 0.007572975168450579
         },
         "f1": {
-          "mean": 0.8198067632850242,
-          "sd": 0.01431452404833724
+          "mean": 0.9464975615498298,
+          "sd": 0.004204540940330934
         }
       },
       "per_attack_recall": {
@@ -309,34 +313,34 @@
           "sd": 0.0
         },
         "premature_data": {
-          "mean": 0.07407407407407407,
-          "sd": 0.05237828008789241
+          "mean": 0.6944444444444445,
+          "sd": 0.022680460581325734
         }
       },
       "multiclass_accuracy": {
-        "mean": 0.5510510510510511,
-        "sd": 0.04565404142796028
+        "mean": 0.9075989782886335,
+        "sd": 0.008867815655112955
       },
       "flood_hijack_confusion": {
-        "cf_correct": 11,
-        "cf_to_hj": 16,
-        "hj_correct": 21,
-        "hj_to_cf": 7
+        "cf_correct": 109,
+        "cf_to_hj": 0,
+        "hj_correct": 108,
+        "hj_to_cf": 0
       },
       "overlap": {
-        "create_flood__circuit_hijack": 6,
-        "premature_data__benign": 1
+        "create_flood__circuit_hijack": 0,
+        "premature_data__benign": 2
       }
     },
     "delta": {
       "per_attack_recall": {
         "create_flood": 0.0,
         "circuit_hijack": 0.0,
-        "premature_data": 0.0
+        "premature_data": 0.5925925925925927
       },
-      "multiclass_accuracy": 0.009509509509509573,
-      "flood_hijack_overlap": 2
+      "multiclass_accuracy": 0.3071040868454662,
+      "flood_hijack_overlap": 9
     },
-    "improved": false
+    "improved": true
   }
 }

@@ -98,8 +98,9 @@ baselines (p &lt; .001; Cohen's d ∈ [3.6, 15.4]). Contributions: (i) the first
 complete δ-matrix for the Tor circuit protocol, (ii) a programmatic classification of all
 105 invalid pairs into attack vectors with severity labels, (iii) a reference
 MDT implementation, and (iv) a numerically validated three-way baseline comparison.
-In addition, an independent (non-circular) machine-learning baseline — using only raw
-behavioural event counts, never the FSM violation label — converges, through a
+In addition, an independent (non-circular) machine-learning baseline — using raw
+behavioural event counts (and, as an extension, event n-grams and inter-event timing;
+Section 4.17d), never the FSM violation label — converges, through a
 cross-validation-independent structural-separability analysis, on the same three
 discrimination outcomes as the rule-based FSM (create_flood is cleanly separable,
 circuit_hijack is not type-level discriminative, premature_data is closest to benign),
@@ -212,7 +213,8 @@ sistematik literatür taraması (SLR, bkz. Bölüm 2) ile teyit edilmiştir.</p>
   0.2505 ± 0.0071 → 0.0320 ± 0.0052
   düşürürken recall = 1.0000 korunmuştur (bkz. Bölüm 4.16).</li>
   <li>FSM dedektöründen <b>bağımsız (non-circular) bir makine öğrenmesi temel
-  çizgisi</b>: yalnızca ham davranış sayımlarını (FSM ihlal etiketi olmadan)
+  çizgisi</b>: ham davranış özniteliklerini (sayımlar; uzatma olarak n-gram ve
+  olaylar-arası zamanlama, Bölüm 4.17d — FSM ihlal etiketi hiç kullanılmadan)
   kullanan ML, çapraz-doğrulamadan bağımsız yapısal ayrılabilirlik analiziyle
   kural-tabanlı FSM ile aynı üç ayrım sonucuna yakınsayarak bulguları bağımsızca
   teyit eder (bkz. Bölüm 4.17).</li>
@@ -1665,14 +1667,21 @@ Deney hattı çok-istemci koşumunu (<code>CLIENTS&gt;1</code>; her ek <code>tor
 host'u ayrı bir örnek) destekler ve bu genişleme bir <b>sağlamlık (robustness)
 kontrolü</b> olarak <code>CLIENTS=4</code> ile üç seed (42/137/2718) üzerinde
 başarıyla koşulmuştur (tüm süreçler <code>EXIT=0</code>; gerçek Shadow verisi).
-Ancak deterministik ortamda ek istemciler birincil istemciyle neredeyse <i>özdeş</i>
-devreler üretmiştir (istemciler arası native CREATE_FLOOD/CIRCUIT_HIJACK sayıları
-±0,000); dolayısıyla ortaya çıkan n = 12 örneklem <b>bağımsız değil yüksek
-korelasyonludur</b> (4 kopya × 3 seed). Bu nedenle birincil sonuçlar tek-istemci
-(n = 3) olarak korunur; çok-istemci yalnızca bir sağlamlık teyidi sayılır — yapısal
-ve ML bulguları tek-istemciyle birebir aynı kalmıştır (Bölüm 4.17). Çok-istemci
-örneklemini bağımsız tekrar gibi sunmak ve oradaki dar güven aralıklarını (±0,000)
-bir hassasiyet kanıtı saymak yanıltıcı olacağından bu yapılmaz. Çok-istemci koşumunda
+Ancak deterministik ortamda ek istemciler, <i>saldırı-confusion toplamları</i>
+açısından birincil istemciyle <b>özdeş</b> sonuç üretmiştir (istemciler arası native
+CREATE_FLOOD/CIRCUIT_HIJACK sayıları ±0,000); yani <b>bu bölümün native-confusion
+metriği için</b> ortaya çıkan n = 12 örneklem bağımsız değil yüksek korelasyonludur
+(4 kopya × 3 seed). Bu nedenle <b>native-confusion birincil sonuçları tek-istemci
+(n = 3) olarak korunur</b> ve çok-istemci bu metrik için yalnızca bir sağlamlık
+teyidi sayılır; bu örneklemi bağımsız tekrar gibi sunup dar güven aralıklarını
+(±0,000) bir hassasiyet kanıtı saymak yanıltıcı olacağından bu yapılmaz.
+Buna karşılık, <b>devre-başına öznitelik vektörü</b> seviyesinde istemciler
+özdeş değildir: deterministik Shadow'da her istemcinin ayrı RNG ofseti, benign
+devre kurulum ayrıntılarını (uzatma/yol-uzunluğu, olay sayıları) istemciden
+istemciye değiştirir; dolayısıyla çok-istemci koşumu sınıf başına <i>daha fazla
+eşsiz öznitelik vektörü</i> üretir. Bu ayrımın sonucu olarak, ML temel çizgisi
+(Bölüm 4.17) — native-confusion'dan farklı olarak — bu zengin çeşitlilikten
+yararlanmak için <b>çok-istemci veri setini birincil alır</b>. Çok-istemci koşumunda
 örnek-boyutu kuralı şudur: CREATE_FLOOD/CIRCUIT_HIJACK native ve PREMATURE_DATA
 <i>event-level</i> confusion <b>per-client</b> ölçülür (n = seed × istemci); buna
 karşılık PREMATURE_DATA <i>relay-side native</i> (zero-stream-id) sinyali
@@ -1692,32 +1701,36 @@ sayımlarıdır</i> (10 öznitelik: 9
 olay-tipi sayısı + toplam olay sayısı); <b>FSM ihlal etiketi öznitelik olarak
 kullanılmaz</b> &mdash; bu, modelin dedektörün çıktısını taklit etmesini önler
 (non-circular). Veri, Bölüm 4.15'teki 3 seed-deterministik Shadow
-koşumundan toplanan 109 devredir (benign 27,
-create_flood 27, circuit_hijack
-28, premature_data 27).
+koşumundan toplanan 433 devredir (benign 108,
+create_flood 109, circuit_hijack
+108, premature_data 108).
 Tüm sayılar <code>experiments/ml_baseline.py</code> çıktısından
 (<code>ml_baseline_results.json</code>) üretilmiştir; elle girilmemiştir.
-Bu tablo <b>birincil olarak tek-istemci (<code>CLIENTS=1</code>)</b> koşumundan
-raporlanır; çok-istemci (<code>CLIENTS=4</code>) koşumu yalnızca bir sağlamlık
-doğrulamasıdır ve birincil ML bulgularını değiştirmemiştir (bkz. Bölüm 4.16).</p>
+Bu bölüm <b>birincil olarak çok-istemci (<code>CLIENTS=4</code>)</b> koşumundan
+raporlanır (3 seed × 4 istemci = 433 devre):
+native-confusion metriğinden (Bölüm 4.16, tek-istemci birincil) farklı olarak, ML
+devre-başına öznitelik vektörüyle çalışır ve bu vektörler istemciden istemciye
+değiştiğinden çok-istemci koşumu sınıf başına daha fazla <i>eşsiz</i> öznitelik
+vektörü sağlar (ör. create_flood 18
+eşsiz vektör). Bu ayrımın gerekçesi Bölüm 4.16'da açıklanmıştır.</p>
 
 <p class="no-indent"><b>Metodolojik uyarı (önce okunmalı).</b> Veri deterministik
 olduğundan sınıf başına yalnızca az sayıda <i>eşsiz</i> öznitelik vektörü vardır
-(benign 8, create_flood
-9, circuit_hijack
+(benign 11, create_flood
+18, circuit_hijack
 11, premature_data
-10); gerisi seed'ler arası birebir
+12); gerisi seed'ler arası birebir
 kopyadır. Bu nedenle <b>seed-bazlı Leave-One-Seed-Out (LOSO) çapraz-doğrulama
 sızıntıyı önlemez</b>: foldlarda test vektörlerinin
-83.3%&ndash;97.3%
-kadarı (seed bazında: seed 42 34/36, seed 137 36/37, seed 2718 30/36)
+92.4%&ndash;98.6%
+kadarı (seed bazında: seed 42 140/144, seed 137 143/145, seed 2718 133/144)
 train kümesinde birebir bulunur. Dolayısıyla seed-bazlı CV metrikleri
 <i>iyimserdir</i> (dağıtım-içi/in-distribution) ve genelleme kanıtı olarak
 okunmamalıdır. Bu sızıntıyı tamamen kaldırmak için sonuçlar ayrıca, grubun
 <i>eşsiz öznitelik vektörü</i> olduğu <b>sızıntısız GroupKFold</b> ile yeniden
 hesaplanmış ve iyimser LOSO ile yan yana sunulmuştur (kısım (b), Tablo 4.17d);
-toplam 28 eşsiz vektörün
-18'i tek-sınıf, 10'u
+toplam 40 eşsiz vektörün
+28'i tek-sınıf, 12'u
 sınıflar-arası paylaşımlıdır. Bu sınırlamadan <b>bağımsız</b> asıl kanıt ise
 aşağıdaki yapısal ayrılabilirliktir.</p>
 
@@ -1729,9 +1742,9 @@ kullanılsın değişmeyen yapısal bir gerçektir (Tablo 4.17a).</p>
 <tr><th style="padding:3pt 8pt;border:1px solid #999;text-align:left;">Sınıf çifti</th>
 <th style="padding:3pt 8pt;border:1px solid #999;">Ortak eşsiz vektör</th></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">create_flood ∩ circuit_hijack</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;"><b>8</b> (|cf|=9, |ch|=11)</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;"><b>9</b> (|cf|=18, |ch|=11)</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">premature_data ∩ benign</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">2 (|pd|=10, |bn|=8)</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">3 (|pd|=12, |bn|=11)</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">create_flood ∩ benign</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;"><b>0</b></td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">circuit_hijack ∩ benign</td>
@@ -1739,14 +1752,14 @@ kullanılsın değişmeyen yapısal bir gerçektir (Tablo 4.17a).</p>
 </table>
 <p class="no-indent">Bu yapısal gerçekten üç sonuç çıkar: (1) create_flood ve
 circuit_hijack eşsiz vektörleri büyük ölçüde ortaktır
-(8/9
-ve 8/11);
+(9/18
+ve 9/11);
 ikisi de <code>SEND_CREATE=2</code> imzası taşıdığından sayım-seviyesinde ayırt
 edilemezler. Bu, FSM bulgusu <i>"CIRCUIT_HIJACK FSM-tip seviyesinde ayırt edici
 değildir"</i> ile birebir tutarlıdır. (2) create_flood ve circuit_hijack benign
 ile <b>hiç</b> ortak eşsiz vektör paylaşmaz (0); bu, denetimli modelin bu iki tipte
 recall = 1.0 vermesinin sızıntıdan bağımsız yapısal nedenidir. (3) premature benign
-ile 2 eşsiz vektör paylaşır,
+ile 3 eşsiz vektör paylaşır,
 benign'e en yakın ve en zor ayrılan sınıftır.</p>
 
 <p class="no-indent"><b>(b) Denetimli, denetimsiz ve çok-sınıflı sonuçlar (LOSO iyimser vs. sızıntısız).</b>
@@ -1760,39 +1773,39 @@ sızıntısız GroupKFold ile (grup = eşsiz öznitelik vektörü) yeniden hesap
 <th style="padding:3pt 8pt;border:1px solid #999;">Recall</th>
 <th style="padding:3pt 8pt;border:1px solid #999;">F1</th></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli LogReg (benign vs. saldırı)</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">1.000 ± 0.000</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.695 ± 0.020</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.820 ± 0.014</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.996 ± 0.006</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.702 ± 0.005</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.823 ± 0.003</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimsiz IsolationForest (yalnız benign'e fit)</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.750 ± 0.018</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.842 ± 0.043</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.793 ± 0.028</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.801 ± 0.018</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.745 ± 0.063</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.770 ± 0.024</td></tr>
 </table>
 <p class="no-indent">Denetimli modelde saldırı tipi bazında recall: create_flood
 1.000 ± 0.000, circuit_hijack
 1.000 ± 0.000, premature_data
-<b>0.074 ± 0.052</b>. create_flood ve
+<b>0.102 ± 0.013</b>. create_flood ve
 circuit_hijack kusursuz yakalanır (benign ile sıfır örtüşme); premature neredeyse
 hiç yakalanmaz çünkü çoğu devre sayım-seviyesinde benign'e benzer ve zayıf etiketle
 eğitilen model bunları benign tarafına atar (yanlış-negatif şişer). Bu, FSM
 tarafındaki <i>premature recall ≈ 0.47 kapsam kaybıyla aynı yöndedir</i>.
 Denetimsiz anomali modeli tersine premature'ı tam yakalar
-(1.000 ± 0.000; BUILDING sırasında fazladan
+(0.824 ± 0.026; BUILDING sırasında fazladan
 <code>SEND_RELAY_DATA</code> benign'e göre anomaliktir) ama create_flood/hijack'in
-bir kısmını kaçırır (0.778 ± 0.091 /
-0.752 ± 0.037). İki paradigma bir
+bir kısmını kaçırır (0.716 ± 0.104 /
+0.694 ± 0.060). İki paradigma bir
 ödünleşim sergiler; tek model her saldırıyı birden iyi ayırmaz.</p>
 <p class="no-indent">Çok-sınıflı LogReg ortalama doğruluğu
-<b>0.542 ± 0.020</b>'dir. Karışıklık matrisi (Tablo 4.17c) yapısal
+<b>0.600 ± 0.027</b>'dir. Karışıklık matrisi (Tablo 4.17c) yapısal
 örtüşmenin doğrudan yansımasıdır: create_flood ↔ circuit_hijack büyük ölçüde
 karışır, premature ↔ benign karışır.</p>
 <p class="no-indent"><b>Tablo 4.17c.</b> Çok-sınıflı karışıklık matrisi (satır = gerçek, sütun = tahmin; 3 fold toplamı).</p>
 <table style="border-collapse:collapse;font-size:9pt;margin:6pt 0;">
 <tr><th style="padding:3pt 8pt;border:1px solid #999;"></th><th style="padding:3pt 8pt;border:1px solid #999;">benign</th><th style="padding:3pt 8pt;border:1px solid #999;">create_flood</th><th style="padding:3pt 8pt;border:1px solid #999;">circuit_hijack</th><th style="padding:3pt 8pt;border:1px solid #999;">premature_data</th></tr>
-<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>benign</b></td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;background:#eef;font-weight:bold;">22</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">5</td></tr>
-<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>create_flood</b></td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;background:#eef;font-weight:bold;">19</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">8</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td></tr>
-<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>circuit_hijack</b></td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">18</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;background:#eef;font-weight:bold;">10</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td></tr>
-<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>premature_data</b></td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">19</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;background:#eef;font-weight:bold;">8</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>benign</b></td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;background:#eef;font-weight:bold;">91</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">17</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>create_flood</b></td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;background:#eef;font-weight:bold;">65</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">44</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>circuit_hijack</b></td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">57</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;background:#eef;font-weight:bold;">51</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>premature_data</b></td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">55</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0</td><td style="padding:3pt 8pt;border:1px solid #999;text-align:center;background:#eef;font-weight:bold;">53</td></tr>
 </table>
 
 <p class="no-indent"><b>Sızıntısız değerlendirme (GroupKFold).</b> Yukarıdaki LOSO
@@ -1801,7 +1814,7 @@ iyimserdir. Sızıntıyı tamamen kaldırmak için aynı modeller, grubun <i>eş
 öznitelik vektörü</i> olduğu 5-katlı GroupKFold ile
 yeniden değerlendirilmiştir: aynı vektör (seed kopyaları dâhil) train ve test'e
 <b>birlikte düşemez</b>, böylece kopya-sızıntısı sıfıra iner (kod içi doğrulama:
-0/109 test vektörü train'de). Tahminler fold-dışı (out-of-fold)
+0/433 test vektörü train'de). Tahminler fold-dışı (out-of-fold)
 havuzlanıp metrikler tek bir sızıntısız bölme üzerinden hesaplanır. Tablo 4.17d
 iki değerlendirmeyi yan yana verir.</p>
 <p class="no-indent"><b>Tablo 4.17d.</b> İyimser LOSO vs. sızıntısız GroupKFold (grup = eşsiz öznitelik vektörü, K = 5).</p>
@@ -1810,20 +1823,20 @@ iki değerlendirmeyi yan yana verir.</p>
 <th style="padding:3pt 8pt;border:1px solid #999;">LOSO (iyimser)</th>
 <th style="padding:3pt 8pt;border:1px solid #999;">Sızıntısız (GroupKFold)</th></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — Precision</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">1.000</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.949</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.996</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.952</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — Recall</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.695</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.683</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.702</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.674</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — F1</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.820</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.794</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.823</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.789</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimsiz — F1</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.793</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.775</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.770</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.700</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Çok-sınıflı — Accuracy</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.542</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.550</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.600</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.480</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli recall — create_flood</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">1.000</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">1.000</td></tr>
@@ -1831,8 +1844,8 @@ iki değerlendirmeyi yan yana verir.</p>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">1.000</td>
 <td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">1.000</td></tr>
 <tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli recall — premature_data</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.074</td>
-<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.037</td></tr>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.102</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">0.019</td></tr>
 </table>
 <p class="no-indent">Karşılaştırmanın yorumu: sızıntı kaldırıldığında <b>tablo
 çökmiyor</b>. Denetimli model create_flood ve circuit_hijack'i sızıntısız bölmede
@@ -1840,15 +1853,15 @@ de kusursuz yakalar (recall 1.000
 / 1.000); bu, ayrımın
 ezberden değil gerçek bir öznitelik sinyalinden (<code>SEND_CREATE=2</code>) geldiğini
 gösterir — çünkü model, hiç görmediği eşsiz vektörleri bile bu sayım üzerinden doğru
-sınıflar. Buna karşılık precision 1.000'ten
-0.949'e <i>düşer</i> (bazı benign devreler artık
+sınıflar. Buna karşılık precision 0.996'ten
+0.952'e <i>düşer</i> (bazı benign devreler artık
 yanlış-pozitif olur): sızıntı kaldırılınca kaybolan tek şey, train'deki birebir benign
 kopyalarının yarattığı yapay mükemmel precision'dır. premature recall sızıntısız bölmede
-de düşük kalır (0.074 &rarr;
-0.037); zayıf-etiketli ve
+de düşük kalır (0.102 &rarr;
+0.019); zayıf-etiketli ve
 benign'e en yakın sınıf olduğundan ne LOSO ne de sızıntısız değerlendirme onu kurtarır.
-Çok-sınıflı doğruluk neredeyse değişmez (0.542 &rarr;
-0.550). Özetle <b>sızıntı, ayrılabilirlik
+Çok-sınıflı doğruluk neredeyse değişmez (0.600 &rarr;
+0.480). Özetle <b>sızıntı, ayrılabilirlik
 sonuçlarının niteliğini değiştirmez</b>; yalnızca precision'daki iyimser şişmeyi açıklar.
 Bu, yapısal ayrılabilirlik bulgusunu (kısım (a)) bağımsız bir değerlendirme şemasıyla
 doğrular.</p>
@@ -1880,25 +1893,38 @@ sınırlar (Tablo 4.17c). Bu öznitelikler <code>experiments/export_features.mjs
 ham olay dizilerinden çıkarılır (bigram <code>bg_*</code>; olaylar-arası gecikme
 ortalama/medyan/maks <code>t_*</code>; ilk veri hücresine kadar geçen süre ve veri
 öncesi tamamlanan kurulum olayı sayısı), aynı LOSO protokolüyle sayım-only modelle
-karşılaştırılır. Tüm değerler <code>ml_baseline_results.json</code>'dan üretilmiştir.</p><p class="no-indent"><b>Dürüst sınırlılık.</b> Bu derlemede kullanılan
-commit'li öznitelik tablosu yalnızca <i>sayım-seviyesi</i> sütunları ve gerçek toplam
-süre (<code>dur_ms</code>) içerir; n-gram (<code>bg_*</code>) ve olaylar-arası gecikme
-(<code>t_*</code>) sütunları, ham Shadow olay dizilerini barındıran VM'de
-<code>export_features.mjs</code> ile CSV yeniden üretildiğinde devreye girer (kod hazırdır).
-Mevcut veriyle test edilebilen tek zamanlama özniteliği <code>dur_ms</code>'tir ve onu
-eklemek saldırı-tipi recall'unu değiştirmemiştir: create_flood
-1.000 ± 0.000 → 1.000 ± 0.000,
-circuit_hijack 1.000 ± 0.000 →
-1.000 ± 0.000, premature_data
-0.074 ± 0.052 → 0.074 ± 0.052;
-çok-sınıflı doğruluk 0.542 ± 0.020 → 0.551 ± 0.046
-(Δ +0.010, SD içinde). Yapısal eşsiz-vektör örtüşmesi
-(create_flood ∩ circuit_hijack) 8 →
-6 düşmüştür; ancak bu düşüş büyük ölçüde
-<code>dur_ms</code>'nin sürekli/gürültülü olmasından kaynaklanır (her devre vektörünü
-neredeyse eşsizleştirir) ve gerçek sınıf-ayrımı sayılmaz. <b>Sonuç:</b> mevcut
-veriyle <i>ayrım hâlâ sınırlıdır</i>; n-gram ve olaylar-arası gecikme özniteliklerinin
-asıl katkısı, VM'de yeniden üretilen tam öznitelik tablosuyla raporlanacaktır.</p>
+karşılaştırılır. Tüm değerler <code>ml_baseline_results.json</code>'dan üretilmiştir.</p><p class="no-indent">5 zamanlama özniteliği ve
+19 sıra (n-gram/sıra) sütunu eklenmiştir (toplam
+10 → 34 öznitelik). Saldırı-tipi recall (sayım-only →
+genişletilmiş): create_flood 1.000 ± 0.000 →
+1.000 ± 0.000, circuit_hijack
+1.000 ± 0.000 → 1.000 ± 0.000
+(Δ +0.000), premature_data
+0.102 ± 0.013 → 0.694 ± 0.023
+(Δ +0.593); çok-sınıflı doğruluk
+0.600 ± 0.027 → 0.908 ± 0.009
+(Δ +0.307). create_flood ↔ circuit_hijack karışması
+(doğru/karışan): sayım-only cf=65/hj-karışan
+44, hj=51/cf-karışan
+57; genişletilmiş cf=109/0,
+hj=108/0.
+Yapısal eşsiz-vektör örtüşmesi create_flood ∩ circuit_hijack
+9 → 0,
+premature_data ∩ benign 3 →
+2. <b>Sonuç:</b> Sıra/zamanlama öznitelikleri <b>ayrımı iyileştirmiştir</b>.</p>
+<p class="no-indent"><b>Dürüstlük çıpası.</b> Yukarıdaki recall/doğruluk değerleri (d)
+aynı <b>LOSO</b> protokolüyle hesaplandığından dağıtım-içi (iyimser) okunmalıdır;
+genişletilmiş öznitelikler için ayrı bir sızıntısız (GroupKFold) değerlendirme bu
+koşumda üretilmemiştir. İyileşmenin <b>çapraz-doğrulamadan bağımsız (leak-free)</b>
+kısmı, yapısal eşsiz-vektör örtüşmesinin <code>create_flood ∩ circuit_hijack</code>
+9 → 0
+düşmesidir: sıra/zamanlama eklenince bu iki sınıfın eşsiz vektörleri <i>ayrık</i> hâle
+gelir; bu, hangi CV kullanılırsa kullanılsın değişmez ve karışıklığın
+(44/57 → 0/0)
+gerçek bir sinyalden geldiğini gösterir. Buna karşılık premature_data benign ile hâlâ
+2 eşsiz vektör paylaşır; recall artışı
+(0.102 ± 0.013 → 0.694 ± 0.023)
+kısmidir ve bu sınıf tam olarak çözülmüş değildir.</p>
 
 <div class="pagebreak"></div>
 
@@ -2070,43 +2096,48 @@ tamamlanabilir.</p>
   ortalama 107× hızlanma
   ölçülmüştür. Tam Tor C/Rust relay portu hâlâ kapsam dışıdır.</li>
   <li><b>ML temel çizgisi küçük-n + deterministik veri (Bölüm 4.17).</b> ML baseline
-  109 devre ve 3 seed üzerinde kurulmuştur; sınıf
-  başına yalnızca 8&ndash;11
+  433 devre ve 3 seed üzerinde kurulmuştur; sınıf
+  başına yalnızca 11&ndash;18
   eşsiz öznitelik vektörü vardır. Seed-bazlı LOSO çapraz-doğrulama sızıntıyı önlemez
-  (test vektörlerinin 83.3%&ndash;97.3%
+  (test vektörlerinin 92.4%&ndash;98.6%
   kadarı train'de birebir bulunur); bu nedenle CV metrikleri <i>dağıtım-içi/iyimserdir</i>,
   genelleme tahmini değildir. Bu sızıntı, grubun eşsiz öznitelik vektörü olduğu
   <b>sızıntısız GroupKFold</b> ile giderilmiş ve metrikler iyimser LOSO ile yan yana
-  raporlanmıştır (Tablo 4.17d; kopya-sızıntısı 0/109 olarak doğrulandı).
+  raporlanmıştır (Tablo 4.17d; kopya-sızıntısı 0/433 olarak doğrulandı).
   Sonuç: ayrılabilirlik sonuçları nitelik olarak değişmez (create_flood/circuit_hijack
   recall sızıntısız bölmede de 1.000;
-  precision 1.000&rarr;0.949
+  precision 0.996&rarr;0.952
   düşerek yalnız iyimser şişme açığa çıkar; çok-sınıflı doğruluk
-  0.542&rarr;0.550).
+  0.600&rarr;0.480).
   Asıl güvenilir kanıt yine CV'den bağımsız yapısal ayrılabilirliktir. Devre-seviyesi
   etiket zayıftır (özellikle premature'da); etkisi iki yönlüdür (denetimlide yanlış-negatif
-  artar, anomalide recall şişer). Öznitelikler yalnız sayım-seviyesindedir; sıra/zamanlama
-  (n-gram, olaylar-arası gecikme) modellenmemiştir. <b>Eşsiz örüntü çeşitliliğini
-  artırmanın doğru yolu yeni seed değil yeni senaryodur.</b> Veri deterministik
-  olduğundan aynı topolojide yalnızca yeni seed eklemek çoğunlukla birebir kopya
-  öznitelik vektörü üretir (yukarıdaki LOSO kopya oranı
-  83.3%&ndash;97.3%
-  bunu doğrudan gösterir); örüntü sayısını gerçekten artırmak için <i>farklı seed
-  değil farklı senaryo</i> gerekir: çok-istemci (her istemci Shadow'da ayrı bir RNG
-  akışı alır → farklı yol seçimi/zamanlama → gerçekten farklı devreler), istemci
-  başına daha çok devre, veya farklı topoloji/zamanlama. Bu amaçla deney hattı
-  (<code>experiments/full_pipeline.sh</code>) çok-seed (<code>SEEDS=</code>) yanında
-  artık çok-istemci (<code>CLIENTS=</code>) parametresini de destekler; ek istemci
-  koşumları yalnız bu ML yolunu besler (non-circular native confusion Bölüm 4.16
-  birincil istemcide değişmeden kalır) ve <code>ml_features.csv</code> ile
-  <code>ml_baseline_results.json</code>'u uçtan uca yeniler. Bu çok-istemci koşumu
-  bu çalışmada bir sağlamlık kontrolü olarak yürütülmüştür (<code>CLIENTS=4</code> ×
-  3 seed; Bölüm 4.16), ancak deterministik ortamda istemciler birbirine ~özdeş
-  devreler ürettiğinden eklenen çeşitlilik sınırlı kalmış ve bulguları
-  değiştirmemiştir; gerçek örüntü çeşitliliği için farklı topoloji/zamanlama
+  artar, anomalide recall şişer). Sayım-seviyesi özniteliklere ek olarak <b>sıra
+  (n-gram) ve olaylar-arası zamanlama</b> öznitelikleri de modellenmiştir
+  (Bölüm 4.17d): eklenmeleri create_flood ↔ circuit_hijack eşsiz-vektör örtüşmesini
+  9→0
+  indirir (CV'den bağımsız yapısal kanıt); ancak premature hâlâ benign'e en yakın
+  sınıftır ve tam ayrılmaz, ayrıca genişletilmiş öznitelikler için ayrı bir sızıntısız
+  değerlendirme bu koşumda üretilmemiştir (değerler LOSO-iyimser). <b>Eşsiz örüntü
+  çeşitliliğini artırmanın doğru yolu yeni seed değil yeni senaryodur.</b> Veri
+  deterministik olduğundan aynı topolojide yalnızca yeni seed eklemek çoğunlukla
+  birebir kopya öznitelik vektörü üretir (yukarıdaki LOSO kopya oranı
+  92.4%&ndash;98.6%
+  bunu doğrudan gösterir). Bu nedenle bu çalışma, çeşitliliği artıran bir senaryo
+  olarak <b>çok-istemci</b> koşumunu (<code>CLIENTS=4</code> × 3 seed,
+  433 devre) ML temel çizgisinin <b>birincil veri seti</b> olarak
+  kullanır: her istemci Shadow'da ayrı bir RNG akışı aldığından benign devre
+  kurulumları (yol/uzatma) istemciden istemciye değişir ve sınıf başına eşsiz vektör
+  sayısını artırır (ör. create_flood 18
+  eşsiz vektör). Buna karşılık <i>saldırı-confusion toplamları</i> istemciler arası
+  özdeştir (±0,000); bu yüzden non-circular native confusion (Bölüm 4.16) tek-istemci
+  birincil kalır ve çok-istemci'den etkilenmez. Deney hattı
+  (<code>experiments/full_pipeline.sh</code>) çok-seed (<code>SEEDS=</code>) ve
+  çok-istemci (<code>CLIENTS=</code>) parametrelerini destekler;
+  <code>ml_features.csv</code> ve <code>ml_baseline_results.json</code> bu koşumdan
+  uçtan uca üretilir. Daha fazla örüntü çeşitliliği için farklı topoloji/zamanlama
   gerekir (Shadow'a bağlıdır, bu ortamda çalışmaz; sentetik örnek eklenmemiştir —
-  gelecek iş, bkz. Bölüm 6.3). ML baseline,
-  FSM'nin <i>yerine</i> değil bağımsız bir teyit olarak sunulmuştur.</li>
+  gelecek iş, bkz. Bölüm 6.3). ML baseline, FSM'nin <i>yerine</i> değil bağımsız bir
+  teyit olarak sunulmuştur.</li>
 </ul>
 
 <h3>6.3 Gelecek Çalışmalar</h3>

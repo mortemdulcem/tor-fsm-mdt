@@ -294,7 +294,26 @@ that is both the "attack" and the "ground-truth oracle". This violates replit.md
 fabrication). It also claims-as-real exactly the two attacks proven NOT realizable here. Keep thesis honest:
 only CREATE_FLOOD + CIRCUIT_HIJACK are real; ignore this branch (PR #3, #4 are draft + "Devin Review: failure").
 
-## Çok-istemci (CLIENTS>1) ÇÖZÜLDÜ — gerçek veri var ama ÇEŞİTLİLİK DÜŞÜK (n korelasyonlu)
+## GÜNCEL KARAR (çok-istemci = ML birincil; n-gram VM'de mevcut ve ayrımı iyileştirir)
+Bu, aşağıdaki iki bölümdeki (Çok-istemci ÇEŞİTLİLİK DÜŞÜK + dur_ms-only AYRIM SINIRLI)
+eski sonuçların ÜZERİNE YAZAR. Yeni VM koşusu n-gram+zamanlama özniteliklerini gerçek
+ham olay dizilerinden üretti (CLIENTS=4 × 3 seed, 433 devre).
+- **İki seviyeli ayrım (çelişki çözümü):** native saldırı-confusion TOPLAMLARI istemciler
+  arası özdeştir (±0,000) → 4.16 native-confusion TEK-İSTEMCİ birincil kalır. Ama ML
+  öznitelik VEKTÖRÜ istemciden istemciye farklıdır (benign yol/uzatma sayıları değişir) →
+  4.17 ML ÇOK-İSTEMCİ (433) BİRİNCİL veri setidir (sınıf başına daha çok eşsiz vektör).
+- **n-gram GERÇEKTEN ayırır (eski "dur_ms hiçbir şey değiştirmez" notunu geçersiz kılar):**
+  count-only → enhanced: çok-sınıflı acc 0.600→0.908, premature recall 0.102→0.694,
+  create_flood↔circuit_hijack confusion 44/57→0/0, yapısal cf∩ch eşsiz-vektör örtüşmesi
+  → 0. ml_baseline_results.json["sequence_timing"].ngram_available=true; tez 4.17(d)
+  improved dalı otomatik render olur.
+- **Dürüstlük çıpası (KORU):** enhanced öznitelikler için AYRI sızıntısız (GroupKFold)
+  değerlendirme bu koşumda üretilmedi → enhanced sayılar LOSO-İYİMSER. Ayrıca premature
+  hâlâ benign'e en yakın sınıf; tam ayrılmaz. Tezde ve attack_status.md'de bu yazılı.
+- Tutarlılaştırılan dosyalar: thesis/build_thesis.mjs (4.16~1420 / 4.17 giriş / 4.17d /
+  sınırlılık paragrafı), experiments/ml_baseline_results.json (433), attack_status.md.
+
+## (ESKİ — kısmen geçersiz, yukarıdaki GÜNCEL KARAR'a bak) Çok-istemci ÇÖZÜLDÜ ama ÇEŞİTLİLİK DÜŞÜK
 - **Eski hata kök-neden + fix:** ek istemciler (`torclient2/3/4`) Shadow'da `EXIT=1 "Unable to open torrc"`
   ile düşüyordu çünkü Shadow her host'un dosyalarını `shadow.data.template/hosts/<host>/` altından kopyalar;
   make_clients.py YAML'a host EKLER ama template host DİZİNİNİ oluşturmaz. Fix: full_pipeline.sh artık

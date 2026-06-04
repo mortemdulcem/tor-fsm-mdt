@@ -292,8 +292,9 @@ baselines (p &lt; .001; Cohen's d ∈ [3.6, 15.4]). Contributions: (i) the first
 complete δ-matrix for the Tor circuit protocol, (ii) a programmatic classification of all
 ${totalInvalid} invalid pairs into attack vectors with severity labels, (iii) a reference
 MDT implementation, and (iv) a numerically validated three-way baseline comparison.
-In addition, an independent (non-circular) machine-learning baseline — using only raw
-behavioural event counts, never the FSM violation label — converges, through a
+In addition, an independent (non-circular) machine-learning baseline — using raw
+behavioural event counts (and, as an extension, event n-grams and inter-event timing;
+Section 4.17d), never the FSM violation label — converges, through a
 cross-validation-independent structural-separability analysis, on the same three
 discrimination outcomes as the rule-based FSM (create_flood is cleanly separable,
 circuit_hijack is not type-level discriminative, premature_data is closest to benign),
@@ -406,7 +407,8 @@ sistematik literatür taraması (SLR, bkz. Bölüm 2) ile teyit edilmiştir.</p>
   ${f4(fourCell.cells.v1_2hop.benign.fpr)} → ${f4(fourCell.cells.v1_3hop.benign.fpr)}
   düşürürken recall = 1.0000 korunmuştur (bkz. Bölüm 4.16).</li>
   <li>FSM dedektöründen <b>bağımsız (non-circular) bir makine öğrenmesi temel
-  çizgisi</b>: yalnızca ham davranış sayımlarını (FSM ihlal etiketi olmadan)
+  çizgisi</b>: ham davranış özniteliklerini (sayımlar; uzatma olarak n-gram ve
+  olaylar-arası zamanlama, Bölüm 4.17d — FSM ihlal etiketi hiç kullanılmadan)
   kullanan ML, çapraz-doğrulamadan bağımsız yapısal ayrılabilirlik analiziyle
   kural-tabanlı FSM ile aynı üç ayrım sonucuna yakınsayarak bulguları bağımsızca
   teyit eder (bkz. Bölüm 4.17).</li>
@@ -1414,14 +1416,21 @@ Deney hattı çok-istemci koşumunu (<code>CLIENTS&gt;1</code>; her ek <code>tor
 host'u ayrı bir örnek) destekler ve bu genişleme bir <b>sağlamlık (robustness)
 kontrolü</b> olarak <code>CLIENTS=4</code> ile üç seed (42/137/2718) üzerinde
 başarıyla koşulmuştur (tüm süreçler <code>EXIT=0</code>; gerçek Shadow verisi).
-Ancak deterministik ortamda ek istemciler birincil istemciyle neredeyse <i>özdeş</i>
-devreler üretmiştir (istemciler arası native CREATE_FLOOD/CIRCUIT_HIJACK sayıları
-±0,000); dolayısıyla ortaya çıkan n = 12 örneklem <b>bağımsız değil yüksek
-korelasyonludur</b> (4 kopya × 3 seed). Bu nedenle birincil sonuçlar tek-istemci
-(n = 3) olarak korunur; çok-istemci yalnızca bir sağlamlık teyidi sayılır — yapısal
-ve ML bulguları tek-istemciyle birebir aynı kalmıştır (Bölüm 4.17). Çok-istemci
-örneklemini bağımsız tekrar gibi sunmak ve oradaki dar güven aralıklarını (±0,000)
-bir hassasiyet kanıtı saymak yanıltıcı olacağından bu yapılmaz. Çok-istemci koşumunda
+Ancak deterministik ortamda ek istemciler, <i>saldırı-confusion toplamları</i>
+açısından birincil istemciyle <b>özdeş</b> sonuç üretmiştir (istemciler arası native
+CREATE_FLOOD/CIRCUIT_HIJACK sayıları ±0,000); yani <b>bu bölümün native-confusion
+metriği için</b> ortaya çıkan n = 12 örneklem bağımsız değil yüksek korelasyonludur
+(4 kopya × 3 seed). Bu nedenle <b>native-confusion birincil sonuçları tek-istemci
+(n = 3) olarak korunur</b> ve çok-istemci bu metrik için yalnızca bir sağlamlık
+teyidi sayılır; bu örneklemi bağımsız tekrar gibi sunup dar güven aralıklarını
+(±0,000) bir hassasiyet kanıtı saymak yanıltıcı olacağından bu yapılmaz.
+Buna karşılık, <b>devre-başına öznitelik vektörü</b> seviyesinde istemciler
+özdeş değildir: deterministik Shadow'da her istemcinin ayrı RNG ofseti, benign
+devre kurulum ayrıntılarını (uzatma/yol-uzunluğu, olay sayıları) istemciden
+istemciye değiştirir; dolayısıyla çok-istemci koşumu sınıf başına <i>daha fazla
+eşsiz öznitelik vektörü</i> üretir. Bu ayrımın sonucu olarak, ML temel çizgisi
+(Bölüm 4.17) — native-confusion'dan farklı olarak — bu zengin çeşitlilikten
+yararlanmak için <b>çok-istemci veri setini birincil alır</b>. Çok-istemci koşumunda
 örnek-boyutu kuralı şudur: CREATE_FLOOD/CIRCUIT_HIJACK native ve PREMATURE_DATA
 <i>event-level</i> confusion <b>per-client</b> ölçülür (n = seed × istemci); buna
 karşılık PREMATURE_DATA <i>relay-side native</i> (zero-stream-id) sinyali
@@ -1446,9 +1455,13 @@ create_flood ${ml.data.counts.create_flood}, circuit_hijack
 ${ml.data.counts.circuit_hijack}, premature_data ${ml.data.counts.premature_data}).
 Tüm sayılar <code>experiments/ml_baseline.py</code> çıktısından
 (<code>ml_baseline_results.json</code>) üretilmiştir; elle girilmemiştir.
-Bu tablo <b>birincil olarak tek-istemci (<code>CLIENTS=1</code>)</b> koşumundan
-raporlanır; çok-istemci (<code>CLIENTS=4</code>) koşumu yalnızca bir sağlamlık
-doğrulamasıdır ve birincil ML bulgularını değiştirmemiştir (bkz. Bölüm 4.16).</p>
+Bu bölüm <b>birincil olarak çok-istemci (<code>CLIENTS=4</code>)</b> koşumundan
+raporlanır (${ml.data.n_seeds} seed × 4 istemci = ${ml.data.n_circuits} devre):
+native-confusion metriğinden (Bölüm 4.16, tek-istemci birincil) farklı olarak, ML
+devre-başına öznitelik vektörüyle çalışır ve bu vektörler istemciden istemciye
+değiştiğinden çok-istemci koşumu sınıf başına daha fazla <i>eşsiz</i> öznitelik
+vektörü sağlar (ör. create_flood ${ml.structural.unique_per_class.create_flood}
+eşsiz vektör). Bu ayrımın gerekçesi Bölüm 4.16'da açıklanmıştır.</p>
 
 <p class="no-indent"><b>Metodolojik uyarı (önce okunmalı).</b> Veri deterministik
 olduğundan sınıf başına yalnızca az sayıda <i>eşsiz</i> öznitelik vektörü vardır
@@ -1677,7 +1690,20 @@ hj=${en.flood_hijack_confusion.hj_correct}/${en.flood_hijack_confusion.hj_to_cf}
 Yapısal eşsiz-vektör örtüşmesi create_flood ∩ circuit_hijack
 ${co.overlap.create_flood__circuit_hijack} → ${en.overlap.create_flood__circuit_hijack},
 premature_data ∩ benign ${co.overlap.premature_data__benign} →
-${en.overlap.premature_data__benign}. <b>Sonuç:</b> ${verdict}.</p>`;
+${en.overlap.premature_data__benign}. <b>Sonuç:</b> ${verdict}.</p>
+<p class="no-indent"><b>Dürüstlük çıpası.</b> Yukarıdaki recall/doğruluk değerleri (d)
+aynı <b>LOSO</b> protokolüyle hesaplandığından dağıtım-içi (iyimser) okunmalıdır;
+genişletilmiş öznitelikler için ayrı bir sızıntısız (GroupKFold) değerlendirme bu
+koşumda üretilmemiştir. İyileşmenin <b>çapraz-doğrulamadan bağımsız (leak-free)</b>
+kısmı, yapısal eşsiz-vektör örtüşmesinin <code>create_flood ∩ circuit_hijack</code>
+${co.overlap.create_flood__circuit_hijack} → ${en.overlap.create_flood__circuit_hijack}
+düşmesidir: sıra/zamanlama eklenince bu iki sınıfın eşsiz vektörleri <i>ayrık</i> hâle
+gelir; bu, hangi CV kullanılırsa kullanılsın değişmez ve karışıklığın
+(${co.flood_hijack_confusion.cf_to_hj}/${co.flood_hijack_confusion.hj_to_cf} → 0/0)
+gerçek bir sinyalden geldiğini gösterir. Buna karşılık premature_data benign ile hâlâ
+${en.overlap.premature_data__benign} eşsiz vektör paylaşır; recall artışı
+(${r(co.per_attack_recall.premature_data)} → ${r(en.per_attack_recall.premature_data)})
+kısmidir ve bu sınıf tam olarak çözülmüş değildir.</p>`;
 })()}
 
 <div class="pagebreak"></div>
@@ -1844,7 +1870,7 @@ tamamlanabilir.</p>
   ölçülmüştür. Tam Tor C/Rust relay portu hâlâ kapsam dışıdır.</li>
   <li><b>ML temel çizgisi küçük-n + deterministik veri (Bölüm 4.17).</b> ML baseline
   ${ml.data.n_circuits} devre ve ${ml.data.n_seeds} seed üzerinde kurulmuştur; sınıf
-  başına yalnızca ${ml.structural.unique_per_class.benign}&ndash;${ml.structural.unique_per_class.circuit_hijack}
+  başına yalnızca ${Math.min(...Object.values(ml.structural.unique_per_class))}&ndash;${Math.max(...Object.values(ml.structural.unique_per_class))}
   eşsiz öznitelik vektörü vardır. Seed-bazlı LOSO çapraz-doğrulama sızıntıyı önlemez
   (test vektörlerinin ${(ml.structural.loso_dup[String(ml.data.seeds[2])].ratio*100).toFixed(1)}%&ndash;${(ml.structural.loso_dup[String(ml.data.seeds[1])].ratio*100).toFixed(1)}%
   kadarı train'de birebir bulunur); bu nedenle CV metrikleri <i>dağıtım-içi/iyimserdir</i>,
@@ -1858,28 +1884,33 @@ tamamlanabilir.</p>
   ${ml.multiclass.accuracy.mean.toFixed(3)}&rarr;${fmt(ml.leakfree.multiclass.accuracy)}).
   Asıl güvenilir kanıt yine CV'den bağımsız yapısal ayrılabilirliktir. Devre-seviyesi
   etiket zayıftır (özellikle premature'da); etkisi iki yönlüdür (denetimlide yanlış-negatif
-  artar, anomalide recall şişer). Öznitelikler yalnız sayım-seviyesindedir; sıra/zamanlama
-  (n-gram, olaylar-arası gecikme) modellenmemiştir. <b>Eşsiz örüntü çeşitliliğini
-  artırmanın doğru yolu yeni seed değil yeni senaryodur.</b> Veri deterministik
-  olduğundan aynı topolojide yalnızca yeni seed eklemek çoğunlukla birebir kopya
-  öznitelik vektörü üretir (yukarıdaki LOSO kopya oranı
+  artar, anomalide recall şişer). Sayım-seviyesi özniteliklere ek olarak <b>sıra
+  (n-gram) ve olaylar-arası zamanlama</b> öznitelikleri de modellenmiştir
+  (Bölüm 4.17d): eklenmeleri create_flood ↔ circuit_hijack eşsiz-vektör örtüşmesini
+  ${ml.sequence_timing.count_only.overlap.create_flood__circuit_hijack}→${ml.sequence_timing.enhanced.overlap.create_flood__circuit_hijack}
+  indirir (CV'den bağımsız yapısal kanıt); ancak premature hâlâ benign'e en yakın
+  sınıftır ve tam ayrılmaz, ayrıca genişletilmiş öznitelikler için ayrı bir sızıntısız
+  değerlendirme bu koşumda üretilmemiştir (değerler LOSO-iyimser). <b>Eşsiz örüntü
+  çeşitliliğini artırmanın doğru yolu yeni seed değil yeni senaryodur.</b> Veri
+  deterministik olduğundan aynı topolojide yalnızca yeni seed eklemek çoğunlukla
+  birebir kopya öznitelik vektörü üretir (yukarıdaki LOSO kopya oranı
   ${(ml.structural.loso_dup[String(ml.data.seeds[2])].ratio*100).toFixed(1)}%&ndash;${(ml.structural.loso_dup[String(ml.data.seeds[1])].ratio*100).toFixed(1)}%
-  bunu doğrudan gösterir); örüntü sayısını gerçekten artırmak için <i>farklı seed
-  değil farklı senaryo</i> gerekir: çok-istemci (her istemci Shadow'da ayrı bir RNG
-  akışı alır → farklı yol seçimi/zamanlama → gerçekten farklı devreler), istemci
-  başına daha çok devre, veya farklı topoloji/zamanlama. Bu amaçla deney hattı
-  (<code>experiments/full_pipeline.sh</code>) çok-seed (<code>SEEDS=</code>) yanında
-  artık çok-istemci (<code>CLIENTS=</code>) parametresini de destekler; ek istemci
-  koşumları yalnız bu ML yolunu besler (non-circular native confusion Bölüm 4.16
-  birincil istemcide değişmeden kalır) ve <code>ml_features.csv</code> ile
-  <code>ml_baseline_results.json</code>'u uçtan uca yeniler. Bu çok-istemci koşumu
-  bu çalışmada bir sağlamlık kontrolü olarak yürütülmüştür (<code>CLIENTS=4</code> ×
-  3 seed; Bölüm 4.16), ancak deterministik ortamda istemciler birbirine ~özdeş
-  devreler ürettiğinden eklenen çeşitlilik sınırlı kalmış ve bulguları
-  değiştirmemiştir; gerçek örüntü çeşitliliği için farklı topoloji/zamanlama
+  bunu doğrudan gösterir). Bu nedenle bu çalışma, çeşitliliği artıran bir senaryo
+  olarak <b>çok-istemci</b> koşumunu (<code>CLIENTS=4</code> × ${ml.data.n_seeds} seed,
+  ${ml.data.n_circuits} devre) ML temel çizgisinin <b>birincil veri seti</b> olarak
+  kullanır: her istemci Shadow'da ayrı bir RNG akışı aldığından benign devre
+  kurulumları (yol/uzatma) istemciden istemciye değişir ve sınıf başına eşsiz vektör
+  sayısını artırır (ör. create_flood ${ml.structural.unique_per_class.create_flood}
+  eşsiz vektör). Buna karşılık <i>saldırı-confusion toplamları</i> istemciler arası
+  özdeştir (±0,000); bu yüzden non-circular native confusion (Bölüm 4.16) tek-istemci
+  birincil kalır ve çok-istemci'den etkilenmez. Deney hattı
+  (<code>experiments/full_pipeline.sh</code>) çok-seed (<code>SEEDS=</code>) ve
+  çok-istemci (<code>CLIENTS=</code>) parametrelerini destekler;
+  <code>ml_features.csv</code> ve <code>ml_baseline_results.json</code> bu koşumdan
+  uçtan uca üretilir. Daha fazla örüntü çeşitliliği için farklı topoloji/zamanlama
   gerekir (Shadow'a bağlıdır, bu ortamda çalışmaz; sentetik örnek eklenmemiştir —
-  gelecek iş, bkz. Bölüm 6.3). ML baseline,
-  FSM'nin <i>yerine</i> değil bağımsız bir teyit olarak sunulmuştur.</li>
+  gelecek iş, bkz. Bölüm 6.3). ML baseline, FSM'nin <i>yerine</i> değil bağımsız bir
+  teyit olarak sunulmuştur.</li>
 </ul>
 
 <h3>6.3 Gelecek Çalışmalar</h3>

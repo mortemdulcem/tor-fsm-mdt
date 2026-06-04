@@ -59,14 +59,19 @@ confusion'a (bu bölüm) istemci ayrı örnek boyutu olarak katılabilir.
   host ekler ama template host dizinini oluşturmazdı. `full_pipeline.sh` artık
   CLIENTS>1 iken bu dizini idempotent kopyalar → düzeltildi.
 - Düzeltme sonrası `CLIENTS=4`, seed 42/137/2718 koşusu **başarılıdır** (tüm süreçler
-  `EXIT=0`; gerçek Shadow verisi; `results.jsonl`=72 satır). Ancak deterministik
-  ortamda ek istemciler birincil istemciyle neredeyse **özdeş** devreler üretti
-  (native CREATE_FLOOD/CIRCUIT_HIJACK istemciler arası ±0,000). Yani `n=12` örneklem
-  **bağımsız değil yüksek korelasyonludur** (4 kopya × 3 seed).
-- **Bu nedenle birincil sayılar tek-istemci (n=3) kalır**; çok-istemci yalnızca bir
-  sağlamlık teyididir (yapısal ve ML bulguları tek-istemciyle birebir aynı çıktı).
-  `n=12`'yi bağımsız tekrar gibi sunmak ve ±0,000 dar aralığı hassasiyet kanıtı
-  saymak yanıltıcı olacağından yapılmaz (uydurma/yanıltıcı sunum yasak).
+  `EXIT=0`; gerçek Shadow verisi). İki seviye ayrılır:
+  - **Native-confusion (bu bölüm) — istemciler arası özdeş:** ek istemciler
+    birincil istemciyle aynı saldırı-confusion toplamlarını üretti (native
+    CREATE_FLOOD/CIRCUIT_HIJACK istemciler arası ±0,000). Yani bu metrik için `n=12`
+    örneklem **bağımsız değil yüksek korelasyonludur** (4 kopya × 3 seed).
+  - **ML öznitelik vektörü (4.17) — istemciler arası FARKLI:** devre-başına olay
+    sayıları (benign yol/uzatma) istemciden istemciye değişir; çok-istemci sınıf
+    başına daha fazla *eşsiz* vektör verir (ör. create_flood tek-istemci ~8 → çok-istemci 18).
+- **Bu nedenle native-confusion birincil sayıları tek-istemci (n=3) kalır** (çok-istemci
+  bu metrik için yalnızca sağlamlık teyididir; `n=12`'yi bağımsız tekrar gibi sunmak ve
+  ±0,000 dar aralığı hassasiyet kanıtı saymak yanıltıcı olacağından yapılmaz).
+  **ML temel çizgisi (4.17) ise çok-istemci veri setini (CLIENTS=4 × 3 seed, 433 devre)
+  birincil alır**, çünkü orada çeşitlilik gerçekten artar (yukarıdaki ayrım).
 
 **Örnek-boyutu kuralı (çok-istemci için, koşum yapıldığında geçerli olacak):**
 - `create_flood` / `circuit_hijack` native + tip-temiz confusion: **per-client**
