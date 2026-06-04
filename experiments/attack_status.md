@@ -34,12 +34,42 @@ korunmalıdır — üç saldırı "eşit derecede non-circular" diye sunulmamal�
 | CIRCUIT_BYPASS | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
 | HANDSHAKE_SKIP | **Gerçekleştirilemez** | — | — | Yapısal engel (aşağıda) |
 
-## Çoklu-seed sonuçları (n=3, seed 42/137/2718)
+## Çoklu-seed sonuçları (tek-istemci, CLIENTS=1; n=3, seed 42/137/2718)
 Sayılar VM'de Shadow koşulduktan sonra kayıtlı loglardan `experiments/recompute.sh`
 ile `experiments/runs/results.jsonl`'a yazılır ve `experiments/metrics.mjs` ile
 toplanır (ort ± SD; n=3 olduğu için t-tabanlı %95 GA geniştir). Örnek birimi ve
 ground-truth her saldırıda farklı olduğundan rapor **üç-modludur** — tek bir ortak
 confusion matrisi uydurmak yerine her saldırı kendi geçerli ölçüsüyle raporlanır.
+
+**Aşağıdaki tüm sayılar tek-istemci (`CLIENTS=1`) koşumundan gelir** (kanonik
+9-host topoloji, tek `torclient`). Örnek boyutu = seed sayısı (n=3).
+
+### Çok-istemci (CLIENTS>1) durumu — dürüst kapsam
+Deney hattı (`full_pipeline.sh` / `recompute.sh` + `detect_json.mjs --client` +
+`metrics.mjs` `byAttack[attack][seed][client][scenario]`) çok-istemci koşumunu
+**destekler**: her `torclient*` host'u ayrı bir örnek satırı olur ve örnek boyutu
+seed×istemci'ye çıkar. Bu yol öncelikle 4.17 ML çeşitliliği içindir; native
+confusion'a (bu bölüm) istemci ayrı örnek boyutu olarak katılabilir.
+
+Ancak **çok-istemci için gerçek (valid) Shadow verisi henüz üretilmemiştir**:
+- Shadow yalnızca VM'de çalışır (Replit ortamı koşamaz; bkz. Çerçeve).
+- Kayıtlı `CLIENTS=4` topoloji denemesinde ek istemciler (`torclient2/3/4`) Shadow'da
+  `Normal(1)` / `StoppedByShadow` ile düştü; geçerli per-client log üretmedi.
+  Topoloji düzeltilip temiz bir VM koşumu yapılana kadar çok-istemci sayıları
+  **raporlanmaz** (uydurma veri yasak).
+- Dolayısıyla bu bölümün native confusion sayıları tek-istemci kalır; çok-istemci
+  genişlemesi gelecek iştir (geçerli VM koşumu + `metrics.mjs` çıktısı bekler).
+
+**Örnek-boyutu kuralı (çok-istemci için, koşum yapıldığında geçerli olacak):**
+- `create_flood` / `circuit_hijack` native + tip-temiz confusion: **per-client**
+  ölçülür (her istemcinin kendi organik CREATE logu) → örnek boyutu **n = seed×istemci**.
+- `premature_data` event-level confusion (TP=injected, FP=noise, precision/recall):
+  **per-client** → örnek boyutu **n = seed×istemci**.
+- `premature_data` relay-side **native** (zero-stream-id) sinyali **KOŞUM-SEVİYESİDİR**
+  (ilk hop relay'inin logu; tek istemciye atfedilemez) → örnek boyutu **n = seed**
+  (koşum başına bir kez; `metrics.mjs` ek istemci satırlarına `native=null` yazıp
+  toplamada atlar, GA suni daralmaz). Bu run-level / event-level ayrımı tezde açıkça
+  korunmalıdır.
 
 ### Estimand haritası (tezde tutarsızlık eleştirisini önlemek için)
 Her saldırının ölçtüğü nicelik (estimand) farklıdır; aşağıdaki tablo bunu açıkça sabitler.
@@ -61,6 +91,10 @@ Her saldırının ölçtüğü nicelik (estimand) farklıdır; aşağıdaki tabl
   (precision = saldırı koşusunda enjekte/(enjekte+noise); recall = enjekte/gönderilen marker)
 - benign begin-noise FPR (noise/circuits) = **0.481±0.064**
 - non-circular native (relay zero-stream-id): attack=12.0±0 vs benign=0 → ortüşme yok (**en güçlü kanıt**)
+  - **Örnek-boyutu (önemli):** event-level confusion (TP/FP/precision/recall) per-client'tır
+    (çok-istemci'de n=seed×istemci); relay-side native ise **koşum-seviyesidir** (n=seed),
+    çünkü zero-stream-id logunu ilk hop relay'i yazar, tek istemciye atfedilemez. Tek-istemci
+    (CLIENTS=1) bu koşumda ikisi de n=3 verir; ayrım yalnız CLIENTS>1'de görünür hale gelir.
 - Recall<1 nedeni: parser, gönderilen 12 marker'ın yalnızca 5/5/7'sini injected
   PREMATURE_DATA olarak etiketler (parser kapsam sınırı). Bu ölçülen bir değerdir,
   uydurma değil; tezde "tespit kapsamı sınırı" olarak raporlanır.

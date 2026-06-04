@@ -1405,6 +1405,23 @@ tetikleme değil; bkz. Bölüm 6.2.1(B) ve 6.3.3). Dolayısıyla bu tablo, tespi
 mantığının <i>doğruluğunu</i> ve düzeltmenin <i>etkisini</i> gösterir; gerçek
 ağda gözlemlenmiş saldırı tabanlı bir saha çalışması iddiası taşımaz.</p>
 
+<p class="no-indent"><b>Örnek boyutu ve çok-istemci kapsamı.</b> Bu bölümün ve
+eşlik eden non-circular native confusion sonuçlarının (CREATE_FLOOD tip-temiz,
+PREMATURE_DATA event-level, CIRCUIT_HIJACK native; ayrıntı için Ek B /
+<code>experiments/attack_status.md</code>) tamamı <i>tek-istemci</i>
+(<code>CLIENTS=1</code>) koşumundan gelir; örnek boyutu seed sayısıdır (n = 3).
+Deney hattı çok-istemci koşumu (<code>CLIENTS&gt;1</code>; her ek <code>torclient*</code>
+host'u ayrı bir örnek) desteklese de, bu genişleme için <i>geçerli</i> bir Shadow
+verisi henüz üretilmemiştir (kayıtlı <code>CLIENTS=4</code> denemesinde ek istemciler
+düştü; bu ortam Shadow çalıştıramaz) — bu yüzden çok-istemci sayıları
+<b>raporlanmaz</b> (gelecek iş, bkz. Bölüm 6.3). Çok-istemci koşumu yapıldığında
+örnek-boyutu kuralı şudur: CREATE_FLOOD/CIRCUIT_HIJACK native ve PREMATURE_DATA
+<i>event-level</i> confusion <b>per-client</b> ölçülür (n = seed × istemci); buna
+karşılık PREMATURE_DATA <i>relay-side native</i> (zero-stream-id) sinyali
+<b>koşum-seviyesidir</b> (ilk hop relay'inin logu, tek istemciye atfedilemez →
+n = seed). Bu run-level / event-level ayrımı, çok-istemci'de güven aralıklarının
+suni daralmasını önlemek için korunur.</p>
+
 <div class="pagebreak"></div>
 
 <!-- ====================== BÖLÜM 4.17 — ML Temel Çizgisi (non-circular) ====================== -->

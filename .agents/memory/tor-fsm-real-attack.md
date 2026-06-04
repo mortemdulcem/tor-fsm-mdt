@@ -294,6 +294,17 @@ that is both the "attack" and the "ground-truth oracle". This violates replit.md
 fabrication). It also claims-as-real exactly the two attacks proven NOT realizable here. Keep thesis honest:
 only CREATE_FLOOD + CIRCUIT_HIJACK are real; ignore this branch (PR #3, #4 are draft + "Devin Review: failure").
 
+## Çok-istemci (CLIENTS>1) native confusion — veri YOK, sayı raporlanmaz
+- Pipeline çok-istemci'yi DESTEKLER (detect_json `--client`, metrics `byAttack[attack][seed][client][scenario]`),
+  ama **geçerli çok-istemci Shadow verisi üretilmedi**: kayıtlı `CLIENTS=4` denemesinde ek istemciler
+  (`torclient2/3/4`) Shadow'da `Normal(1)`/`StoppedByShadow` ile düştü (attached_assets devin logu, ~28 May 2026).
+  Replit Shadow çalıştıramaz. **Ders:** 4.16 native confusion sayıları tek-istemci (CLIENTS=1, n=3 seed) kalır;
+  çok-istemci sayısı uydurma yasak → "raporlanmaz, gelecek iş" diye yazılır.
+- **Run-level vs event-level örnek-boyutu kuralı (çok-istemci yapıldığında):** create_flood/circuit_hijack native +
+  premature event-level confusion = **per-client** (n=seed×istemci). Ama premature relay-side **native** (zero-stream-id)
+  ilk hop relay logudur → **KOŞUM-SEVİYESİ** (n=seed); recompute.sh ek istemci satırlarına `native=null` yazar,
+  metrics.mjs `pushNat` null'ları atlar (GA suni daralmaz). Bu ayrım attack_status.md + thesis 4.16'da belgelendi.
+
 ## ML baseline — deterministik veride dürüst değerlendirme dersi
 Shadow verisi deterministik: sınıf başına yalnız 8-11 eşsiz öznitelik vektörü, gerisi seed
 kopyası. **Ders:** seed-bazlı LOSO bu veride sızıntıyı ÖNLEMEZ (test vektörünün %83-97'si
