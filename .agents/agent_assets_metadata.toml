@@ -66,3 +66,9 @@ id = "it0dDfRxi12jkWcr0MLdL"
 uri = "file://thesis/Tor_FSM_Calisma.docx"
 type = "word_document"
 title = "Tor FSM Çalışması — Tam Metin (Template uyumlu, 8 bölüm)"
+
+[[outputs]]
+id = "YJatD6lHqaKsxQ1hTMvEL"
+uri = "file://attached_assets/v1_revised.docx"
+type = "word_document"
+title = "v1 (revize) — Tablo 7 düzeltildi"
