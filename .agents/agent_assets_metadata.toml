@@ -72,3 +72,9 @@ id = "YJatD6lHqaKsxQ1hTMvEL"
 uri = "file://attached_assets/v1_revised.docx"
 type = "word_document"
 title = "v2 — ORCID + e-posta tamamlandı"
+
+[[outputs]]
+id = "pU9B3nMUkPcperEEBf25A"
+uri = "file://attached_assets/Hocaya_Revizyon_Cevabi.docx"
+type = "word_document"
+title = "Hocaya revizyon cevabı (Word)"
