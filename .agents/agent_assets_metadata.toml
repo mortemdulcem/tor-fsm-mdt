@@ -78,3 +78,9 @@ id = "pU9B3nMUkPcperEEBf25A"
 uri = "file://attached_assets/Hocaya_Revizyon_Cevabi.docx"
 type = "word_document"
 title = "Hocaya revizyon cevabı (Word)"
+
+[[outputs]]
+id = "gsbfejm-_XfnRqdg68oFN"
+uri = "file://attached_assets/v1_final_with_appendices.docx"
+type = "word_document"
+title = "Sizin görselli sürüm + Appendix B ve C"
