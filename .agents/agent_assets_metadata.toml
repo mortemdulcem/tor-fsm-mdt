@@ -84,3 +84,9 @@ id = "gsbfejm-_XfnRqdg68oFN"
 uri = "file://attached_assets/v1_final_with_appendices.docx"
 type = "word_document"
 title = "Sizin görselli sürüm + Appendix B ve C"
+
+[[outputs]]
+id = "cJCLSKLkGZYJWqOlfrSs1"
+uri = "file://attached_assets/v1_final_formatted.docx"
+type = "word_document"
+title = "Son sürüm — biçim ve tutarlılık düzeltmeleri"
