@@ -120,6 +120,10 @@ export function classifyInvalid(
       return { type: "HANDSHAKE_SKIP", severity: "HIGH",
         description: "CREATE attempted before TLS_OK" };
     }
+    if (state === "TLS_HANDSHAKE" && event === "RECV_CREATED") {
+      return { type: "CIRCUIT_HIJACK", severity: "LOW",
+        description: "CREATED received without a corresponding CREATE — unsolicited/forged response" };
+    }
     if (state === "CIRCUIT_BUILDING" || state === "CIRCUIT_READY" || state === "TRANSMITTING") {
       return { type: "CIRCUIT_HIJACK", severity: "CRITICAL",
         description: `CREATE on an active circuit (${state}) — hijack signature` };
