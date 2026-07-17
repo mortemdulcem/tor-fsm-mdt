@@ -90,3 +90,9 @@ id = "cJCLSKLkGZYJWqOlfrSs1"
 uri = "file://attached_assets/v1_final_formatted.docx"
 type = "word_document"
 title = "Son sürüm — bold/italik düzeltmeleri dahil"
+
+[[outputs]]
+id = "zqPJ4e7TlqoNTn93KceoA"
+uri = "file://attached_assets/v3_hoca_revizyonlari.docx"
+type = "word_document"
+title = "v3 — Hoca revizyonları uygulanmış makale"
