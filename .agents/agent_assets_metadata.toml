@@ -96,3 +96,9 @@ id = "zqPJ4e7TlqoNTn93KceoA"
 uri = "file://attached_assets/v3_hoca_revizyonlari.docx"
 type = "word_document"
 title = "v3 — Kaynakça yeniden numaralandırılmış son sürüm"
+
+[[outputs]]
+id = "Njm3XNUm9gxQC6FoXpEn0"
+uri = "file://attached_assets/v4_hoca_revizyonlari.docx"
+type = "word_document"
+title = "v4 - Hoca yorumları cevaplanmış + Bölüm 4.1/Figure 6 düzenlemeleri"
