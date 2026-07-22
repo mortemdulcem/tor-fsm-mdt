@@ -1,9 +1,15 @@
 # Saldırı Tiplerinin Gerçeklik Durumu (FSM-MDT)
 
 Bu tablo, FSM dedektörünün ürettiği 7 saldırı sınıfının her birinin tez kapsamında
-**gerçek** (modifiye Tor'da gerçek protokol ihlali, Shadow'da koşulmuş, non-circular
-sinyalle doğrulanmış), **sentetik** (yalnızca model/harness içi üretilmiş) ya da
-**yapısal olarak gerçekleştirilemez** olduğunu açıkça etiketler.
+**gerçek** (modifiye Tor'da gerçek protokol ihlali, Shadow *veya* Chutney multi-node
+ağında koşulmuş, non-circular sinyalle doğrulanmış), **sentetik** (yalnızca model/harness
+içi üretilmiş) ya da **yapısal olarak gerçekleştirilemez** olduğunu açıkça etiketler.
+
+**Ortam ayrımı (dürüstlük):** Üç saldırı (CREATE_FLOOD, CIRCUIT_HIJACK, PREMATURE_DATA)
+**Shadow** ağ simülatöründe doğrulandı. Dördüncü saldırı (REPLAY_ATTACK) **Chutney
+multi-node** ağında (gerçek Tor süreçleri, gerçek TLS/localhost) doğrulandı. Her ikisi de
+modifiye Tor 0.4.6.10 ikilisini gerçek çalıştırır; fark koşum ortamıdır ve tabloda/metinde
+açıkça korunur (tek bir "hepsi Shadow" iddiası yapılmaz).
 
 ## Çerçeve (tezde aynen kullanılmalı)
 Gerçek saldırılar, **modifiye edilmiş Tor 0.4.6.10 ikilisinde, ortam değişkeniyle
@@ -29,7 +35,7 @@ korunmalıdır — üç saldırı "eşit derecede non-circular" diye sunulmamal�
 | CREATE_FLOOD | **Gerçek** | `TOR_FSM_ATTACK_CREATE_FLOOD` | Tor'un kendi `circuit_send_first_onion_skin(): First hop: finished sending CREATE cell` satırı bir devre için **iki kez** çıkar (iki gerçek CREATE hücresi) | tip-temiz: P=R=F1=1.0, FPR=0; native 18→9 (ortüşme yok) |
 | CIRCUIT_HIJACK | **Gerçek (saldırı)**, ama FSM-tip dedektörü *ayırt edici değil* | `TOR_FSM_ATTACK_CIRCUIT_HIJACK` | İlk hop OPEN + devre BUILDING iken **fazladan** organik CREATE log satırı (`circuit_finish_handshake(): Finished building...` sonrası SEND_CREATE) | native 18/20/18→9 (ortüşme yok); **FSM-tip benign tabanı=12 → dedektör begin-noise ile confounded** |
 | PREMATURE_DATA | **Gerçek** | `TOR_FSM_ATTACK_PREMATURE_DATA` | İlk hop relay'inin **kendi** protokol-ihlali logu: `handle_relay_cell_command(): Relay data cell with zero stream_id. Dropping.` (relay.c) | native 12→0 (ortüşme yok); event-level P≈0.50/R≈0.47/F1≈0.48; begin-noise FPR≈0.48 |
-| REPLAY_ATTACK | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
+| REPLAY_ATTACK | **Gerçek** (non-circular, Chutney) | `TOR_FSM_ATTACK_REPLAY` | Guard relay'in **kendi** FSM kontrolü: duplicate EXTEND2 gelince `circuit_extend_state_valid_helper()` (`circuitbuild_relay.c:68`) `n_chan already set. Bug/attack. Closing.` basar — saldırganın marker'ından bağımsız | Chutney (n=3: 42/137/2718): REPLAY_ORGANIC attack=19/19/19 vs benign=0 (ortüşme yok) |
 | GHOST_CIRCUIT | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
 | CIRCUIT_BYPASS | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
 | HANDSHAKE_SKIP | **Gerçekleştirilemez** | — | — | Yapısal engel (aşağıda) |
@@ -186,7 +192,32 @@ RELAY_COMMAND_DATA, ..., circ->cpath)` çağrısıyla **gerçek bir erken DATA h
   üretir. Bu **gerçek erken-veri değil, dedektör yanlış-pozitifidir** ve tezde ayrı
   raporlanır (bkz. `metrics.mjs` "begin-noise FPR").
 
-### REPLAY_ATTACK / GHOST_CIRCUIT / CIRCUIT_BYPASS — Sentetik
+### REPLAY_ATTACK — Gerçek (non-circular, Chutney multi-node)
+Modifiye Tor, env açıkken (`TOR_FSM_ATTACK_REPLAY`) bir RELAY hücresini
+`circuit_package_relay_cell()` yoluyla **bir kez daha** enjekte eder (gerçek duplicate
+hücre; recursive re-entry'den kaçınmak için `relay.c` içinde ayrı `replay_cell`).
+- **Asıl kanıt (non-circular):** duplicate hücre bir EXTEND2 (relay_command=14) olduğunda,
+  guard relay ilk EXTEND2 ile devreyi `n_chan` ile genişletmiştir; ikinci (duplicate)
+  EXTEND2 gelince guard'ın **kendi** `circuit_extend_state_valid_helper()`
+  (`src/feature/relay/circuitbuild_relay.c:68`) fonksiyonu
+  `n_chan already set. Bug/attack. Closing.` basar. Bu satır saldırganın `relay.c`'deki
+  marker'ından **bağımsızdır** (relay saldırganın logunu okumaz, kendi FSM durumunu kontrol
+  eder) → `attack_status.md` çerçevesinde **(a) bağımsız-bileşen oracle** (en güçlü kanıt
+  sınıfı; PREMATURE_DATA'nın relay-native zero-stream-id sinyaliyle aynı güçte).
+- **Ölçüm:** Chutney multi-node ağ (000a–003a auth+relay, 004r exit, 005c client,
+  guard=test001a). n=3 seed (42/137/2718): REPLAY_ORGANIC attack=19/19/19 vs benign=0/0/0
+  → ortüşme yok. Benign=0'ın nedeni tautoloji değil; env kapalıyken duplicate EXTEND2 hiç
+  gönderilmediği için relay bu organik satırı üretmez (PREMATURE native 12→0 ile aynı mantık).
+- **Circularity uyarısı (referans kolonu):** aynı koşuda saldırının kendi yazdığı
+  `[FSM-REPLAY]` client-side marker'ı da sayılır (REPLAY, attack≈21 vs benign=0) ama bu
+  **döngüseldir** (saldırı kodu hem yazar hem sayar) → baş sonuç DEĞİLDİR, yalnızca referans.
+  Baş sonuç guard relay'in native `n_chan already set` logudur.
+- **Ortam notu:** bu tek saldırı **Chutney**'de koşuldu (diğer üçü Shadow). İkisi de gerçek
+  Tor binary'sini çalıştırır; tezde ortam farkı açıkça belirtilir.
+- **Framing:** modifiye Tor'da env-gated, varsayılan iyi-huylu gerçek protokol ihlali —
+  stok istemcinin/uzak saldırganın bunu ürettiği iddia edilmez.
+
+### GHOST_CIRCUIT / CIRCUIT_BYPASS — Sentetik
 Bunlar yalnızca model/harness içi enjeksiyonla üretilir; gerçek Tor davranışıyla
 non-circular bir sinyale bağlanmamıştır. Tezde **sentetik / spec-türevli** olarak
 etiketlenmelidir. (Devin AI `feature/attack-scenarios` dalı bunları "gerçek" diye
@@ -202,6 +233,8 @@ oluşmadan log SATIRINI UYDURMADAN üretilemez (uydurma yasak). Bu, FSM'nin mode
 savunmanın ta kendisidir ve **negatif sonuç** olarak raporlanır.
 
 ## Dürüst kapsam
-Bu çalışma S6'nın tamamını gerçek yapmaz: yalnızca üç tip (CREATE_FLOOD,
-CIRCUIT_HIJACK, PREMATURE_DATA) gerçek+doğrulanmıştır; üçü sentetik, biri
-gerçekleştirilemezdir. Tezde bu ayrım her tablo/şekilde korunmalıdır.
+Bu çalışma S6'nın tamamını gerçek yapmaz: dört tip (CREATE_FLOOD, CIRCUIT_HIJACK,
+PREMATURE_DATA — Shadow; REPLAY_ATTACK — Chutney) gerçek+doğrulanmıştır; iki tip
+(GHOST_CIRCUIT, CIRCUIT_BYPASS) sentetik, bir tip (HANDSHAKE_SKIP) gerçekleştirilemezdir.
+Tezde bu ayrım — gerçek/sentetik ayrımı VE Shadow/Chutney ortam ayrımı — her tablo/şekilde
+korunmalıdır.

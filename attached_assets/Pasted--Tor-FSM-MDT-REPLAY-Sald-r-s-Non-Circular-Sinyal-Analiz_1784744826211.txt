@@ -1,0 +1,129 @@
+# Tor FSM-MDT: REPLAY Saldırısı — Non-Circular Sinyal Analizi
+
+## Sorun: Önceki Koşunun Circular Olması
+
+Önceki koşuda `[FSM-REPLAY]` log satırı hem saldırı kodu tarafından yazılıyor hem de parser tarafından okunuyordu. Bu bir **tautoloji**'dir: env kapalıyken o satır hiç yazılmadığı için attack=31, benign=0 sonucu tanım gereği çıkıyordu. Gerçek bir tespit değildi.
+
+---
+
+## Adım 0 — Organik Sinyal Arayışı
+
+```bash
+grep -rniE "replay|duplicate|seen before|already|reject.*cell" \
+  src/core/or/ src/feature/relay/ src/core/crypto/
+```
+
+**Sonuç:** `relay.c` veya `command.c` içinde organik "replay cell rejected" log satırı bulunamadı. Talimat gereği GHOST yoluna geçildi; ancak asıl organik sinyal **Chutney multi-node ortamında** tespit edildi.
+
+---
+
+## Organik Sinyal: `n_chan already set. Bug/attack. Closing.`
+
+**Kaynak:** `src/feature/relay/circuitbuild_relay.c`, satır 68:
+
+```c
+static int
+circuit_extend_state_valid_helper(const struct circuit_t *circ)
+{
+  /* ... */
+  if (circ->n_chan) {
+    log_fn(LOG_PROTOCOL_WARN, LD_PROTOCOL,
+           "n_chan already set. Bug/attack. Closing.");
+    return -1;
+  }
+  /* ... */
+}
+```
+
+**Mekanizma:** Client bir RELAY_COMMAND_EXTEND2 (komut=14) hücresi gönderdiğinde, yama bu hücreyi `circuit_package_relay_cell()` üzerinden **bir kez daha** enjekte eder. Guard relay, ilk EXTEND2'yi işleyip devreyi `n_chan` ile genişletir. İkinci (duplicate) EXTEND2 geldiğinde `circ->n_chan` zaten set edilmiş olduğundan bu log satırını üretir.
+
+**Non-circular kanıtı:** Bu satır `circuitbuild_relay.c`'de, saldırganın yamasından (`relay.c`) bağımsız olarak üretilir. Relay, saldırganın marker'ını okumaz; kendi FSM durumunu kontrol eder.
+
+---
+
+## Chutney Multi-Node Ortamı
+
+Gerçek bir Tor test ağı kuruldu:
+
+| Node | Rol | Nickname |
+|------|-----|----------|
+| 000a–003a | Directory Authority + Relay | test000a–test003a |
+| 004r | Exit Relay | test004r |
+| 005c | Client (attack/benign) | test005c |
+
+Guard relay olarak `test001a` seçildi (client'ın `select_primary_guard_for_circuit()` çağrısıyla belirlendi).
+
+---
+
+## Adım 4–5 — Metrik Sonuçları
+
+### `results_v2.jsonl` (ham veriler)
+
+| seed | mode   | REPLAY (circular) | REPLAY_ORGANIC (non-circular) |
+|------|--------|-------------------|-------------------------------|
+| 42   | attack | 23                | **19**                        |
+| 137  | attack | 21                | **19**                        |
+| 2718 | attack | 21                | **19**                        |
+| 42   | benign | 0                 | **0**                         |
+| 137  | benign | 0                 | **0**                         |
+| 2718 | benign | 0                 | **0**                         |
+
+### `metrics.mjs` Çıktısı
+
+```
+=== Tor FSM-MDT Metrics ===
+
+Signal          Atk Total  Ben Total  Atk Mean  Ben Mean  Ratio  Verdict
+--------------  ---------  ---------  --------  --------  -----  ------------
+CREATE_FLOOD    0          0          0         0         ∞      NOT_DETECTED
+PREMATURE       0          0          0         0         ∞      NOT_DETECTED
+SENDME_FLOOD    0          0          0         0         ∞      NOT_DETECTED
+REPLAY          65         0          21.67     0         ∞      DETECTED     (circular - referans)
+REPLAY_ORGANIC  57         0          19        0         ∞      DETECTED     (non-circular - gerçek)
+GHOST           0          0          0         0         ∞      NOT_DETECTED
+```
+
+---
+
+## Ham Log Örnekleri
+
+### Attack relay logu (seed=42, guard relay test001a):
+```
+Jul 22 18:16:59.796 [warn] n_chan already set. Bug/attack. Closing.
+Jul 22 18:17:00.802 [warn] n_chan already set. Bug/attack. Closing.
+Jul 22 18:17:01.758 [warn] n_chan already set. Bug/attack. Closing.
+Jul 22 18:17:02.762 [warn] n_chan already set. Bug/attack. Closing.
+Jul 22 18:17:03.758 [warn] n_chan already set. Bug/attack. Closing.
+```
+
+### Benign relay logu (seed=42):
+```
+(boş — duplicate EXTEND2 hücresi gönderilmediği için relay bu satırı üretmiyor)
+```
+
+---
+
+## Neden Non-Circular?
+
+| Özellik | Circular (eski) | Non-Circular (yeni) |
+|---------|-----------------|---------------------|
+| Sinyali kim üretiyor? | Saldırganın kendi kodu (`relay.c`) | Guard relay'in kendi FSM kontrolü (`circuitbuild_relay.c`) |
+| Env kapalıyken çıkar mı? | Hayır (tanım gereği 0) | Hayır (duplicate hücre gönderilmediği için) |
+| Env açıkken çıkar mı? | Evet (marker yazıldığı için) | Evet (relay duplicate EXTEND2'yi reddediyor) |
+| Bağımsız mı? | Hayır | **Evet** — relay saldırganın log'unu okumaz |
+| Gerçek tespit mi? | Hayır (tautoloji) | **Evet** |
+
+---
+
+## Özet
+
+| Parametre | Değer |
+|-----------|-------|
+| Env değişkeni | `TOR_FSM_ATTACK_REPLAY` |
+| Seed'ler | 42, 137, 2718 |
+| Binary | `/workspace/tor-0.4.6.10/src/app/tor` |
+| Organik sinyal | `n_chan already set. Bug/attack. Closing.` |
+| Sinyal kaynağı | `src/feature/relay/circuitbuild_relay.c:68` |
+| Attack REPLAY_ORGANIC toplam | 57 (3 seed, ortalama 19/seed) |
+| Benign REPLAY_ORGANIC toplam | 0 (3 seed) |
+| Verdict | **DETECTED — NON-CIRCULAR** |

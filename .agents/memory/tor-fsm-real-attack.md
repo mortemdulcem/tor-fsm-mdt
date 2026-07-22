@@ -414,3 +414,23 @@ CLIENTS=1 reproduces old numbers byte-for-byte (missing `client` defaults to "to
   premature event-level (n=seeds×clients) legitimately report different n in the same block.
 - create_flood/circuit_hijack native ("First hop: finished sending") IS per-client (grep that client's
   own tor.1000.stdout). full_pipeline.sh + recompute.sh share `list_clients` + `native_count <a> <dir> <client>`.
+
+## REPLAY_ATTACK — NOW REAL (4th verified, non-circular) via Chutney multi-node
+Prior verdict "REPLAY synthetic" is SUPERSEDED. REPLAY is now real+verified, but in CHUTNEY
+(real Tor processes on localhost), NOT Shadow — keep that environment distinction in every table.
+- **Circular attempt first (rejected):** patch added `log_info("[FSM-REPLAY] duplicate relay
+  cell injected")` and the parser counted THAT line → tautology (attack 31 vs benign 0 by
+  construction; benign never runs the injection). Do NOT present marker/[FSM-REPLAY] as the result.
+- **Non-circular signal (the honest proof, category (a) independent-component oracle):** the
+  env-gated patch (`TOR_FSM_ATTACK_REPLAY`, in relay.c, re-sends a cell via
+  `circuit_package_relay_cell` with a separate `replay_cell` to avoid recursive re-entry) sends a
+  DUPLICATE cell. When it duplicates an EXTEND2 (relay_command=14), the GUARD RELAY's OWN check
+  `circuit_extend_state_valid_helper()` in `src/feature/relay/circuitbuild_relay.c:68` logs
+  `n_chan already set. Bug/attack. Closing.` — independent of the attacker's marker. Same footing
+  as PREMATURE's relay-native zero-stream-id line.
+- **Numbers:** Chutney net (000a–003a auth+relay, 004r exit, 005c client, guard=test001a),
+  n=3 seeds 42/137/2718: REPLAY_ORGANIC attack=19/19/19 vs benign=0/0/0 (no overlap). benign=0 is
+  NOT tautology — env off ⇒ no duplicate EXTEND2 ⇒ relay emits nothing (same logic as PREMATURE 12→0).
+- **Applied:** attack_status.md updated (row + detail + "Dürüst kapsam" now 4 real / 2 synthetic
+  (GHOST,BYPASS) / 1 unrealizable (HANDSHAKE_SKIP)); paper `attached_assets/v4_hoca_revizyonlari.docx`
+  evaluation-layers paragraph rewritten to "four validated (three Shadow + one Chutney)".
