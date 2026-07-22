@@ -475,3 +475,6 @@ Prior verdict "REPLAY synthetic" is SUPERSEDED. REPLAY is now real+verified, but
   remaining = HANDSHAKE_SKIP unrealizable, negative result not future work"). Now all say six
   (five Shadow + one Chutney). Sweep with a plaintext scan for four/five/six/seven + "of the
   seven" + "synthetic" before finalizing.
+
+## HANDSHAKE_SKIP negatif sonuç — makalede İKİ yer
+6/7 reprodüksiyon iddiası v4_hoca_revizyonlari.docx'te iki paragrafta geçer, ikisi de düzeltilmeli: (1) "two complementary evaluation layers" sonuç paragrafı (yetkili, per-attack organic sinyaller + "six were validated"), (2) sınırlılıklar paragrafı ("six of the seven ... HANDSHAKE_SKIP structurally unrealizable"). Ayrıca internal-validity paragrafı eskiden "rather than by modifying the Tor implementation" diyordu — 6/7 gerçek-binary reprodüksiyonla çelişiyordu, "complemented by env-gated instrumentation of a real Tor binary" ile uzlaştırıldı. HANDSHAKE_SKIP açıklaması: CREATE ancak açık TLS kanalından gönderilir (yapısal önkoşul) + handshake yoksa anahtar yok (kripto blok) + tek-noktalı organic log yok (non-circular sinyal yok). Önceki taslak 3/7 idi; her yer 6/7'ye çekildi.
