@@ -465,3 +465,13 @@ Prior verdict "REPLAY synthetic" is SUPERSEDED. REPLAY is now real+verified, but
 - Applied: attack_status.md now 6 real (CREATE_FLOOD/CIRCUIT_HIJACK/PREMATURE/GHOST/BYPASS Shadow
   + REPLAY Chutney) / 1 unrealizable; paper v4_hoca_revizyonlari.docx = "six validated (five
   Shadow + one Chutney)".
+
+## Paper attack-count lives in 3 places (consistency sweep)
+- v4_hoca_revizyonlari.docx states the real-attack count in THREE separate paragraphs; any count
+  change must update all three or the doc self-contradicts (replit.md inconsistency rule):
+  (1) evaluation-layers paragraph ("X were reproduced inside Shadow ... REPLAY in Chutney; of the
+  seven, N validated"), (2) experimental-setup/abstract ("N attack scenarios were reproduced
+  against real Tor execution"), (3) limitations/future-work ("N of the seven ... reproduced;
+  remaining = HANDSHAKE_SKIP unrealizable, negative result not future work"). Now all say six
+  (five Shadow + one Chutney). Sweep with a plaintext scan for four/five/six/seven + "of the
+  seven" + "synthetic" before finalizing.
