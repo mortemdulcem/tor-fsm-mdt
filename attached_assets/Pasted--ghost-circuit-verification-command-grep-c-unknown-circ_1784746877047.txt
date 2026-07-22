@@ -1,0 +1,37 @@
+{
+  "ghost_circuit_verification": {
+    "command": "grep -c \"unknown circuit [0-9]* on connection from .* Dropping\" experiments/runs/seed_*_attack/relay*.log",
+    "attack_counts": {
+      "seed_42_attack": {
+        "relay1.log": "14",
+        "relay2.log": "18",
+        "relay3.log": "12"
+      },
+      "seed_137_attack": {
+        "relay1.log": "22",
+        "relay2.log": "15",
+        "relay3.log": "19"
+      },
+      "seed_2718_attack": {
+        "relay1.log": "11",
+        "relay2.log": "20",
+        "relay3.log": "16"
+      }
+    },
+    "benign_counts": {
+      "seed_42_benign": "0",
+      "seed_137_benign": "0",
+      "seed_2718_benign": "0"
+    },
+    "result": "SUCCESS (5/7). Organic signal (unknown circuit) is present in 100% of attack runs and 0% of benign runs. No custom FSM marker required."
+  },
+  "circuit_bypass_inspection": {
+    "command": "sed -n '445,480p' src/core/or/relay.c",
+    "output": "  if (circ->state != CIRCUIT_STATE_OPEN) {\n    if (cell_direction == CELL_DIRECTION_OUT &&\n        circ->state == CIRCUIT_STATE_CHAN_WAIT) {\n      /* We're waiting for the channel to finish opening. This is\n       * expected. */\n      return 0;\n    }\n    log_fn(LOG_PROTOCOL_WARN, LD_PROTOCOL,\n           \"Circuits must be open before sending relay cells.\");\n    return -1;\n  }\n\n  if (cell_direction == CELL_DIRECTION_OUT && !layer_hint) {\n    log_warn(LD_BUG, \"No layer_hint for outbound cell; can't encrypt.\");\n    return -1;\n  }\n\n  relay_header_t rh;\n  memset(&rh, 0, sizeof(rh));\n  rh.command = cell_direction == CELL_DIRECTION_OUT ?\n    cell->command : 0; /* ... */",
+    "safety_check": "BYPASS is safe to hook. The code explicitly returns -1 after logging 'Circuits must be open...'. It does NOT reach the crypto/layer_hint logic, so forcing a cell during CIRCUIT_STATE_BUILDING will trigger the organic log without a SIGSEGV/crash."
+  },
+  "conclusion": {
+    "status_ghost": "Verified 5/7",
+    "status_bypass": "Ready for 6/7. Hook plan: Trigger relay_send_command_from_edge while circuit is in BUILDING state. This will hit the 'Circuits must be open' check at line 451, providing a non-circular organic signal."
+  }
+}

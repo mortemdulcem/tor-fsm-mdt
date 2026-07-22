@@ -5,11 +5,11 @@ Bu tablo, FSM dedektörünün ürettiği 7 saldırı sınıfının her birinin t
 ağında koşulmuş, non-circular sinyalle doğrulanmış), **sentetik** (yalnızca model/harness
 içi üretilmiş) ya da **yapısal olarak gerçekleştirilemez** olduğunu açıkça etiketler.
 
-**Ortam ayrımı (dürüstlük):** Üç saldırı (CREATE_FLOOD, CIRCUIT_HIJACK, PREMATURE_DATA)
-**Shadow** ağ simülatöründe doğrulandı. Dördüncü saldırı (REPLAY_ATTACK) **Chutney
-multi-node** ağında (gerçek Tor süreçleri, gerçek TLS/localhost) doğrulandı. Her ikisi de
-modifiye Tor 0.4.6.10 ikilisini gerçek çalıştırır; fark koşum ortamıdır ve tabloda/metinde
-açıkça korunur (tek bir "hepsi Shadow" iddiası yapılmaz).
+**Ortam ayrımı (dürüstlük):** Dört saldırı (CREATE_FLOOD, CIRCUIT_HIJACK, PREMATURE_DATA,
+GHOST_CIRCUIT) **Shadow** ağ simülatöründe doğrulandı. Beşinci saldırı (REPLAY_ATTACK)
+**Chutney multi-node** ağında (gerçek Tor süreçleri, gerçek TLS/localhost) doğrulandı. Her
+ikisi de modifiye Tor 0.4.6.10 ikilisini gerçek çalıştırır; fark koşum ortamıdır ve
+tabloda/metinde açıkça korunur (tek bir "hepsi Shadow" iddiası yapılmaz).
 
 ## Çerçeve (tezde aynen kullanılmalı)
 Gerçek saldırılar, **modifiye edilmiş Tor 0.4.6.10 ikilisinde, ortam değişkeniyle
@@ -36,8 +36,8 @@ korunmalıdır — üç saldırı "eşit derecede non-circular" diye sunulmamal�
 | CIRCUIT_HIJACK | **Gerçek (saldırı)**, ama FSM-tip dedektörü *ayırt edici değil* | `TOR_FSM_ATTACK_CIRCUIT_HIJACK` | İlk hop OPEN + devre BUILDING iken **fazladan** organik CREATE log satırı (`circuit_finish_handshake(): Finished building...` sonrası SEND_CREATE) | native 18/20/18→9 (ortüşme yok); **FSM-tip benign tabanı=12 → dedektör begin-noise ile confounded** |
 | PREMATURE_DATA | **Gerçek** | `TOR_FSM_ATTACK_PREMATURE_DATA` | İlk hop relay'inin **kendi** protokol-ihlali logu: `handle_relay_cell_command(): Relay data cell with zero stream_id. Dropping.` (relay.c) | native 12→0 (ortüşme yok); event-level P≈0.50/R≈0.47/F1≈0.48; begin-noise FPR≈0.48 |
 | REPLAY_ATTACK | **Gerçek** (non-circular, Chutney) | `TOR_FSM_ATTACK_REPLAY` | Guard relay'in **kendi** FSM kontrolü: duplicate EXTEND2 gelince `circuit_extend_state_valid_helper()` (`circuitbuild_relay.c:68`) `n_chan already set. Bug/attack. Closing.` basar — saldırganın marker'ından bağımsız | Chutney (n=3: 42/137/2718): REPLAY_ORGANIC attack=19/19/19 vs benign=0 (ortüşme yok) |
-| GHOST_CIRCUIT | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
-| CIRCUIT_BYPASS | Sentetik | — | — | Yalnızca harness/model içi enjeksiyon |
+| GHOST_CIRCUIT | **Gerçek** (non-circular, Shadow) | `TOR_FSM_ATTACK_GHOST` | Alıcı relay'in **kendi** organik protokol-uyarısı: tahsis edilmemiş circ_id'li hücre gelince Tor'un `command.c` `unknown circuit %u on connection from %s. Dropping.` satırını basar — saldırganın marker'ından bağımsız | Shadow (n=3: 42/137/2718): attack her relay için >0 (aralık 11–22) vs benign=0/0/0 (ortüşme yok) |
+| CIRCUIT_BYPASS | Sentetik (koşulmadı; yama güvenli-hazır) | `TOR_FSM_ATTACK_BYPASS` (aday) | Aday: istemcinin kendi `relay.c:451` `Circuits must be open before sending relay cells.` satırı (BUILDING'de relay cell paketleme guard'ı) | Henüz VM'de koşulmadı; sinyal doğrulanana kadar sentetik |
 | HANDSHAKE_SKIP | **Gerçekleştirilemez** | — | — | Yapısal engel (aşağıda) |
 
 ## Çoklu-seed sonuçları (tek-istemci, CLIENTS=1; n=3, seed 42/137/2718)
@@ -217,12 +217,42 @@ hücre; recursive re-entry'den kaçınmak için `relay.c` içinde ayrı `replay_
 - **Framing:** modifiye Tor'da env-gated, varsayılan iyi-huylu gerçek protokol ihlali —
   stok istemcinin/uzak saldırganın bunu ürettiği iddia edilmez.
 
-### GHOST_CIRCUIT / CIRCUIT_BYPASS — Sentetik
-Bunlar yalnızca model/harness içi enjeksiyonla üretilir; gerçek Tor davranışıyla
-non-circular bir sinyale bağlanmamıştır. Tezde **sentetik / spec-türevli** olarak
-etiketlenmelidir. (Devin AI `feature/attack-scenarios` dalı bunları "gerçek" diye
-sunar; o dal uydurmadır — var olmayan Tor sembolleri, döngüsel marker-oracle — teze
-ALINMAZ.)
+### GHOST_CIRCUIT — Gerçek (non-circular, Shadow)
+Modifiye Tor, env açıkken (`TOR_FSM_ATTACK_GHOST`) `circuit_package_relay_cell()`
+içinde her 10 hücrede bir, **tahsis edilmemiş bir circ_id** (`circ->n_circ_id + 0x1000`)
+taşıyan bir RELAY hücresini `append_cell_to_circuit_queue(..., CELL_DIRECTION_OUT, 0)`
+ile kabloya koyar (gerçek "hayalet devre" hücresi; saldırgan marker'ı YOK).
+- **Asıl kanıt (non-circular):** hücre var olmayan bir devreye ait olduğundan, alıcı
+  düğüm Tor'un **kendi** kodu ile (`command.c`) `unknown circuit %u on connection from
+  %s. Dropping.` basar. Bu satır saldırının yazdığı bir marker değil, Tor'un organik
+  protokol-uyarısıdır (parser'ın girdisinden ayrı bir bileşen üretir).
+- **Ölçüm:** Shadow (n=3 seed: 42/137/2718). Attack koşumunda üç relay'in her birinde
+  sayı >0 (gözlenen aralık 11–22), benign koşumda üç seed de 0/0/0 → ortüşme yok.
+  Benign=0 tautoloji değil; env kapalıyken hayalet hücre gönderilmediği için relay bu
+  organik satırı hiç üretmez (PREMATURE native 12→0 ile aynı mantık).
+- **Kısıt (dürüstlük):** `n_circ_id + 0x1000` teorik olarak nadiren gerçek bir devreyle
+  çakışabilir; çakışırsa o hücre "unknown circuit" üretmez (eksik sayım riski, uydurma
+  değil). attack≫benign farkı bu riske rağmen net.
+- **Framing:** modifiye Tor'da env-gated, varsayılan iyi-huylu gerçek protokol ihlali —
+  stok istemcinin/uzak saldırganın bunu ürettiği iddia edilmez.
+
+### CIRCUIT_BYPASS — Sentetik (aday yama güvenli-hazır, henüz koşulmadı)
+Şu an yalnızca model/harness içi enjeksiyonla üretilir; gerçek Tor davranışıyla
+non-circular bir sinyale **henüz** bağlanmamıştır → tezde **sentetik** olarak etiketlenir.
+- **Aday organik sinyal:** `relay.c:451` `Circuits must be open before sending relay
+  cells.`. `circuit_package_relay_cell()` başındaki `circ->state != CIRCUIT_STATE_OPEN`
+  guard'ı, `CELL_DIRECTION_OUT && CIRCUIT_STATE_CHAN_WAIT` meşru istisnası hariç, bu
+  satırı basıp **`return -1`** eder — crypto/`layer_hint` yoluna inmeden (sed 445–480 ile
+  doğrulandı → crash riski yok).
+- **Aday yama:** BUILDING (OPEN ve CHAN_WAIT değil) bir devrede
+  `circuit_package_relay_cell(&cell, circ, CELL_DIRECTION_OUT, NULL, NULL)` çağrısı;
+  guard log basıp döner.
+- **Doğrulanmadan gerçek sayılmaz:** VM koşusu bu satırı attack>0 / benign≈0 ile ve
+  PREMATURE'ın `zero stream_id` satırından **ayrı** üretmediği sürece BYPASS sentetik
+  kalır (çift sayım ve crash≠tespit kuralları geçerli).
+
+(Devin AI `feature/attack-scenarios` dalı bu iki tipi "gerçek" diye sunar; o dal
+uydurmadır — var olmayan Tor sembolleri, döngüsel marker-oracle — teze ALINMAZ.)
 
 ### HANDSHAKE_SKIP — Yapısal olarak gerçekleştirilemez
 HANDSHAKE_SKIP, IDLE/CONNECTING'de SEND_CREATE ya da CREATE_SENT'te SEND_EXTEND
@@ -233,8 +263,8 @@ oluşmadan log SATIRINI UYDURMADAN üretilemez (uydurma yasak). Bu, FSM'nin mode
 savunmanın ta kendisidir ve **negatif sonuç** olarak raporlanır.
 
 ## Dürüst kapsam
-Bu çalışma S6'nın tamamını gerçek yapmaz: dört tip (CREATE_FLOOD, CIRCUIT_HIJACK,
-PREMATURE_DATA — Shadow; REPLAY_ATTACK — Chutney) gerçek+doğrulanmıştır; iki tip
-(GHOST_CIRCUIT, CIRCUIT_BYPASS) sentetik, bir tip (HANDSHAKE_SKIP) gerçekleştirilemezdir.
-Tezde bu ayrım — gerçek/sentetik ayrımı VE Shadow/Chutney ortam ayrımı — her tablo/şekilde
-korunmalıdır.
+Bu çalışma S6'nın tamamını gerçek yapmaz: **beş tip** (CREATE_FLOOD, CIRCUIT_HIJACK,
+PREMATURE_DATA, GHOST_CIRCUIT — Shadow; REPLAY_ATTACK — Chutney) gerçek+doğrulanmıştır;
+**bir tip** (CIRCUIT_BYPASS) sentetiktir (aday yama güvenli-hazır ama henüz koşulmadı),
+**bir tip** (HANDSHAKE_SKIP) gerçekleştirilemezdir. Tezde bu ayrım — gerçek/sentetik
+ayrımı VE Shadow/Chutney ortam ayrımı — her tablo/şekilde korunmalıdır.

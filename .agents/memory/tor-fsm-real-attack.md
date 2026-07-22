@@ -434,3 +434,18 @@ Prior verdict "REPLAY synthetic" is SUPERSEDED. REPLAY is now real+verified, but
 - **Applied:** attack_status.md updated (row + detail + "Dürüst kapsam" now 4 real / 2 synthetic
   (GHOST,BYPASS) / 1 unrealizable (HANDSHAKE_SKIP)); paper `attached_assets/v4_hoca_revizyonlari.docx`
   evaluation-layers paragraph rewritten to "four validated (three Shadow + one Chutney)".
+
+## GHOST_CIRCUIT verified real (5/7)
+- Non-circular signal = receiving relay's own `command.c` "unknown circuit %u on connection from
+  %s. Dropping." emitted for a cell with unallocated circ_id (patch: circuit_package_relay_cell,
+  every 10th cell, circ_id=n_circ_id+0x1000, CELL_DIRECTION_OUT, no marker). Shadow, seeds
+  42/137/2718: attack >0 on every relay (range 11-22) vs benign 0/0/0. benign=0 not tautology
+  (env off ⇒ no ghost cell). Caveat: +0x1000 could rarely collide a real circ (undercount risk,
+  not fabrication).
+- CIRCUIT_BYPASS still SYNTHETIC: candidate organic signal relay.c:451 "Circuits must be open
+  before sending relay cells." — sed 445-480 confirms guard returns -1 BEFORE crypto/layer_hint
+  (no crash), safe to hook, but NOT yet run on VM. Must (a) fire attack>0/benign~0 AND (b) be
+  counted SEPARATELY from PREMATURE zero-stream-id, else double-count. Until run, stays synthetic.
+- Applied: attack_status.md now 5 real (CREATE_FLOOD/CIRCUIT_HIJACK/PREMATURE/GHOST Shadow +
+  REPLAY Chutney) / 1 synthetic (BYPASS) / 1 unrealizable (HANDSHAKE_SKIP); paper
+  v4_hoca_revizyonlari.docx evaluation paragraph = "five validated (four Shadow + one Chutney)".
