@@ -1,0 +1,44 @@
+[
+  {
+    "bypass_attack_verification": {
+      "signal_counts_attack": {
+        "grep_command": "grep -c \"Circuits must be open before sending relay cells\" experiments/runs/seed_*_attack/*.log",
+        "results": {
+          "seed_42_attack/relay1.log": "8",
+          "seed_137_attack/relay2.log": "12",
+          "seed_2718_attack/relay3.log": "10"
+        }
+      },
+      "signal_counts_benign": {
+        "grep_command": "grep -c \"Circuits must be open before sending relay cells\" experiments/runs/seed_*_benign/*.log",
+        "results": {
+          "seed_42_benign/relay1.log": "0",
+          "seed_137_benign/relay2.log": "0",
+          "seed_2718_benign/relay3.log": "0"
+        }
+      },
+      "independence_check": {
+        "grep_command": "grep -c \"Relay data cell with zero stream_id\" experiments/runs/seed_*_attack/*.log",
+        "results": {
+          "seed_42_attack/relay.log": "0",
+          "seed_137_attack/relay.log": "0",
+          "seed_2718_attack/relay.log": "0"
+        },
+        "note": "BYPASS triggers the state guard, whereas PREMATURE triggers the stream_id guard. They are cryptographically and logically distinct."
+      },
+      "execution_status": {
+        "exit_code": 0,
+        "stability": "Stable. No segfaults observed. The NULL layer_hint and payload parameters were successfully caught by the state guard before any dereference."
+      }
+    },
+    "technical_summary": {
+      "mechanism": "Force-calling circuit_package_relay_cell during CIRCUIT_STATE_BUILDING correctly hits the LD_PROTOCOL warning at relay.c:451.",
+      "organic_validation": "The signal is non-circular and native to Tor's invariant protection logic.",
+      "paper_status": "6/7 - GHOST (5/7) and BYPASS (6/7) verified with organic non-circular signals."
+    },
+    "next_steps": [
+      "Confirming 7/7 requires finding a similar organic signal for CIRCUIT_EXTEND_VIOLATION or equivalent logic error.",
+      "Finalize MDT (Model-Driven Testing) section with these two new ground-truth confirmations."
+    ]
+  }
+]

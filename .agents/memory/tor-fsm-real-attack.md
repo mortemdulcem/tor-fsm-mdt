@@ -449,3 +449,19 @@ Prior verdict "REPLAY synthetic" is SUPERSEDED. REPLAY is now real+verified, but
 - Applied: attack_status.md now 5 real (CREATE_FLOOD/CIRCUIT_HIJACK/PREMATURE/GHOST Shadow +
   REPLAY Chutney) / 1 synthetic (BYPASS) / 1 unrealizable (HANDSHAKE_SKIP); paper
   v4_hoca_revizyonlari.docx evaluation paragraph = "five validated (four Shadow + one Chutney)".
+
+## CIRCUIT_BYPASS verified real (6/7) — honest ceiling
+- Non-circular signal = Tor's own state invariant relay.c:451 "Circuits must be open before
+  sending relay cells." (guard logs + return -1). Patch: in build path (circuit_send_next_onion_skin,
+  same spot as PREMATURE), every 10th, directly call circuit_package_relay_cell(&cell, circ,
+  CELL_DIRECTION_OUT, NULL, NULL) on a BUILDING (not OPEN, not CHAN_WAIT) circuit. Direct call is
+  REQUIRED because PREMATURE's relay_send_command_from_edge path bypasses this guard (produces
+  zero-stream-id instead). Shadow seeds 42/137/2718: attack=8/12/10 vs benign=0/0/0; EXIT=0 no
+  crash (guard returns before layer_hint/crypto deref, sed 445-480 confirmed); zero-stream-id=0
+  in same run ⇒ distinct from PREMATURE (different guard, no double-count).
+- 6/7 is the HONEST CEILING. 7th = HANDSHAKE_SKIP is structurally unrealizable (Tor sends first
+  CREATE only after channel open); making it "real" = fabricating a log line = forbidden. Do NOT
+  chase 7/7.
+- Applied: attack_status.md now 6 real (CREATE_FLOOD/CIRCUIT_HIJACK/PREMATURE/GHOST/BYPASS Shadow
+  + REPLAY Chutney) / 1 unrealizable; paper v4_hoca_revizyonlari.docx = "six validated (five
+  Shadow + one Chutney)".
