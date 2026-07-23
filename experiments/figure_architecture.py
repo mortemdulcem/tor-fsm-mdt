@@ -66,7 +66,7 @@ ax.add_patch(Circle(core + [-1.55, 0.05], 0.30, facecolor="none", edgecolor="#8a
 attacks = ["CIRCUIT_BYPASS", "REPLAY_ATTACK", "GHOST_CIRCUIT", "HANDSHAKE_SKIP",
            "PREMATURE_DATA", "CIRCUIT_HIJACK", "CREATE_FLOOD"]
 angles = np.deg2rad(np.linspace(150, 210, len(attacks)))
-Rnode = 3.9
+Rnode = 4.3
 for lbl, th in zip(attacks, angles):
     nx, ny = core[0] + Rnode * np.cos(th), core[1] + Rnode * np.sin(th)
     # leader line to core edge
@@ -74,9 +74,9 @@ for lbl, th in zip(attacks, angles):
     ax.plot([nx, ex], [ny, ey], color=GREY, lw=0.5, alpha=0.35)
     ax.add_patch(Circle((nx, ny), 0.10, facecolor=BLUE, edgecolor="white", lw=0.6, zorder=5))
     rot = np.rad2deg(th) - 180
-    ax.text(nx - 0.18 * np.cos(th) + 0.02, ny - 0.18 * np.sin(th), lbl,
+    ax.text(nx + 0.35 * np.cos(th) + 0.02, ny + 0.35 * np.sin(th), lbl,
             rotation=rot, rotation_mode="anchor", ha="right", va="center",
-            fontsize=11.48, color=GREY, family="monospace", zorder=6)
+            fontsize=10.5, color=GREY, family="monospace", zorder=6)
 
 # ---- core labels -----------------------------------------------------------
 ax.text(core[0], core[1] + 2.05, "Tor Protocol Specification",
@@ -107,7 +107,7 @@ ax.add_patch(plt.Rectangle((core[0]+0.55, core[1]-2.55), 0.18, 0.18,
 # ---- left titles -----------------------------------------------------------
 ax.text(0.3, 8.4, "Tor Protocol\nSpecification", ha="left", va="top",
         fontsize=20.25, fontweight="bold", color=GREY)
-ax.text(0.3, 6.6, "Deterministic\nFSM \u2014 S=10, E=13", ha="left", va="top",
+ax.text(0.3, 7.2, "Deterministic\nFSM \u2014 S=10, E=13", ha="left", va="top",
         fontsize=13.50, color=GREY)
 ax.text(0.3, 0.9, "valid paths \u2192\nTesting Pipeline", ha="left", va="top",
         fontsize=13.50, fontweight="bold", color=ORANGE)
