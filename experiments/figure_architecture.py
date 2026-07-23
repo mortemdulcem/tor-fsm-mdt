@@ -65,8 +65,8 @@ ax.add_patch(Circle(core + [-1.55, 0.05], 0.30, facecolor="none", edgecolor="#8a
 # ---- attack taxonomy arc (7 correct categories, no duplicates) -------------
 attacks = ["CIRCUIT_BYPASS", "REPLAY_ATTACK", "GHOST_CIRCUIT", "HANDSHAKE_SKIP",
            "PREMATURE_DATA", "CIRCUIT_HIJACK", "CREATE_FLOOD"]
-angles = np.deg2rad(np.linspace(150, 210, len(attacks)))
-Rnode = 4.3
+angles = np.deg2rad(np.linspace(163, 206, len(attacks)))
+Rnode = 3.8
 for lbl, th in zip(attacks, angles):
     nx, ny = core[0] + Rnode * np.cos(th), core[1] + Rnode * np.sin(th)
     # leader line to core edge
@@ -76,7 +76,7 @@ for lbl, th in zip(attacks, angles):
     rot = np.rad2deg(th) - 180
     ax.text(nx + 0.35 * np.cos(th) + 0.02, ny + 0.35 * np.sin(th), lbl,
             rotation=rot, rotation_mode="anchor", ha="right", va="center",
-            fontsize=10.5, color=GREY, family="monospace", zorder=6)
+            fontsize=9.5, color=GREY, family="monospace", zorder=6)
 
 # ---- core labels -----------------------------------------------------------
 ax.text(core[0], core[1] + 2.05, "Tor Protocol Specification",
@@ -107,7 +107,7 @@ ax.add_patch(plt.Rectangle((core[0]+0.55, core[1]-2.55), 0.18, 0.18,
 # ---- left titles -----------------------------------------------------------
 ax.text(0.3, 8.4, "Tor Protocol\nSpecification", ha="left", va="top",
         fontsize=20.25, fontweight="bold", color=GREY)
-ax.text(0.3, 7.2, "Deterministic\nFSM \u2014 S=10, E=13", ha="left", va="top",
+ax.text(0.3, 6.95, "Deterministic\nFSM \u2014 S=10, E=13", ha="left", va="top",
         fontsize=13.50, color=GREY)
 ax.text(0.3, 0.9, "valid paths \u2192\nTesting Pipeline", ha="left", va="top",
         fontsize=13.50, fontweight="bold", color=ORANGE)
@@ -145,6 +145,14 @@ ax.text(lx + 0.28, ly, "= positive", ha="left", va="center", fontsize=12.15, col
 ax.add_patch(Circle((lx, ly - 0.45), 0.15, facecolor=ORANGE, edgecolor="white", lw=0.6))
 ax.text(lx, ly - 0.45, "\u2212", ha="center", va="center", color="white", fontsize=13.50, fontweight="bold")
 ax.text(lx + 0.28, ly - 0.45, "= negative", ha="left", va="center", fontsize=12.15, color=GREY)
+
+# ---- readability: white halo behind floating labels (over particle clouds) ---
+for _t in ax.texts:
+    _x = _t.get_position()[0]
+    if _x < 4.2 or _x > 8.9:
+        _t.set_bbox(dict(facecolor="white", alpha=0.7, edgecolor="none",
+                         boxstyle="round,pad=0.12"))
+    _t.set_zorder(7)
 
 plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 out = "experiments/figure_architecture.png"
