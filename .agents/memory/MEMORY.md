@@ -7,3 +7,4 @@
 - [Tor FSM ML reproducibility](tor-fsm-real-attack.md) — 433×38 feature CSV committed; `python3 ml_baseline.py` reproduces canonical JSON bit-for-bit; ngram+shape guards + provenance.versions; only leakfree-unsupervised f1 is sklearn-version-sensitive.
 - [Tez derleme komutu](tor-fsm-real-attack.md) — thesis/build_thesis.mjs `server/fsm.ts` import eder; `node` .ts uzantısını çözemez, `npx tsx thesis/build_thesis.mjs` ile derle. thesis.html değişmezse sayılar zaten ml_baseline_results.json ile tutarlı.
 - [Tor FSM v1 paper Tablo 7](tor-fsm-v1-paper.md) — doğrulanmış Cohen's d: TC(6.93,3.64) ITDR(6.22,15.40) hepsi p<0.001; v1 taslağı 15.4 yanlış+ITDR "x" placeholder idi, v1_revised.docx düzeltir.
+- [GitHub push bloke](tor-fsm-real-attack.md) — public repo mortemdulcem/tor-fsm-mdt (main) okunabilir ama GITHUB_TOKEN(93) ve GITHUB_PERSONAL_ACCESS_TOKEN(ghp_,40) her ikisi de 401; geçerli kimlik gelmeden push yapılamaz, curl API ile teyit et.

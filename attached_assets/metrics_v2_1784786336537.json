@@ -1,0 +1,137 @@
+{
+  "metrics": {
+    "CREATE_FLOOD": {
+      "attack": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "NOT_DETECTED"
+    },
+    "PREMATURE": {
+      "attack": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "NOT_DETECTED"
+    },
+    "SENDME_FLOOD": {
+      "attack": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "NOT_DETECTED"
+    },
+    "REPLAY": {
+      "attack": {
+        "counts": [
+          21,
+          21,
+          23
+        ],
+        "total": 65,
+        "mean": 21.67
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "DETECTED"
+    },
+    "REPLAY_ORGANIC": {
+      "attack": {
+        "counts": [
+          19,
+          19,
+          19
+        ],
+        "total": 57,
+        "mean": 19
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "DETECTED"
+    },
+    "GHOST": {
+      "attack": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "NOT_DETECTED"
+    }
+  },
+  "records_count": 6
+}
