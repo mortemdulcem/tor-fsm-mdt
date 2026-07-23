@@ -23,7 +23,7 @@ BLUE = "#3B5B92"
 BLUE_L = "#6E8CBE"
 GREY = "#4A4A4A"
 
-fig, ax = plt.subplots(figsize=(12.8, 7.2), dpi=200)
+fig, ax = plt.subplots(figsize=(12.8, 7.2), dpi=400)
 ax.set_xlim(0, 16)
 ax.set_ylim(0, 9)
 ax.axis("off")
@@ -76,27 +76,27 @@ for lbl, th in zip(attacks, angles):
     rot = np.rad2deg(th) - 180
     ax.text(nx - 0.18 * np.cos(th) + 0.02, ny - 0.18 * np.sin(th), lbl,
             rotation=rot, rotation_mode="anchor", ha="right", va="center",
-            fontsize=8.5, color=GREY, family="monospace", zorder=6)
+            fontsize=11.48, color=GREY, family="monospace", zorder=6)
 
 # ---- core labels -----------------------------------------------------------
 ax.text(core[0], core[1] + 2.05, "Tor Protocol Specification",
-        ha="center", va="center", fontsize=9.5, fontweight="bold", color=GREY)
+        ha="center", va="center", fontsize=12.83, fontweight="bold", color=GREY)
 ax.text(core[0], core[1] + 1.65, "Formal Modeling Layer",
-        ha="center", va="center", fontsize=8.5, color=GREY)
+        ha="center", va="center", fontsize=11.48, color=GREY)
 ax.text(core[0] - 0.05, core[1] + 0.35, "FSM  \u03b4: S\u00d7E\u2192S",
-        ha="center", va="center", fontsize=9, color=GREY)
+        ha="center", va="center", fontsize=12.15, color=GREY)
 ax.text(core[0] + 0.15, core[1] - 0.05, "FSM CORE",
-        ha="center", va="center", fontsize=12.5, fontweight="bold", color=GREY)
+        ha="center", va="center", fontsize=16.88, fontweight="bold", color=GREY)
 ax.text(core[0] - 1.5, core[1] - 0.55, "25\nvalid",
-        ha="center", va="center", fontsize=8.5, color=GREY)
+        ha="center", va="center", fontsize=11.48, color=GREY)
 ax.text(core[0] + 1.55, core[1] - 0.55, "105\ninvalid",
-        ha="center", va="center", fontsize=8.5, color=GREY)
+        ha="center", va="center", fontsize=11.48, color=GREY)
 ax.text(core[0] - 0.9, core[1] - 1.15, "Transition\nMatrix",
-        ha="center", va="center", fontsize=8.5, fontweight="bold", color=GREY)
+        ha="center", va="center", fontsize=11.48, fontweight="bold", color=GREY)
 ax.text(core[0] + 0.9, core[1] - 1.15, "Behavior\nPartition",
-        ha="center", va="center", fontsize=8.5, fontweight="bold", color=GREY)
+        ha="center", va="center", fontsize=11.48, fontweight="bold", color=GREY)
 ax.text(core[0] + 1.75, core[1] - 1.85, "Model-Driven\nTesting",
-        ha="center", va="center", fontsize=8.5, fontweight="bold", color=GREY)
+        ha="center", va="center", fontsize=11.48, fontweight="bold", color=GREY)
 
 # small MDT nodes below core
 ax.add_patch(Circle(core + [0.55, -1.95], 0.13, facecolor=ORANGE, edgecolor="white", lw=0.6))
@@ -106,11 +106,11 @@ ax.add_patch(plt.Rectangle((core[0]+0.55, core[1]-2.55), 0.18, 0.18,
 
 # ---- left titles -----------------------------------------------------------
 ax.text(0.3, 8.4, "Tor Protocol\nSpecification", ha="left", va="top",
-        fontsize=15, fontweight="bold", color=GREY)
+        fontsize=20.25, fontweight="bold", color=GREY)
 ax.text(0.3, 6.6, "Deterministic\nFSM \u2014 S=10, E=13", ha="left", va="top",
-        fontsize=10, color=GREY)
+        fontsize=13.50, color=GREY)
 ax.text(0.3, 0.9, "valid paths \u2192\nTesting Pipeline", ha="left", va="top",
-        fontsize=10, fontweight="bold", color=ORANGE)
+        fontsize=13.50, fontweight="bold", color=ORANGE)
 # dashed vertical guide (like original)
 ax.plot([0.35, 0.35], [1.4, 6.0], color=ORANGE, lw=1.2, ls=(0, (4, 3)), alpha=0.7)
 
@@ -118,35 +118,35 @@ ax.plot([0.35, 0.35], [1.4, 6.0], color=ORANGE, lw=1.2, ls=(0, (4, 3)), alpha=0.
 ax.annotate("", xy=(9.9, 3.9), xytext=(core[0]+2.4, core[1]-1.6),
             arrowprops=dict(arrowstyle="->", color=GREY, lw=0.8, alpha=0.6))
 ax.text(9.9, 4.35, "MDT (proposed)\nRandom Testing", ha="left", va="center",
-        fontsize=9, fontweight="bold", color=GREY)
-ax.text(12.7, 4.25, "GreedySC", ha="center", va="center", fontsize=9, color=GREY)
-ax.text(11.3, 3.15, "GreedySC", ha="center", va="center", fontsize=9, color=GREY)
+        fontsize=12.15, fontweight="bold", color=GREY)
+ax.text(12.7, 4.25, "GreedySC", ha="center", va="center", fontsize=12.15, color=GREY)
+ax.text(11.3, 3.15, "GreedySC", ha="center", va="center", fontsize=12.15, color=GREY)
 ax.text(13.7, 3.55, "SC \u00b7 TC \u00b7 ITDR \u00b7 FPR", ha="center", va="center",
-        fontsize=9.5, fontweight="bold", color=GREY)
+        fontsize=12.83, fontweight="bold", color=GREY)
 ax.text(13.9, 2.75, "Welch's t-test\nMann\u2013Whitney U\nCohen's d",
-        ha="center", va="center", fontsize=8.5, color=GREY)
+        ha="center", va="center", fontsize=11.48, color=GREY)
 ax.text(15.7, 1.35, "Security\nInterpretation\nLayer", ha="right", va="center",
-        fontsize=15, fontweight="bold", color=GREY)
+        fontsize=20.25, fontweight="bold", color=GREY)
 
 # ---- comparative baselines ellipses ---------------------------------------
 for (ex, ey) in [(12.2, 7.2), (8.7, 1.15)]:
     ax.add_patch(Ellipse((ex, ey), 3.0, 1.15, facecolor=BLUE_L, alpha=0.28, edgecolor="none"))
     ax.add_patch(Circle((ex - 1.0, ey), 0.16, facecolor=BLUE, edgecolor="white", lw=0.6))
     ax.text(ex - 0.7, ey + 0.16, "Comparative Baselines", ha="left", va="center",
-            fontsize=9, fontweight="bold", color=GREY)
+            fontsize=12.15, fontweight="bold", color=GREY)
     ax.text(ex - 0.7, ey - 0.18, "identical model, environment, budget",
-            ha="left", va="center", fontsize=7.5, color=GREY)
+            ha="left", va="center", fontsize=10.12, color=GREY)
 
 # ---- legend (top-right) ----------------------------------------------------
 lx, ly = 14.4, 8.4
 ax.add_patch(Circle((lx, ly), 0.15, facecolor=BLUE, edgecolor="white", lw=0.6))
-ax.text(lx, ly, "+", ha="center", va="center", color="white", fontsize=10, fontweight="bold")
-ax.text(lx + 0.28, ly, "= positive", ha="left", va="center", fontsize=9, color=GREY)
+ax.text(lx, ly, "+", ha="center", va="center", color="white", fontsize=13.50, fontweight="bold")
+ax.text(lx + 0.28, ly, "= positive", ha="left", va="center", fontsize=12.15, color=GREY)
 ax.add_patch(Circle((lx, ly - 0.45), 0.15, facecolor=ORANGE, edgecolor="white", lw=0.6))
-ax.text(lx, ly - 0.45, "\u2212", ha="center", va="center", color="white", fontsize=10, fontweight="bold")
-ax.text(lx + 0.28, ly - 0.45, "= negative", ha="left", va="center", fontsize=9, color=GREY)
+ax.text(lx, ly - 0.45, "\u2212", ha="center", va="center", color="white", fontsize=13.50, fontweight="bold")
+ax.text(lx + 0.28, ly - 0.45, "= negative", ha="left", va="center", fontsize=12.15, color=GREY)
 
 plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 out = "experiments/figure_architecture.png"
-plt.savefig(out, dpi=200, facecolor="white")
+plt.savefig(out, dpi=400, facecolor="white")
 print("saved", out)
