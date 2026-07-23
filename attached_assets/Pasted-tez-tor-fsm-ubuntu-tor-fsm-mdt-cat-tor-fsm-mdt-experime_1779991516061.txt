@@ -1,0 +1,83 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cat ~/tor-fsm-mdt/experiments/shadow_results.json | head -80
+{
+  "metadata": {
+    "shadow_version": "3.3.0",
+    "tor_version": "Tor version 0.4.6.10.",
+    "run_date": "2026-05-28T17:52:49.360Z",
+    "seeds": [
+      42,
+      137,
+      2718
+    ],
+    "scenarios": [
+      "benign",
+      "replay_attack",
+      "circuit_bypass"
+    ],
+    "simulated_time": "30 min",
+    "repetitions": 3,
+    "network_topology": {
+      "authorities": 1,
+      "relays": 6,
+      "clients": 2,
+      "note": "Shadow example topology: 1 DA, 4 non-exit relays, 2 exit relays, 1 direct client, 1 tor client"
+    },
+    "fsm_spec": {
+      "states": 10,
+      "events": 13,
+      "valid_transitions": 25
+    }
+  },
+  "runs": [
+    {
+      "seed": 42,
+      "scenario": "benign",
+      "wallTime": "7.5",
+      "circuitCount": 75,
+      "rawEventCount": 687,
+      "injectedCount": 0,
+      "fsmResult": {
+        "validCount": 508,
+        "invalidCount": 179,
+        "circuitCount": 75
+      },
+      "metrics": {
+        "scenario": "benign",
+        "totalEvents": 687,
+        "circuitCount": 75,
+        "validTransitions": 508,
+        "structuralViolations": 179,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 508,
+        "precision": null,
+        "recall": null,
+        "f1": null,
+        "fpr": 0,
+        "violationRate": 0.26055312954876275,
+        "violationBreakdown": {
+          "CIRCUIT_HIJACK": 152,
+          "HANDSHAKE_SKIP": 6,
+          "REPLAY_ATTACK": 4,
+          "GHOST_CIRCUIT": 4,
+          "PREMATURE_DATA": 13
+        }
+      },
+      "sampleCircuit": [
+        {
+          "cid": "4uthority_circ1",
+          "eventCount": 6,
+          "validCount": 6,
+          "invalidCount": 0,
+          "finalState": "CIRCUIT_READY"
+        },
+        {
+          "cid": "4uthority_circ2",
+          "eventCount": 8,
+          "validCount": 6,
+          "invalidCount": 2,
+          "finalState": "CIRCUIT_READY"
+        },
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+

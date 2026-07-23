@@ -1,0 +1,6 @@
+{"seed":137,"mode":"attack","signals":{"REPLAY":17,"GHOST":0,"CREATE_FLOOD":0,"PREMATURE":0,"SENDME_FLOOD":0},"log":"/workspace/tor-fsm-mdt/experiments/runs/seed_137_attack/tor.log"}
+{"seed":137,"mode":"benign","signals":{"REPLAY":0,"GHOST":0,"CREATE_FLOOD":0,"PREMATURE":0,"SENDME_FLOOD":0},"log":"/workspace/tor-fsm-mdt/experiments/runs/seed_137_benign/tor.log"}
+{"seed":2718,"mode":"attack","signals":{"REPLAY":14,"GHOST":0,"CREATE_FLOOD":0,"PREMATURE":0,"SENDME_FLOOD":0},"log":"/workspace/tor-fsm-mdt/experiments/runs/seed_2718_attack/tor.log"}
+{"seed":2718,"mode":"benign","signals":{"REPLAY":0,"GHOST":0,"CREATE_FLOOD":0,"PREMATURE":0,"SENDME_FLOOD":0},"log":"/workspace/tor-fsm-mdt/experiments/runs/seed_2718_benign/tor.log"}
+{"seed":42,"mode":"attack","signals":{"REPLAY":0,"GHOST":0,"CREATE_FLOOD":0,"PREMATURE":0,"SENDME_FLOOD":0},"log":"/workspace/tor-fsm-mdt/experiments/runs/seed_42_attack/tor.log"}
+{"seed":42,"mode":"benign","signals":{"REPLAY":0,"GHOST":0,"CREATE_FLOOD":0,"PREMATURE":0,"SENDME_FLOOD":0},"log":"/workspace/tor-fsm-mdt/experiments/runs/seed_42_benign/tor.log"}

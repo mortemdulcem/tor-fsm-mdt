@@ -1,0 +1,29 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42$ ls ~/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/ && echo "---" && find ~/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/ -type f | head -20 && echo "---" && ls ~/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/conf/ 2>/dev/null
+4uthority  exit1  exit2  relay1  relay2  relay3  relay4  torclient  torflowauthority
+---
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay1/fingerprint
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay1/keys/secret_id_key
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay1/keys/secret_onion_key
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay1/keys/secret_onion_key_ntor
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay1/torrc
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay1/torrc-defaults
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/4uthority/fingerprint
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/4uthority/keys/authority_signing_key
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/4uthority/keys/authority_identity_key
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/4uthority/keys/authority_certificate
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/4uthority/keys/secret_id_key
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/4uthority/keys/secret_onion_key
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/4uthority/torrc
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/4uthority/torrc-defaults
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay3/fingerprint
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay3/keys/ed25519_signing_secret_key
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay3/keys/ed25519_master_id_secret_key
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay3/keys/secret_id_key
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay3/keys/secret_onion_key
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.data.template/hosts/relay3/keys/ed25519_signing_cert
+---
+authgen.pw     shadowresolv.conf        tgen.torclient.graphml.xml  tor.common.torrc    tor.relay.torrc
+authgen.torrc  tgen.client.graphml.xml  tor.authority.torrc         tor.exit.torrc
+conf           tgen.server.graphml.xml  tor.client.torrc            tor.non-exit.torrc
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42$ 
+

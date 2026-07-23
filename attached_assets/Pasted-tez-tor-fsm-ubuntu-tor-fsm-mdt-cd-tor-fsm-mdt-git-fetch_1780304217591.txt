@@ -1,0 +1,75 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt && git fetch https://github.com/mortemdulcem/tor-fsm-mdt.git premature-transport && git checkout FETCH_HEAD -- experiments/premature_v2.sh && bash experiments/premature_v2.sh
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+ * branch            premature-transport -> FETCH_HEAD
+
+=== 1) Tor patch: circuituse.c stream-attach hook ===
+zaten uygulanmis (atlandi)
+2937:            log_info(LD_CIRC, "TOR_FSM_PREMATURE_BEGIN gid=%u", (unsigned)foc->global_identifier);
+probe zaten var (atlandi)
+
+=== 2) Tor build ===
+
+=== 3) Parser: shadow_harness.mjs (3 edit, guarded) ===
+parser kontrol:
+35:  let lastReadyCircuitId = null;
+36:  let pendingPrematureGid = null;
+114:    const pmark = line.match(/TOR_FSM_PREMATURE_BEGIN gid=(\d+)/);
+116:      pendingPrematureGid = pmark[1];
+117:      if (!circuits[pendingPrematureGid]) circuits[pendingPrematureGid] = [];
+121:    if (/connection_ap_handshake_send_begin\(\): Sending relay cell/.test(line)) {
+122:      const bcid = pendingPrematureGid || lastReadyCircuitId || lastCircuitId;
+123:      pendingPrematureGid = null;
+
+=== 4) Shadow yaml hazirligi ===
+premature yaml env satiri:
+101:      environment: { TOR_FSM_ATTACK_PREMATURE_DATA: "1" }
+
+=== 5) Shadow calistir (attack + benign) ===
+ATTACK EXIT=0
+00:00:07.220751 [11481:shadow] n/a [INFO] [n/a] [shadow.rs:234] [shadow_rs::shadow] Log message buffering is disabled during cleanup
+** Shadow completed successfully
+BENIGN EXIT=0
+00:00:08.148055 [11529:shadow] n/a [INFO] [n/a] [shadow.rs:234] [shadow_rs::shadow] Log message buffering is disabled during cleanup
+** Shadow completed successfully
+
+=== 6) Detection ===
+MARKER (attack icinde gercek erken-begin sayisi):
+0
+0
+--- PROBE teshisi (attack) ---
+PROBE toplam satir (env+binary etkin mi):
+15
+PROBE ornek (ilk 5):
+Jan 01 00:15:01.000 [info] connection_ap_handshake_attach_circuit(): TOR_FSM_PREMATURE_PROBE building=0 building_cpath_open=0 open=0
+Jan 01 00:15:01.711 [info] connection_ap_handshake_attach_circuit(): TOR_FSM_PREMATURE_PROBE building=0 building_cpath_open=0 open=1
+Jan 01 00:15:01.821 [info] connection_ap_handshake_attach_circuit(): TOR_FSM_PREMATURE_PROBE building=0 building_cpath_open=0 open=1
+Jan 01 00:24:23.000 [info] connection_ap_handshake_attach_circuit(): TOR_FSM_PREMATURE_PROBE building=0 building_cpath_open=0 open=5
+Jan 01 00:25:00.000 [info] connection_ap_handshake_attach_circuit(): TOR_FSM_PREMATURE_PROBE building=0 building_cpath_open=0 open=6
+Somurulebilir pencere (building_cpath_open>0) olan deneme sayisi:
+0
+0
+--- ATTACK detect ---
+file:///home/tez/tor-fsm-mdt/experiments/cf_detect.mjs:2
+import { parseTorHostLog, runFsmOnAllCircuits } from "./shadow_harness.mjs";
+         ^^^^^^^^^^^^^^^
+SyntaxError: The requested module './shadow_harness.mjs' does not provide an export named 'parseTorHostLog'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:335:5)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:665:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.22.2
+--- BENIGN detect ---
+file:///home/tez/tor-fsm-mdt/experiments/cf_detect.mjs:2
+import { parseTorHostLog, runFsmOnAllCircuits } from "./shadow_harness.mjs";
+         ^^^^^^^^^^^^^^^
+SyntaxError: The requested module './shadow_harness.mjs' does not provide an export named 'parseTorHostLog'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:335:5)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:665:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.22.2
+
+=== BITTI ===
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 

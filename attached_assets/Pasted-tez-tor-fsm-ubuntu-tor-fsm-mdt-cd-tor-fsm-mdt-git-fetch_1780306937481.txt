@@ -1,0 +1,68 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt
+git fetch https://github.com/mortemdulcem/tor-fsm-mdt.git premature-transport
+git checkout FETCH_HEAD -- experiments/premature_v3.sh experiments/premature_detect.mjs
+bash experiments/premature_v3.sh
+remote: Enumerating objects: 18, done.
+remote: Counting objects: 100% (18/18), done.
+remote: Compressing objects: 100% (16/16), done.
+remote: Total 16 (delta 10), reused 0 (delta 0), pack-reused 0 (from 0)
+Nesneler açılıyor: 100% (16/16), 5.92 KiB | 2.96 MiB/sn, bitti.
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+ * branch            premature-transport -> FETCH_HEAD
+
+=== 1) Tor patch: circuitbuild.c circuit_send_next_onion_skin hook ===
+zaten uygulanmis (atlandi)
+946:    log_info(LD_CIRC, "TOR_FSM_PREMATURE_SEND gid=%u cstate=%d",
+
+=== 2) Tor build ===
+
+=== 3) Parser: shadow_harness.mjs (guarded edit) ===
+parser kontrol:
+21:export function parseTorHostLog(logContent, hostName) {
+43:    const psend = line.match(/TOR_FSM_PREMATURE_SEND gid=(\d+)/);
+218:export function runFsmOnAllCircuits(circuitMap) {
+
+=== 4) Shadow yaml hazirligi ===
+premature yaml env satiri:
+101:      environment: { TOR_FSM_ATTACK_PREMATURE_DATA: "1" }
+
+=== 5) Shadow calistir (attack + benign) ===
+ATTACK EXIT=0
+00:00:07.560765 [12674:shadow] n/a [INFO] [n/a] [shadow.rs:234] [shadow_rs::shadow] Log message buffering is disabled during cleanup
+** Shadow completed successfully
+BENIGN EXIT=0
+00:00:09.215489 [12717:shadow] n/a [INFO] [n/a] [shadow.rs:234] [shadow_rs::shadow] Log message buffering is disabled during cleanup
+** Shadow completed successfully
+
+=== 6) Detection (attack vs benign) ===
+[cross-check] client gonderim marker'i (TOR_FSM_PREMATURE_SEND):
+  attack: 12   benign: 0
+0
+  ornek: Jan 01 00:15:03.501 [info] circuit_send_next_onion_skin(): TOR_FSM_PREMATURE_SEND gid=3 cstate=0
+[NATIVE SIGNAL] Tor'un kendi protokol-ihlali logu (relay.c:1677), tum host loglari:
+  ATTACK : 12 satir, 1 host
+  BENIGN : 0 satir, 0 host
+  hangi host(lar) attack'ta logladi:
+    relay1
+  ATTACK ornek (ilk 2, native Tor satiri):
+    Jan 01 00:15:03.551 [info] handle_relay_cell_command(): Relay data cell with zero stream_id. Dropping.
+    Jan 01 00:15:03.751 [info] handle_relay_cell_command(): Relay data cell with zero stream_id. Dropping.
+--- FSM dedektor (marker tabanli; ikincil) ATTACK ---
+circuits: 10 valid: 68 invalid: 29
+types: {"PREMATURE_DATA":11,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12}
+PREMATURE_DATA toplam: 11 | INJECTED (gercek, gid-atifli): 5 | begin-noise (lastCircuitId): 6
+  injected: CIRCUIT_BUILDING x SEND_RELAY_DATA -> PREMATURE_DATA (HIGH)
+  injected: CIRCUIT_BUILDING x SEND_RELAY_DATA -> PREMATURE_DATA (HIGH)
+  injected: CIRCUIT_BUILDING x SEND_RELAY_DATA -> PREMATURE_DATA (HIGH)
+  injected: CIRCUIT_BUILDING x SEND_RELAY_DATA -> PREMATURE_DATA (HIGH)
+  injected: CIRCUIT_BUILDING x SEND_RELAY_DATA -> PREMATURE_DATA (HIGH)
+--- FSM dedektor (marker tabanli; ikincil) BENIGN ---
+circuits: 9 valid: 53 invalid: 27
+types: {"PREMATURE_DATA":9,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3,"CIRCUIT_HIJACK":12}
+PREMATURE_DATA toplam: 9 | INJECTED (gercek, gid-atifli): 0 | begin-noise (lastCircuitId): 9
+
+=== BITTI ===
+ASIL KANIT (non-circular): [NATIVE SIGNAL] ATTACK > 0, BENIGN = 0 olmali.
+  -> Tor'un KENDI logu, gercek erken DATA hucresinin relay'de yarattigi protokol ihlali.
+  Marker ve FSM dedektoru yalnizca capraz-kontrol/illustrasyon.
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 

@@ -1,0 +1,244 @@
+ez@tor-fsm-ubuntu:~/tor-0.4.6.10$ cd ~/tor-0.4.6.10
+echo "=== circuituse 2630-2800 ==="; sed -n '2630,2800p' src/core/or/circuituse.c
+echo "=== circuituse 2950-2985 ==="; sed -n '2950,2985p' src/core/or/circuituse.c
+echo "=== connection_edge 3118-3145 (optimistic gate) ==="; sed -n '3118,3145p' src/core/or/connection_edge.c
+=== circuituse 2630-2800 ===
+  if (connection_edge_is_rendezvous_stream(ENTRY_TO_EDGE_CONN(apconn))) {
+    /* We are attaching a stream to a rendezvous circuit.  That means
+     * that an attempt to connect to a hidden service just
+     * succeeded.  Tell rendclient.c. */
+    hs_client_note_connection_attempt_succeeded(ENTRY_TO_EDGE_CONN(apconn));
+  }
+
+  if (cpath) { /* we were given one; use it */
+    tor_assert(cpath_is_on_circuit(circ, cpath));
+  } else {
+    /* use the last hop in the circuit */
+    tor_assert(circ->cpath);
+    tor_assert(circ->cpath->prev);
+    tor_assert(circ->cpath->prev->state == CPATH_STATE_OPEN);
+    cpath = circ->cpath->prev;
+  }
+  ENTRY_TO_EDGE_CONN(apconn)->cpath_layer = cpath;
+
+  circ->isolation_any_streams_attached = 1;
+  connection_edge_update_circuit_isolation(apconn, circ, 0);
+
+  /* Compute the exitnode if possible, for logging below */
+  if (cpath->extend_info)
+    exitnode = node_get_by_id(cpath->extend_info->identity_digest);
+
+  /* See if we can use optimistic data on this circuit */
+  if (circ->base_.purpose == CIRCUIT_PURPOSE_C_GENERAL ||
+      circ->base_.purpose == CIRCUIT_PURPOSE_C_HSDIR_GET ||
+      circ->base_.purpose == CIRCUIT_PURPOSE_S_HSDIR_POST ||
+      circ->base_.purpose == CIRCUIT_PURPOSE_C_REND_JOINED)
+    apconn->may_use_optimistic_data = 1;
+  else
+    apconn->may_use_optimistic_data = 0;
+  log_info(LD_APP, "Looks like completed circuit to %s %s allow "
+           "optimistic data for connection to %s",
+           (circ->base_.purpose == CIRCUIT_PURPOSE_C_GENERAL ||
+            circ->base_.purpose == CIRCUIT_PURPOSE_CONTROLLER) ?
+             /* node_describe() does the right thing if exitnode is NULL */
+             safe_str_client(node_describe(exitnode)) :
+             "hidden service",
+           apconn->may_use_optimistic_data ? "does" : "doesn't",
+           safe_str_client(apconn->socks_request->address));
+}
+
+/** Return true iff <b>address</b> is matched by one of the entries in
+ * TrackHostExits. */
+int
+hostname_in_track_host_exits(const or_options_t *options, const char *address)
+{
+  if (!options->TrackHostExits)
+    return 0;
+  SMARTLIST_FOREACH_BEGIN(options->TrackHostExits, const char *, cp) {
+    if (cp[0] == '.') { /* match end */
+      if (cp[1] == '\0' ||
+          !strcasecmpend(address, cp) ||
+          !strcasecmp(address, &cp[1]))
+        return 1;
+    } else if (strcasecmp(cp, address) == 0) {
+      return 1;
+    }
+  } SMARTLIST_FOREACH_END(cp);
+  return 0;
+}
+
+/** If an exit wasn't explicitly specified for <b>conn</b>, consider saving
+ * the exit that we *did* choose for use by future connections to
+ * <b>conn</b>'s destination.
+ */
+static void
+consider_recording_trackhost(const entry_connection_t *conn,
+                             const origin_circuit_t *circ)
+{
+  const or_options_t *options = get_options();
+  char *new_address = NULL;
+  char fp[HEX_DIGEST_LEN+1];
+  uint64_t stream_id = 0;
+
+  if (BUG(!conn)) {
+    return;
+  }
+
+  stream_id = ENTRY_TO_CONN(conn)->global_identifier;
+
+  /* Search the addressmap for this conn's destination. */
+  /* If they're not in the address map.. */
+  if (!options->TrackHostExits ||
+      addressmap_have_mapping(conn->socks_request->address,
+                              options->TrackHostExitsExpire))
+    return; /* nothing to track, or already mapped */
+
+  if (!hostname_in_track_host_exits(options, conn->socks_request->address) ||
+      !circ->build_state->chosen_exit)
+    return;
+
+  /* write down the fingerprint of the chosen exit, not the nickname,
+   * because the chosen exit might not be named. */
+  base16_encode(fp, sizeof(fp),
+                circ->build_state->chosen_exit->identity_digest, DIGEST_LEN);
+
+  /* Add this exit/hostname pair to the addressmap. */
+  tor_asprintf(&new_address, "%s.%s.exit",
+               conn->socks_request->address, fp);
+
+  addressmap_register(conn->socks_request->address, new_address,
+                      time(NULL) + options->TrackHostExitsExpire,
+                      ADDRMAPSRC_TRACKEXIT, 0, 0, stream_id);
+}
+
+/** Attempt to attach the connection <b>conn</b> to <b>circ</b>, and send a
+ * begin or resolve cell as appropriate.  Return values are as for
+ * connection_ap_handshake_attach_circuit.  The stream will exit from the hop
+ * indicated by <b>cpath</b>, or from the last hop in circ's cpath if
+ * <b>cpath</b> is NULL. */
+int
+connection_ap_handshake_attach_chosen_circuit(entry_connection_t *conn,
+                                              origin_circuit_t *circ,
+                                              crypt_path_t *cpath)
+{
+  connection_t *base_conn = ENTRY_TO_CONN(conn);
+  tor_assert(conn);
+  tor_assert(base_conn->state == AP_CONN_STATE_CIRCUIT_WAIT ||
+             base_conn->state == AP_CONN_STATE_CONTROLLER_WAIT);
+  tor_assert(conn->socks_request);
+  tor_assert(circ);
+  tor_assert(circ->base_.state == CIRCUIT_STATE_OPEN);
+
+  base_conn->state = AP_CONN_STATE_CIRCUIT_WAIT;
+
+  if (!circ->base_.timestamp_dirty ||
+      ((conn->entry_cfg.isolation_flags & ISO_SOCKSAUTH) &&
+       (conn->entry_cfg.socks_iso_keep_alive) &&
+       (conn->socks_request->usernamelen ||
+        conn->socks_request->passwordlen))) {
+    /* When stream isolation is in use and controlled by an application
+     * we are willing to keep using the stream. */
+    circ->base_.timestamp_dirty = approx_time();
+  }
+
+  pathbias_count_use_attempt(circ);
+
+  /* Now, actually link the connection. */
+  link_apconn_to_circ(conn, circ, cpath);
+
+  tor_assert(conn->socks_request);
+  if (conn->socks_request->command == SOCKS_COMMAND_CONNECT) {
+    if (!conn->use_begindir) {
+      consider_recording_trackhost(conn, circ);
+    }
+    if (connection_ap_handshake_send_begin(conn) < 0)
+      return -1;
+  } else {
+    if (connection_ap_handshake_send_resolve(conn) < 0)
+      return -1;
+  }
+
+  return 1;
+}
+
+/**
+ * Return an appropriate circuit purpose for non-rend streams.
+ * We don't handle rends here because a rend stream triggers two
+ * circuit builds with different purposes, so it is handled elsewhere.
+ *
+ * This function just figures out what type of hsdir activity this is,
+ * and tells us. Everything else is general.
+ */
+static int
+connection_ap_get_nonrend_circ_purpose(const entry_connection_t *conn)
+{
+  const connection_t *base_conn = ENTRY_TO_CONN(conn);
+  tor_assert_nonfatal(!connection_edge_is_rendezvous_stream(
+=== circuituse 2950-2985 ===
+      tor_assert(rendcirc);
+      /* one is already established, attach */
+      log_info(LD_REND,
+               "rend joined circ %u (id: %" PRIu32 ") already here. "
+               "Attaching. (stream %d sec old)",
+               (unsigned) TO_CIRCUIT(rendcirc)->n_circ_id,
+               rendcirc->global_identifier, conn_age);
+      /* Mark rendezvous circuits as 'newly dirty' every time you use
+       * them, since the process of rebuilding a rendezvous circ is so
+       * expensive. There is a tradeoff between linkability and
+       * feasibility, at this point.
+       */
+      rendcirc->base_.timestamp_dirty = time(NULL);
+
+      /* We've also attempted to use them. If they fail, we need to
+       * probe them for path bias */
+      pathbias_count_use_attempt(rendcirc);
+
+      link_apconn_to_circ(conn, rendcirc, NULL);
+      if (connection_ap_handshake_send_begin(conn) < 0)
+        return 0; /* already marked, let them fade away */
+      return 1;
+    }
+
+    /* At this point we need to re-check the state, since it's possible that
+     * our call to circuit_get_open_circ_or_launch() changed the connection's
+     * state from "CIRCUIT_WAIT" to "RENDDESC_WAIT" because we decided to
+     * re-fetch the descriptor.
+     */
+    if (ENTRY_TO_CONN(conn)->state != AP_CONN_STATE_CIRCUIT_WAIT) {
+      log_info(LD_REND, "This connection is no longer ready to attach; its "
+               "state changed."
+               "(We probably have to re-fetch its descriptor.)");
+      return 0;
+    }
+
+=== connection_edge 3118-3145 (optimistic gate) ===
+
+  return test_stream_id;
+}
+
+/** Return true iff <b>conn</b> is linked to a circuit and configured to use
+ * an exit that supports optimistic data. */
+static int
+connection_ap_supports_optimistic_data(const entry_connection_t *conn)
+{
+  const edge_connection_t *edge_conn = ENTRY_TO_EDGE_CONN(conn);
+  /* We can only send optimistic data if we're connected to an open
+     general circuit. */
+  if (edge_conn->on_circuit == NULL ||
+      edge_conn->on_circuit->state != CIRCUIT_STATE_OPEN ||
+      (edge_conn->on_circuit->purpose != CIRCUIT_PURPOSE_C_GENERAL &&
+       edge_conn->on_circuit->purpose != CIRCUIT_PURPOSE_C_HSDIR_GET &&
+       edge_conn->on_circuit->purpose != CIRCUIT_PURPOSE_S_HSDIR_POST &&
+       edge_conn->on_circuit->purpose != CIRCUIT_PURPOSE_C_REND_JOINED))
+    return 0;
+
+  return conn->may_use_optimistic_data;
+}
+
+/** Return a bitmask of BEGIN_FLAG_* flags that we should transmit in the
+ * RELAY_BEGIN cell for <b>ap_conn</b>. */
+static uint32_t
+connection_ap_get_begincell_flags(entry_connection_t *ap_conn)
+{
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ 
+

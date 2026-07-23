@@ -1,0 +1,80 @@
+<pre><font color="#26A269"><b>ez@tor-fsm-ubuntu</b></font>:<font color="#12488B"><b>~/tor-fsm-mdt</b></font>$ cat experiments/runs/results.jsonl
+echo &quot;----&quot;
+cat &gt; /tmp/inspect.mjs &lt;&lt;&apos;EOF&apos;
+import { parseTorHostLog, runFsmOnAllCircuits } from &quot;./experiments/shadow_harness.mjs&quot;;
+import { readFileSync } from &quot;node:fs&quot;;
+const log = &quot;experiments/runs/circuit_hijack/seed42/hosts/torclient/tor.1000.stdout&quot;;
+const c = parseTorHostLog(readFileSync(log, &quot;utf8&quot;), &quot;torclient&quot;);
+const f = runFsmOnAllCircuits(c);
+console.log(&quot;circuitCount:&quot;, f.circuitCount, &quot;violations:&quot;, f.violations.length);
+console.log(&quot;keys:&quot;, Object.keys(f.violations[0] || {}));
+console.log(&quot;sample:&quot;, JSON.stringify(f.violations[0]));
+EOF
+npx tsx /tmp/inspect.mjs
+{&quot;attack&quot;:&quot;create_flood&quot;,&quot;seed&quot;:42,&quot;scenario&quot;:&quot;attack&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:9,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:18,&quot;markers&quot;:0,&quot;types&quot;:{&quot;CREATE_FLOOD&quot;:9,&quot;PREMATURE_DATA&quot;:4,&quot;REPLAY_ATTACK&quot;:2,&quot;GHOST_CIRCUIT&quot;:2,&quot;CIRCUIT_HIJACK&quot;:12}}
+{&quot;attack&quot;:&quot;create_flood&quot;,&quot;seed&quot;:42,&quot;scenario&quot;:&quot;benign&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:0,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:9,&quot;markers&quot;:0,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:5,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12}}
+{&quot;attack&quot;:&quot;circuit_hijack&quot;,&quot;seed&quot;:42,&quot;scenario&quot;:&quot;attack&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:21,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:18,&quot;markers&quot;:0,&quot;types&quot;:{&quot;CIRCUIT_HIJACK&quot;:21,&quot;PREMATURE_DATA&quot;:4,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3}}
+{&quot;attack&quot;:&quot;circuit_hijack&quot;,&quot;seed&quot;:42,&quot;scenario&quot;:&quot;benign&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:12,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:9,&quot;markers&quot;:0,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:5,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12}}
+{&quot;attack&quot;:&quot;premature_data&quot;,&quot;seed&quot;:42,&quot;scenario&quot;:&quot;attack&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:17,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:12,&quot;markers&quot;:12,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:17,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12},&quot;prem_injected&quot;:5,&quot;prem_noise&quot;:12}
+{&quot;attack&quot;:&quot;premature_data&quot;,&quot;seed&quot;:42,&quot;scenario&quot;:&quot;benign&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:5,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:0,&quot;markers&quot;:0,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:5,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12},&quot;prem_injected&quot;:0,&quot;prem_noise&quot;:5}
+{&quot;attack&quot;:&quot;create_flood&quot;,&quot;seed&quot;:137,&quot;scenario&quot;:&quot;attack&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:9,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:18,&quot;markers&quot;:0,&quot;types&quot;:{&quot;CREATE_FLOOD&quot;:9,&quot;PREMATURE_DATA&quot;:5,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12}}
+{&quot;attack&quot;:&quot;create_flood&quot;,&quot;seed&quot;:137,&quot;scenario&quot;:&quot;benign&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:0,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:9,&quot;markers&quot;:0,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:4,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12}}
+{&quot;attack&quot;:&quot;circuit_hijack&quot;,&quot;seed&quot;:137,&quot;scenario&quot;:&quot;attack&quot;,&quot;circuits&quot;:10,&quot;flagged&quot;:22,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:20,&quot;markers&quot;:0,&quot;types&quot;:{&quot;CIRCUIT_HIJACK&quot;:22,&quot;PREMATURE_DATA&quot;:6,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3}}
+{&quot;attack&quot;:&quot;circuit_hijack&quot;,&quot;seed&quot;:137,&quot;scenario&quot;:&quot;benign&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:12,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:9,&quot;markers&quot;:0,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:4,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12}}
+{&quot;attack&quot;:&quot;premature_data&quot;,&quot;seed&quot;:137,&quot;scenario&quot;:&quot;attack&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:9,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:12,&quot;markers&quot;:12,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:9,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12},&quot;prem_injected&quot;:5,&quot;prem_noise&quot;:4}
+{&quot;attack&quot;:&quot;premature_data&quot;,&quot;seed&quot;:137,&quot;scenario&quot;:&quot;benign&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:4,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:0,&quot;markers&quot;:0,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:4,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12},&quot;prem_injected&quot;:0,&quot;prem_noise&quot;:4}
+{&quot;attack&quot;:&quot;create_flood&quot;,&quot;seed&quot;:2718,&quot;scenario&quot;:&quot;attack&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:9,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:18,&quot;markers&quot;:0,&quot;types&quot;:{&quot;CREATE_FLOOD&quot;:9,&quot;PREMATURE_DATA&quot;:5,&quot;REPLAY_ATTACK&quot;:2,&quot;GHOST_CIRCUIT&quot;:2,&quot;CIRCUIT_HIJACK&quot;:12}}
+{&quot;attack&quot;:&quot;create_flood&quot;,&quot;seed&quot;:2718,&quot;scenario&quot;:&quot;benign&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:0,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:9,&quot;markers&quot;:0,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:4,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12}}
+{&quot;attack&quot;:&quot;circuit_hijack&quot;,&quot;seed&quot;:2718,&quot;scenario&quot;:&quot;attack&quot;,&quot;circuits&quot;:8,&quot;flagged&quot;:20,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:16,&quot;markers&quot;:0,&quot;types&quot;:{&quot;CIRCUIT_HIJACK&quot;:20,&quot;PREMATURE_DATA&quot;:3,&quot;REPLAY_ATTACK&quot;:2,&quot;GHOST_CIRCUIT&quot;:2}}
+{&quot;attack&quot;:&quot;circuit_hijack&quot;,&quot;seed&quot;:2718,&quot;scenario&quot;:&quot;benign&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:12,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:9,&quot;markers&quot;:0,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:4,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12}}
+{&quot;attack&quot;:&quot;premature_data&quot;,&quot;seed&quot;:2718,&quot;scenario&quot;:&quot;attack&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:11,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:12,&quot;markers&quot;:12,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:11,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:14},&quot;prem_injected&quot;:7,&quot;prem_noise&quot;:4}
+{&quot;attack&quot;:&quot;premature_data&quot;,&quot;seed&quot;:2718,&quot;scenario&quot;:&quot;benign&quot;,&quot;circuits&quot;:9,&quot;flagged&quot;:4,&quot;flaggedCircuits&quot;:null,&quot;native&quot;:0,&quot;markers&quot;:0,&quot;types&quot;:{&quot;PREMATURE_DATA&quot;:4,&quot;REPLAY_ATTACK&quot;:3,&quot;GHOST_CIRCUIT&quot;:3,&quot;CIRCUIT_HIJACK&quot;:12},&quot;prem_injected&quot;:0,&quot;prem_noise&quot;:4}
+----
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module &apos;/tmp/experiments/shadow_harness.mjs&apos; imported from /tmp/inspect.mjs
+Did you mean to import &quot;../home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs&quot;?
+<font color="#5E5C64">    at finalizeResolution (node:internal/modules/esm/resolve:275:11)</font>
+<font color="#5E5C64">    at moduleResolve (node:internal/modules/esm/resolve:861:10)</font>
+<font color="#5E5C64">    at defaultResolve (node:internal/modules/esm/resolve:985:11)</font>
+<font color="#5E5C64">    at nextResolve (node:internal/modules/esm/hooks:748:28)</font>
+    at resolveBase <font color="#5E5C64">(file:///home/tez/tor-fsm-mdt/</font>node_modules/<u style="text-decoration-style:single">tsx</u>/dist/esm/index.mjs?1780313117093:2:3744<font color="#5E5C64">)</font>
+    at resolveDirectory <font color="#5E5C64">(file:///home/tez/tor-fsm-mdt/</font>node_modules/<u style="text-decoration-style:single">tsx</u>/dist/esm/index.mjs?1780313117093:2:4243<font color="#5E5C64">)</font>
+    at resolveTsPaths <font color="#5E5C64">(file:///home/tez/tor-fsm-mdt/</font>node_modules/<u style="text-decoration-style:single">tsx</u>/dist/esm/index.mjs?1780313117093:2:4984<font color="#5E5C64">)</font>
+    at resolve <font color="#5E5C64">(file:///home/tez/tor-fsm-mdt/</font>node_modules/<u style="text-decoration-style:single">tsx</u>/dist/esm/index.mjs?1780313117093:2:5361<font color="#5E5C64">)</font>
+<font color="#5E5C64">    at nextResolve (node:internal/modules/esm/hooks:748:28)</font>
+<font color="#5E5C64">    at Hooks.resolve (node:internal/modules/esm/hooks:240:30)</font> {
+  code: <font color="#26A269">&apos;ERR_MODULE_NOT_FOUND&apos;</font>,
+  url: <font color="#26A269">&apos;file:///tmp/experiments/shadow_harness.mjs&apos;</font>
+}
+
+Node.js v22.22.2
+<font color="#26A269"><b>tez@tor-fsm-ubuntu</b></font>:<font color="#12488B"><b>~/tor-fsm-mdt</b></font>$ cd ~/tor-fsm-mdt
+cat &gt; inspect.mjs &lt;&lt;&apos;EOF&apos;
+import { parseTorHostLog, runFsmOnAllCircuits } from &quot;./experiments/shadow_harness.mjs&quot;;
+import { readFileSync } from &quot;node:fs&quot;;
+const log = &quot;experiments/runs/circuit_hijack/seed42/hosts/torclient/tor.1000.stdout&quot;;
+const f = runFsmOnAllCircuits(parseTorHostLog(readFileSync(log,&quot;utf8&quot;),&quot;torclient&quot;));
+console.log(&quot;circuitCount:&quot;, f.circuitCount, &quot;violations:&quot;, f.violations.length);
+console.log(&quot;keys:&quot;, Object.keys(f.violations[0]||{}));
+for (const v of f.violations.slice(0,4)) console.log(JSON.stringify(v));
+EOF
+npx tsx inspect.mjs &amp;&amp; rm inspect.mjs
+circuitCount: <font color="#A2734C">9</font> violations: <font color="#A2734C">31</font>
+keys: [
+  <font color="#26A269">&apos;from&apos;</font>,
+  <font color="#26A269">&apos;event&apos;</font>,
+  <font color="#26A269">&apos;classification&apos;</font>,
+  <font color="#26A269">&apos;timestamp&apos;</font>,
+  <font color="#26A269">&apos;injected&apos;</font>,
+  <font color="#26A269">&apos;attackType&apos;</font>
+]
+{&quot;from&quot;:&quot;CIRCUIT_BUILDING&quot;,&quot;event&quot;:&quot;SEND_CREATE&quot;,&quot;classification&quot;:{&quot;type&quot;:&quot;CIRCUIT_HIJACK&quot;,&quot;severity&quot;:&quot;CRITICAL&quot;,&quot;description&quot;:&quot;CREATE on an active circuit (CIRCUIT_BUILDING) — hijack signature&quot;},&quot;timestamp&quot;:&quot;Jan 01 00:15:01.501&quot;,&quot;injected&quot;:false,&quot;attackType&quot;:null}
+{&quot;from&quot;:&quot;CIRCUIT_BUILDING&quot;,&quot;event&quot;:&quot;SEND_RELAY_DATA&quot;,&quot;classification&quot;:{&quot;type&quot;:&quot;PREMATURE_DATA&quot;,&quot;severity&quot;:&quot;HIGH&quot;,&quot;description&quot;:&quot;Data attempted before circuit reached READY (in CIRCUIT_BUILDING)&quot;},&quot;timestamp&quot;:&quot;Jan 01 00:15:01.501&quot;,&quot;injected&quot;:false,&quot;attackType&quot;:null}
+{&quot;from&quot;:&quot;CIRCUIT_BUILDING&quot;,&quot;event&quot;:&quot;SEND_RELAY_DATA&quot;,&quot;classification&quot;:{&quot;type&quot;:&quot;PREMATURE_DATA&quot;,&quot;severity&quot;:&quot;HIGH&quot;,&quot;description&quot;:&quot;Data attempted before circuit reached READY (in CIRCUIT_BUILDING)&quot;},&quot;timestamp&quot;:&quot;Jan 01 00:15:01.611&quot;,&quot;injected&quot;:false,&quot;attackType&quot;:null}
+{&quot;from&quot;:&quot;CIRCUIT_BUILDING&quot;,&quot;event&quot;:&quot;SEND_DESTROY&quot;,&quot;classification&quot;:{&quot;type&quot;:&quot;REPLAY_ATTACK&quot;,&quot;severity&quot;:&quot;MEDIUM&quot;,&quot;description&quot;:&quot;DESTROY before circuit READY (in CIRCUIT_BUILDING)&quot;},&quot;timestamp&quot;:&quot;Jan 01 00:16:10.050&quot;,&quot;injected&quot;:false,&quot;attackType&quot;:null}
+<font color="#26A269"><b>tez@tor-fsm-ubuntu</b></font>:<font color="#12488B"><b>~/tor-fsm-mdt</b></font>$ 
+
+</pre>

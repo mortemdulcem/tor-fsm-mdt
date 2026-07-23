@@ -1,0 +1,67 @@
+Tor 0.4.6.10 — CIRCUIT_HIJACK real-attack patch (env-gated, benign by default)
+File: src/core/or/circuitbuild.c
+
+Two hunks:
+
+1) Trigger (in circuit_finish_handshake): after the FIRST hop's keys are installed
+   and the circuit is BUILDING, re-call circuit_send_first_onion_skin(circ) under
+   TOR_FSM_ATTACK_CIRCUIT_HIJACK. The state-restore lines are harmless no-ops once
+   hunk 2 intercepts the call.
+
+--- a/src/core/or/circuitbuild.c (circuit_finish_handshake)
++++ b/src/core/or/circuitbuild.c
+@@
+   circuit_event_status(circ, CIRC_EVENT_EXTENDED, 0);
+ 
++  if (hop == circ->cpath && getenv("TOR_FSM_ATTACK_CIRCUIT_HIJACK")) {
++    (void) circuit_send_first_onion_skin(circ);
++    hop->state = CPATH_STATE_OPEN;
++    circuit_set_state(TO_CIRCUIT(circ), CIRCUIT_STATE_BUILDING);
++  }
++
+   return 0;
+ }
+
+2) Non-destructive emission (top of circuit_send_first_onion_skin): when re-entered
+   on an already-OPEN first hop (i.e. the hijack call above), send ONE genuine extra
+   CREATE cell on the EXISTING circ->n_circ_id (do NOT reassign via
+   circuit_deliver_create_cell, which would make the relay answer with CREATED and
+   tear the live circuit down). The relay drops the duplicate CREATE on a known circ
+   id, so the circuit survives and the run exits 0. A throwaway onion_handshake_state_t
+   keeps the circuit's real crypto untouched. The log_info below carries the
+   circuit_send_first_onion_skin() funcname the FSM harness reads as SEND_CREATE,
+   classified CIRCUIT_HIJACK because the circuit is in BUILDING. No fabricated log.
+
+--- a/src/core/or/circuitbuild.c (circuit_send_first_onion_skin)
++++ b/src/core/or/circuitbuild.c
+@@
+   memset(&cc, 0, sizeof(cc));
+ 
++  if (getenv("TOR_FSM_ATTACK_CIRCUIT_HIJACK") && circ->cpath &&
++      circ->cpath->state == CPATH_STATE_OPEN && circ->base_.n_circ_id &&
++      circ->base_.n_chan) {  /* n_chan guard: deref'd below for identity + queue */
++    create_cell_t hcc; onion_handshake_state_t hst; cell_t hcell; int hf, hl;
++    const node_t *hn;
++    memset(&hcc,0,sizeof(hcc)); memset(&hst,0,sizeof(hst));
++    memset(&hcell,0,sizeof(hcell));
++    hn = node_get_by_id(circ->base_.n_chan->identity_digest);
++    hf = should_use_create_fast_for_circuit(circ);
++    if (!hf)
++      circuit_pick_create_handshake(&hcc.cell_type,&hcc.handshake_type,
++                                    circ->cpath->extend_info);
++    else { hcc.cell_type=CELL_CREATE_FAST;
++           hcc.handshake_type=ONION_HANDSHAKE_TYPE_FAST; }
++    hl = onion_skin_create(hcc.handshake_type,circ->cpath->extend_info,
++                           &hst,hcc.onionskin);
++    if (hl>=0) { hcc.handshake_len=hl;
++      if (create_cell_format(&hcell,&hcc)==0) { hcell.circ_id=circ->base_.n_circ_id;
++        append_cell_to_circuit_queue(TO_CIRCUIT(circ),circ->base_.n_chan,
++                                     &hcell,CELL_DIRECTION_OUT,0);
++        log_info(LD_CIRC,"First hop: finished sending %s cell to %s",
++                 hf?"CREATE_FAST":"CREATE",
++                 hn?node_describe(hn):"<unnamed>"); } }
++    onion_handshake_state_release(&hst);
++    return 0;
++  }
++
+   log_debug(LD_CIRC,"First skin; sending create cell.");

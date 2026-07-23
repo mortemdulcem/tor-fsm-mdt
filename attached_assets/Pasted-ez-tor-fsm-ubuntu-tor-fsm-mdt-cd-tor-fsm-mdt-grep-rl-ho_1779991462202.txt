@@ -1,0 +1,43 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt && grep -rl "/home/ubuntu" experiments/ | xargs sed -i 's|/home/ubuntu|/home/tez|g' && npx tsx experiments/shadow_harness.mjs 2>&1 | tail -40
+  Injected 96 replay attack events
+  FSM: 504 valid, 259 invalid across 73 circuits
+  Metrics: P=0.3707 R=1.0000 F1=0.5408 FPR=0.2444
+  Running Shadow simulation: replay_attack seed=2718 ...
+  Completed in 8.5s
+  Parsed 677 events across 74 circuits
+  Injected 99 replay attack events
+  FSM: 510 valid, 266 invalid across 74 circuits
+  Metrics: P=0.3722 R=1.0000 F1=0.5425 FPR=0.2467
+
+--- Scenario: circuit_bypass ---
+  Running Shadow simulation: circuit_bypass seed=42 ...
+  Completed in 9.2s
+  Parsed 687 events across 75 circuits
+  Injected 150 circuit bypass events
+  FSM: 508 valid, 329 invalid across 75 circuits
+  Metrics: P=0.4559 R=1.0000 F1=0.6263 FPR=0.2606
+  Running Shadow simulation: circuit_bypass seed=137 ...
+  Completed in 9.7s
+  Parsed 667 events across 73 circuits
+  Injected 146 circuit bypass events
+  FSM: 504 valid, 309 invalid across 73 circuits
+  Metrics: P=0.4725 R=1.0000 F1=0.6418 FPR=0.2444
+  Running Shadow simulation: circuit_bypass seed=2718 ...
+  Completed in 9.6s
+  Parsed 677 events across 74 circuits
+  Injected 148 circuit bypass events
+  FSM: 510 valid, 315 invalid across 74 circuits
+  Metrics: P=0.4698 R=1.0000 F1=0.6393 FPR=0.2467
+
+
+=== RESULTS SUMMARY ===
+
+Scenario           | Precision       | Recall          | F1              | FPR
+-------------------|-----------------|-----------------|-----------------|----------------
+benign             | N/A             | N/A             | N/A             | 0.0000 +/- 0.0000
+replay_attack      | 0.3686 +/- 0.0040 | 1.0000 +/- 0.0000 | 0.5386 +/- 0.0043 | 0.2505 +/- 0.0071
+circuit_bypass     | 0.4661 +/- 0.0073 | 1.0000 +/- 0.0000 | 0.6358 +/- 0.0068 | 0.2505 +/- 0.0071
+
+Results written to: /home/tez/tor-fsm-mdt/experiments/shadow_results.json
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+

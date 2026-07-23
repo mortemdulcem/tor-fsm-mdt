@@ -1,0 +1,63 @@
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ echo "=== include ==="; grep -n "socks_request_st.h" src/core/or/circuitbuild.c; echo "=== blok ==="; grep -n "TOR_FSM_ATTACK_PREMATURE_DATA" src/core/or/circuitbuild.c
+make -j$(nproc) src/app/tor 2>&1 | tail -6
+=== include ===
+79:#include "core/or/socks_request_st.h"
+=== blok ===
+1297:  if (hop == circ->cpath && getenv("TOR_FSM_ATTACK_PREMATURE_DATA")) {
+  CC       src/core/or/circuitbuild.o
+  AR       src/core/libtor-app.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       libtor.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  CCLD     src/app/tor
+tez@tor-fsm-ubuntu:~/tor-0.4.6.10$ cd /tmp/cf_test
+cp shadow_benign.yaml shadow_premature.yaml
+perl -pi -e 's/environment: \{\}/environment: { TOR_FSM_ATTACK_PREMATURE_DATA: "1" }/' shadow_premature.yaml
+echo "=== env kontrol (sadece torclient'te gorunmeli) ==="; grep -n "TOR_FSM_ATTACK_PREMATURE_DATA" shadow_premature.yaml
+=== env kontrol (sadece torclient'te gorunmeli) ===
+101:      environment: { TOR_FSM_ATTACK_PREMATURE_DATA: "1" }
+tez@tor-fsm-ubuntu:/tmp/cf_test$ rm -rf shadow.data.premature; if [ -d shadow.data.template ]; then TPL="--template-directory shadow.data.template"; else TPL=""; fi; ~/.local/bin/shadow -d shadow.data.premature $TPL shadow_premature.yaml > shadow_premature.log 2>&1; echo "EXIT=$?"; tail -3 shadow_premature.log
+EXIT=0
+00:00:14.819430 [56880:shadow] n/a [INFO] [n/a] [controller.rs:67] [shadow_rs::core::controller] Finished simulation
+00:00:14.819432 [56880:shadow] n/a [INFO] [n/a] [shadow.rs:234] [shadow_rs::shadow] Log message buffering is disabled during cleanup
+** Shadow completed successfully
+tez@tor-fsm-ubuntu:/tmp/cf_test$ cd ~/tor-fsm-mdt && npx tsx experiments/cf_detect.mjs /tmp/cf_test/shadow.data.premature/hosts/torclient/tor.1000.stdout
+circuits: 10 valid: 82 invalid: 18
+types: {"PREMATURE_DATA":12,"REPLAY_ATTACK":3,"GHOST_CIRCUIT":3}
+CREATE_FLOOD count: 0
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt && grep -n "send_begin\|PREMATURE\|lastCircuit\|buildingCircuit\|SEND_RELAY_DATA\|RELAY_DATA\|send begin\|Sending relay" experiments/shadow_harness.mjs
+23:  let lastCircuitId = null;
+30:  // buildingCircuitId: the circuit that most recently sent CREATE. Handshake
+32:  // not lastCircuitId, because new circuits can be created before the
+34:  let buildingCircuitId = null;
+44:      lastCircuitId = cid;
+63:        if (lastCircuitId && circuits[lastCircuitId]) {
+64:          circuits[lastCircuitId].push({
+75:      if (lastCircuitId && circuits[lastCircuitId]) {
+76:        circuits[lastCircuitId].push({
+88:      buildingCircuitId = lastCircuitId;
+89:      if (lastCircuitId && circuits[lastCircuitId]) {
+90:        circuits[lastCircuitId].push({
+100:    // We attribute it to buildingCircuitId (the circuit that sent CREATE),
+101:    // not lastCircuitId, because new circuits may have been created since.
+106:      const cid = buildingCircuitId || lastCircuitId;
+136:    if (/connection_ap_handshake_send_begin\(\)/.test(line)) {
+137:      if (lastCircuitId && circuits[lastCircuitId]) {
+138:        circuits[lastCircuitId].push({
+139:          event: "SEND_RELAY_DATA",
+150:      const cid = closeMatch ? closeMatch[1] : lastCircuitId;
+164:      const cid = freeMatch ? freeMatch[1] : lastCircuitId;
+176:      if (lastCircuitId && circuits[lastCircuitId]) {
+177:        circuits[lastCircuitId].push({
+328:            event: "SEND_RELAY_DATA",
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ echo "ATTACK begins:"; grep -c "connection_ap_handshake_send_begin" /tmp/cf_test/shadow.data.premature/hosts/torclient/tor.1000.stdout; echo "BENIGN begins:"; grep -c "connection_ap_handshake_send_begin" /tmp/cf_test/shadow.data/hosts/torclient/tor.1000.stdout 2>/dev/null || (ls /tmp/cf_test/ | grep -i shadow.data)
+ATTACK begins:
+30
+BENIGN begins:
+31
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ grep -n "connection_ap_handshake_send_begin" /tmp/cf_test/shadow.data.premature/hosts/torclient/tor.1000.stdout | head -4
+95:Jan 01 00:15:01.501 [info] connection_ap_handshake_send_begin(): Sending relay cell 1 on circ 2806744864 to begin stream 30417.
+96:Jan 01 00:15:01.501 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2806744864
+124:Jan 01 00:15:01.711 [info] connection_ap_handshake_send_begin(): Sending relay cell 1 on circ 2806744864 to begin stream 30418.
+125:Jan 01 00:15:01.711 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2806744864
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 

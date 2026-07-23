@@ -1,0 +1,115 @@
+{
+  "metrics": {
+    "CREATE_FLOOD": {
+      "attack": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "NOT_DETECTED"
+    },
+    "PREMATURE": {
+      "attack": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "NOT_DETECTED"
+    },
+    "SENDME_FLOOD": {
+      "attack": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "NOT_DETECTED"
+    },
+    "REPLAY": {
+      "attack": {
+        "counts": [
+          17,
+          14,
+          0
+        ],
+        "total": 31,
+        "mean": 10.33
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "DETECTED"
+    },
+    "GHOST": {
+      "attack": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "benign": {
+        "counts": [
+          0,
+          0,
+          0
+        ],
+        "total": 0,
+        "mean": 0
+      },
+      "ratio": "∞",
+      "verdict": "NOT_DETECTED"
+    }
+  },
+  "records_count": 6
+}

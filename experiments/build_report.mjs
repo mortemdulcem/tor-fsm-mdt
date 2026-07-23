@@ -1,4 +1,4 @@
-// Orchestrates: runs B1/B2/B3 trials, computes statistics, generates SVG figures, builds PDF.
+c// Orchestrates: runs B1/B2/B3 trials, computes statistics, generates SVG figures, builds PDF.
 // All numbers are real, computed from the algorithms in baselines.mjs.
 
 import fs from "node:fs/promises";

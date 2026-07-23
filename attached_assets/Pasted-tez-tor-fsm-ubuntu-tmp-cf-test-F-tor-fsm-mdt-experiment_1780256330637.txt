@@ -1,0 +1,34 @@
+tez@tor-fsm-ubuntu:/tmp/cf_test$ F=~/tor-fsm-mdt/experiments/shadow_harness.mjs
+cp "$F" "$F.bak"
+sed -i 's#^const results = await main();#const results = (import.meta.url === (await import("node:url")).pathToFileURL(process.argv[1]).href) ? await main() : null;#' "$F"
+grep -q "export { parseTorHostLog, runFsmOnAllCircuits }" "$F" || echo 'export { parseTorHostLog, runFsmOnAllCircuits };' >> "$F"
+echo "=== degisen satirlar ==="
+grep -nE "const results =|export \{ parseTorHostLog" "$F"
+cat > ~/tor-fsm-mdt/experiments/cf_detect.mjs <<'EOF'
+import { readFileSync } from "node:fs";
+import { parseTorHostLog, runFsmOnAllCircuits } from "./shadow_harness.mjs";
+const p = process.argv[2] || "/tmp/cf_test/shadow.data/hosts/torclient/tor.1000.stdout";
+const circuits = parseTorHostLog(readFileSync(p, "utf8"), "torclient");
+const fsm = runFsmOnAllCircuits(circuits);
+const byType = {};
+for (const v of fsm.violations) byType[v.classification.type] = (byType[v.classification.type] || 0) + 1;
+const cf = fsm.violations.filter((v) => v.classification.type === "CREATE_FLOOD");
+console.log("circuits:", fsm.circuitCount, "valid:", fsm.validCount, "invalid:", fsm.invalidCount);
+console.log("types:", JSON.stringify(byType));
+console.log("CREATE_FLOOD count:", cf.length);
+for (const v of cf.slice(0, 5)) console.log("  " + v.from + " x " + v.event + " -> " + v.classification.type + " (" + v.classification.severity + ")");
+EOF
+cd ~/tor-fsm-mdt && npx tsx experiments/cf_detect.mjs
+=== degisen satirlar ===
+709:const results = (import.meta.url === (await import("node:url")).pathToFileURL(process.argv[1]).href) ? await main() : null;
+711:export { parseTorHostLog, runFsmOnAllCircuits };
+circuits: 9 valid: 76 invalid: 28
+types: {"CREATE_FLOOD":9,"PREMATURE_DATA":15,"REPLAY_ATTACK":2,"GHOST_CIRCUIT":2}
+CREATE_FLOOD count: 9
+  CREATE_SENT x SEND_CREATE -> CREATE_FLOOD (MEDIUM)
+  CREATE_SENT x SEND_CREATE -> CREATE_FLOOD (MEDIUM)
+  CREATE_SENT x SEND_CREATE -> CREATE_FLOOD (MEDIUM)
+  CREATE_SENT x SEND_CREATE -> CREATE_FLOOD (MEDIUM)
+  CREATE_SENT x SEND_CREATE -> CREATE_FLOOD (MEDIUM)
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+

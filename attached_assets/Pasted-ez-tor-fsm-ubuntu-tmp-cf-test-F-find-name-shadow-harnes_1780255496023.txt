@@ -1,0 +1,283 @@
+ez@tor-fsm-ubuntu:/tmp/cf_test$ F=$(find ~ -name 'shadow_harness.mjs' 2>/dev/null | head -1)
+echo "DOSYA: $F"; wc -l "$F"
+echo "=== SHADOW_EXAMPLE_DIR / path satirlari ==="
+grep -nE "SHADOW_EXAMPLE_DIR|/home/|tor\.[0-9]+\.stdout|\.stdout|hosts" "$F"
+echo "=== nasil cagriliyor / argv / main ==="
+grep -nE "process\.argv|function main|readFileSync|stdout|run\(|export" "$F" | head -30
+DOSYA: /home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs
+710 /home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs
+=== SHADOW_EXAMPLE_DIR / path satirlari ===
+429:const SHADOW_EXAMPLE_DIR = "/home/ubuntu/shadow/examples/docs/tor";
+437:  const srcDir = SHADOW_EXAMPLE_DIR;
+477:  const hostsDir = path.join(runDir, "shadow.data", "hosts");
+480:    entries = await fs.readdir(hostsDir);
+488:    const hostDir = path.join(hostsDir, host);
+497:      if (f.startsWith("tor.") && f.endsWith(".stdout")) {
+=== nasil cagriliyor / argv / main ===
+497:      if (f.startsWith("tor.") && f.endsWith(".stdout")) {
+515:async function main() {
+710:export default results;
+tez@tor-fsm-ubuntu:/tmp/cf_test$ F=/home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs
+echo "=== onemli semboller (satir no) ==="
+grep -nE "CREATE_FLOOD|SEND_CREATE|inject|violation|classif|transition|invalid|function |const .*=|=>|States|FSM|parse" "$F" | head -60
+echo "=== main() ve sonu (515-710) ==="
+sed -n '515,710p' "$F"
+=== onemli semboller (satir no) ===
+3:// maps them to this thesis's FSM event alphabet (Sigma), feeds them through
+4:// the spec FSM (server/fsm.ts), and computes precision/recall/F1/FPR.
+13:import { STATES, EVENTS, VALID, k, classifyInvalid } from "../server/fsm.ts";
+15:const __dirname = path.dirname(fileURLToPath(import.meta.url));
+18:// 1) Per-host Tor log parser — reconstructs per-circuit FSM event sequences
+21:function parseTorHostLog(logContent, hostName) {
+22:  const lines = logContent.split("\n");
+24:  const circuits = {};
+29:  const circuitHopCount = {}; // track hop count per circuit for RECV_CREATED vs RECV_EXTENDED
+37:    const tsMatch = line.match(/^(\w+ \d+ [\d:.]+)/);
+38:    const ts = tsMatch ? tsMatch[1] : null;
+41:    const circNew = line.match(/origin_circuit_new\(\): Circuit (\d+)/);
+43:      const cid = circNew[1];
+57:    const orconn = line.match(/ORCONN BEST_ANY state (?:-?\d+)->(\d+)/);
+59:      const newState = parseInt(orconn[1]);
+91:          event: "SEND_CREATE",
+106:      const cid = buildingCircuitId || lastCircuitId;
+108:        const hop = (circuitHopCount[cid] || 0) + 1;
+149:      const closeMatch = line.match(/\(id:\s*(\d+)\)/);
+150:      const cid = closeMatch ? closeMatch[1] : lastCircuitId;
+163:      const freeMatch = line.match(/\(id:\s*(\d+)\)/);
+164:      const cid = freeMatch ? freeMatch[1] : lastCircuitId;
+191:// 2) Per-circuit FSM runner
+194:function runFsmOnCircuit(events) {
+196:  const transitions = [];
+197:  const violations = [];
+199:  let invalidCount = 0;
+202:    const key = k(state, ev.event);
+203:    const nextState = VALID[key];
+206:      transitions.push({
+216:      const classification = classifyInvalid(state, ev.event);
+217:      violations.push({
+220:        classification,
+222:        injected: ev.injected || false,
+225:      transitions.push({
+230:        classification,
+233:      invalidCount++;
+242:    transitions,
+243:    violations,
+245:    invalidCount,
+250:function runFsmOnAllCircuits(circuitMap) {
+253:  const allViolations = [];
+254:  const allTransitions = [];
+255:  const perCircuit = {};
+258:    const result = runFsmOnCircuit(events);
+260:    totalInvalid += result.invalidCount;
+261:    allViolations.push(...result.violations);
+262:    allTransitions.push(...result.transitions);
+266:      invalidCount: result.invalidCount,
+272:    transitions: allTransitions,
+273:    violations: allViolations,
+275:    invalidCount: totalInvalid,
+282:// 3) Attack injection
+285:function injectReplayAttack(circuitMap) {
+286:  const modified = {};
+287:  let injectedCount = 0;
+290:    const newEvents = [...events];
+296:        const ts = newEvents[i].timestamp;
+299:            event: "SEND_CREATE",
+302:            injected: true,
+=== main() ve sonu (515-710) ===
+async function main() {
+  console.log("=== Shadow + Tor Empirical Validation Harness ===");
+  console.log("=== Per-Circuit FSM Tracking ===\n");
+
+  const SEEDS = [42, 137, 2718];
+  const SCENARIOS = ["benign", "replay_attack", "circuit_bypass"];
+  const allResults = {
+    metadata: {
+      shadow_version: "3.3.0",
+      tor_version: execSync("tor --version", { encoding: "utf8" })
+        .trim()
+        .split("\n")[0],
+      run_date: new Date().toISOString(),
+      seeds: SEEDS,
+      scenarios: SCENARIOS,
+      simulated_time: "30 min",
+      repetitions: SEEDS.length,
+      network_topology: {
+        authorities: 1,
+        relays: 6,
+        clients: 2,
+        note: "Shadow example topology: 1 DA, 4 non-exit relays, 2 exit relays, 1 direct client, 1 tor client",
+      },
+      fsm_spec: {
+        states: STATES.length,
+        events: EVENTS.length,
+        valid_transitions: Object.keys(VALID).length,
+      },
+    },
+    runs: [],
+    perScenario: {},
+    summary: {},
+  };
+
+  for (const scenario of SCENARIOS) {
+    console.log(`\n--- Scenario: ${scenario} ---`);
+    const scenarioRuns = [];
+
+    for (const seed of SEEDS) {
+      const simResult = await runShadowSimulation(seed, scenario);
+
+      if (!simResult.success) {
+        scenarioRuns.push({ seed, error: simResult.error, metrics: null });
+        continue;
+      }
+
+      const circuitMap = await collectPerCircuitLogs(simResult.runDir);
+      const circuitCount = Object.keys(circuitMap).length;
+      const totalEvents = Object.values(circuitMap).reduce(
+        (a, e) => a + e.length,
+        0,
+      );
+      console.log(
+        `  Parsed ${totalEvents} events across ${circuitCount} circuits`,
+      );
+
+      const jsonlPath = path.join(simResult.runDir, "events.jsonl");
+      const jsonlLines = [];
+      for (const [cid, events] of Object.entries(circuitMap)) {
+        for (const ev of events) {
+          jsonlLines.push(JSON.stringify({ circuitId: cid, ...ev }));
+        }
+      }
+      await fs.writeFile(jsonlPath, jsonlLines.join("\n"));
+
+      let traceCircuits = circuitMap;
+      let injectedCount = 0;
+
+      if (scenario === "replay_attack") {
+        const result = injectReplayAttack(circuitMap);
+        traceCircuits = result.circuits;
+        injectedCount = result.injectedCount;
+        console.log(`  Injected ${injectedCount} replay attack events`);
+      } else if (scenario === "circuit_bypass") {
+        const result = injectCircuitBypass(circuitMap);
+        traceCircuits = result.circuits;
+        injectedCount = result.injectedCount;
+        console.log(`  Injected ${injectedCount} circuit bypass events`);
+      }
+
+      const fsmResult = runFsmOnAllCircuits(traceCircuits);
+      console.log(
+        `  FSM: ${fsmResult.validCount} valid, ${fsmResult.invalidCount} invalid across ${fsmResult.circuitCount} circuits`,
+      );
+
+      const metrics = computeMetrics(fsmResult, scenario, injectedCount);
+      console.log(
+        `  Metrics: P=${metrics.precision?.toFixed(4) ?? "N/A"} R=${metrics.recall?.toFixed(4) ?? "N/A"} F1=${metrics.f1?.toFixed(4) ?? "N/A"} FPR=${metrics.fpr?.toFixed(4)}`,
+      );
+
+      const runResult = {
+        seed,
+        scenario,
+        wallTime: simResult.elapsed,
+        circuitCount,
+        rawEventCount: totalEvents,
+        injectedCount,
+        fsmResult: {
+          validCount: fsmResult.validCount,
+          invalidCount: fsmResult.invalidCount,
+          circuitCount: fsmResult.circuitCount,
+        },
+        metrics,
+        sampleCircuit: Object.entries(fsmResult.perCircuit)
+          .slice(0, 3)
+          .map(([cid, r]) => ({ cid, ...r })),
+        sampleViolations: fsmResult.violations.slice(0, 5).map((v) => ({
+          from: v.from,
+          event: v.event,
+          type: v.classification.type,
+          severity: v.classification.severity,
+          injected: v.injected,
+        })),
+      };
+
+      await fs.writeFile(
+        path.join(simResult.runDir, "results.json"),
+        JSON.stringify(runResult, null, 2),
+      );
+
+      scenarioRuns.push(runResult);
+      allResults.runs.push(runResult);
+    }
+
+    const ok = scenarioRuns.filter((r) => r.metrics);
+    if (ok.length > 0) {
+      const avg = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+      const sd = (a) => {
+        const m = avg(a);
+        return Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length);
+      };
+      const stat = (arr) =>
+        arr.length > 0 ? { mean: avg(arr), sd: sd(arr), values: arr } : null;
+
+      const ps = ok.map((r) => r.metrics.precision).filter((v) => v !== null);
+      const rs = ok.map((r) => r.metrics.recall).filter((v) => v !== null);
+      const f1s = ok.map((r) => r.metrics.f1).filter((v) => v !== null);
+      const fprs = ok.map((r) => r.metrics.fpr);
+
+      allResults.perScenario[scenario] = {
+        runsCompleted: ok.length,
+        runsTotal: SEEDS.length,
+        precision: stat(ps),
+        recall: stat(rs),
+        f1: stat(f1s),
+        fpr: stat(fprs),
+        avgCircuits: avg(ok.map((r) => r.circuitCount)),
+        avgEvents: avg(ok.map((r) => r.rawEventCount)),
+        avgValid: avg(ok.map((r) => r.fsmResult.validCount)),
+        avgInvalid: avg(ok.map((r) => r.fsmResult.invalidCount)),
+      };
+    }
+  }
+
+  console.log("\n\n=== RESULTS SUMMARY ===\n");
+  console.log(
+    "Scenario           | Precision       | Recall          | F1              | FPR",
+  );
+  console.log(
+    "-------------------|-----------------|-----------------|-----------------|----------------",
+  );
+  for (const s of SCENARIOS) {
+    const d = allResults.perScenario[s];
+    if (!d) {
+      console.log(`${s.padEnd(19)}| NO DATA`);
+      continue;
+    }
+    const fmt = (x) =>
+      x ? `${x.mean.toFixed(4)} +/- ${x.sd.toFixed(4)}` : "N/A            ";
+    console.log(
+      `${s.padEnd(19)}| ${fmt(d.precision)} | ${fmt(d.recall)} | ${fmt(d.f1)} | ${fmt(d.fpr)}`,
+    );
+  }
+
+  allResults.summary = {
+    totalSimulations: allResults.runs.length,
+    successfulSimulations: allResults.runs.filter((r) => r.metrics).length,
+    totalEventsProcessed: allResults.runs.reduce(
+      (a, r) => a + (r.rawEventCount || 0),
+      0,
+    ),
+    totalCircuitsAnalyzed: allResults.runs.reduce(
+      (a, r) => a + (r.circuitCount || 0),
+      0,
+    ),
+  };
+
+  const outPath = path.resolve(__dirname, "shadow_results.json");
+  await fs.writeFile(outPath, JSON.stringify(allResults, null, 2));
+  console.log(`\nResults written to: ${outPath}`);
+
+  return allResults;
+}
+
+const results = await main();
+export default results;
+tez@tor-fsm-ubuntu:/tmp/cf_test$

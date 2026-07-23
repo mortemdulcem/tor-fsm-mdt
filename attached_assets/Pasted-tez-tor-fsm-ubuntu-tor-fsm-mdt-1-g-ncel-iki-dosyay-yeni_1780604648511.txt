@@ -1,0 +1,166 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ # 1) güncel iki dosyayı yeni daldan çalışma ağacına al
+git fetch origin ml-ngram-features
+git checkout origin/ml-ngram-features -- experiments/export_features.mjs experiments/ml_baseline.py
+
+# 2) n-gram + zamanlama öznitelikli CSV'yi yeniden üret
+node experiments/export_features.mjs
+
+# 3) ML baseline (artık "5) SIRA (n-gram) + ZAMANLAMA" bölümü olmalı)
+python3 experiments/ml_baseline.py
+remote: Enumerating objects: 57, done.
+remote: Counting objects: 100% (57/57), done.
+remote: Compressing objects: 100% (18/18), done.
+remote: Total 45 (delta 31), reused 41 (delta 27), pack-reused 0 (from 0)
+Nesneler açılıyor: 100% (45/45), 199.76 KiB | 828.00 KiB/sn, bitti.
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+ * branch            ml-ngram-features -> FETCH_HEAD
+ * [yeni dal]        ml-ngram-features -> origin/ml-ngram-features
+  [parse sekli] Object; ust anahtarlar: [
+  '1', '2', '3',
+  '4', '5', '6',
+  '7', '8', '9'
+]
+  benign/benign seed=42: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  attack/create_flood seed=42: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  attack/circuit_hijack seed=42: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  attack/premature_data seed=42: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  benign/benign seed=137: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  attack/create_flood seed=137: 37 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  attack/circuit_hijack seed=137: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  attack/premature_data seed=137: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  benign/benign seed=2718: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  attack/create_flood seed=2718: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  attack/circuit_hijack seed=2718: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+  attack/premature_data seed=2718: 36 devre (4 istemci: torclient,torclient2,torclient3,torclient4)
+
+--- olay-tipi alfabesi --- CIRCUIT_CLOSED CONNECT RECV_CREATED RECV_EXTENDED SEND_CREATE SEND_DESTROY SEND_EXTEND SEND_RELAY_DATA TLS_OK
+--- n-gram (bigram) sayisi: 18 ---
+yazildi: experiments/ml_features.csv (433 devre, 38 sutun)
+yazildi: experiments/ml_dataset.json (433 devre, 3 seed)
+
+--- ml_features.csv (ilk 6 satir) ---
+scenario,attack,seed,gid,n_events,dur_ms,CIRCUIT_CLOSED,CONNECT,RECV_CREATED,RECV_EXTENDED,SEND_CREATE,SEND_DESTROY,SEND_EXTEND,SEND_RELAY_DATA,TLS_OK,bg_CIRCUIT_CLOSED>SEND_RELAY_DATA,bg_CONNECT>TLS_OK,bg_RECV_CREATED>SEND_CREATE,bg_RECV_CREATED>SEND_EXTEND,bg_RECV_CREATED>SEND_RELAY_DATA,bg_RECV_EXTENDED>SEND_CREATE,bg_RECV_EXTENDED>SEND_EXTEND,bg_RECV_EXTENDED>SEND_RELAY_DATA,bg_SEND_CREATE>RECV_CREATED,bg_SEND_CREATE>SEND_CREATE,bg_SEND_CREATE>SEND_EXTEND,bg_SEND_CREATE>SEND_RELAY_DATA,bg_SEND_DESTROY>CIRCUIT_CLOSED,bg_SEND_EXTEND>RECV_EXTENDED,bg_SEND_RELAY_DATA>SEND_DESTROY,bg_SEND_RELAY_DATA>SEND_EXTEND,bg_SEND_RELAY_DATA>SEND_RELAY_DATA,bg_TLS_OK>SEND_CREATE,seq_setup_before_data,t_gap_mean,t_gap_max,t_gap_med,t_first_data_ms
+benign,benign,42,torclient:1,8,69050,1,1,1,0,1,1,0,2,1,0,1,0,0,1,0,0,0,1,0,0,0,1,0,1,0,1,1,1,9864,68439,110,501
+benign,benign,42,torclient:2,7,61329,1,1,1,0,1,1,0,1,1,0,1,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0,1,1,10222,60828,0,501
+benign,benign,42,torclient:3,6,701,0,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,1,-1,140,401,100,-1
+benign,benign,42,torclient:4,10,600,0,1,1,3,1,0,3,0,1,0,1,0,1,0,0,2,0,1,0,0,0,0,3,0,0,0,1,-1,67,300,0,-1
+benign,benign,42,torclient:5,8,600,0,1,1,2,1,0,2,0,1,0,1,0,1,0,0,1,0,1,0,0,0,0,2,0,0,0,1,-1,86,300,0,-1
+========================================================================
+VERI OZETI
+========================================================================
+toplam devre: 433 | seed: [42, 137, 2718] | oznitelik: ['n_events', 'CIRCUIT_CLOSED', 'CONNECT', 'RECV_CREATED', 'RECV_EXTENDED', 'SEND_CREATE', 'SEND_DESTROY', 'SEND_EXTEND', 'SEND_RELAY_DATA', 'TLS_OK']
+scenario  attack        
+attack    circuit_hijack    108
+          create_flood      109
+          premature_data    108
+benign    benign            108
+
+benign devre: 108 satir, 11 essiz oznitelik vektoru -> 97 kopya (seed'ler arasi tekrar; deterministik Shadow)
+
+========================================================================
+0) YAPISAL AYRILABILIRLIK (CV yok; deterministik veri gercegi)
+========================================================================
+  circuit_hijack  : 108 devre -> 11 essiz vektor
+  create_flood    : 109 devre -> 18 essiz vektor
+  premature_data  : 108 devre -> 12 essiz vektor
+  benign          : 108 devre -> 11 essiz vektor
+  ortusme create_flood ∩ circuit_hijack: 9 essiz vektor ortak (|create_flood|=18, |circuit_hijack|=11)
+  ortusme premature_data ∩ benign: 3 essiz vektor ortak (|premature_data|=12, |benign|=11)
+  ortusme create_flood ∩ benign: 0 essiz vektor ortak (|create_flood|=18, |benign|=11)
+  ortusme circuit_hijack ∩ benign: 0 essiz vektor ortak (|circuit_hijack|=11, |benign|=11)
+  -> create_flood ve circuit_hijack essiz vektorleri buyuk olcude AYNI kumede;
+     bu, hangi CV kullanilirsa kullanilsin degismeyen yapisal bir gercektir.
+
+  LOSO fold-ici kopya ortusme (test vektorunun train'de birebir bulunma orani):
+    test seed=42: 140/144 (97.2%) test vektoru train'de mevcut
+    test seed=137: 143/145 (98.6%) test vektoru train'de mevcut
+    test seed=2718: 133/144 (92.4%) test vektoru train'de mevcut
+  -> LOSO sizintiyi ONLEMEZ; asagidaki CV metrikleri IYIMSERDIR (dagitim-ici/in-distribution), genelleme olarak okunmamalidir.
+
+  dedup: 40 essiz vektor -> 28 tek-sinif, 12 paylasimli
+
+========================================================================
+1) DENETIMLI LogisticRegression  (benign=0 / attack=1)  LOSO CV
+========================================================================
+  test seed=42: P=1.000 R=0.694 F1=0.820
+  test seed=137: P=0.987 R=0.706 F1=0.824
+  test seed=2718: P=1.000 R=0.704 F1=0.826
+  ORT: P=0.996±0.006  R=0.702±0.005  F1=0.823±0.003
+  saldiri tipi bazinda recall (attack olarak isaretlenen oran):
+    create_flood    : 1.000±0.000
+    circuit_hijack  : 1.000±0.000
+    premature_data  : 0.102±0.013
+
+========================================================================
+2) DENETIMSIZ IsolationForest  (yalniz benign'e fit -> anomali=attack)  LOSO
+========================================================================
+  test seed=42: P=0.809 R=0.704 F1=0.752
+  test seed=137: P=0.817 R=0.697 F1=0.752
+  test seed=2718: P=0.776 R=0.833 F1=0.804
+  ORT: P=0.801±0.018  R=0.745±0.063  F1=0.770±0.024
+  saldiri tipi bazinda recall (anomali olarak isaretlenen oran):
+    create_flood    : 0.716±0.104
+    circuit_hijack  : 0.694±0.060
+    premature_data  : 0.824±0.026
+
+========================================================================
+3) COK-SINIFLI LogReg (benign/create_flood/circuit_hijack/premature)  LOSO
+========================================================================
+  ort accuracy=0.600±0.027
+  toplam karisiklik matrisi (satir=gercek, sutun=tahmin):
+       benign  create_fl  circuit_h  premature
+  benign                91          0          0         17
+  create_flood           0         65         44          0
+  circuit_hijack         0         57         51          0
+  premature_data        55          0          0         53
+
+  create_flood: 65/109 dogru; 44 -> circuit_hijack'e karisti
+  circuit_hijack: 51/108 dogru; 57 -> create_flood'a karisti
+
+(Yorum: ikisi de SEND_CREATE=2 imzasi tasidigindan sayim-seviyesinde buyuk olcude ortusur; bu FSM bulgusuyla -hijack ayirt edici degil- tutarlidir.)
+
+========================================================================
+4) SIZINTISIZ GroupKFold (grup=essiz vektor, K=5); OOF havuzlanmis
+========================================================================
+  sizinti kontrolu: 0/433 test vektoru train'de (0 olmali)
+  DENETIMLI (OOF): P=0.952 R=0.674 F1=0.789
+    create_flood     recall(OOF)=1.000
+    circuit_hijack   recall(OOF)=1.000
+    premature_data   recall(OOF)=0.019
+  DENETIMSIZ (OOF): P=0.728 R=0.674 F1=0.700
+    create_flood     recall(OOF)=0.532
+    circuit_hijack   recall(OOF)=0.491
+    premature_data   recall(OOF)=1.000
+  COK-SINIFLI (OOF) accuracy=0.480
+  karisiklik matrisi (satir=gercek, sutun=tahmin):
+       benign  create_fl  circuit_h  premature
+  benign                80          0          0         28
+  create_flood           0         65         44          0
+  circuit_hijack         0         57         51          0
+  premature_data        96          0          0         12
+
+(Yorum: GroupKFold ile ayni vektor train/test'e birlikte dusmez; kopya sizintisi 0'a iner. LOSO ile farki, iyimserligin ne kadarinin ezberden -ne kadarinin gercek sinyalden- geldigini gosterir.)
+
+========================================================================
+5) SIRA (n-gram) + ZAMANLAMA OZNITELIKLERI vs SAYIM-ONLY (LOSO)
+========================================================================
+  sayim-only oznitelik: 10 | genisletilmis: 34 (+zamanlama ['dur_ms', 't_gap_mean', 't_gap_max', 't_gap_med', 't_first_data_ms'], +n-gram/sira 19 sutun)
+
+  saldiri tipi bazinda recall (sayim-only -> genisletilmis):
+    create_flood    : 1.000 -> 1.000  (delta +0.000)
+    circuit_hijack  : 1.000 -> 1.000  (delta +0.000)
+    premature_data  : 0.102 -> 0.694  (delta +0.593)
+
+  cok-sinifli accuracy: 0.600 -> 0.908  (delta +0.307)
+  create_flood<->circuit_hijack karismasi (cf->hj, hj->cf):
+    sayim-only : cf_dogru=65 cf->hj=44 | hj_dogru=51 hj->cf=57
+    genisletil.: cf_dogru=109 cf->hj=0 | hj_dogru=108 hj->cf=0
+  yapisal essiz-vektor ortusme (dusmesi = daha iyi ayrim):
+    create_flood ∩ circuit_hijack: 9 -> 0
+    premature_data ∩ benign      : 3 -> 2
+
+  -> iyilesme tespiti: hijack_recall delta=+0.000, premature_recall delta=+0.593, accuracy delta=+0.307, flood/hijack ortusme dususu=9
+     SONUC: IYILESME VAR
+
+[OK] sonuclar JSON'a yazildi -> experiments/ml_baseline_results.json
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 

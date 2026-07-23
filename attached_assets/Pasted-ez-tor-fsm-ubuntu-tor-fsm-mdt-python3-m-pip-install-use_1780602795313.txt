@@ -1,0 +1,80 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ python3 -m pip install --user numpy pandas scikit-learn
+python3 experiments/ml_baseline.py
+Requirement already satisfied: numpy in /usr/lib/python3/dist-packages (1.21.5)
+Requirement already satisfied: pandas in /usr/lib/python3/dist-packages (1.3.5)
+Requirement already satisfied: scikit-learn in /usr/lib/python3/dist-packages (0.23.2)
+========================================================================
+VERI OZETI
+========================================================================
+toplam devre: 109 | seed: [42, 137, 2718] | oznitelik: ['n_events', 'CIRCUIT_CLOSED', 'CONNECT', 'RECV_CREATED', 'RECV_EXTENDED', 'SEND_CREATE', 'SEND_DESTROY', 'SEND_EXTEND', 'SEND_RELAY_DATA', 'TLS_OK']
+scenario  attack        
+attack    circuit_hijack    27
+          create_flood      28
+          premature_data    27
+benign    benign            27
+
+benign devre: 27 satir, 8 essiz oznitelik vektoru -> 19 kopya (seed'ler arasi tekrar; deterministik Shadow)
+
+========================================================================
+0) YAPISAL AYRILABILIRLIK (CV yok; deterministik veri gercegi)
+========================================================================
+  circuit_hijack  : 27 devre -> 10 essiz vektor
+  create_flood    : 28 devre ->  8 essiz vektor
+  premature_data  : 27 devre -> 10 essiz vektor
+  benign          : 27 devre ->  8 essiz vektor
+  ortusme create_flood ∩ circuit_hijack: 7 essiz vektor ortak (|create_flood|=8, |circuit_hijack|=10)
+  ortusme premature_data ∩ benign: 2 essiz vektor ortak (|premature_data|=10, |benign|=8)
+  ortusme create_flood ∩ benign: 0 essiz vektor ortak (|create_flood|=8, |benign|=8)
+  ortusme circuit_hijack ∩ benign: 0 essiz vektor ortak (|circuit_hijack|=10, |benign|=8)
+  -> create_flood ve circuit_hijack essiz vektorleri buyuk olcude AYNI kumede;
+     bu, hangi CV kullanilirsa kullanilsin degismeyen yapisal bir gercektir.
+
+  LOSO fold-ici kopya ortusme (test vektorunun train'de birebir bulunma orani):
+    test seed=42: 34/36 (94.4%) test vektoru train'de mevcut
+    test seed=137: 35/37 (94.6%) test vektoru train'de mevcut
+    test seed=2718: 31/36 (86.1%) test vektoru train'de mevcut
+  -> LOSO sizintiyi ONLEMEZ; asagidaki CV metrikleri IYIMSERDIR (dagitim-ici/in-distribution), genelleme olarak okunmamalidir.
+
+========================================================================
+1) DENETIMLI LogisticRegression  (benign=0 / attack=1)  LOSO CV
+========================================================================
+  test seed=42: P=1.000 R=0.667 F1=0.800
+  test seed=137: P=1.000 R=0.714 F1=0.833
+  test seed=2718: P=1.000 R=0.704 F1=0.826
+  ORT: P=1.000±0.000  R=0.695±0.020  F1=0.820±0.014
+  saldiri tipi bazinda recall (attack olarak isaretlenen oran):
+    create_flood    : 1.000±0.000
+    circuit_hijack  : 1.000±0.000
+    premature_data  : 0.074±0.052
+
+========================================================================
+2) DENETIMSIZ IsolationForest  (yalniz benign'e fit -> anomali=attack)  LOSO
+========================================================================
+  test seed=42: P=0.774 R=0.889 F1=0.828
+  test seed=137: P=0.733 R=0.786 F1=0.759
+  test seed=2718: P=0.742 R=0.852 F1=0.793
+  ORT: P=0.750±0.018  R=0.842±0.043  F1=0.793±0.028
+  saldiri tipi bazinda recall (anomali olarak isaretlenen oran):
+    create_flood    : 0.789±0.078
+    circuit_hijack  : 0.741±0.052
+    premature_data  : 1.000±0.000
+
+========================================================================
+3) COK-SINIFLI LogReg (benign/create_flood/circuit_hijack/premature)  LOSO
+========================================================================
+  ort accuracy=0.532±0.017
+  toplam karisiklik matrisi (satir=gercek, sutun=tahmin):
+       benign  create_fl  circuit_h  premature
+  benign                22          0          0          5
+  create_flood           0         14         14          0
+  circuit_hijack         0         13         14          0
+  premature_data        19          0          0          8
+
+  create_flood: 14/28 dogru; 14 -> circuit_hijack'e karisti
+  circuit_hijack: 14/27 dogru; 13 -> create_flood'a karisti
+
+(Yorum: ikisi de SEND_CREATE=2 imzasi tasidigindan sayim-seviyesinde buyuk olcude ortusur; bu FSM bulgusuyla -hijack ayirt edici degil- tutarlidir.)
+
+[OK] sonuclar JSON'a yazildi -> experiments/ml_baseline_results.json
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+

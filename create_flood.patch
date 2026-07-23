@@ -1,0 +1,22 @@
+--- a/src/core/or/circuitbuild.c
++++ b/src/core/or/circuitbuild.c
+@@ -1011,6 +1011,19 @@
+   log_info(LD_CIRC,"First hop: finished sending %s cell to '%s'",
+            fast ? "CREATE_FAST" : "CREATE",
+            node ? node_describe(node) : "<unnamed>");
++
++  /* FSM-MDT CREATE_FLOOD attack: when running as the designated attacker node
++   * (gated by an environment variable so the same binary is benign by default),
++   * deliver a SECOND, duplicate CREATE cell on the same circuit id. This is a
++   * real protocol violation on the wire (two first-hop CREATE cells for one
++   * circuit), not a fabricated log line. The matching info log below reflects
++   * the genuine second cell and is what the FSM harness keys on as SEND_CREATE. */
++  if (getenv("TOR_FSM_ATTACK_CREATE_FLOOD")) {
++    (void) circuit_deliver_create_cell(TO_CIRCUIT(circ), &cc, 0);
++    log_info(LD_CIRC,"First hop: finished sending %s cell to '%s'",
++             fast ? "CREATE_FAST" : "CREATE",
++             node ? node_describe(node) : "<unnamed>");
++  }
+   return 0;
+ }
+ 

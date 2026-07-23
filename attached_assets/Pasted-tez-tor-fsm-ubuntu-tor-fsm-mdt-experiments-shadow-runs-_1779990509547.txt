@@ -1,0 +1,36 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42$ cd ~/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42 && rm -rf shadow.data/ && ~/.local/bin/shadow --template-directory shadow.data.template shadow.yaml 2>&1 | grep -E "ERROR|exit|StoppedByShadow|expected" | head -40
+00:00:00.394027 [27245:shadow-worker] 00:01:00.000000000 [ERROR] [relay8:11.0.0.13] [process.rs:1557] [shadow_rs::host::process] process 'relay8.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'relay8.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:00.394887 [27244:shadow-worker] 00:01:00.000000000 [WARN] [exit1:11.0.0.2] [regular_file.c:393] [regularfile_openat] Opening unsupported proc file. Contents may incorrectly refer to native process instead of emulated, and/or have nondeterministic contents: /proc/meminfo
+00:00:00.394954 [27244:shadow-worker] 00:01:00.000000000 [WARN] [exit1:11.0.0.2] [regular_file.c:393] [regularfile_openat] Opening unsupported proc file. Contents may incorrectly refer to native process instead of emulated, and/or have nondeterministic contents: /proc/meminfo
+00:00:00.401582 [27247:shadow-worker] 00:01:00.000000000 [ERROR] [relay5:11.0.0.10] [process.rs:1557] [shadow_rs::host::process] process 'relay5.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'relay5.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:00.417530 [27245:shadow-worker] 00:01:00.000000000 [ERROR] [exit3:11.0.0.4] [process.rs:1557] [shadow_rs::host::process] process 'exit3.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'exit3.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:00.421382 [27247:shadow-worker] 00:01:00.000000000 [WARN] [exit2:11.0.0.3] [regular_file.c:393] [regularfile_openat] Opening unsupported proc file. Contents may incorrectly refer to native process instead of emulated, and/or have nondeterministic contents: /proc/meminfo
+00:00:00.421521 [27247:shadow-worker] 00:01:00.000000000 [WARN] [exit2:11.0.0.3] [regular_file.c:393] [regularfile_openat] Opening unsupported proc file. Contents may incorrectly refer to native process instead of emulated, and/or have nondeterministic contents: /proc/meminfo
+00:00:00.870853 [27245:shadow-worker] 00:01:00.000000000 [ERROR] [relay6:11.0.0.11] [process.rs:1557] [shadow_rs::host::process] process 'relay6.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'relay6.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:00.892460 [27245:shadow-worker] 00:01:00.000000000 [ERROR] [relay7:11.0.0.12] [process.rs:1557] [shadow_rs::host::process] process 'relay7.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'relay7.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:03.443468 [27245:shadow-worker] 00:15:00.000000000 [ERROR] [torclient3:11.0.0.16] [process.rs:1557] [shadow_rs::host::process] process 'torclient3.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'torclient3.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:03.444437 [27247:shadow-worker] 00:15:00.000000000 [ERROR] [torclient4:11.0.0.17] [process.rs:1557] [shadow_rs::host::process] process 'torclient4.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'torclient4.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:03.466644 [27245:shadow-worker] 00:15:00.000000000 [ERROR] [torclient2:11.0.0.15] [process.rs:1557] [shadow_rs::host::process] process 'torclient2.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+Error: process 'torclient2.tor.1000' exited with status Normal(1); expected end state was running but was exited: 1
+00:00:06.381819 [27247:shadow-worker] 00:30:00.000000000 [ERROR] [torclient3:11.0.0.16] [process.rs:1557] [shadow_rs::host::process] process 'torclient3.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+Error: process 'torclient3.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+00:00:06.381975 [27245:shadow-worker] 00:30:00.000000000 [ERROR] [torclient2:11.0.0.15] [process.rs:1557] [shadow_rs::host::process] process 'torclient2.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+Error: process 'torclient2.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+00:00:06.390521 [27245:shadow-worker] 00:30:00.000000000 [ERROR] [torclient4:11.0.0.17] [process.rs:1557] [shadow_rs::host::process] process 'torclient4.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+Error: process 'torclient4.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+00:00:06.405658 [27230:shadow] n/a [INFO] [n/a] [manager.rs:586] [shadow_rs::core::manager] Global syscall counts: {write:141371, read:64229, epoll_wait:37187, getpid:10287, epoll_ctl:8758, getsockopt:6073, ioctl:5414, getrandom:4695, sendto:4213, close:3528, newfstatat:3188, readlink:3005, recvfrom:2723, open:2241, futex:1797, setsockopt:1423, rename:1277, socket:739, connect:708, unlink:697, mmap:688, brk:664, accept4:659, munmap:629, fstat:487, stat:262, lseek:250, rt_sigaction:221, mprotect:157, openat:129, uname:98, prctl:96, getgid:75, getuid:75, fcntl:73, getsockname:71, rt_sigprocmask:63, timerfd_create:54, timerfd_settime:54, getcwd:49, madvise:44, accept:40, shutdown:40, unknown-syscall:40, geteuid:32, mremap:32, getdents64:26, bind:24, getegid:24, listen:24, sysinfo:16, fchmod:15, clone3:14, rseq:14, set_robust_list:14, access:12, epoll_create:12, exit_group:10, epoll_create1:8, flock:8, fsync:8, getrlimit:8, mkdir:8, pipe2:8, setrlimit:8, eventfd2:7, sched_getaffinity:6}
+00:00:06.406588 [27230:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export] Failed to run the simulation
+00:00:06.406746 [27230:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export] 
+00:00:06.406871 [27230:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export] Caused by:
+00:00:06.407043 [27230:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export]     11 managed processes in unexpected final state
+Error:     11 managed processes in unexpected final state
+**   11 managed processes in unexpected final state
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42$ 
+

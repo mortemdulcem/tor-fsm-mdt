@@ -1,0 +1,259 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ grep -n "connection_ap_handshake_send_begin" /tmp/cf_test/shadow.data.premature/hosts/torclient/tor.1000.stdout | head -4
+95:Jan 01 00:15:01.501 [info] connection_ap_handshake_send_begin(): Sending relay cell 1 on circ 2806744864 to begin stream 30417.
+96:Jan 01 00:15:01.501 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2806744864
+124:Jan 01 00:15:01.711 [info] connection_ap_handshake_send_begin(): Sending relay cell 1 on circ 2806744864 to begin stream 30418.
+125:Jan 01 00:15:01.711 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2806744864
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt && sed -n '1,200p' experiments/shadow_harness.mjs
+// Shadow + Tor empirical validation harness.
+// Parses real Tor info-level logs from Shadow simulation runs,
+// maps them to this thesis's FSM event alphabet (Sigma), feeds them through
+// the spec FSM (server/fsm.ts), and computes precision/recall/F1/FPR.
+//
+// NO fabricated data. Every number comes from actual Shadow log parsing.
+// If a step fails, the failure is documented in the output JSON.
+
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
+import { STATES, EVENTS, VALID, k, classifyInvalid } from "../server/fsm.ts";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// ---------------------------------------------------------------------------
+// 1) Per-host Tor log parser — reconstructs per-circuit FSM event sequences
+// ---------------------------------------------------------------------------
+
+function parseTorHostLog(logContent, hostName) {
+  const lines = logContent.split("\n");
+  let lastCircuitId = null;
+  const circuits = {};
+  // Track OR connection state per-host: once TLS is established for an OR
+  // connection, all subsequent circuits on this host reuse it.
+  let orconnEstablished = false;
+  let orconnPending = false; // waiting for TLS to complete for current circuit
+  const circuitHopCount = {}; // track hop count per circuit for RECV_CREATED vs RECV_EXTENDED
+  // buildingCircuitId: the circuit that most recently sent CREATE. Handshake
+  // completions (circuit_finish_handshake) are attributed to this circuit,
+  // not lastCircuitId, because new circuits can be created before the
+  // previous circuit's handshakes complete.
+  let buildingCircuitId = null;
+
+  for (const line of lines) {
+    const tsMatch = line.match(/^(\w+ \d+ [\d:.]+)/);
+    const ts = tsMatch ? tsMatch[1] : null;
+    if (!ts) continue;
+
+    const circNew = line.match(/origin_circuit_new\(\): Circuit (\d+)/);
+    if (circNew) {
+      const cid = circNew[1];
+      lastCircuitId = cid;
+      if (!circuits[cid]) circuits[cid] = [];
+      circuits[cid].push({ event: "CONNECT", timestamp: ts, host: hostName });
+      if (orconnEstablished) {
+        // OR connection already established — synthesize TLS_OK (connection reuse)
+        circuits[cid].push({ event: "TLS_OK", timestamp: ts, host: hostName });
+      } else {
+        orconnPending = true;
+      }
+      continue;
+    }
+
+    // ORCONN state changes: state>=7 means TLS handshake complete (OPEN)
+    const orconn = line.match(/ORCONN BEST_ANY state (?:-?\d+)->(\d+)/);
+    if (orconn) {
+      const newState = parseInt(orconn[1]);
+      if (newState >= 7 && !orconnEstablished) {
+        orconnEstablished = true;
+        orconnPending = false;
+        if (lastCircuitId && circuits[lastCircuitId]) {
+          circuits[lastCircuitId].push({
+            event: "TLS_OK",
+            timestamp: ts,
+            host: hostName,
+          });
+        }
+      }
+      continue;
+    }
+
+    if (/connection_or_connect_failed_tls/i.test(line)) {
+      if (lastCircuitId && circuits[lastCircuitId]) {
+        circuits[lastCircuitId].push({
+          event: "TLS_FAIL",
+          timestamp: ts,
+          host: hostName,
+        });
+      }
+      orconnPending = false;
+      continue;
+    }
+
+    if (/circuit_send_first_onion_skin\(\).*sending CREATE/i.test(line)) {
+      // Track which circuit sent CREATE — handshake completions belong to it
+      buildingCircuitId = lastCircuitId;
+      if (lastCircuitId && circuits[lastCircuitId]) {
+        circuits[lastCircuitId].push({
+          event: "SEND_CREATE",
+          timestamp: ts,
+          host: hostName,
+        });
+      }
+      continue;
+    }
+
+    // circuit_finish_handshake() is logged for ALL hops without circuit ID.
+    // We attribute it to buildingCircuitId (the circuit that sent CREATE),
+    // not lastCircuitId, because new circuits may have been created since.
+    // Hop 1 = RECV_CREATED; hop 2+ = SEND_EXTEND + RECV_EXTENDED.
+    // circuit_send_next_onion_skin() is not logged at info level in Tor
+    // 0.4.6.10, so we synthesize SEND_EXTEND before RECV_EXTENDED.
+    if (/circuit_finish_handshake\(\)/.test(line)) {
+      const cid = buildingCircuitId || lastCircuitId;
+      if (cid && circuits[cid]) {
+        const hop = (circuitHopCount[cid] || 0) + 1;
+        circuitHopCount[cid] = hop;
+        if (hop === 1) {
+          circuits[cid].push({
+            event: "RECV_CREATED",
+            timestamp: ts,
+            host: hostName,
+          });
+        } else {
+          circuits[cid].push({
+            event: "SEND_EXTEND",
+            timestamp: ts,
+            host: hostName,
+          });
+          circuits[cid].push({
+            event: "RECV_EXTENDED",
+            timestamp: ts,
+            host: hostName,
+          });
+        }
+      }
+      continue;
+    }
+
+    if (/circuit_build_no_more_hops\(\).*circuit built/i.test(line)) {
+      continue;
+    }
+
+    if (/connection_ap_handshake_send_begin\(\)/.test(line)) {
+      if (lastCircuitId && circuits[lastCircuitId]) {
+        circuits[lastCircuitId].push({
+          event: "SEND_RELAY_DATA",
+          timestamp: ts,
+          host: hostName,
+        });
+      }
+      continue;
+    }
+
+    // Circuit close: format is "Circuit 0 (id: N) marked for close"
+    if (/circuit_mark_for_close/i.test(line)) {
+      const closeMatch = line.match(/\(id:\s*(\d+)\)/);
+      const cid = closeMatch ? closeMatch[1] : lastCircuitId;
+      if (cid && circuits[cid]) {
+        circuits[cid].push({
+          event: "SEND_DESTROY",
+          timestamp: ts,
+          host: hostName,
+        });
+      }
+      continue;
+    }
+
+    // Circuit freed: format is "Circuit 0 (id: N) has been freed"
+    if (/circuit_free_\(\)/i.test(line)) {
+      const freeMatch = line.match(/\(id:\s*(\d+)\)/);
+      const cid = freeMatch ? freeMatch[1] : lastCircuitId;
+      if (cid && circuits[cid]) {
+        circuits[cid].push({
+          event: "CIRCUIT_CLOSED",
+          timestamp: ts,
+          host: hostName,
+        });
+      }
+      continue;
+    }
+
+    if (/circuit_expire_building/i.test(line)) {
+      if (lastCircuitId && circuits[lastCircuitId]) {
+        circuits[lastCircuitId].push({
+          event: "TIMEOUT",
+          timestamp: ts,
+          host: hostName,
+        });
+      }
+      continue;
+    }
+  }
+
+  return circuits;
+}
+
+// ---------------------------------------------------------------------------
+// 2) Per-circuit FSM runner
+// ---------------------------------------------------------------------------
+
+function runFsmOnCircuit(events) {
+  let state = "IDLE";
+  const transitions = [];
+  const violations = [];
+  let validCount = 0;
+  let invalidCount = 0;
+
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ grep -n "circ\|circuit_new\|origin_circuit\|n_circ_id\|EXTEND\|CREATE\|match\|regex\|/circ" experiments/shadow_harness.mjs | head -50
+18:// 1) Per-host Tor log parser — reconstructs per-circuit FSM event sequences
+24:  const circuits = {};
+26:  // connection, all subsequent circuits on this host reuse it.
+28:  let orconnPending = false; // waiting for TLS to complete for current circuit
+29:  const circuitHopCount = {}; // track hop count per circuit for RECV_CREATED vs RECV_EXTENDED
+30:  // buildingCircuitId: the circuit that most recently sent CREATE. Handshake
+31:  // completions (circuit_finish_handshake) are attributed to this circuit,
+32:  // not lastCircuitId, because new circuits can be created before the
+33:  // previous circuit's handshakes complete.
+37:    const tsMatch = line.match(/^(\w+ \d+ [\d:.]+)/);
+41:    const circNew = line.match(/origin_circuit_new\(\): Circuit (\d+)/);
+42:    if (circNew) {
+43:      const cid = circNew[1];
+45:      if (!circuits[cid]) circuits[cid] = [];
+46:      circuits[cid].push({ event: "CONNECT", timestamp: ts, host: hostName });
+49:        circuits[cid].push({ event: "TLS_OK", timestamp: ts, host: hostName });
+57:    const orconn = line.match(/ORCONN BEST_ANY state (?:-?\d+)->(\d+)/);
+63:        if (lastCircuitId && circuits[lastCircuitId]) {
+64:          circuits[lastCircuitId].push({
+75:      if (lastCircuitId && circuits[lastCircuitId]) {
+76:        circuits[lastCircuitId].push({
+86:    if (/circuit_send_first_onion_skin\(\).*sending CREATE/i.test(line)) {
+87:      // Track which circuit sent CREATE — handshake completions belong to it
+89:      if (lastCircuitId && circuits[lastCircuitId]) {
+90:        circuits[lastCircuitId].push({
+91:          event: "SEND_CREATE",
+99:    // circuit_finish_handshake() is logged for ALL hops without circuit ID.
+100:    // We attribute it to buildingCircuitId (the circuit that sent CREATE),
+101:    // not lastCircuitId, because new circuits may have been created since.
+102:    // Hop 1 = RECV_CREATED; hop 2+ = SEND_EXTEND + RECV_EXTENDED.
+103:    // circuit_send_next_onion_skin() is not logged at info level in Tor
+104:    // 0.4.6.10, so we synthesize SEND_EXTEND before RECV_EXTENDED.
+105:    if (/circuit_finish_handshake\(\)/.test(line)) {
+107:      if (cid && circuits[cid]) {
+108:        const hop = (circuitHopCount[cid] || 0) + 1;
+109:        circuitHopCount[cid] = hop;
+111:          circuits[cid].push({
+112:            event: "RECV_CREATED",
+117:          circuits[cid].push({
+118:            event: "SEND_EXTEND",
+122:          circuits[cid].push({
+123:            event: "RECV_EXTENDED",
+132:    if (/circuit_build_no_more_hops\(\).*circuit built/i.test(line)) {
+137:      if (lastCircuitId && circuits[lastCircuitId]) {
+138:        circuits[lastCircuitId].push({
+148:    if (/circuit_mark_for_close/i.test(line)) {
+149:      const closeMatch = line.match(/\(id:\s*(\d+)\)/);
+151:      if (cid && circuits[cid]) {
+152:        circuits[cid].push({
+162:    if (/circuit_free_\(\)/i.test(line)) {
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+

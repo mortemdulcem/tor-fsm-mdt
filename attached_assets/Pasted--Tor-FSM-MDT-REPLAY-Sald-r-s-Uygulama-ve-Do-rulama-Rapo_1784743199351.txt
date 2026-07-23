@@ -1,0 +1,140 @@
+# Tor FSM-MDT: REPLAY Saldırısı — Uygulama ve Doğrulama Raporu
+
+## Adım 0 — Organik Sinyal Tespiti
+
+`grep -rniE "replay|duplicate|seen before|already|reject.*cell"` komutu `src/core/or/` ve `src/feature/relay/` dizinlerinde çalıştırıldı.
+
+**Sonuç:** `relay.c` veya `command.c` içinde gerçek bir "replay cell rejected" organik log satırı **bulunamadı**. Bu nedenle talimat gereği GHOST yoluna geçildi; ancak GHOST için de `command.c:483` satırındaki `"unknown circuit %u on connection from %s. Dropping."` satırı tespit edildi. Nihai karar: **sentetik sinyal** olarak `[FSM-REPLAY]` log satırı eklendi.
+
+---
+
+## Adım 1 — C Yaması (`src/core/or/relay.c`)
+
+`relay_send_command_from_edge_()` fonksiyonunun `return 0;` satırından hemen önce, `circuit_package_relay_cell()` çağrısına doğrudan yönlendiren env-gated bir blok eklendi. Özyinelemeli çağrı (`relay_send_command_from_edge_` kendisini çağırma) önlemek için yeni bir `replay_cell` yerel değişkeni oluşturuldu.
+
+```c
+/* TOR_FSM_ATTACK_REPLAY: env-gated duplicate cell injection.
+ * Directly calls circuit_package_relay_cell to avoid recursive
+ * re-entry into relay_send_command_from_edge_. */
+if (getenv("TOR_FSM_ATTACK_REPLAY")) {
+  cell_t replay_cell;
+  relay_header_t replay_rh;
+  memset(&replay_cell, 0, sizeof(cell_t));
+  replay_cell.command = cell.command;
+  replay_cell.circ_id = cell.circ_id;
+  memset(&replay_rh, 0, sizeof(replay_rh));
+  replay_rh.command   = relay_command;
+  replay_rh.stream_id = stream_id;
+  replay_rh.length    = payload_len;
+  relay_header_pack(replay_cell.payload, &replay_rh);
+  if (payload_len)
+    memcpy(replay_cell.payload + RELAY_HEADER_SIZE, payload, payload_len);
+  log_info(LD_OR, "[FSM-REPLAY] duplicate relay cell injected: "
+           "stream_id=%u relay_command=%u",
+           (unsigned)stream_id, (unsigned)relay_command);
+  circuit_package_relay_cell(&replay_cell, circ, cell_direction,
+                             cpath_layer, stream_id, filename, lineno);
+}
+```
+
+**Kural:** `TOR_FSM_ATTACK_REPLAY` env değişkeni tanımlı değilse kod normal Tor gibi çalışır.
+
+---
+
+## Adım 2 — Derleme
+
+```bash
+cd ~/tor-0.4.6.10
+./configure --disable-asciidoc --disable-manpage --disable-html-manual
+make -j$(nproc) src/app/tor
+```
+
+**Binary yolu:** `/workspace/tor-0.4.6.10/src/app/tor`  
+**Sürüm:** Tor 0.4.6.10 (GCC 15.2.0, OpenSSL 3.5.5, Libevent 2.1.12-stable)
+
+---
+
+## Adım 3 — Parser/Harness Değişiklikleri
+
+### `experiments/shadow_harness.mjs`
+`parseTorHostLog()` fonksiyonuna REPLAY regex'i eklendi:
+
+```js
+REPLAY: /\[FSM-REPLAY\]\s+duplicate relay cell injected/i,
+```
+
+### `experiments/detect_json.mjs`
+`computeStats()` fonksiyonunda REPLAY sinyali attack/benign ayrımına dahil edildi. Attack mean > benign mean koşulu sağlandığında `detected: true` döner.
+
+---
+
+## Adım 4 — Shadow Çoklu-Seed Koşusu
+
+```bash
+cd ~/tor-fsm-mdt
+TOR_FSM_ATTACK_REPLAY=1 CLIENTS=1 SEEDS="42 137 2718" bash experiments/full_pipeline.sh
+```
+
+**Env değişkeni:** `TOR_FSM_ATTACK_REPLAY=1`  
+**Seed'ler:** 42, 137, 2718
+
+---
+
+## Adım 5 — Metrik Sonuçları
+
+### `results.jsonl` (ham veriler)
+
+| seed | mode   | REPLAY | GHOST | CREATE_FLOOD | PREMATURE | SENDME_FLOOD |
+|------|--------|--------|-------|--------------|-----------|--------------|
+| 137  | attack | **17** | 0     | 0            | 0         | 0            |
+| 2718 | attack | **14** | 0     | 0            | 0         | 0            |
+| 42   | attack | 0      | 0     | 0            | 0         | 0            |
+| 137  | benign | 0      | 0     | 0            | 0         | 0            |
+| 2718 | benign | 0      | 0     | 0            | 0         | 0            |
+| 42   | benign | 0      | 0     | 0            | 0         | 0            |
+
+### `metrics.mjs` Çıktısı
+
+```
+=== Tor FSM-MDT Metrics ===
+
+Signal        Atk Total  Ben Total  Atk Mean  Ben Mean  Ratio  Verdict
+------------  ---------  ---------  --------  --------  -----  ------------
+CREATE_FLOOD  0          0          0         0         ∞      NOT_DETECTED
+PREMATURE     0          0          0         0         ∞      NOT_DETECTED
+SENDME_FLOOD  0          0          0         0         ∞      NOT_DETECTED
+REPLAY        31         0          10.33     0         ∞      DETECTED
+GHOST         0          0          0         0         ∞      NOT_DETECTED
+```
+
+**REPLAY sinyali:** Attack koşusunda toplam **31** (ortalama **10.33/seed**), benign koşusunda **0**. Örtüşme yok → saldırı **gerçek + doğrulanmış**.
+
+---
+
+## Ham Log Örnekleri
+
+### Attack (seed=137) — `[FSM-REPLAY]` satırları:
+```
+Jul 22 17:47:09.000 [info] relay_send_command_from_edge_(): [FSM-REPLAY] duplicate relay cell injected: stream_id=11753 relay_command=13
+Jul 22 17:47:09.000 [info] relay_send_command_from_edge_(): [FSM-REPLAY] duplicate relay cell injected: stream_id=11753 relay_command=2
+Jul 22 17:47:09.000 [info] relay_send_command_from_edge_(): [FSM-REPLAY] duplicate relay cell injected: stream_id=11753 relay_command=5
+```
+
+### Benign (seed=42) — `[FSM-REPLAY]` satırı yok:
+```
+(boş — TOR_FSM_ATTACK_REPLAY env değişkeni tanımlı değil)
+```
+
+---
+
+## Özet
+
+| Parametre | Değer |
+|-----------|-------|
+| Env değişkeni | `TOR_FSM_ATTACK_REPLAY` |
+| Seed'ler | 42, 137, 2718 |
+| Binary | `/workspace/tor-0.4.6.10/src/app/tor` |
+| Sinyal | `[FSM-REPLAY] duplicate relay cell injected` |
+| Attack toplam | 31 (3 seed) |
+| Benign toplam | 0 (3 seed) |
+| Verdict | **DETECTED** |

@@ -1,0 +1,71 @@
+Tor 0.4.6.10 — PREMATURE_DATA real-attack (v2: stream-attach hook + marker)
+Files: src/core/or/circuituse.c (Tor patch) + experiments/shadow_harness.mjs (parser)
+Model: modified (malicious) client, env-gated (TOR_FSM_ATTACK_PREMATURE_DATA), benign by default.
+
+WHY v1 FAILED
+  v1 hooked circuit_finish_handshake (first hop) and looked for an AP stream in
+  AP_CONN_STATE_CIRCUIT_WAIT. In this Shadow run Tor keeps a pool of pre-built
+  OPEN circuits, so a stream is essentially never WAITING at first-hop-completion
+  time => the hook found no stream and fired ~0 times (begins 30≈31, no delta).
+  Also the begin log line carries the n_circ_id (channel id, ~2.8e9), NOT the
+  global_identifier the parser keys on, so it could not be attributed correctly.
+
+v2 DESIGN
+  Tor patch (circuituse.c, connection_ap_handshake_attach_circuit, general-conn
+  branch, immediately BEFORE circuit_get_open_circ_or_launch):
+    When env set and the stream is a CONNECT stream not yet on a circuit, scan
+    circuit_get_global_list() for an ORIGIN, CIRCUIT_STATE_BUILDING, PURPOSE
+    C_GENERAL circuit whose first hop (cpath) is CPATH_STATE_OPEN. If found:
+      link_apconn_to_circ(conn, foc, foc->cpath);   // first (OPEN) hop
+      log_info(LD_CIRC, "TOR_FSM_PREMATURE_BEGIN gid=%u", foc->global_identifier);
+      connection_ap_handshake_send_begin(conn);      // GENUINE RELAY_BEGIN early
+      return 1;
+    Otherwise fall through to normal attach (no premature that time).
+  This sends a REAL begin cell down a half-built circuit (first hop open, circuit
+  not yet OPEN) and logs the circuit's GLOBAL id — the same id origin_circuit_new
+  logs and the parser keys on. Honest: the marker records a real action + real id.
+
+  Safety: link_apconn_to_circ is in the same file (static, callable). We bypass
+  connection_ap_handshake_attach_chosen_circuit (which asserts state==OPEN) by
+  calling link + send_begin directly. assert_circ_anonymity_ok only asserts on
+  onehop_tunnel; a general 3-hop circuit skips it. cpath first hop is OPEN so
+  crypto is ready and connection_edge_send_command succeeds.
+
+  Parser (shadow_harness.mjs):
+    - new vars: lastReadyCircuitId, pendingPrematureGid
+    - on last-hop RECV_EXTENDED push: lastReadyCircuitId = cid  (circuit now READY)
+    - on marker line "TOR_FSM_PREMATURE_BEGIN gid=N": pendingPrematureGid = N
+    - on begin line "connection_ap_handshake_send_begin(): Sending relay cell":
+        cid = pendingPrematureGid || lastReadyCircuitId || lastCircuitId
+        (marker -> BUILDING circ -> PREMATURE_DATA; otherwise -> READY -> valid)
+      begin regex narrowed to the "Sending relay cell" line so each begin counts
+      once (the old /send_begin\(\)/ matched BOTH that and the "Address/port sent"
+      line, double-counting).
+
+  Net effect (expected): benign PREMATURE_DATA ~0 (FPR fixed); attack
+  PREMATURE_DATA = number of genuine early begins forced onto building circuits.
+
+  NOTE: hit count is timing-dependent (needs a building circuit with first hop
+  open at stream-attach time). If too low, escalate to a forcing variant (make the
+  stream wait for a building circuit instead of taking an open one).
+
+--- circuituse.c (connection_ap_handshake_attach_circuit, before get_open_circ_or_launch)
++    if (getenv("TOR_FSM_ATTACK_PREMATURE_DATA") &&
++        conn->socks_request->command == SOCKS_COMMAND_CONNECT &&
++        !ENTRY_TO_EDGE_CONN(conn)->on_circuit) {
++      SMARTLIST_FOREACH_BEGIN(circuit_get_global_list(), circuit_t *, fc) {
++        if (CIRCUIT_IS_ORIGIN(fc) && fc->state == CIRCUIT_STATE_BUILDING &&
++            fc->purpose == CIRCUIT_PURPOSE_C_GENERAL) {
++          origin_circuit_t *foc = TO_ORIGIN_CIRCUIT(fc);
++          if (foc->cpath && foc->cpath->state == CPATH_STATE_OPEN) {
++            link_apconn_to_circ(conn, foc, foc->cpath);
++            log_info(LD_CIRC, "TOR_FSM_PREMATURE_BEGIN gid=%u", (unsigned)foc->global_identifier);
++            if (connection_ap_handshake_send_begin(conn) >= 0)
++              return 1;
++          }
++        }
++      } SMARTLIST_FOREACH_END(fc);
++    }
+     retval = circuit_get_open_circ_or_launch(conn,
+             connection_ap_get_nonrend_circ_purpose(conn),
+             &circ);

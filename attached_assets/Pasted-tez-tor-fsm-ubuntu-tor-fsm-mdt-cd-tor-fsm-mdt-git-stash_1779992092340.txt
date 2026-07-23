@@ -1,0 +1,59 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt
+git stash
+git checkout devin/1779968748-mega-tier-a
+grep -rl "/home/ubuntu" experiments/ | xargs sed -i 's|/home/ubuntu|/home/tez|g' 2>/dev/null
+ls experiments/shadow_harness_v2.mjs && echo OK
+npx tsx experiments/shadow_harness_v2.mjs 2>&1 | tail -60
+Çalışma dizini ve indeks durumu WIP on main: 14ddba2 fix: Tor version string typo and README client count kaydedildi
+'devin/1779968748-mega-tier-a' dalı 'devin/1779968748-mega-tier-a' uzak dalını origin konumundan izlemek üzere ayarlandı.
+Yeni 'devin/1779968748-mega-tier-a' dalına geçildi.
+experiments/shadow_harness_v2.mjs
+OK
+=== Shadow + Tor v2 Harness (Expanded Topology) ===
+
+--- Phase 1: Running benign Shadow simulations ---
+node:internal/errors:983
+  const err = new Error(message);
+              ^
+
+Error: Command failed: cp -r /home/tez/shadow_v2_template /home/tez/tor-fsm-mdt/experiments/shadow_runs_v2/benign/run_seed42/shadow.data.template
+cp: '/home/tez/shadow_v2_template' durumlanamadı: Böyle bir dosya ya da dizin yok
+
+    at genericNodeError (node:internal/errors:983:15)
+    at wrappedFn (node:internal/errors:537:14)
+    at checkExecSyncError (node:child_process:916:11)
+    at execSync (node:child_process:988:15)
+    at runShadowSimulation (file:///home/tez/tor-fsm-mdt/experiments/shadow_harness_v2.mjs:637:3)
+    at async main (file:///home/tez/tor-fsm-mdt/experiments/shadow_harness_v2.mjs:764:23)
+    at async file:///home/tez/tor-fsm-mdt/experiments/shadow_harness_v2.mjs:915:17 {
+  status: 1,
+  signal: null,
+  output: [
+    null,
+    Buffer(0) [Uint8Array] [],
+    Buffer(84) [Uint8Array] [
+       99, 112,  58,  32,  39,  47, 104, 111, 109, 101,  47, 116,
+      101, 122,  47, 115, 104,  97, 100, 111, 119,  95, 118,  50,
+       95, 116, 101, 109, 112, 108,  97, 116, 101,  39,  32, 100,
+      117, 114, 117, 109, 108,  97, 110,  97, 109,  97, 100, 196,
+      177,  58,  32,  66, 195, 182, 121, 108, 101,  32,  98, 105,
+      114,  32, 100, 111, 115, 121,  97,  32, 121,  97,  32, 100,
+       97,  32, 100, 105, 122, 105, 110,  32, 121, 111, 107,  10
+    ]
+  ],
+  pid: 28248,
+  stdout: Buffer(0) [Uint8Array] [],
+  stderr: Buffer(84) [Uint8Array] [
+     99, 112,  58,  32,  39,  47, 104, 111, 109, 101,  47, 116,
+    101, 122,  47, 115, 104,  97, 100, 111, 119,  95, 118,  50,
+     95, 116, 101, 109, 112, 108,  97, 116, 101,  39,  32, 100,
+    117, 114, 117, 109, 108,  97, 110,  97, 109,  97, 100, 196,
+    177,  58,  32,  66, 195, 182, 121, 108, 101,  32,  98, 105,
+    114,  32, 100, 111, 115, 121,  97,  32, 121,  97,  32, 100,
+     97,  32, 100, 105, 122, 105, 110,  32, 121, 111, 107,  10
+  ]
+}
+
+Node.js v22.22.2
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+

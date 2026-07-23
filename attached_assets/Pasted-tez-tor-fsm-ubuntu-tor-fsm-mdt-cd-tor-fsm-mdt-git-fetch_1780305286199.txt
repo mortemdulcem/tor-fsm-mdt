@@ -1,0 +1,164 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt
+git fetch https://github.com/mortemdulcem/tor-fsm-mdt.git premature-transport
+git checkout FETCH_HEAD -- experiments/premature_v3.sh experiments/premature_detect.mjs
+bash experiments/premature_v3.sh
+remote: Enumerating objects: 10, done.
+remote: Counting objects: 100% (10/10), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 8 (delta 4), reused 0 (delta 0), pack-reused 0 (from 0)
+Nesneler açılıyor: 100% (8/8), 4.09 KiB | 4.09 MiB/sn, bitti.
+Şu konumdan: https://github.com/mortemdulcem/tor-fsm-mdt
+ * branch            premature-transport -> FETCH_HEAD
+
+=== 1) Tor patch: circuitbuild.c circuit_send_next_onion_skin hook ===
+hook eklendi OK
+946:    log_info(LD_CIRC, "TOR_FSM_PREMATURE_SEND gid=%u cstate=%d",
+
+=== 2) Tor build ===
+  CC       src/core/or/circuitbuild.o
+  AR       src/core/libtor-app.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  AR       libtor.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+  CCLD     src/app/tor
+
+=== 3) Parser: shadow_harness.mjs (guarded edit) ===
+parser kontrol:
+21:export function parseTorHostLog(logContent, hostName) {
+43:    const psend = line.match(/TOR_FSM_PREMATURE_SEND gid=(\d+)/);
+218:export function runFsmOnAllCircuits(circuitMap) {
+
+=== 4) Shadow yaml hazirligi ===
+premature yaml env satiri:
+101:      environment: { TOR_FSM_ATTACK_PREMATURE_DATA: "1" }
+
+=== 5) Shadow calistir (attack + benign) ===
+ATTACK EXIT=0
+00:00:08.643584 [12096:shadow] n/a [INFO] [n/a] [shadow.rs:234] [shadow_rs::shadow] Log message buffering is disabled during cleanup
+** Shadow completed successfully
+BENIGN EXIT=0
+00:00:10.953833 [12140:shadow] n/a [INFO] [n/a] [shadow.rs:234] [shadow_rs::shadow] Log message buffering is disabled during cleanup
+** Shadow completed successfully
+
+=== 6) Detection (attack vs benign) ===
+MARKER (attack icindeki gercek erken-DATA gonderim sayisi):
+12
+MARKER ornek (ilk 3, cstate=4 => CIRCUIT_STATE_BUILDING):
+Jan 01 00:15:03.501 [info] circuit_send_next_onion_skin(): TOR_FSM_PREMATURE_SEND gid=3 cstate=0
+Jan 01 00:15:03.701 [info] circuit_send_next_onion_skin(): TOR_FSM_PREMATURE_SEND gid=3 cstate=0
+Jan 01 00:15:04.100 [info] circuit_send_next_onion_skin(): TOR_FSM_PREMATURE_SEND gid=4 cstate=0
+MARKER (benign'de olmamali):
+0
+0
+--- ATTACK detect ---
+=== Shadow + Tor Empirical Validation Harness ===
+=== Per-Circuit FSM Tracking ===
+
+
+--- Scenario: benign ---
+node:internal/errors:983
+  const err = new Error(message);
+              ^
+
+Error: Command failed: cp -r /home/ubuntu/shadow/examples/docs/tor/shadow.yaml /home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/
+cp: '/home/ubuntu/shadow/examples/docs/tor/shadow.yaml' durumlanamadı: Böyle bir dosya ya da dizin yok
+
+    at genericNodeError (node:internal/errors:983:15)
+    at wrappedFn (node:internal/errors:537:14)
+    at checkExecSyncError (node:child_process:916:11)
+    at execSync (node:child_process:988:15)
+    at runShadowSimulation (file:///home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs:378:3)
+    at async main (file:///home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs:482:25)
+    at async file:///home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs:603:17 {
+  status: 1,
+  signal: null,
+  output: [
+    null,
+    Buffer(0) [Uint8Array] [],
+    Buffer(105) [Uint8Array] [
+       99, 112,  58,  32,  39,  47, 104, 111, 109, 101,  47, 117,
+       98, 117, 110, 116, 117,  47, 115, 104,  97, 100, 111, 119,
+       47, 101, 120,  97, 109, 112, 108, 101, 115,  47, 100, 111,
+       99, 115,  47, 116, 111, 114,  47, 115, 104,  97, 100, 111,
+      119,  46, 121,  97, 109, 108,  39,  32, 100, 117, 114, 117,
+      109, 108,  97, 110,  97, 109,  97, 100, 196, 177,  58,  32,
+       66, 195, 182, 121, 108, 101,  32,  98, 105, 114,  32, 100,
+      111, 115, 121,  97,  32, 121,  97,  32, 100,  97,  32, 100,
+      105, 122, 105, 110,
+      ... 5 more items
+    ]
+  ],
+  pid: 12228,
+  stdout: Buffer(0) [Uint8Array] [],
+  stderr: Buffer(105) [Uint8Array] [
+     99, 112,  58,  32,  39,  47, 104, 111, 109, 101,  47, 117,
+     98, 117, 110, 116, 117,  47, 115, 104,  97, 100, 111, 119,
+     47, 101, 120,  97, 109, 112, 108, 101, 115,  47, 100, 111,
+     99, 115,  47, 116, 111, 114,  47, 115, 104,  97, 100, 111,
+    119,  46, 121,  97, 109, 108,  39,  32, 100, 117, 114, 117,
+    109, 108,  97, 110,  97, 109,  97, 100, 196, 177,  58,  32,
+     66, 195, 182, 121, 108, 101,  32,  98, 105, 114,  32, 100,
+    111, 115, 121,  97,  32, 121,  97,  32, 100,  97,  32, 100,
+    105, 122, 105, 110,
+    ... 5 more items
+  ]
+}
+
+Node.js v22.22.2
+--- BENIGN detect ---
+=== Shadow + Tor Empirical Validation Harness ===
+=== Per-Circuit FSM Tracking ===
+
+
+--- Scenario: benign ---
+node:internal/errors:983
+  const err = new Error(message);
+              ^
+
+Error: Command failed: cp -r /home/ubuntu/shadow/examples/docs/tor/shadow.yaml /home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/
+cp: '/home/ubuntu/shadow/examples/docs/tor/shadow.yaml' durumlanamadı: Böyle bir dosya ya da dizin yok
+
+    at genericNodeError (node:internal/errors:983:15)
+    at wrappedFn (node:internal/errors:537:14)
+    at checkExecSyncError (node:child_process:916:11)
+    at execSync (node:child_process:988:15)
+    at runShadowSimulation (file:///home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs:378:3)
+    at async main (file:///home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs:482:25)
+    at async file:///home/tez/tor-fsm-mdt/experiments/shadow_harness.mjs:603:17 {
+  status: 1,
+  signal: null,
+  output: [
+    null,
+    Buffer(0) [Uint8Array] [],
+    Buffer(105) [Uint8Array] [
+       99, 112,  58,  32,  39,  47, 104, 111, 109, 101,  47, 117,
+       98, 117, 110, 116, 117,  47, 115, 104,  97, 100, 111, 119,
+       47, 101, 120,  97, 109, 112, 108, 101, 115,  47, 100, 111,
+       99, 115,  47, 116, 111, 114,  47, 115, 104,  97, 100, 111,
+      119,  46, 121,  97, 109, 108,  39,  32, 100, 117, 114, 117,
+      109, 108,  97, 110,  97, 109,  97, 100, 196, 177,  58,  32,
+       66, 195, 182, 121, 108, 101,  32,  98, 105, 114,  32, 100,
+      111, 115, 121,  97,  32, 121,  97,  32, 100,  97,  32, 100,
+      105, 122, 105, 110,
+      ... 5 more items
+    ]
+  ],
+  pid: 12268,
+  stdout: Buffer(0) [Uint8Array] [],
+  stderr: Buffer(105) [Uint8Array] [
+     99, 112,  58,  32,  39,  47, 104, 111, 109, 101,  47, 117,
+     98, 117, 110, 116, 117,  47, 115, 104,  97, 100, 111, 119,
+     47, 101, 120,  97, 109, 112, 108, 101, 115,  47, 100, 111,
+     99, 115,  47, 116, 111, 114,  47, 115, 104,  97, 100, 111,
+    119,  46, 121,  97, 109, 108,  39,  32, 100, 117, 114, 117,
+    109, 108,  97, 110,  97, 109,  97, 100, 196, 177,  58,  32,
+     66, 195, 182, 121, 108, 101,  32,  98, 105, 114,  32, 100,
+    111, 115, 121,  97,  32, 121,  97,  32, 100,  97,  32, 100,
+    105, 122, 105, 110,
+    ... 5 more items
+  ]
+}
+
+Node.js v22.22.2
+
+=== BITTI — gercek sinyal: ATTACK'ta INJECTED PREMATURE_DATA > 0, BENIGN'de = 0 olmali ===

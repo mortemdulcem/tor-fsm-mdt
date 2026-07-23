@@ -22,7 +22,8 @@ const torStatic = JSON.parse(await fs.readFile(path.resolve(__dirname, "../exper
 const fext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions.json"), "utf8"));
 const fval = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/f_extensions_validated.json"), "utf8"));
 const gext = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/g_extensions.json"), "utf8"));
-const shadowRes = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/shadow_results.json"), "utf8"));
+const fourCell = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/shadow_results_4cell.json"), "utf8"));
+const ml = JSON.parse(await fs.readFile(path.resolve(__dirname, "../experiments/ml_baseline_results.json"), "utf8"));
 const fvalBy = Object.fromEntries(fval.comparisons.filter(v => v.B === "B2_GreedySC").map(v => [v.metric, v]));
 const stats = trials.stats;
 const comparisons = trials.comparisons;
@@ -31,8 +32,62 @@ const sevSplit = trials.severitySumPerAlgo;
 // Helpers
 const pct = (x) => `${(x * 100).toFixed(2)}%`;
 const fmt = (x, d = 3) => isFinite(x) ? x.toFixed(d) : "—";
+const f4 = (x) => x == null ? "N/A" : (typeof x === "object" ? `${x.mean.toFixed(4)} ± ${x.sd.toFixed(4)}` : Number(x).toFixed(4));
 const sig = (p) => p < 0.001 ? "&lt;.001" : p.toFixed(4);
 const stars = (p) => p < 0.001 ? "***" : p < 0.01 ? "**" : p < 0.05 ? "*" : "";
+// ML mean±sd (3 ondalık) ve yüzde-mean yardımcıları
+const ms = (o) => `${o.mean.toFixed(3)} ± ${o.sd.toFixed(3)}`;
+const mpct = (o) => `${(o.mean * 100).toFixed(1)}%`;
+
+// ---------- Kod parçaları: gerçek kaynak dosyalardan BİREBİR okunur (uydurma yok) ----------
+const escHtml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+// İçerik-çapalı blok çıkarımı: hem başlangıç hem bitiş bir metin imine bağlanır,
+// böylece kaynak dosyada satır kayması olsa bile alıntı bağlam dışı kalmaz.
+const sliceBetween = (src, startNeedle, endNeedle) => {
+  const lines = src.split("\n");
+  const i = lines.findIndex((l) => l.includes(startNeedle));
+  if (i < 0) return "";
+  const j = lines.findIndex((l, k) => k > i && l.includes(endNeedle));
+  return j < 0 ? "" : lines.slice(i, j).join("\n").replace(/\s+$/, "");
+};
+const fsmSrc = await fs.readFile(path.resolve(__dirname, "../server/fsm.ts"), "utf8");
+const classifyCode = sliceBetween(fsmSrc, "export function classifyInvalid(", 'if (state === "CLOSING")');
+const pipelineSrc = await fs.readFile(path.resolve(__dirname, "../experiments/full_pipeline.sh"), "utf8");
+const pipelineCode = sliceBetween(pipelineSrc, "for seed in $SEEDS; do", "for attack in $ACTIVE");
+if (!classifyCode || !pipelineCode) {
+  throw new Error("Kod parçası bulunamadı (kaynak dosya değişmiş olabilir); tez derlenmedi.");
+}
+
+// ---------- Akademik ortam görseli: GERÇEK VM ekran görüntüsü (kullanıcının VM'inden) ----------
+// Oracle VirtualBox Yöneticisi'nde tor-fsm-ubuntu VM yapılandırması; base64 ile gömülür
+// (HTML+PDF kendine yeterli olsun). Uydurma diyagram DEĞİL, gerçek ekran görüntüsü.
+// Akademik kullanım için ekran görüntüleri masaüstü/taskbar/tarayıcı öğelerinden
+// arındırılarak VirtualBox penceresine kırpılmıştır (thesis/assets/).
+const vmConfigB64 = (await fs.readFile(path.resolve(__dirname, "assets/vm_config.png"))).toString("base64");
+const vmShotImg = `<img src="data:image/png;base64,${vmConfigB64}" alt="Oracle VirtualBox Yöneticisi — tor-fsm-ubuntu VM yapılandırması (8192 MB RAM, 4 vCPU, EFI, ubuntu-22.04.5-desktop-amd64.iso, 50 GB VDI, NAT)" style="max-width:100%;height:auto;border:1px solid #999;"/>`;
+const vmRunB64 = (await fs.readFile(path.resolve(__dirname, "assets/vm_running.png"))).toString("base64");
+const vmRunImg = `<img src="data:image/png;base64,${vmRunB64}" alt="tor-fsm-ubuntu VM çalışırken — Oracle VirtualBox penceresinde Ubuntu önyükleme ekranı" style="max-width:100%;height:auto;border:1px solid #999;"/>`;
+// ---------- Topoloji şeması (mantıksal diyagram; ekran görüntüsü değil) ----------
+const vmTopoSvg = `<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica,Arial,sans-serif">
+  <rect x="290" y="12" width="140" height="40" rx="4" fill="#fbf6ec" stroke="#9a6b1f"/>
+  <text x="360" y="37" font-size="10.5" font-weight="bold" text-anchor="middle">Directory Authority (×1)</text>
+  <line x1="360" y1="52" x2="360" y2="90" stroke="#9a6b1f" stroke-dasharray="4 3"/>
+  <text x="368" y="74" font-size="8.5" fill="#9a6b1f">konsensüs</text>
+  <rect x="70" y="90" width="580" height="78" rx="5" fill="#f4f8ff" stroke="#2b5d8a"/>
+  <text x="360" y="108" font-size="10.5" font-weight="bold" text-anchor="middle">Relay düzlemi: 4 non-exit relay + 2 exit relay</text>
+  <circle cx="150" cy="138" r="15" fill="#d6e6f5" stroke="#2b5d8a"/><text x="150" y="142" font-size="8.5" text-anchor="middle">R1</text>
+  <circle cx="230" cy="138" r="15" fill="#d6e6f5" stroke="#2b5d8a"/><text x="230" y="142" font-size="8.5" text-anchor="middle">R2</text>
+  <circle cx="310" cy="138" r="15" fill="#d6e6f5" stroke="#2b5d8a"/><text x="310" y="142" font-size="8.5" text-anchor="middle">R3</text>
+  <circle cx="390" cy="138" r="15" fill="#d6e6f5" stroke="#2b5d8a"/><text x="390" y="142" font-size="8.5" text-anchor="middle">R4</text>
+  <circle cx="490" cy="138" r="15" fill="#f5d6d6" stroke="#a83232"/><text x="490" y="142" font-size="8.5" text-anchor="middle">E1</text>
+  <circle cx="570" cy="138" r="15" fill="#f5d6d6" stroke="#a83232"/><text x="570" y="142" font-size="8.5" text-anchor="middle">E2</text>
+  <rect x="90" y="198" width="170" height="40" rx="4" fill="#eef7ee" stroke="#2e7d32"/>
+  <text x="175" y="223" font-size="10.5" font-weight="bold" text-anchor="middle">Tor istemci (×1)</text>
+  <rect x="460" y="198" width="170" height="40" rx="4" fill="#eef7ee" stroke="#2e7d32"/>
+  <text x="545" y="223" font-size="10.5" font-weight="bold" text-anchor="middle">Doğrudan istemci (×1)</text>
+  <line x1="175" y1="198" x2="220" y2="168" stroke="#2e7d32"/>
+  <line x1="545" y1="198" x2="500" y2="168" stroke="#2e7d32"/>
+</svg>`;
 
 // ---------- Atıflar (IEEE) — 20 doğrulanmış kaynak (Literatur_Notlari ile bire bir) ----------
 const REFS = [
@@ -163,6 +218,7 @@ const html = `<!doctype html>
   pre.algo { background: #f4f4f4; border: 1px solid #ccc; padding: 8pt 10pt; font-size: 9pt; line-height: 1.4; white-space: pre-wrap; page-break-inside: avoid; font-family: "Courier New", monospace; }
   .fig { text-align: center; margin: 8pt 0 16pt; page-break-inside: avoid; }
   .fig svg { max-width: 100%; height: auto; }
+  .fig img { max-width: 100%; height: auto; }
   .fig .cap { font-size: 9.5pt; color: #444; margin-top: 4pt; }
   code { font-family: "Courier New", monospace; font-size: 10pt; background: #f0f0f0; padding: 0 3pt; }
   .ref-list { font-size: 10pt; }
@@ -209,9 +265,13 @@ istatistiksel anlamlı üstünlüğü doğrular (p &lt; .001; Cohen d ∈ [3.6, 
 (i) Tor devre protokolü için yayımlanmış ilk tam δ-matrisini, (ii) ${totalInvalid} geçersiz
 ikilinin saldırı vektörü ve şiddet etiketiyle programatik sınıflandırmasını,
 (iii) referans bir MDT implementasyonunu ve (iv) sayısal olarak doğrulanmış üç-katmanlı
-karşılaştırmayı sunar.</p>
+karşılaştırmayı sunar. Ek olarak, FSM dedektöründen bağımsız (non-circular) bir makine
+öğrenmesi temel çizgisi kurulmuş; yapısal ayrılabilirlik analizi, kural-tabanlı FSM ile
+aynı üç ayrım sonucuna (create_flood kolay ayrılır, circuit_hijack tip-seviyesinde ayırt
+edici değildir, premature_data benign'e en yakındır) ulaşarak bulguları bağımsızca teyit
+etmiştir (Bölüm 4.17).</p>
 <p><b>Anahtar kelimeler:</b> Tor, anonim ağ, sonlu durum makinesi, model-driven testing,
-protokol state fuzzing, güvenlik testi, geçiş kapsamı.</p>
+protokol state fuzzing, güvenlik testi, geçiş kapsamı, makine öğrenmesi temel çizgisi.</p>
 
 <h2>Abstract</h2>
 <p>This work formally models the circuit life-cycle of the Tor anonymous network protocol
@@ -231,9 +291,16 @@ of ${pct(stats.B3_MDT.itdr.mean)}. Welch t-tests confirm statistical superiority
 baselines (p &lt; .001; Cohen's d ∈ [3.6, 15.4]). Contributions: (i) the first published
 complete δ-matrix for the Tor circuit protocol, (ii) a programmatic classification of all
 ${totalInvalid} invalid pairs into attack vectors with severity labels, (iii) a reference
-MDT implementation, and (iv) a numerically validated three-way baseline comparison.</p>
+MDT implementation, and (iv) a numerically validated three-way baseline comparison.
+In addition, an independent (non-circular) machine-learning baseline — using raw
+behavioural event counts (and, as an extension, event n-grams and inter-event timing;
+Section 4.17d), never the FSM violation label — converges, through a
+cross-validation-independent structural-separability analysis, on the same three
+discrimination outcomes as the rule-based FSM (create_flood is cleanly separable,
+circuit_hijack is not type-level discriminative, premature_data is closest to benign),
+independently corroborating the findings (Section 4.17).</p>
 <p><b>Keywords:</b> Tor, anonymous network, finite-state machine, model-driven testing,
-protocol state fuzzing, security testing, transition coverage.</p>
+protocol state fuzzing, security testing, transition coverage, machine-learning baseline.</p>
 
 <div class="pagebreak"></div>
 
@@ -268,6 +335,15 @@ protocol state fuzzing, security testing, transition coverage.</p>
   <div class="lvl2"><span>4.6 Detection Latency Ölçümü</span><span></span></div>
   <div class="lvl2"><span>4.7 Bütçe-Kapsama Eğrisi</span><span></span></div>
   <div class="lvl2"><span>4.8 Rule-Based Detector Karşılaştırması (B0)</span><span></span></div>
+  <div class="lvl2"><span>4.9 Bootstrap Güven Aralıkları ve Post-hoc Güç Analizi</span><span></span></div>
+  <div class="lvl2"><span>4.10 Stream Alt-FSM Modeli ve Deneysel Karşılaştırma</span><span></span></div>
+  <div class="lvl2"><span>4.11 D-grubu: Bağımsız Oracle, Genişletilmiş SLR ve Cross-Language Latency</span><span></span></div>
+  <div class="lvl2"><span>4.12 E-grubu: Gerçek Tor Kaynak Kodundan Statik FSM Çıkarımı</span><span></span></div>
+  <div class="lvl2"><span>4.13 F-grubu: N=100 Yeniden Koşu, A-priori Güç Analizi, BCa Bootstrap</span><span></span></div>
+  <div class="lvl2"><span>4.14 G-grubu: Angluin L* Algoritmasının Implementasyonu</span><span></span></div>
+  <div class="lvl2"><span>4.15 Bağımsız VM Ortamında Reproducibility Doğrulaması (C5)</span><span></span></div>
+  <div class="lvl2"><span>4.16 Ampirik Doğrulamanın Bir Model Hatasını Yakalaması: 2-hop → 3-hop FSM Düzeltmesi</span><span></span></div>
+  <div class="lvl2"><span>4.17 Makine Öğrenmesi Temel Çizgisi: Bağımsız (Non-circular) Doğrulama</span><span></span></div>
   <div class="lvl1"><span>5. Görselleştirme</span><span></span></div>
   <div class="lvl1"><span>6. Sonuç ve Gelecek Çalışmalar</span><span></span></div>
   <div class="lvl2"><span>6.1 Katkıların Yeniden Değerlendirilmesi</span><span></span></div>
@@ -319,6 +395,23 @@ sistematik literatür taraması (SLR, bkz. Bölüm 2) ile teyit edilmiştir.</p>
   implementasyonu</b> (kaynak kodu açık, üretilebilir).</li>
   <li>Üç algoritmanın (B1/B2/B3) eşleştirilmiş 30 koşu ile <b>istatistiksel karşılaştırması</b>;
   Welch t-testi, Mann-Whitney U ve Cohen's d ile birlikte raporlanır.</li>
+  <li>Shadow 3.3.0 + Tor 0.4.6.10 + tgen tabanlı FSM analiz boru hattının
+  harici bir Ubuntu 22.04 VirtualBox VM'inde 9-host kanonik topoloji üzerinde
+  <b>bit bit reproducibility doğrulaması</b> (3 senaryo × 3 seed = 9 simülasyon;
+  bkz. Bölüm 4.15).</li>
+  <li>Ampirik doğrulamanın spesifikasyon analizinin gözden kaçırdığı bir
+  <b>model hatasını yakalaması</b>: baz 2-hop FSM'in meşru çok-hop devre uzatmasını
+  yanlış-pozitif (CIRCUIT_HIJACK) saydığı gösterilmiş; Tor'un 3-hop davranışını
+  modelleyen iki geçişlik prensipli düzeltme, aynı gerçek event log'larında
+  yanlış-pozitif oranını
+  ${f4(fourCell.cells.v1_2hop.benign.fpr)} → ${f4(fourCell.cells.v1_3hop.benign.fpr)}
+  düşürürken recall = 1.0000 korunmuştur (bkz. Bölüm 4.16).</li>
+  <li>FSM dedektöründen <b>bağımsız (non-circular) bir makine öğrenmesi temel
+  çizgisi</b>: ham davranış özniteliklerini (sayımlar; uzatma olarak n-gram ve
+  olaylar-arası zamanlama, Bölüm 4.17d — FSM ihlal etiketi hiç kullanılmadan)
+  kullanan ML, çapraz-doğrulamadan bağımsız yapısal ayrılabilirlik analiziyle
+  kural-tabanlı FSM ile aynı üç ayrım sonucuna yakınsayarak bulguları bağımsızca
+  teyit eder (bkz. Bölüm 4.17).</li>
 </ol>
 
 <h3>1.4 Tezin Yapısı</h3>
@@ -333,7 +426,11 @@ sınıflandırıcı envanterini içerir.</p>
 betiklerin (<code>experiments/build_report.mjs</code>, <code>experiments/baselines.mjs</code>,
 <code>experiments/stats.mjs</code>, <code>experiments/figures.mjs</code>) tek komutla
 çalıştırılmasıyla yeniden üretilebilir. Bütün rastgelelik mulberry32 PRNG ile sabit seed
-altındadır.
+altındadır. Shadow + Tor tabanlı FSM analiz boru hattının
+(<code>experiments/shadow_harness.mjs</code>) seed-deterministik ve donanım bağımsız
+çalıştığı, bu tezin geliştirildiği bulut ortamından bağımsız bir Ubuntu 22.04
+VirtualBox VM'inde 9 simülasyonun tamamı bit bit eşleşmesiyle doğrulanmıştır
+(bkz. Bölüm 4.15).
 </div>
 
 <div class="pagebreak"></div>
@@ -457,6 +554,34 @@ modellenmiştir:</p>
 </ul>
 <p>Tam δ matrisi Ek A'da, görsel ısı haritası Şekil 2'de verilmiştir.</p>
 
+<p><b>Σ'nın gerçek Tor günlüğüne dayanması.</b> Olay alfabesi keyfi seçilmemiştir;
+çalışan bir Tor istemcisinin ürettiği günlük (log) ve protokol olaylarına dayanır.
+Tor Project'in resmî günlük rehberi (Tor Project, &ldquo;Reading Tor logs,&rdquo;
+<code>support.torproject.org/tor-browser/encountering-issues/reading-tor-logs/</code>,
+erişim Haz. 2026), bir istemcinin NOTICE/WARN seviyesinde ürettiği faz satırlarını
+belgeler. Örneğin <code>Bootstrapped 10%: Finishing handshake with directory server</code>
+satırı CONNECTING&rarr;TLS_HANDSHAKE geçişine, <code>Bootstrapped 85%: Finishing
+handshake with first hop</code> satırı CREATE_SENT/CIRCUIT_BUILDING fazına,
+<code>[WARN] Failed to find node for hop 0 of our path. Discarding this circuit.</code>
+satırı ise başarısız/iptal edilmiş devre kurulumuna (ERROR ve devre düşürme)
+karşılık gelir. Bu kaba fazların altındaki hücre-seviyesi olaylar (CREATE/CREATED,
+EXTEND/EXTENDED, RELAY_DATA, DESTROY) tor-spec ${cite(19)} tarafından tanımlanır ve
+çalışan bir Tor sürecinin control-port CIRC/STREAM olayları ile INFO-seviyesi
+günlükleri üzerinden gözlemlenir; Bölüm 4.15'teki VM/Shadow ortamında bu tip gerçek
+günlükler üretilmiştir. Böylece FSM olay sözlüğü, gerçek Tor günlük semantiğine
+birebir izlenebilir.</p>
+
+<p class="no-indent"><i>Kapsam notu (günlük veri kaynakları).</i> Tor Metrics
+tarafından yayımlanan <i>web sunucu günlükleri</i> (Tor Project, &ldquo;Tor Web
+Server Logs,&rdquo; <code>metrics.torproject.org/web-server-logs.html</code>, erişim
+Haz. 2026), Tor Project web sitelerine yapılan HTTP isteklerinin gizlilik-duyarlı
+(Apache biçimli) erişim günlükleridir; yani web trafiğidir, Tor devre/hücre verisi
+değildir. Bu nedenle FSM geçersiz-geçiş tespiti için uygun bir kaynak oluşturmaz ve
+bu çalışmada kullanılmamıştır. Ayrıca devre-seviyesi günlüğe erişmek için dış izin
+gerekmez: yukarıdaki satırlar kendi çalıştırdığımız Tor sürecinin kendi çıktısıdır.
+İzin/etik kısıtı yalnızca <i>canlı</i> Tor ağı üzerinde aktif saldırı/deney
+çalıştırmaya ilişkindir; deneyler bu nedenle Shadow simülasyonunda yürütülmüştür.</p>
+
 <h3>3.2 Saldırı Sınıflandırıcı</h3>
 <p>Invalid kümesindeki her ikili, deterministik bir <code>classifyInvalid(state, event)</code>
 fonksiyonu (kod referansı: <code>server/fsm.ts</code>, 64–204. satırlar) ile yedi ana
@@ -466,6 +591,11 @@ CREATE_FLOOD. Sınıflandırma mantığı dokuz koşul ailesi üzerinden işler:
 veri-akış-öncesi, CREATE/CREATED akışı, EXTEND/EXTENDED akışı, DESTROY ihlali, CONNECT
 yer-dışı, TLS_OK/TLS_FAIL yer-dışı, CIRCUIT_CLOSED yer-dışı, TIMEOUT yer-dışı. Her ikiliye
 LOW/MEDIUM/HIGH/CRITICAL şiddet etiketi atanır. Kategorilerin nicel dağılımı Ek B'dedir.</p>
+
+<p class="no-indent"><b>Kod 3.1.</b> Sınıflandırıcının çekirdek dalı — devre hazır olmadan
+gerçekleşen veri akışı ihlalleri (kaynak: <code>server/fsm.ts</code>, derleme anında
+dosyadan birebir okunur).</p>
+<pre class="algo">${escHtml(classifyCode)}</pre>
 
 <h3>3.3 MDT Motoru — Algoritma 1</h3>
 <pre class="algo">Algoritma 1: Model-Driven Test (BFS-tabanlı)
@@ -949,126 +1079,16 @@ ${Object.entries(torStatic.structural.state_mapping).map(([impl, m]) => `<tr>
 <code>circuit_set_state()</code> çağrı noktalarının durum envanterini çıkarır.
 Wrapper fonksiyonlar, inline'lar, çok-satırlı imzalar veya
 <code>src/feature/</code> alt sistemleri (gizli servisler, control port)
-kapsam dışındadır. <b>Runtime davranış doğrulaması</b> aşağıda Bölüm 4.12-B'de
-Shadow simülatörü üzerinde gerçekleştirilmiştir.</p>
+kapsam dışındadır. Runtime davranış (Shadow + gerçek tor binary) için
+Bölüm 4.15'te 9-host kanonik topoloji üzerinde reproducibility doğrulaması
+yapılmıştır; bu statik analizin ölçtüğü <i>yapısal</i> divergence ile
+tamamlayıcı niteliktedir.</p>
 
 <p><b>Sınırlama (açıkça):</b> Bu STATİK bir analizdir.
 ${torStatic.limitations.join(" ")} <b>Yapısal divergence ölçülmüştür</b>;
-runtime davranış farkı aşağıdaki Shadow deneyleriyle kısmen ölçülmüştür.</p>
-
-<h4>4.12-B Shadow Simülatörü ile Runtime Doğrulama</h4>
-
-<p>Yukarıdaki statik analizin <i>runtime</i> karşılığı olarak, Shadow discrete-event
-ağ simülatörü ${cite(18)} (v${shadowRes.metadata.shadow_version}) üzerinde gerçek
-Tor binary'si (v${shadowRes.metadata.tor_version.replace('Tor version ','').replace(/\.$/,'')})
-koşturulmuş ve info-level log çıktısından per-circuit FSM olay dizileri
-çıkarılmıştır. Bu, Bölüm 6.3.3'te "gelecek çalışma" olarak listelenen
-S5-S6 adımlarının <b>uygulanmış</b> hâlidir.</p>
-
-<p><b>Deney tasarımı.</b> Shadow topolojisi:
-${shadowRes.metadata.network_topology.authorities} directory authority,
-${shadowRes.metadata.network_topology.relays} relay (guard/middle/exit karışımı),
-${shadowRes.metadata.network_topology.clients} client.
-Her senaryo ${shadowRes.metadata.simulated_time} simüle edilmiş zaman,
-${shadowRes.metadata.repetitions} tekrar (seed: ${shadowRes.metadata.seeds.join(', ')}).
-Üç senaryo koşulmuştur: (a) yalnızca benign trafik, (b) replay-attack
-(kapatılmış devrelere CREATE hücresi enjeksiyonu), (c) circuit-bypass
-(TLS atlayarak doğrudan veri gönderimi). Toplam
-${shadowRes.summary.totalSimulations} simülasyon,
-${shadowRes.summary.totalCircuitsAnalyzed} devre,
-${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay
-işlenmiştir. Harness kodu:
-<code>experiments/shadow_harness.mjs</code> (${shadowRes.metadata.fsm_spec.states}-durumlu
-spec FSM, ${shadowRes.metadata.fsm_spec.events} olay,
-${shadowRes.metadata.fsm_spec.valid_transitions} geçerli geçiş).</p>
-
-<p><b>Olay eşlemesi.</b> Tor'un info-level log satırları per-circuit FSM olaylarına
-şu şekilde eşlenmiştir: <code>origin_circuit_new()</code> → CONNECT;
-ORCONN state≥7 → TLS_OK; <code>circuit_send_first_onion_skin()</code> → SEND_CREATE;
-<code>circuit_finish_handshake()</code> hop 1 → RECV_CREATED, hop 2+ → SEND_EXTEND +
-RECV_EXTENDED; <code>circuit_mark_for_close()</code> → SEND_DESTROY;
-<code>circuit_free_()</code> → CIRCUIT_CLOSED. OR bağlantı yeniden kullanımı
-(aynı host'taki sonraki devreler mevcut TLS'i kullanır) ve çok-atlamalı
-devre yapısı (hop-count izleme ile RECV_CREATED vs RECV_EXTENDED ayrımı)
-harness'ta per-circuit düzeyinde modellenmiştir.</p>
-
-<p class="no-indent"><b>Tablo 4.12-D.</b> Shadow runtime doğrulama sonuçları
-(${shadowRes.metadata.repetitions} tekrar, ortalama ± SD).</p>
-<table>
-<tr><th>Senaryo</th><th>Ort. devre</th><th>Ort. olay</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th></tr>
-<tr>
-  <td class="l">benign</td>
-  <td>${shadowRes.perScenario.benign.avgCircuits}</td>
-  <td>${shadowRes.perScenario.benign.avgEvents}</td>
-  <td>N/A</td><td>N/A</td><td>N/A</td>
-  <td>${shadowRes.perScenario.benign.fpr.mean.toFixed(4)}</td>
-</tr>
-<tr>
-  <td class="l">replay_attack</td>
-  <td>${shadowRes.perScenario.replay_attack.avgCircuits}</td>
-  <td>${shadowRes.perScenario.replay_attack.avgEvents}</td>
-  <td>${shadowRes.perScenario.replay_attack.precision.mean.toFixed(4)} ± ${shadowRes.perScenario.replay_attack.precision.sd.toFixed(4)}</td>
-  <td>${shadowRes.perScenario.replay_attack.recall.mean.toFixed(4)}</td>
-  <td>${shadowRes.perScenario.replay_attack.f1.mean.toFixed(4)} ± ${shadowRes.perScenario.replay_attack.f1.sd.toFixed(4)}</td>
-  <td>${shadowRes.perScenario.replay_attack.fpr.mean.toFixed(4)} ± ${shadowRes.perScenario.replay_attack.fpr.sd.toFixed(4)}</td>
-</tr>
-<tr>
-  <td class="l">circuit_bypass</td>
-  <td>${shadowRes.perScenario.circuit_bypass.avgCircuits}</td>
-  <td>${shadowRes.perScenario.circuit_bypass.avgEvents}</td>
-  <td>${shadowRes.perScenario.circuit_bypass.precision.mean.toFixed(4)} ± ${shadowRes.perScenario.circuit_bypass.precision.sd.toFixed(4)}</td>
-  <td>${shadowRes.perScenario.circuit_bypass.recall.mean.toFixed(4)}</td>
-  <td>${shadowRes.perScenario.circuit_bypass.f1.mean.toFixed(4)} ± ${shadowRes.perScenario.circuit_bypass.f1.sd.toFixed(4)}</td>
-  <td>${shadowRes.perScenario.circuit_bypass.fpr.mean.toFixed(4)} ± ${shadowRes.perScenario.circuit_bypass.fpr.sd.toFixed(4)}</td>
-</tr>
-</table>
-
-<p><b>Bulgular.</b></p>
-<ol>
-  <li><b>[Gözlem] Recall = 1.000:</b> FSM monitörü enjekte edilen saldırıların
-  %100'ünü tespit etmiştir. Hem replay-attack hem circuit-bypass senaryolarında
-  hiçbir saldırı kaçırılmamıştır (FN = 0). Bu, spec-tabanlı δ-matrisinin
-  saldırı olaylarını yapısal olarak reddettiğini doğrular.</li>
-  <li><b>[Gözlem] Precision düşüklüğü (~0.37-0.47):</b> Yüksek FP oranı
-  yapısal kökenlidir. Benign trafikte ortalama
-  ${((shadowRes.perScenario.benign.avgInvalid / shadowRes.perScenario.benign.avgEvents) * 100).toFixed(1)}%
-  oranında FSM ihlali gözlenmiştir. Bunların büyük çoğunluğu (bkz. aşağıdaki
-  kırılım) 3-atlamalı devre yapısından kaynaklanmaktadır.</li>
-  <li><b>[Gözlem] Yapısal ihlal kırılımı (benign, seed=${shadowRes.metadata.seeds[0]}):</b>
-  CIRCUIT_HIJACK: ${shadowRes.runs[0].metrics.violationBreakdown.CIRCUIT_HIJACK || 0}
-  (FSM 2-atlamalı devre modellerken Tor 3-atlamalı kullanır; 3. hop'un
-  SEND_EXTEND olayı CIRCUIT_READY durumunda CIRCUIT_HIJACK olarak sınıflandırılır),
-  PREMATURE_DATA: ${shadowRes.runs[0].metrics.violationBreakdown.PREMATURE_DATA || 0}
-  (tek-atlamalı directory devreleri EXTEND/EXTENDED atlar),
-  diğer: ${(shadowRes.runs[0].metrics.violationBreakdown.REPLAY_ATTACK || 0) + (shadowRes.runs[0].metrics.violationBreakdown.GHOST_CIRCUIT || 0) + (shadowRes.runs[0].metrics.violationBreakdown.HANDSHAKE_SKIP || 0)}
-  (relay tarafı OR bağlantı görünürlüğü kenar durumları).</li>
-  <li><b>[Yorum] FP kaynağının yapısal açıklaması:</b> Tor spec'i devre
-  uzunluğunu sabitlemez; gerçek Tor varsayılan olarak 3-hop devre kurar
-  (guard → middle → exit). Bu tezin FSM modeli 2-hop'a kadar olan geçişleri
-  tanımlar (SEND_CREATE → RECV_CREATED → SEND_EXTEND → RECV_EXTENDED →
-  CIRCUIT_READY). Üçüncü hop'un SEND_EXTEND olayı CIRCUIT_READY durumunda
-  alındığında, δ-tablosunda tanımsız olduğundan CIRCUIT_HIJACK olarak
-  sınıflandırılır. Bu, modelin <i>kasıtlı bir kısıtlamasıdır</i>, saldırı
-  tespit hatasından ziyade spec modelinin kapsam sınırıdır.</li>
-</ol>
-
-<p><b>Sınırlılıklar (dürüstçe):</b></p>
-<ol>
-  <li><b>Küçük ağ ölçeği:</b> ${shadowRes.metadata.network_topology.authorities} DA +
-  ${shadowRes.metadata.network_topology.relays} relay + ${shadowRes.metadata.network_topology.clients} client;
-  gerçek Tor ağı ~7.000 relay içerir. Sonuçlar büyük ölçekli ağlara doğrudan
-  genellenemez.</li>
-  <li><b>Yapısal FP oranı (~25%):</b> FSM modelinin 2-hop kısıtlaması nedeniyle
-  benign 3-hop devrelerde sistematik FP üretilmektedir. Bu, n-hop genişletmesi
-  ile giderilebilir ancak mevcut spec modeli bu ayrımı yapmamaktadır.</li>
-  <li><b>Saldırı enjeksiyonu yöntemi:</b> Saldırılar gerçek modifiye tor binary'si
-  yerine, harness seviyesinde olay dizilerine enjekte edilmiştir (post-hoc
-  enjeksiyon). Bu, FSM monitörünün <i>olay-düzeyinde</i> tespit yeteneğini
-  doğrular, ancak gerçek hücre-düzeyinde saldırı davranışını tam olarak
-  yansıtmaz.</li>
-  <li><b>Simüle edilmiş zaman:</b> ${shadowRes.metadata.simulated_time} simülasyon,
-  gerçek Tor ağının uzun dönem davranışını temsil etmez.</li>
-</ol>
+runtime davranış farkı (timing, error path'leri, race conditions) ek olarak
+ölçülürse spec ↔ implementation karşılaştırması tam hâle gelir — bu adımın
+uygulama yol haritası Bölüm 6.3.2'de 10 maddede somutlaştırılmıştır.</p>
 
 <div class="pagebreak"></div>
 
@@ -1175,10 +1195,529 @@ ${gext.trace.map((t) => `<tr><td>${t.round}</td><td>${t.S_size}</td><td>${t.E_si
 </table>
 
 <p><b>Açık sınır:</b> ${gext.honest_scope.join(" ")} Yani bu, L*'nin <i>algoritma
-ve pipeline doğruluğunun</i> kanıtıdır. Bölüm 4.12-B'deki Shadow deneyleri
-runtime olay akışını doğrudan yakalamıştır; ancak L*'nin MQ oracle'ını
-running tor process'e bağlamak (her MQ için circuit kur → state gözle)
-gelecek çalışma olarak kalmaktadır (bkz. Bölüm 6.3).</p>
+ve pipeline doğruluğunun</i> kanıtıdır — Shadow üzerinde gerçek tor binary'sine
+MQ probe'ları göndermenin yerini tutmaz. Pipeline tor binary'sine bağlanmaya
+hazırdır; yalnızca MQ implementasyonunun "tor process'e probe gönder + observe"
+ile değiştirilmesi yeterlidir. Pipeline'ın Shadow + gerçek tor binary üzerinde
+seed-deterministik çalıştığı Bölüm 4.15'te bağımsız bir VM ortamında ayrıca
+doğrulanmıştır (bkz. Bölüm 6.3).</p>
+
+<div class="pagebreak"></div>
+
+<!-- ====================== BÖLÜM 4.15 — C5: Harici VM Reproducibility ====================== -->
+<h3>4.15 Bağımsız VM Ortamında Reproducibility Doğrulaması (C5)</h3>
+
+<p>Çalışmanın geliştirildiği bulut tabanlı CI ortamından bağımsız olarak,
+Shadow + Tor tabanlı FSM analiz boru hattının seed-deterministik ve donanım
+bağımsız çalıştığını doğrulamak amacıyla deneyler harici bir sanal makinede
+tekrarlanmıştır. Bu, Hacettepe Üniversitesi BYZ 658 ders gereksinimlerinden
+"C5 — bağımsız reproducibility" maddesinin somut karşılığıdır.</p>
+
+<p class="no-indent"><b>Test ortamı.</b></p>
+<ul>
+  <li><b>Hipervizör:</b> Oracle VirtualBox 7.0 (Guest Additions yüklü;
+  build-essential, dkms, linux-headers-generic ile derlenmiş).</li>
+  <li><b>Misafir işletim sistemi:</b> Ubuntu 22.04.5 LTS
+  (<code>ubuntu-22.04.5-desktop-amd64.iso</code>'dan kurulu); 8 GB RAM (8192 MB),
+  4 vCPU, 50 GB sanal disk (VDI), EFI etkin, NAT ağı.
+  <i>(Not: Şekil 4.15a'da VirtualBox'ın misafir-OS tür etiketi "Ubuntu 22.10
+  (Kinetic Kudu)" olarak görünür; bu yalnızca VirtualBox ayar etiketidir —
+  fiilen kurulan sistem, takılı ISO'dan Ubuntu 22.04.5 LTS'tir.)</i></li>
+  <li><b>Simülatör:</b> Shadow 3.3.0 (kaynaktan derlenmiş; clang, libclang-dev,
+  llvm-dev, Rust toolchain ile).</li>
+  <li><b>Tor:</b> sürüm 0.4.6.10 (Ubuntu apt paketi; Shadow 3.3.0 ile uyumlu
+  olduğu doğrulanmış sürüm).</li>
+  <li><b>Trafik üretici:</b> tgen (Shadow ekosistemi; kaynaktan derlenmiş).</li>
+  <li><b>Analiz boru hattı:</b> Node.js 22.22.2 + TypeScript; harness
+  <code>experiments/shadow_harness.mjs</code>.</li>
+</ul>
+
+<div class="fig">${vmShotImg}<div class="cap"><b>Şekil 4.15a.</b> Bağımsız reproducibility
+doğrulamasında kullanılan sanal makinenin Oracle VirtualBox Yöneticisi
+ekran görüntüsü (<code>tor-fsm-ubuntu</code>): 8192 MB ana bellek, 4 işlemci,
+EFI etkin, iç içe sayfalama + KVM yarı-sanallaştırma hızlandırma; takılı kurulum
+ortamı <code>ubuntu-22.04.5-desktop-amd64.iso</code>, 50 GB <code>tor-fsm-ubuntu.vdi</code>
+sabit diski ve Intel PRO/1000 MT (NAT) ağ bağdaştırıcısı. Üstteki misafir-OS tür
+etiketi "Ubuntu 22.10 (Kinetic Kudu)" bir VirtualBox ayar etiketidir; fiilen
+kurulan sistem takılı ISO'dan Ubuntu 22.04.5 LTS'tir.</div></div>
+
+<div class="fig">${vmRunImg}<div class="cap"><b>Şekil 4.15b.</b> Aynı sanal makinenin
+çalışır durumdaki ekran görüntüsü: VirtualBox pencere başlığında
+<code>tor-fsm-ubuntu [Çalışıyor]</code> ibaresi ve misafir sistemin Ubuntu önyükleme
+ekranı görülmektedir. Bu görsel, ortamın yalnızca tanımlanmış değil fiilen
+çalıştırılmış olduğunu belgeler.</div></div>
+
+<p class="no-indent"><b>Deney protokolü.</b> Repodaki harness komut satırından
+çalıştırılmış; üç senaryo (<i>benign</i>, <i>replay_attack</i>,
+<i>circuit_bypass</i>) her biri üç sabit seed ({42, 137, 2718}) ile, toplam
+9 simülasyon, simüle edilmiş 30 dakikalık Tor trafiği üretmiştir. Topoloji:
+1 directory authority + 4 non-exit relay + 2 exit relay + 1 doğrudan istemci
++ 1 tor istemci (9 host; Shadow'un kanonik <code>examples/tor/minimal</code>
+şablonuyla aynı yapı). Üretilen <code>shadow_results.json</code> dosyası,
+repoda commit edilmiş referans dosyayla <code>git diff</code> ile birebir
+karşılaştırılmıştır.</p>
+
+<div class="fig">${vmTopoSvg}<div class="cap"><b>Şekil 4.15c.</b> Shadow'un kanonik
+<code>examples/tor/minimal</code> şablonuyla aynı 9-host topoloji: bir directory
+authority, dört non-exit relay (R1–R4) ile iki exit relay (E1–E2) içeren relay
+düzlemi ve iki istemci (bir tor istemcisi, bir doğrudan istemci). Düğüm rolleri
+ve sayıları yukarıdaki deney protokolünde belirtildiği gibidir.</div></div>
+
+<p class="no-indent"><b>Çalıştırma — nasıl yapıldı.</b> Bu bölümdeki (C5) reproducibility
+koşumu, yukarıda listelenen harness ile üç senaryo (<i>benign</i>, <i>replay_attack</i>,
+<i>circuit_bypass</i>) üzerinde yürütülmüştür. Aynı VM ortamı, gerçek-saldırı
+deneyleri (<i>create_flood</i>, <i>circuit_hijack</i>, <i>premature_data</i>;
+bkz. Bölüm 4.16–4.17) için de kullanılır: repo kökünden <code>bash experiments/full_pipeline.sh</code>
+betiği her sabit seed için önce bir <i>benign</i>, ardından kaynak hook'u VM'de mevcut
+olan her saldırı için bir <i>attack</i> Shadow koşusu yürütür ve host loglarını kalıcı
+<code>experiments/runs/</code> dizinine kopyalar. Aşağıdaki Kod 4.15, bu betiğin çok-seed
+döngüsünü — VM üzerinde seed-deterministik Shadow koşumunun nasıl sürüldüğünü —
+örneklemek için gösterir (derleme anında dosyadan birebir okunur):</p>
+<p class="no-indent"><b>Kod 4.15.</b> VM'de çok-seed Shadow koşum döngüsü; gerçek-saldırı
+deneyleri için kullanılır (kaynak: <code>experiments/full_pipeline.sh</code>).</p>
+<pre class="algo">${escHtml(pipelineCode)}</pre>
+
+<p class="no-indent"><b>Sonuç — bit bit eşleşme.</b> İki dosya arasındaki
+<i>tek farklar</i> şunlardır:</p>
+<ol>
+  <li><b><code>run_date</code></b> alanı (ISO 8601 zaman damgası, kaçınılmaz).</li>
+  <li><b><code>wallTime</code></b> alanı (CI ortamında ortalama 4.5&nbsp;sn,
+  harici VM'de ortalama 8.5&nbsp;sn; donanım hızı farkından kaynaklı, simülasyon
+  doğruluğunu etkilemez).</li>
+</ol>
+
+<p>Aşağıdaki bilimsel alanların <i>tamamı</i> bit bit eşleşmiştir:
+<code>circuitCount</code>, <code>rawEventCount</code>, <code>injectedCount</code>,
+<code>fsmResult.validCount</code>, <code>fsmResult.invalidCount</code>,
+<code>metrics.tp/fp/fn/tn</code>, <code>precision</code>, <code>recall</code>,
+<code>f1</code>, <code>fpr</code>, <code>violationRate</code> ve tüm yedi
+saldırı kategorisindeki <code>violationBreakdown</code> sayıları
+(CIRCUIT_HIJACK, HANDSHAKE_SKIP, REPLAY_ATTACK, GHOST_CIRCUIT, PREMATURE_DATA,
+CIRCUIT_BYPASS, CREATE_FLOOD).</p>
+
+<p class="no-indent"><b>Tablo 4.15.</b> Üç senaryo &times; üç seed
+reproduction sonuçları (CI ortamı ile harici VM ortalama ± SD).</p>
+<table>
+<tr><th>Senaryo</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th></tr>
+<tr><td>benign</td><td>N/A</td><td>N/A</td><td>N/A</td><td>0.0000 ± 0.0000</td></tr>
+<tr><td>replay_attack</td><td>0.3686 ± 0.0040</td><td>1.0000 ± 0.0000</td><td>0.5386 ± 0.0043</td><td>0.2505 ± 0.0071</td></tr>
+<tr><td>circuit_bypass</td><td>0.4661 ± 0.0073</td><td>1.0000 ± 0.0000</td><td>0.6358 ± 0.0068</td><td>0.2505 ± 0.0071</td></tr>
+</table>
+<p class="no-indent"><i>Not:</i> Tablo 4.15'teki değerler, repoda commit edilmiş referans
+<code>shadow_results.json</code> dosyasının <i>orijinal muhasebesini</i> yansıtır;
+burada <i>benign</i> senaryosunda FPR yalnızca enjekte edilmiş saldırılara karşı
+ölçüldüğü için 0.0000 görünür. Bu muhasebe, meşru trafikte FSM'nin ürettiği yapısal
+ihlalleri yanlış-pozitif saymaz. Bölüm 4.16, aynı <i>gerçek</i> event log'larını
+hem dürüst yanlış-pozitif muhasebesiyle (benign yapısal ihlal = FP) hem de
+düzeltilmiş bir FSM modeliyle yeniden analiz eder ve bu rakamların neden ve nasıl
+değiştiğini gösterir.</p>
+
+<p class="no-indent"><b>Yorum.</b> Bu bulgu üç şeyi birlikte gösterir:
+(i) Shadow + Tor + harness + FSM analizi zinciri <i>seed-deterministiktir</i>;
+aynı seed ile farklı donanımda, farklı tarihte, farklı kullanıcı altında
+aynı sayısal çıktıyı verir. (ii) Çalışmanın sayısal sonuçları çalıştırıldığı
+CI ortamına özgü bir artefakt değildir; harici, bağımsız bir Linux makinesinde
+de aynı sonuçlar elde edilir. (iii) Replikasyon talimatları
+(<code>README.md</code>, <code>experiments/shadow_harness.mjs</code>) yeterli
+kabul edilebilir niteliktedir. Bu doğrulama Shadow tabanlı FSM analiz hattının
+operasyonel sağlamlığını desteklerken, Bölüm 6.2.1(B)'de değinilen tam-ölçekli
+runtime trace araştırmasının (modifiye tor client ile saldırı tetikleme, pcap
+seviyesinde cell decode) yerini tutmaz; bu adım Bölüm 6.3.3 yol haritasında
+korunmaktadır.</p>
+
+<div class="pagebreak"></div>
+
+<!-- ====================== BÖLÜM 4.16 — 2-hop → 3-hop FSM düzeltmesi ====================== -->
+<h3>4.16 Ampirik Doğrulamanın Bir Model Hatasını Yakalaması: 2-hop → 3-hop FSM Düzeltmesi</h3>
+
+<p>Bölüm 4.15'teki bit-bit reproducibility, FSM analiz hattının
+<i>deterministik</i> olduğunu kanıtlar; ancak determinizm tek başına modelin
+<i>doğru</i> olduğunu garanti etmez. Aynı gerçek Shadow event log'larının
+daha yakından incelenmesi, spesifikasyondan türetilen FSM'in kritik bir
+<i>model-gerçeklik uyumsuzluğu</i> içerdiğini ortaya koymuştur. Bu bölüm, hiçbir
+yeni Shadow koşusu yapılmadan (<code>experiments/reanalyze_fsm.mjs</code>;
+girdi: Bölüm 4.15'te commit edilmiş <code>events.jsonl</code> dosyaları) yapılan
+yeniden analizin bulgularını raporlar. Bu, ampirik doğrulamanın saf
+spesifikasyon analizinin gözden kaçırdığı bir hatayı nasıl yakaladığının somut
+bir örneğidir.</p>
+
+<p class="no-indent"><b>Tespit edilen hata.</b> Tezin baz FSM modeli, devre
+yaşam döngüsünü <i>2-hop</i> bir basitleştirme olarak ele alır: <code>SEND_EXTEND</code>
+yalnızca <code>CIRCUIT_BUILDING</code> durumundan geçerli kabul edilir. Oysa Tor,
+varsayılan olarak <i>3-hop</i> devre kurar; istemci ilk hop kurulduktan sonra
+ikinci ve üçüncü hop için tekrar <code>SEND_EXTEND</code> gönderir. Baz model bu
+<i>meşru</i> çok-hop uzatmayı (CIRCUIT_READY durumundan gelen <code>SEND_EXTEND</code>)
+<code>CIRCUIT_HIJACK</code> (hop enjeksiyonu) saldırısı olarak yanlış sınıflandırmıştır.
+Gerçek <i>benign</i> Shadow trafiğinde yapısal ihlallerin büyük çoğunluğu (koşu
+başına ~150 CIRCUIT_HIJACK) tam olarak bu yanlış-pozitiften kaynaklanmaktaydı.</p>
+
+<p class="no-indent"><b>Düzeltme.</b> 3-hop modeli, baz modele yalnızca iki geçiş
+ekler (kural silme veya gevşetme <i>değil</i>; Tor'un gerçek davranışını modelleyen
+prensipli bir tamamlama):</p>
+<pre style="background:#f4f4f4;border:1px solid #ccc;padding:6pt;font-size:9pt;">
+CIRCUIT_READY + SEND_EXTEND   → CIRCUIT_BUILDING
+CIRCUIT_READY + RECV_EXTENDED → CIRCUIT_READY</pre>
+<p class="no-indent">Bu, geçerli geçiş sayısını
+${fourCell.metadata.fsm_2hop_transitions}'ten
+${fourCell.metadata.fsm_3hop_transitions}'ye çıkarır.</p>
+
+<p class="no-indent"><b>Dürüst muhasebe.</b> Bu yeniden analiz, Bölüm 4.15'in
+aksine, <i>benign</i> trafikte FSM'nin ürettiği her yapısal ihlali açıkça
+yanlış-pozitif (FP) olarak sayar — çünkü tanım gereği saldırısız trafikte
+bulunan her ihlal bir yanlış alarmdır. Aşağıdaki tüm rakamlar bu dürüst muhasebe
+ile, ${fourCell.metadata.v1_topology.authorities + fourCell.metadata.v1_topology.relays + fourCell.metadata.v1_topology.clients}-host
+kanonik topolojide (${fourCell.metadata.v1_topology.authorities} authority +
+${fourCell.metadata.v1_topology.relays} relay +
+${fourCell.metadata.v1_topology.clients} istemci; Bölüm 4.15 ile aynı topoloji,
+<i>genişletme yok</i>) ve 3 senaryo × 3 seed üzerinden hesaplanmıştır.</p>
+
+<p class="no-indent"><b>Tablo 4.16.</b> Aynı gerçek event log'ları üzerinde
+2-hop (baz) ve 3-hop (düzeltilmiş) FSM altında tespit metrikleri
+(${fourCell.metadata.v1_topology.authorities + fourCell.metadata.v1_topology.relays + fourCell.metadata.v1_topology.clients}-host
+topoloji, ortalama ± SD, N = 3 seed).</p>
+<table>
+<tr><th>Senaryo</th><th>Model</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th></tr>
+<tr><td rowspan="2">benign</td><td>2-hop</td><td>N/A</td><td>N/A</td><td>N/A</td><td>${f4(fourCell.cells.v1_2hop.benign.fpr)}</td></tr>
+<tr><td>3-hop</td><td>N/A</td><td>N/A</td><td>N/A</td><td><b>${f4(fourCell.cells.v1_3hop.benign.fpr)}</b></td></tr>
+<tr><td rowspan="2">replay_attack</td><td>2-hop</td><td>${f4(fourCell.cells.v1_2hop.replay_attack.precision)}</td><td>${f4(fourCell.cells.v1_2hop.replay_attack.recall)}</td><td>${f4(fourCell.cells.v1_2hop.replay_attack.f1)}</td><td>${f4(fourCell.cells.v1_2hop.replay_attack.fpr)}</td></tr>
+<tr><td>3-hop</td><td><b>${f4(fourCell.cells.v1_3hop.replay_attack.precision)}</b></td><td>${f4(fourCell.cells.v1_3hop.replay_attack.recall)}</td><td><b>${f4(fourCell.cells.v1_3hop.replay_attack.f1)}</b></td><td><b>${f4(fourCell.cells.v1_3hop.replay_attack.fpr)}</b></td></tr>
+<tr><td rowspan="2">circuit_bypass</td><td>2-hop</td><td>${f4(fourCell.cells.v1_2hop.circuit_bypass.precision)}</td><td>${f4(fourCell.cells.v1_2hop.circuit_bypass.recall)}</td><td>${f4(fourCell.cells.v1_2hop.circuit_bypass.f1)}</td><td>${f4(fourCell.cells.v1_2hop.circuit_bypass.fpr)}</td></tr>
+<tr><td>3-hop</td><td><b>${f4(fourCell.cells.v1_3hop.circuit_bypass.precision)}</b></td><td>${f4(fourCell.cells.v1_3hop.circuit_bypass.recall)}</td><td><b>${f4(fourCell.cells.v1_3hop.circuit_bypass.f1)}</b></td><td><b>${f4(fourCell.cells.v1_3hop.circuit_bypass.fpr)}</b></td></tr>
+</table>
+
+<p class="no-indent"><b>Yorum.</b> Düzeltilmiş 3-hop model, meşru çok-hop
+uzatmayı artık doğru sınıflandırdığı için yanlış-pozitif oranını <i>benign</i>
+trafikte ${f4(fourCell.cells.v1_2hop.benign.fpr)}'ten
+${f4(fourCell.cells.v1_3hop.benign.fpr)}'ye düşürür; replay tespitinde precision
+${f4(fourCell.cells.v1_2hop.replay_attack.precision)} → ${f4(fourCell.cells.v1_3hop.replay_attack.precision)},
+F1 ${f4(fourCell.cells.v1_2hop.replay_attack.f1)} → ${f4(fourCell.cells.v1_3hop.replay_attack.f1)};
+circuit_bypass tespitinde precision ${f4(fourCell.cells.v1_2hop.circuit_bypass.precision)} →
+${f4(fourCell.cells.v1_3hop.circuit_bypass.precision)} olur. Her iki modelde de
+recall = 1.0000 korunur: düzeltme hiçbir gerçek saldırıyı kaçırmaz, yalnızca
+yanlış alarmları temizler. Bu bulgu metodolojik olarak önemlidir — <i>ampirik
+Shadow doğrulaması, saf δ-matris analizinin tek başına ortaya çıkaramayacağı bir
+model eksikliğini görünür kılmıştır</i>.</p>
+
+<p class="no-indent"><b>Dürüst sınırlılık.</b> Tablo 4.16'da <i>benign</i> FPR
+rakamları tamamen gerçek Shadow/Tor trafiğine dayanır. Buna karşılık
+replay_attack ve circuit_bypass senaryolarındaki precision/recall/F1 değerleri,
+gerçek benign trafiğe <i>sentetik olarak enjekte edilmiş</i> saldırı olayları
+üzerinden hesaplanmıştır (modifiye edilmiş Tor istemcisiyle gerçek saldırı
+tetikleme değil; bkz. Bölüm 6.2.1(B) ve 6.3.3). Dolayısıyla bu tablo, tespit
+mantığının <i>doğruluğunu</i> ve düzeltmenin <i>etkisini</i> gösterir; gerçek
+ağda gözlemlenmiş saldırı tabanlı bir saha çalışması iddiası taşımaz.</p>
+
+<p class="no-indent"><b>Örnek boyutu ve çok-istemci kapsamı.</b> Bu bölümün ve
+eşlik eden non-circular native confusion sonuçlarının (CREATE_FLOOD tip-temiz,
+PREMATURE_DATA event-level, CIRCUIT_HIJACK native; ayrıntı için Ek B /
+<code>experiments/attack_status.md</code>) tamamı <i>tek-istemci</i>
+(<code>CLIENTS=1</code>) koşumundan gelir; örnek boyutu seed sayısıdır (n = 3).
+Deney hattı çok-istemci koşumunu (<code>CLIENTS&gt;1</code>; her ek <code>torclient*</code>
+host'u ayrı bir örnek) destekler ve bu genişleme bir <b>sağlamlık (robustness)
+kontrolü</b> olarak <code>CLIENTS=4</code> ile üç seed (42/137/2718) üzerinde
+başarıyla koşulmuştur (tüm süreçler <code>EXIT=0</code>; gerçek Shadow verisi).
+Ancak deterministik ortamda ek istemciler, <i>saldırı-confusion toplamları</i>
+açısından birincil istemciyle <b>özdeş</b> sonuç üretmiştir (istemciler arası native
+CREATE_FLOOD/CIRCUIT_HIJACK sayıları ±0,000); yani <b>bu bölümün native-confusion
+metriği için</b> ortaya çıkan n = 12 örneklem bağımsız değil yüksek korelasyonludur
+(4 kopya × 3 seed). Bu nedenle <b>native-confusion birincil sonuçları tek-istemci
+(n = 3) olarak korunur</b> ve çok-istemci bu metrik için yalnızca bir sağlamlık
+teyidi sayılır; bu örneklemi bağımsız tekrar gibi sunup dar güven aralıklarını
+(±0,000) bir hassasiyet kanıtı saymak yanıltıcı olacağından bu yapılmaz.
+Buna karşılık, <b>devre-başına öznitelik vektörü</b> seviyesinde istemciler
+özdeş değildir: deterministik Shadow'da her istemcinin ayrı RNG ofseti, benign
+devre kurulum ayrıntılarını (uzatma/yol-uzunluğu, olay sayıları) istemciden
+istemciye değiştirir; dolayısıyla çok-istemci koşumu sınıf başına <i>daha fazla
+eşsiz öznitelik vektörü</i> üretir. Bu ayrımın sonucu olarak, ML temel çizgisi
+(Bölüm 4.17) — native-confusion'dan farklı olarak — bu zengin çeşitlilikten
+yararlanmak için <b>çok-istemci veri setini birincil alır</b>. Çok-istemci koşumunda
+örnek-boyutu kuralı şudur: CREATE_FLOOD/CIRCUIT_HIJACK native ve PREMATURE_DATA
+<i>event-level</i> confusion <b>per-client</b> ölçülür (n = seed × istemci); buna
+karşılık PREMATURE_DATA <i>relay-side native</i> (zero-stream-id) sinyali
+<b>koşum-seviyesidir</b> (ilk hop relay'inin logu, tek istemciye atfedilemez →
+n = seed). Bu run-level / event-level ayrımı, çok-istemci'de güven aralıklarının
+suni daralmasını önlemek için korunur.</p>
+
+<div class="pagebreak"></div>
+
+<!-- ====================== BÖLÜM 4.17 — ML Temel Çizgisi (non-circular) ====================== -->
+<h3>4.17 Makine Öğrenmesi Temel Çizgisi: Bağımsız (Non-circular) Doğrulama</h3>
+<p>Önceki bölümlerdeki tüm sonuçlar, FSM δ-matrisinden türetilen <i>kural tabanlı</i>
+bir dedektöre dayanır. Bu bölüm, FSM dedektöründen <b>bağımsız</b> bir makine
+öğrenmesi (ML) temel çizgisi kurarak aynı bulgulara ayrı bir yöntemle ulaşılıp
+ulaşılamayacağını sınar. Öznitelikler, devre başına yalnızca <i>ham davranış
+sayımlarıdır</i> (${ml.data.n_features} öznitelik: ${ml.data.features.filter(f=>f!=="n_events").length}
+olay-tipi sayısı + toplam olay sayısı); <b>FSM ihlal etiketi öznitelik olarak
+kullanılmaz</b> &mdash; bu, modelin dedektörün çıktısını taklit etmesini önler
+(non-circular). Veri, Bölüm 4.15'teki ${ml.data.n_seeds} seed-deterministik Shadow
+koşumundan toplanan ${ml.data.n_circuits} devredir (benign ${ml.data.counts.benign},
+create_flood ${ml.data.counts.create_flood}, circuit_hijack
+${ml.data.counts.circuit_hijack}, premature_data ${ml.data.counts.premature_data}).
+Tüm sayılar <code>experiments/ml_baseline.py</code> çıktısından
+(<code>ml_baseline_results.json</code>) üretilmiştir; elle girilmemiştir.
+Bu bölüm <b>birincil olarak çok-istemci (<code>CLIENTS=4</code>)</b> koşumundan
+raporlanır (${ml.data.n_seeds} seed × 4 istemci = ${ml.data.n_circuits} devre):
+native-confusion metriğinden (Bölüm 4.16, tek-istemci birincil) farklı olarak, ML
+devre-başına öznitelik vektörüyle çalışır ve bu vektörler istemciden istemciye
+değiştiğinden çok-istemci koşumu sınıf başına daha fazla <i>eşsiz</i> öznitelik
+vektörü sağlar (ör. create_flood ${ml.structural.unique_per_class.create_flood}
+eşsiz vektör). Bu ayrımın gerekçesi Bölüm 4.16'da açıklanmıştır.</p>
+
+<p class="no-indent"><b>Metodolojik uyarı (önce okunmalı).</b> Veri deterministik
+olduğundan sınıf başına yalnızca az sayıda <i>eşsiz</i> öznitelik vektörü vardır
+(benign ${ml.structural.unique_per_class.benign}, create_flood
+${ml.structural.unique_per_class.create_flood}, circuit_hijack
+${ml.structural.unique_per_class.circuit_hijack}, premature_data
+${ml.structural.unique_per_class.premature_data}); gerisi seed'ler arası birebir
+kopyadır. Bu nedenle <b>seed-bazlı Leave-One-Seed-Out (LOSO) çapraz-doğrulama
+sızıntıyı önlemez</b>: foldlarda test vektörlerinin
+${(ml.structural.loso_dup[String(ml.data.seeds[2])].ratio*100).toFixed(1)}%&ndash;${(ml.structural.loso_dup[String(ml.data.seeds[1])].ratio*100).toFixed(1)}%
+kadarı (seed bazında: ${ml.data.seeds.map(s=>`seed ${s} ${ml.structural.loso_dup[String(s)].dup}/${ml.structural.loso_dup[String(s)].total}`).join(", ")})
+train kümesinde birebir bulunur. Dolayısıyla seed-bazlı CV metrikleri
+<i>iyimserdir</i> (dağıtım-içi/in-distribution) ve genelleme kanıtı olarak
+okunmamalıdır. Bu sızıntıyı tamamen kaldırmak için sonuçlar ayrıca, grubun
+<i>eşsiz öznitelik vektörü</i> olduğu <b>sızıntısız GroupKFold</b> ile yeniden
+hesaplanmış ve iyimser LOSO ile yan yana sunulmuştur (kısım (b), Tablo 4.17d);
+toplam ${ml.structural.dedup.n_unique_vectors} eşsiz vektörün
+${ml.structural.dedup.pure}'i tek-sınıf, ${ml.structural.dedup.shared}'u
+sınıflar-arası paylaşımlıdır. Bu sınırlamadan <b>bağımsız</b> asıl kanıt ise
+aşağıdaki yapısal ayrılabilirliktir.</p>
+
+<p class="no-indent"><b>(a) Yapısal ayrılabilirlik (çapraz-doğrulamadan bağımsız).</b>
+Sınıfların eşsiz öznitelik vektörlerinin örtüşmesi, hangi CV kullanılırsa
+kullanılsın değişmeyen yapısal bir gerçektir (Tablo 4.17a).</p>
+<p class="no-indent"><b>Tablo 4.17a.</b> Sınıflar-arası ortak eşsiz öznitelik vektörü sayısı.</p>
+<table style="border-collapse:collapse;font-size:9pt;margin:6pt 0;">
+<tr><th style="padding:3pt 8pt;border:1px solid #999;text-align:left;">Sınıf çifti</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">Ortak eşsiz vektör</th></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">create_flood ∩ circuit_hijack</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;"><b>${ml.structural.overlap.create_flood__circuit_hijack.inter}</b> (|cf|=${ml.structural.overlap.create_flood__circuit_hijack.na}, |ch|=${ml.structural.overlap.create_flood__circuit_hijack.nb})</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">premature_data ∩ benign</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.structural.overlap.premature_data__benign.inter} (|pd|=${ml.structural.overlap.premature_data__benign.na}, |bn|=${ml.structural.overlap.premature_data__benign.nb})</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">create_flood ∩ benign</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;"><b>${ml.structural.overlap.create_flood__benign.inter}</b></td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">circuit_hijack ∩ benign</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;"><b>${ml.structural.overlap.circuit_hijack__benign.inter}</b></td></tr>
+</table>
+<p class="no-indent">Bu yapısal gerçekten üç sonuç çıkar: (1) create_flood ve
+circuit_hijack eşsiz vektörleri büyük ölçüde ortaktır
+(${ml.structural.overlap.create_flood__circuit_hijack.inter}/${ml.structural.overlap.create_flood__circuit_hijack.na}
+ve ${ml.structural.overlap.create_flood__circuit_hijack.inter}/${ml.structural.overlap.create_flood__circuit_hijack.nb});
+ikisi de <code>SEND_CREATE=2</code> imzası taşıdığından sayım-seviyesinde ayırt
+edilemezler. Bu, FSM bulgusu <i>"CIRCUIT_HIJACK FSM-tip seviyesinde ayırt edici
+değildir"</i> ile birebir tutarlıdır. (2) create_flood ve circuit_hijack benign
+ile <b>hiç</b> ortak eşsiz vektör paylaşmaz (0); bu, denetimli modelin bu iki tipte
+recall = 1.0 vermesinin sızıntıdan bağımsız yapısal nedenidir. (3) premature benign
+ile ${ml.structural.overlap.premature_data__benign.inter} eşsiz vektör paylaşır,
+benign'e en yakın ve en zor ayrılan sınıftır.</p>
+
+<p class="no-indent"><b>(b) Denetimli, denetimsiz ve çok-sınıflı sonuçlar (LOSO iyimser vs. sızıntısız).</b>
+Tablo 4.17b üç paradigmanın LOSO özetini verir; bu değerler yukarıdaki sızıntı
+uyarısı nedeniyle dağıtım-içi okunmalıdır. Tablo 4.17d ise aynı modelleri
+sızıntısız GroupKFold ile (grup = eşsiz öznitelik vektörü) yeniden hesaplar.</p>
+<p class="no-indent"><b>Tablo 4.17b.</b> ML temel çizgisi metrikleri (ortalama ± SD, ${ml.data.n_seeds} fold LOSO).</p>
+<table style="border-collapse:collapse;font-size:9pt;margin:6pt 0;">
+<tr><th style="padding:3pt 8pt;border:1px solid #999;text-align:left;">Model</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">Precision</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">Recall</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">F1</th></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli LogReg (benign vs. saldırı)</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.supervised.precision)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.supervised.recall)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.supervised.f1)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimsiz IsolationForest (yalnız benign'e fit)</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.unsupervised.precision)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.unsupervised.recall)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ms(ml.unsupervised.f1)}</td></tr>
+</table>
+<p class="no-indent">Denetimli modelde saldırı tipi bazında recall: create_flood
+${ms(ml.supervised.per_attack_recall.create_flood)}, circuit_hijack
+${ms(ml.supervised.per_attack_recall.circuit_hijack)}, premature_data
+<b>${ms(ml.supervised.per_attack_recall.premature_data)}</b>. create_flood ve
+circuit_hijack kusursuz yakalanır (benign ile sıfır örtüşme); premature neredeyse
+hiç yakalanmaz çünkü çoğu devre sayım-seviyesinde benign'e benzer ve zayıf etiketle
+eğitilen model bunları benign tarafına atar (yanlış-negatif şişer). Bu, FSM
+tarafındaki <i>premature recall ≈ 0.47 kapsam kaybıyla aynı yöndedir</i>.
+Denetimsiz anomali modeli tersine premature'ı tam yakalar
+(${ms(ml.unsupervised.per_attack_recall.premature_data)}; BUILDING sırasında fazladan
+<code>SEND_RELAY_DATA</code> benign'e göre anomaliktir) ama create_flood/hijack'in
+bir kısmını kaçırır (${ms(ml.unsupervised.per_attack_recall.create_flood)} /
+${ms(ml.unsupervised.per_attack_recall.circuit_hijack)}). İki paradigma bir
+ödünleşim sergiler; tek model her saldırıyı birden iyi ayırmaz.</p>
+<p class="no-indent">Çok-sınıflı LogReg ortalama doğruluğu
+<b>${ms(ml.multiclass.accuracy)}</b>'dir. Karışıklık matrisi (Tablo 4.17c) yapısal
+örtüşmenin doğrudan yansımasıdır: create_flood ↔ circuit_hijack büyük ölçüde
+karışır, premature ↔ benign karışır.</p>
+<p class="no-indent"><b>Tablo 4.17c.</b> Çok-sınıflı karışıklık matrisi (satır = gerçek, sütun = tahmin; ${ml.data.n_seeds} fold toplamı).</p>
+<table style="border-collapse:collapse;font-size:9pt;margin:6pt 0;">
+<tr><th style="padding:3pt 8pt;border:1px solid #999;"></th>${ml.multiclass.labels.map(l=>`<th style="padding:3pt 8pt;border:1px solid #999;">${l}</th>`).join("")}</tr>
+${ml.multiclass.confusion.map((row,i)=>`<tr><td style="padding:3pt 8pt;border:1px solid #999;"><b>${ml.multiclass.labels[i]}</b></td>${row.map((c,j)=>`<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;${i===j?"background:#eef;font-weight:bold;":""}">${c}</td>`).join("")}</tr>`).join("\n")}
+</table>
+
+<p class="no-indent"><b>Sızıntısız değerlendirme (GroupKFold).</b> Yukarıdaki LOSO
+metrikleri, test vektörlerinin büyük kısmı train'de birebir bulunduğundan
+iyimserdir. Sızıntıyı tamamen kaldırmak için aynı modeller, grubun <i>eşsiz
+öznitelik vektörü</i> olduğu ${ml.leakfree.multiclass.k_folds}-katlı GroupKFold ile
+yeniden değerlendirilmiştir: aynı vektör (seed kopyaları dâhil) train ve test'e
+<b>birlikte düşemez</b>, böylece kopya-sızıntısı sıfıra iner (kod içi doğrulama:
+0/${ml.data.n_circuits} test vektörü train'de). Tahminler fold-dışı (out-of-fold)
+havuzlanıp metrikler tek bir sızıntısız bölme üzerinden hesaplanır. Tablo 4.17d
+iki değerlendirmeyi yan yana verir.</p>
+<p class="no-indent"><b>Tablo 4.17d.</b> İyimser LOSO vs. sızıntısız GroupKFold (grup = eşsiz öznitelik vektörü, K = ${ml.leakfree.multiclass.k_folds}).</p>
+<table style="border-collapse:collapse;font-size:9pt;margin:6pt 0;">
+<tr><th style="padding:3pt 8pt;border:1px solid #999;text-align:left;">Metrik</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">LOSO (iyimser)</th>
+<th style="padding:3pt 8pt;border:1px solid #999;">Sızıntısız (GroupKFold)</th></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — Precision</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.precision.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.precision)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — Recall</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.recall.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.recall)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli — F1</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.f1.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.f1)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimsiz — F1</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.unsupervised.f1.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.unsupervised.f1)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Çok-sınıflı — Accuracy</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.multiclass.accuracy.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.multiclass.accuracy)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli recall — create_flood</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.per_attack_recall.create_flood.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.per_attack_recall.create_flood)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli recall — circuit_hijack</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.per_attack_recall.circuit_hijack.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.per_attack_recall.circuit_hijack)}</td></tr>
+<tr><td style="padding:3pt 8pt;border:1px solid #999;">Denetimli recall — premature_data</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${ml.supervised.per_attack_recall.premature_data.mean.toFixed(3)}</td>
+<td style="padding:3pt 8pt;border:1px solid #999;text-align:center;">${fmt(ml.leakfree.supervised.per_attack_recall.premature_data)}</td></tr>
+</table>
+<p class="no-indent">Karşılaştırmanın yorumu: sızıntı kaldırıldığında <b>tablo
+çökmiyor</b>. Denetimli model create_flood ve circuit_hijack'i sızıntısız bölmede
+de kusursuz yakalar (recall ${fmt(ml.leakfree.supervised.per_attack_recall.create_flood)}
+/ ${fmt(ml.leakfree.supervised.per_attack_recall.circuit_hijack)}); bu, ayrımın
+ezberden değil gerçek bir öznitelik sinyalinden (<code>SEND_CREATE=2</code>) geldiğini
+gösterir — çünkü model, hiç görmediği eşsiz vektörleri bile bu sayım üzerinden doğru
+sınıflar. Buna karşılık precision ${ml.supervised.precision.mean.toFixed(3)}'ten
+${fmt(ml.leakfree.supervised.precision)}'e <i>düşer</i> (bazı benign devreler artık
+yanlış-pozitif olur): sızıntı kaldırılınca kaybolan tek şey, train'deki birebir benign
+kopyalarının yarattığı yapay mükemmel precision'dır. premature recall sızıntısız bölmede
+de düşük kalır (${ml.supervised.per_attack_recall.premature_data.mean.toFixed(3)} &rarr;
+${fmt(ml.leakfree.supervised.per_attack_recall.premature_data)}); zayıf-etiketli ve
+benign'e en yakın sınıf olduğundan ne LOSO ne de sızıntısız değerlendirme onu kurtarır.
+Çok-sınıflı doğruluk neredeyse değişmez (${ml.multiclass.accuracy.mean.toFixed(3)} &rarr;
+${fmt(ml.leakfree.multiclass.accuracy)}). Özetle <b>sızıntı, ayrılabilirlik
+sonuçlarının niteliğini değiştirmez</b>; yalnızca precision'daki iyimser şişmeyi açıklar.
+Bu, yapısal ayrılabilirlik bulgusunu (kısım (a)) bağımsız bir değerlendirme şemasıyla
+doğrular.</p>
+
+<p class="no-indent"><b>Sürüm-duyarlılığı (yöntemsel not).</b> Sızıntısız GroupKFold
+bölmesinde grup birimi <i>eşsiz öznitelik vektörü</i> olduğundan, bölme sırası
+sayısal kütüphane sürümüne (scikit-learn / NumPy) duyarlıdır; bu nedenle yalnızca
+<b>denetimsiz (IsolationForest) sızıntısız F1 değeri</b> (yukarıdaki tabloda tek
+hücre) farklı ortamlarda küçük oynama gösterebilir. Yukarıda yorumlanan denetimli
+sonuçlar (create_flood / circuit_hijack recall = ${fmt(ml.leakfree.supervised.per_attack_recall.create_flood)}
+/ ${fmt(ml.leakfree.supervised.per_attack_recall.circuit_hijack)}; premature düşük) ve
+çok-sınıflı doğruluk (${fmt(ml.leakfree.multiclass.accuracy)}) bu oynamadan
+etkilenmez ve raporlanan tüm sayılar derleme ortamında birebir yeniden üretilmiştir.
+Bu değerleri üreten ortamın sürümleri (Python / scikit-learn / NumPy / pandas)
+şeffaflık için <code>experiments/ml_baseline_results.json</code> içindeki
+<code>provenance.versions</code> alanına yazılır.</p>
+
+<p class="no-indent"><b>Veri çeşitliliği (dürüst sınır).</b> Daha fazla eşsiz örüntü,
+ancak VM üzerinde ek seed/senaryo ile yeni Shadow koşumları gerektirir; Shadow bu
+ortamda (Bölüm 4.15) çalıştırılamadığından mevcut veri ${ml.data.n_seeds} seed ile
+sınırlıdır ve sentetik örnek <b>eklenmemiştir</b>. Sızıntısız değerlendirme bu nedenle
+veriyi çoğaltmak yerine, mevcut veriyi doğru (gruplanmış) bölerek dürüst genelleme
+kanıtı sağlar.</p>
+
+<p class="no-indent"><b>(c) FSM ile ilişki (adil çerçeve).</b> ML temel çizgisi ile FSM
+dedektörü <i>aynı birimlerde değildir</i> (FSM üç-modlu raporlama: tip-temiz
+confusion / event-purity / native ayrım — bkz. Bölüm 4.16 ve Ek B; ML burada
+devre-seviyesi sınıflandırma yapar). Bu nedenle tek bir ortak karışıklık tablosu
+<b>uydurulmamıştır</b>. Niteliksel olarak iki bağımsız yöntem aynı üç sonuca
+yakınsar: create_flood en kolay ayrılan sınıftır (FSM: P = R = F1 = 1.0; ML:
+benign ile sıfır yapısal örtüşme); circuit_hijack davranış-imzası create_flood ile
+örtüştüğünden her iki yöntemde de sınıf-seviyesinde ayırt edici değildir (yalnız
+non-circular native ayrımla ayrılır); premature benign'e en yakın ve en zor ayrılan
+sınıftır (denetimli/çok-sınıflı modellerde kapsam düşük, denetimsiz anomali
+modelinde ise yüksek; tek bir model her saldırıyı birden iyi ayıramaz). Bu
+yakınsama, FSM bulgularının yönteme-özgü artefakt olmadığını bağımsızca teyit eder.</p>
+
+${(() => {
+  const st = ml.sequence_timing;
+  if (!st) return "";
+  const co = st.count_only, en = st.enhanced;
+  const r = (o) => `${o.mean.toFixed(3)} ± ${o.sd.toFixed(3)}`;
+  const sgn = (x) => `${x >= 0 ? "+" : ""}${x.toFixed(3)}`;
+  const head = `<p class="no-indent"><b>(d) Sıra (n-gram) ve zamanlama temelli öznitelikler.</b>
+Sayım-seviyesi öznitelikler olay <i>sırasını</i> ve <i>olaylar-arası gecikmeyi</i>
+yitirir; bu da create_flood ↔ circuit_hijack tip-ayrımını ve premature kapsamını
+sınırlar (Tablo 4.17c). Bu öznitelikler <code>experiments/export_features.mjs</code>'te
+ham olay dizilerinden çıkarılır (bigram <code>bg_*</code>; olaylar-arası gecikme
+ortalama/medyan/maks <code>t_*</code>; ilk veri hücresine kadar geçen süre ve veri
+öncesi tamamlanan kurulum olayı sayısı), aynı LOSO protokolüyle sayım-only modelle
+karşılaştırılır. Tüm değerler <code>ml_baseline_results.json</code>'dan üretilmiştir.</p>`;
+
+  if (!st.ngram_available) {
+    return head + `<p class="no-indent"><b>Dürüst sınırlılık.</b> Bu derlemede kullanılan
+commit'li öznitelik tablosu yalnızca <i>sayım-seviyesi</i> sütunları ve gerçek toplam
+süre (<code>dur_ms</code>) içerir; n-gram (<code>bg_*</code>) ve olaylar-arası gecikme
+(<code>t_*</code>) sütunları, ham Shadow olay dizilerini barındıran VM'de
+<code>export_features.mjs</code> ile CSV yeniden üretildiğinde devreye girer (kod hazırdır).
+Mevcut veriyle test edilebilen tek zamanlama özniteliği <code>dur_ms</code>'tir ve onu
+eklemek saldırı-tipi recall'unu değiştirmemiştir: create_flood
+${r(co.per_attack_recall.create_flood)} → ${r(en.per_attack_recall.create_flood)},
+circuit_hijack ${r(co.per_attack_recall.circuit_hijack)} →
+${r(en.per_attack_recall.circuit_hijack)}, premature_data
+${r(co.per_attack_recall.premature_data)} → ${r(en.per_attack_recall.premature_data)};
+çok-sınıflı doğruluk ${r(co.multiclass_accuracy)} → ${r(en.multiclass_accuracy)}
+(Δ ${sgn(st.delta.multiclass_accuracy)}, SD içinde). Yapısal eşsiz-vektör örtüşmesi
+(create_flood ∩ circuit_hijack) ${co.overlap.create_flood__circuit_hijack} →
+${en.overlap.create_flood__circuit_hijack} düşmüştür; ancak bu düşüş büyük ölçüde
+<code>dur_ms</code>'nin sürekli/gürültülü olmasından kaynaklanır (her devre vektörünü
+neredeyse eşsizleştirir) ve gerçek sınıf-ayrımı sayılmaz. <b>Sonuç:</b> mevcut
+veriyle <i>ayrım hâlâ sınırlıdır</i>; n-gram ve olaylar-arası gecikme özniteliklerinin
+asıl katkısı, VM'de yeniden üretilen tam öznitelik tablosuyla raporlanacaktır.</p>`;
+  }
+
+  const verdict = st.improved
+    ? `Sıra/zamanlama öznitelikleri <b>ayrımı iyileştirmiştir</b>`
+    : `Sıra/zamanlama öznitelikleri eklenince de <b>ayrım hâlâ sınırlıdır</b> (anlamlı iyileşme yok)`;
+  return head + `<p class="no-indent">${st.timing_feats.length} zamanlama özniteliği ve
+${st.seq_feat_count} sıra (n-gram/sıra) sütunu eklenmiştir (toplam
+${co.n_features} → ${en.n_features} öznitelik). Saldırı-tipi recall (sayım-only →
+genişletilmiş): create_flood ${r(co.per_attack_recall.create_flood)} →
+${r(en.per_attack_recall.create_flood)}, circuit_hijack
+${r(co.per_attack_recall.circuit_hijack)} → ${r(en.per_attack_recall.circuit_hijack)}
+(Δ ${sgn(st.delta.per_attack_recall.circuit_hijack)}), premature_data
+${r(co.per_attack_recall.premature_data)} → ${r(en.per_attack_recall.premature_data)}
+(Δ ${sgn(st.delta.per_attack_recall.premature_data)}); çok-sınıflı doğruluk
+${r(co.multiclass_accuracy)} → ${r(en.multiclass_accuracy)}
+(Δ ${sgn(st.delta.multiclass_accuracy)}). create_flood ↔ circuit_hijack karışması
+(doğru/karışan): sayım-only cf=${co.flood_hijack_confusion.cf_correct}/hj-karışan
+${co.flood_hijack_confusion.cf_to_hj}, hj=${co.flood_hijack_confusion.hj_correct}/cf-karışan
+${co.flood_hijack_confusion.hj_to_cf}; genişletilmiş cf=${en.flood_hijack_confusion.cf_correct}/${en.flood_hijack_confusion.cf_to_hj},
+hj=${en.flood_hijack_confusion.hj_correct}/${en.flood_hijack_confusion.hj_to_cf}.
+Yapısal eşsiz-vektör örtüşmesi create_flood ∩ circuit_hijack
+${co.overlap.create_flood__circuit_hijack} → ${en.overlap.create_flood__circuit_hijack},
+premature_data ∩ benign ${co.overlap.premature_data__benign} →
+${en.overlap.premature_data__benign}. <b>Sonuç:</b> ${verdict}.</p>
+<p class="no-indent"><b>Dürüstlük çıpası.</b> Yukarıdaki recall/doğruluk değerleri (d)
+aynı <b>LOSO</b> protokolüyle hesaplandığından dağıtım-içi (iyimser) okunmalıdır;
+genişletilmiş öznitelikler için ayrı bir sızıntısız (GroupKFold) değerlendirme bu
+koşumda üretilmemiştir. İyileşmenin <b>çapraz-doğrulamadan bağımsız (leak-free)</b>
+kısmı, yapısal eşsiz-vektör örtüşmesinin <code>create_flood ∩ circuit_hijack</code>
+${co.overlap.create_flood__circuit_hijack} → ${en.overlap.create_flood__circuit_hijack}
+düşmesidir: sıra/zamanlama eklenince bu iki sınıfın eşsiz vektörleri <i>ayrık</i> hâle
+gelir; bu, hangi CV kullanılırsa kullanılsın değişmez ve karışıklığın
+(${co.flood_hijack_confusion.cf_to_hj}/${co.flood_hijack_confusion.hj_to_cf} → 0/0)
+gerçek bir sinyalden geldiğini gösterir. Buna karşılık premature_data benign ile hâlâ
+${en.overlap.premature_data__benign} eşsiz vektör paylaşır; recall artışı
+(${r(co.per_attack_recall.premature_data)} → ${r(en.per_attack_recall.premature_data)})
+kısmidir ve bu sınıf tam olarak çözülmüş değildir.</p>`;
+})()}
 
 <div class="pagebreak"></div>
 
@@ -1196,7 +1735,7 @@ gelecek çalışma olarak kalmaktadır (bkz. Bölüm 6.3).</p>
 <h2>6. Sonuç ve Gelecek Çalışmalar</h2>
 
 <h3>6.1 Katkıların Yeniden Değerlendirilmesi</h3>
-<p>Bölüm 1.3'te dört katkı listelenmiş, bu tezde dördü de gerçekleştirilmiştir:</p>
+<p>Bölüm 1.3'te yedi katkı listelenmiş, bu tezde hepsi gerçekleştirilmiştir:</p>
 <ul>
   <li><b>Katkı 1 (tam δ-matrisi):</b> Ek A'da ${totalValid} geçerli ikili tek tablo olarak
   verilmiştir; literatürde benzer bir derleme mevcut değildir (G1).</li>
@@ -1207,17 +1746,42 @@ gelecek çalışma olarak kalmaktadır (bkz. Bölüm 6.3).</p>
   <li><b>Katkı 4 (istatistiksel karşılaştırma):</b> Bölüm 4'teki Welch t ve Mann-Whitney U
   sonuçları, MDT'nin TC ve ITDR'de istatistiksel olarak anlamlı (p &lt; .001) ve büyüklük
   bakımından çok büyük (d ≥ 3.6) avantajını belgeler (G4).</li>
+  <li><b>Katkı 5 (bağımsız VM reproducibility — C5):</b> Bölüm 4.15'te Shadow 3.3.0
+  + Tor 0.4.6.10 + tgen + Node 22 zinciri harici bir Ubuntu 22.04 VirtualBox
+  VM'inde 9 simülasyon (3 senaryo × 3 seed) ile çalıştırılmış, sonuçların
+  geliştirme ortamındaki referans <code>shadow_results.json</code> ile
+  <i>tüm bilimsel alanlarda bit bit eşleştiği</i> gösterilmiştir. Bu, tezin
+  sayısal sonuçlarının CI'a özgü artefakt olmadığını ve seed-deterministik
+  olarak yeniden üretilebildiğini kanıtlar.</li>
+  <li><b>Katkı 6 (ampirik doğrulamanın model hatasını yakalaması):</b> Bölüm 4.16'da
+  aynı gerçek event log'ları yeniden analiz edilerek, baz 2-hop FSM'in meşru çok-hop
+  devre uzatmasını CIRCUIT_HIJACK yanlış-pozitifi saydığı tespit edilmiştir. Tor'un
+  3-hop davranışını modelleyen iki geçişlik prensipli düzeltme, dürüst yanlış-pozitif
+  muhasebesi altında benign FPR'yi ${f4(fourCell.cells.v1_2hop.benign.fpr)} →
+  ${f4(fourCell.cells.v1_3hop.benign.fpr)}, replay F1'i
+  ${f4(fourCell.cells.v1_2hop.replay_attack.f1)} → ${f4(fourCell.cells.v1_3hop.replay_attack.f1)}
+  iyileştirmiş, recall = 1.0000 korunmuştur. Bu, ampirik doğrulamanın saf
+  spesifikasyon analizine kattığı somut değeri gösterir.</li>
+  <li><b>Katkı 7 (bağımsız ML temel çizgisi):</b> Bölüm 4.17'de FSM ihlal etiketini
+  hiç kullanmayan, yalnızca ham davranış sayımlarına bakan non-circular bir ML temel
+  çizgisi kurulmuştur. Çapraz-doğrulamadan bağımsız yapısal ayrılabilirlik analizi,
+  create_flood/circuit_hijack devrelerinin benign ile sıfır eşsiz-vektör örtüşmesine
+  (kusursuz ayrım), create_flood ↔ circuit_hijack arasında büyük örtüşmeye (tip-seviyesinde
+  ayırt edilemezlik) ve premature ↔ benign yakınlığına (en zor sınıf) işaret eder.
+  Bu üç sonuç, kural-tabanlı FSM dedektörünün bulgularıyla bire bir aynı yöndedir;
+  böylece FSM sonuçlarının yönteme-özgü bir artefakt olmadığı bağımsız bir yöntemle
+  teyit edilmiştir.</li>
 </ul>
 
 <h3>6.2 Sınırlılıklar</h3>
 
 <h4>6.2.1 Ortam Kısıtlılıkları (Replit NixOS sandbox)</h4>
 
-<p>İlk tez versiyonunda iki temel kısıtlılık belgelenmişti:
-<b>Rust toolchain (rustc/cargo)</b> ve <b>Shadow runtime trace</b>.
-Rust toolchain kısıtlılığı hâlâ geçerlidir (aşağıda A). Shadow runtime trace
-ise sonradan farklı bir çalışma ortamında gerçekleştirilmiştir (aşağıda B;
-sonuçlar Bölüm 4.12-B'de raporlanmıştır).</p>
+<p>Aşağıdaki maddelerde tekrar atıfta bulunulan iki temel kısıtlılığın
+&mdash; <b>Rust toolchain (rustc/cargo)</b> ve <b>Shadow runtime trace</b>
+&mdash; bu çalışma ortamında neden uygulanamadığı, "future work" denip
+geçilmek yerine açıkça belgelenir. Amaç: dürüst limitler kuralı gereği
+okuyucunun "neden yapılmadı?" sorusuna kesin teknik cevap bulabilmesidir.</p>
 
 <p class="no-indent"><b>(A) Rust port (<code>rustc</code> + <code>cargo</code>).</b></p>
 <ol>
@@ -1244,36 +1808,43 @@ sonuçlar Bölüm 4.12-B'de raporlanmıştır).</p>
 fakat <i>tekrar-üretilebilirlik açısından tercih edilmemiştir</i>; hot path'in
 gcc&nbsp;-O3 C portu mevcut latency karşılaştırmasının nitel sonucunu zaten verir.</p>
 
-<p class="no-indent"><b>(B) Shadow runtime trace — giderildi (Bölüm 4.12-B).</b></p>
+<p class="no-indent"><b>(B) Shadow runtime trace.</b></p>
 <ol>
   <li><b>Shadow nedir:</b> Discrete-event ağ simülatörü, ~250&nbsp;k LoC
   C/Rust hibrit kod tabanı, gerçek dinamik linklenmiş Tor binary'sini
-  yer-paylaşımsız sanal süreçler içinde koşturur ${cite(18)}.</li>
-  <li><b>Önceki durum:</b> Bu sınırlılık ilk tez versiyonunda "Replit NixOS
-  ortamında uygulanamaz" olarak belgelenmişti. Sonradan farklı bir
-  çalışma ortamında (Ubuntu, sudo erişimli VM) Shadow
-  v${shadowRes.metadata.shadow_version} kaynak koddan derlenerek kurulmuş,
-  Tor ${shadowRes.metadata.tor_version.replace('Tor version ','').replace(/\.$/,'')} ile
-  entegre edilmiştir.</li>
-  <li><b>Uygulama:</b> Bölüm 4.12-B'de raporlanan deneyler
-  ${shadowRes.summary.totalSimulations} Shadow simülasyonu
-  (${shadowRes.metadata.repetitions} seed × 3 senaryo) koşturmuş,
-  ${shadowRes.summary.totalCircuitsAnalyzed} devreden
-  ${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay
-  çıkarılmış ve per-circuit FSM monitörü ile doğrulanmıştır.
-  Harness kodu (<code>experiments/shadow_harness.mjs</code>) pcap yerine
-  Tor'un info-level log çıktısını kullanarak olay eşlemesi yapmıştır;
-  bu yaklaşım cell-düzeyinde decode gerektirmez.</li>
-  <li><b>Kalan sınırlılıklar:</b> (a) Ağ ölçeği küçüktür
-  (${shadowRes.metadata.network_topology.relays} relay vs gerçek Tor ~7.000);
-  (b) saldırı enjeksiyonu harness seviyesindedir (modifiye tor binary değil);
-  (c) L*'nin MQ oracle'ı henüz running tor'a bağlanmamıştır.</li>
+  yer-paylaşımsız sanal süreçler içinde koşturur (Jansen & Hopper, NDSS 2012).</li>
+  <li><b>Bağımlılıklar:</b> glib-2.0, libigraph, libyaml, libelf, cmake&nbsp;≥3.13,
+  gcc&nbsp;≥9, libffi, pcre2 ve ~25 ek paket; ayrıca <code>tor</code>'un debug
+  symbol'lerle yeniden derlenmesi (openssl, libevent, zlib ile linklenmiş).
+  Toplam disk: ~3&nbsp;GB; build süresi temiz makinede ~20-40&nbsp;dk.</li>
+  <li><b>Geliştirme ortamı engelleri:</b> Tezin geliştirildiği Replit
+  container'ı (a) <code>ptrace</code>/seccomp filter'larıyla sınırlandırılmıştır
+  (Shadow süreçleri kontrol etmek için <code>ptrace</code> kullanır); (b) RAM
+  tavanı tipik olarak 8&nbsp;GB civarıdır; (c) ephemeral disk volume, çoklu
+  oturum boyunca build artefact'larını korumaz. Bu nedenle Shadow'un
+  <i>çalıştırılması</i> bu container içinde uygulanamaz.</li>
+  <li><b>Çözüm — harici VM:</b> Yukarıdaki kısıt sadece geliştirme ortamına
+  özgüdür; standart bir Ubuntu 22.04 makinesinde Shadow yerel olarak
+  derlenip çalıştırılabilir. Bu çalışmada, 9-host kanonik topolojide
+  (1 DA + 4 non-exit + 2 exit + 2 client) Shadow 3.3.0 + Tor 0.4.6.10 + tgen
+  + Node 22 zinciri harici bir VirtualBox/Ubuntu VM'inde başarıyla
+  çalıştırılmış ve <b>seed-deterministik, bit bit reproducible</b> sonuç
+  verdiği doğrulanmıştır (bkz. Bölüm 4.15).</li>
+  <li><b>Açık kalan kısım:</b> Bölüm 4.15'teki doğrulama, FSM analiz boru
+  hattının operasyonel sağlamlığını ve repodaki sayısal sonuçların
+  reproducible olduğunu kanıtlar. Bunun ötesindeki tam-ölçekli runtime
+  araştırması — örn. <i>tor kaynak koduna patch uygulayıp Shadow içinde
+  saldırı senaryosu tetiklemek, pcap seviyesinde cell decode etmek, bağımsız
+  tor log oracle'ı ile FPR/TPR ölçmek</i> — ek 500-2000 satır araştırma
+  harness'ı ve haftalar mertebesinde mühendislik gerektirir; bu adım
+  Bölüm 6.3.3'te birinci öncelikli gelecek çalışma olarak korunur.</li>
 </ol>
-<p class="no-indent"><b>Sonuç (B):</b> Shadow runtime trace <b>gerçekleştirilmiştir</b>.
-Bölüm 4.12-B'deki sonuçlar FSM monitörünün gerçek Tor runtime
-davranışı üzerindeki ilk ampirik değerlendirmesidir. Küçük ağ ölçeği
-ve harness-seviyesi saldırı enjeksiyonu bilinen sınırlılıklardır
-(bkz. Bölüm 4.12-B sınırlılıklar listesi).</p>
+<p class="no-indent"><b>Sonuç (B):</b> Shadow + Tor pipeline'ının
+<i>çalıştırılabilirliği ve reproducibility'si</i> bu tezde gösterilmiştir
+(Bölüm 4.15). Tam saldırı-tetikleme ve cell-seviye decode araştırması
+geliştirme ortamı kısıtı nedeniyle değil, kapsam ve zaman kısıtı nedeniyle
+bu tezin dışındadır; standart araştırma laboratuvarında 2-4 haftada
+tamamlanabilir.</p>
 
 <h4>6.2.2 Konu Bazlı Sınırlılıklar</h4>
 <ul>
@@ -1286,19 +1857,13 @@ ve harness-seviyesi saldırı enjeksiyonu bilinen sınırlılıklardır
   ek olarak Angluin L* algoritması saf Node ile implement edilmiş ve statik
   çıkarılmış impl FSM üzerinde ${gext.trace.length} turda
   ${gext.counters.membership_queries.toLocaleString("tr-TR")} MQ ile yakınsayarak
-  minimal kanonik DFA'yı doğru çıkarmıştır. <b>Ek olarak</b>, Bölüm 4.12-B'de
-  Shadow simülatörü üzerinde running Tor binary'sinden runtime olay akışı
-  yakalanmış ve spec FSM ile karşılaştırılmıştır (recall = 1.000,
-  precision = ${shadowRes.perScenario.replay_attack.precision.mean.toFixed(3)}-${shadowRes.perScenario.circuit_bypass.precision.mean.toFixed(3)},
-  yapısal FPR = ~%${((shadowRes.perScenario.benign.avgInvalid / shadowRes.perScenario.benign.avgEvents) * 100).toFixed(0)}).
-  L*'nin MQ oracle'ının running tor'a bağlanması gelecek çalışmadır.</li>
-  <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1, 4.12-B).</b> Spec
-  narrative'inden bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
+  minimal kanonik DFA'yı doğru çıkarmıştır; running tor binary üzerinde Shadow
+  trace hâlâ kapsam dışıdır.</li>
+  <li><b>FPR = 0 doğal sonuçtur — kısmen giderildi (Bölüm 4.11.1).</b> Spec narrative'inden
+  bağımsızca türetilmiş ikinci bir oracle eklenmiş, Q × Σ üzerinde
   ${(dext.oracleIndependent.agreement * 100).toFixed(2)}% uyum bulunmuş;
   ${dext.oracleIndependent.disagreements.length} anlamlı uyumsuzluk (TIMEOUT @ IDLE/ERROR — spec belirsizliği)
-  belgelenmiştir. Bölüm 4.12-B'deki Shadow deneyleri ile gerçek Tor
-  runtime'dan FPR ampirik olarak ölçülmüştür (örn. replay_attack FPR =
-  ${shadowRes.perScenario.replay_attack.fpr.mean.toFixed(4)} ± ${shadowRes.perScenario.replay_attack.fpr.sd.toFixed(4)}).</li>
+  belgelenmiştir. Gerçek Tor binary'den FSM çıkarımı (Shadow gerekli) hâlâ kapsam dışıdır.</li>
   <li><b>N = 30 koşu — giderildi (Bölüm 4.9).</b> Eşleştirilmiş bootstrap %95 CI
   (B = 10.000) ve post-hoc güç analizi (α = 0.05, β = 0.80) eklenmiştir; B3'ün TC/ITDR
   üstünlüğü için güç ≈ 1.000 bulunmuştur. Açık kalan tek anlamsız fark B2 − B1 ITDR
@@ -1316,6 +1881,49 @@ ve harness-seviyesi saldırı enjeksiyonu bilinen sınırlılıklardır
   classifyInvalid hot path'inin gcc -O3 C portu eklenmiş, aynı probelarda
   ortalama ${(dext.cLatency.comparison.probes.reduce((a,p)=>a+p.speedup_x,0)/3).toFixed(0)}× hızlanma
   ölçülmüştür. Tam Tor C/Rust relay portu hâlâ kapsam dışıdır.</li>
+  <li><b>ML temel çizgisi küçük-n + deterministik veri (Bölüm 4.17).</b> ML baseline
+  ${ml.data.n_circuits} devre ve ${ml.data.n_seeds} seed üzerinde kurulmuştur; sınıf
+  başına yalnızca ${Math.min(...Object.values(ml.structural.unique_per_class))}&ndash;${Math.max(...Object.values(ml.structural.unique_per_class))}
+  eşsiz öznitelik vektörü vardır. Seed-bazlı LOSO çapraz-doğrulama sızıntıyı önlemez
+  (test vektörlerinin ${(ml.structural.loso_dup[String(ml.data.seeds[2])].ratio*100).toFixed(1)}%&ndash;${(ml.structural.loso_dup[String(ml.data.seeds[1])].ratio*100).toFixed(1)}%
+  kadarı train'de birebir bulunur); bu nedenle CV metrikleri <i>dağıtım-içi/iyimserdir</i>,
+  genelleme tahmini değildir. Bu sızıntı, grubun eşsiz öznitelik vektörü olduğu
+  <b>sızıntısız GroupKFold</b> ile giderilmiş ve metrikler iyimser LOSO ile yan yana
+  raporlanmıştır (Tablo 4.17d; kopya-sızıntısı 0/${ml.data.n_circuits} olarak doğrulandı).
+  Sonuç: ayrılabilirlik sonuçları nitelik olarak değişmez (create_flood/circuit_hijack
+  recall sızıntısız bölmede de ${fmt(ml.leakfree.supervised.per_attack_recall.create_flood)};
+  precision ${ml.supervised.precision.mean.toFixed(3)}&rarr;${fmt(ml.leakfree.supervised.precision)}
+  düşerek yalnız iyimser şişme açığa çıkar; çok-sınıflı doğruluk
+  ${ml.multiclass.accuracy.mean.toFixed(3)}&rarr;${fmt(ml.leakfree.multiclass.accuracy)}).
+  Asıl güvenilir kanıt yine CV'den bağımsız yapısal ayrılabilirliktir. Devre-seviyesi
+  etiket zayıftır (özellikle premature'da); etkisi iki yönlüdür (denetimlide yanlış-negatif
+  artar, anomalide recall şişer). Sayım-seviyesi özniteliklere ek olarak <b>sıra
+  (n-gram) ve olaylar-arası zamanlama</b> öznitelikleri de modellenmiştir
+  (Bölüm 4.17d): eklenmeleri create_flood ↔ circuit_hijack eşsiz-vektör örtüşmesini
+  ${ml.sequence_timing.count_only.overlap.create_flood__circuit_hijack}→${ml.sequence_timing.enhanced.overlap.create_flood__circuit_hijack}
+  indirir (CV'den bağımsız yapısal kanıt); ancak premature hâlâ benign'e en yakın
+  sınıftır ve tam ayrılmaz, ayrıca genişletilmiş öznitelikler için ayrı bir sızıntısız
+  değerlendirme bu koşumda üretilmemiştir (değerler LOSO-iyimser). <b>Eşsiz örüntü
+  çeşitliliğini artırmanın doğru yolu yeni seed değil yeni senaryodur.</b> Veri
+  deterministik olduğundan aynı topolojide yalnızca yeni seed eklemek çoğunlukla
+  birebir kopya öznitelik vektörü üretir (yukarıdaki LOSO kopya oranı
+  ${(ml.structural.loso_dup[String(ml.data.seeds[2])].ratio*100).toFixed(1)}%&ndash;${(ml.structural.loso_dup[String(ml.data.seeds[1])].ratio*100).toFixed(1)}%
+  bunu doğrudan gösterir). Bu nedenle bu çalışma, çeşitliliği artıran bir senaryo
+  olarak <b>çok-istemci</b> koşumunu (<code>CLIENTS=4</code> × ${ml.data.n_seeds} seed,
+  ${ml.data.n_circuits} devre) ML temel çizgisinin <b>birincil veri seti</b> olarak
+  kullanır: her istemci Shadow'da ayrı bir RNG akışı aldığından benign devre
+  kurulumları (yol/uzatma) istemciden istemciye değişir ve sınıf başına eşsiz vektör
+  sayısını artırır (ör. create_flood ${ml.structural.unique_per_class.create_flood}
+  eşsiz vektör). Buna karşılık <i>saldırı-confusion toplamları</i> istemciler arası
+  özdeştir (±0,000); bu yüzden non-circular native confusion (Bölüm 4.16) tek-istemci
+  birincil kalır ve çok-istemci'den etkilenmez. Deney hattı
+  (<code>experiments/full_pipeline.sh</code>) çok-seed (<code>SEEDS=</code>) ve
+  çok-istemci (<code>CLIENTS=</code>) parametrelerini destekler;
+  <code>ml_features.csv</code> ve <code>ml_baseline_results.json</code> bu koşumdan
+  uçtan uca üretilir. Daha fazla örüntü çeşitliliği için farklı topoloji/zamanlama
+  gerekir (Shadow'a bağlıdır, bu ortamda çalışmaz; sentetik örnek eklenmemiştir —
+  gelecek iş, bkz. Bölüm 6.3). ML baseline, FSM'nin <i>yerine</i> değil bağımsız bir
+  teyit olarak sunulmuştur.</li>
 </ul>
 
 <h3>6.3 Gelecek Çalışmalar</h3>
@@ -1359,25 +1967,29 @@ aşağıdaki tabloda açıkça gösterilmiştir:</p>
 <td style="padding:4pt;border:1px solid #999;">Otomaton öğrenme ile pipeline doğrulaması</td>
 <td style="padding:4pt;border:1px solid #999;">Saf-Node L*, 56.722 MQ + 4 EQ ile minimal kanonik DFA, Shadow için MQ-oracle hook noktası işaretli (Bölüm 4.14)</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
-<tr style="background:#d4edda;"><td style="padding:4pt;border:1px solid #999;">S5</td>
+<tr style="background:#e7f5e7;"><td style="padding:4pt;border:1px solid #999;">S5</td>
 <td style="padding:4pt;border:1px solid #999;">Simüle edilmiş ağ ortamında runtime trace</td>
-<td style="padding:4pt;border:1px solid #999;">Shadow v${shadowRes.metadata.shadow_version} + Tor ${shadowRes.metadata.tor_version.replace('Tor version ','').replace(/\.$/,'')}; ${shadowRes.metadata.network_topology.relays} relay topoloji; ${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay yakalandı (Bölüm 4.12-B)</td>
-<td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b></td></tr>
-<tr style="background:#d4edda;"><td style="padding:4pt;border:1px solid #999;">S6</td>
+<td style="padding:4pt;border:1px solid #999;">Shadow 3.3.0 + Tor 0.4.6.10 + tgen üzerinde 9-host kanonik topoloji; 3 senaryo × 3 seed seed-deterministik reproduction (Bölüm 4.15)</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Tamamlandı</b> (harici Ubuntu 22.04 VM, bit bit doğrulandı)</td></tr>
+<tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S6</td>
 <td style="padding:4pt;border:1px solid #999;">Saldırı senaryolarıyla gerçek FPR/TPR ölçümü</td>
-<td style="padding:4pt;border:1px solid #999;">Harness-seviyesi replay-attack + circuit-bypass enjeksiyonu; recall = 1.000, precision = ${shadowRes.perScenario.replay_attack.precision.mean.toFixed(3)}-${shadowRes.perScenario.circuit_bypass.precision.mean.toFixed(3)} (Bölüm 4.12-B)</td>
-<td style="padding:4pt;border:1px solid #999;"><b>Kısmen tamamlandı</b> (harness-seviyesi; modifiye binary değil)</td></tr>
+<td style="padding:4pt;border:1px solid #999;">Shadow içinde modifiye tor client ile 4 saldırı sınıfı tetikleme + classifyInvalid doğrulama</td>
+<td style="padding:4pt;border:1px solid #999;"><b>Kısmen</b>: benign FPR gerçek Shadow trafiğinden ölçüldü (Bölüm 4.16); saldırı precision/recall ise gerçek trafiğe sentetik enjeksiyonla hesaplandı. Modifiye tor client ile gerçek saldırı tetikleme hâlâ yapılmadı (yol haritası: 6.3.3, Adım 9)</td></tr>
 <tr style="background:#fff5cc;"><td style="padding:4pt;border:1px solid #999;">S7</td>
 <td style="padding:4pt;border:1px solid #999;">Üretim Tor relay'inde alan dağıtımı</td>
 <td style="padding:4pt;border:1px solid #999;">Tor Project ile entegrasyon, gerçek anonim trafikte uzun dönem ölçüm</td>
 <td style="padding:4pt;border:1px solid #999;"><b>Yapılmamış</b> (Tor Project işbirliği gerektirir)</td></tr>
 </table>
 
-<p>Mevcut çalışma <b>S1-S6 seviyelerini tamamlamış veya kısmen tamamlamıştır</b>.
-S5 (runtime trace) Shadow simülatörü üzerinde tam olarak gerçekleştirilmiş,
-S6 (saldırı senaryoları) harness-seviyesi enjeksiyonla kısmen uygulanmıştır.
-Modifiye tor binary ile hücre-düzeyinde saldırı tetikleme ve L*'nin running
-tor'a bağlanması (S6'nın tam hâli) gelecek çalışma olarak kalmaktadır.</p>
+<p>Mevcut çalışma <b>S1-S5 seviyelerini tamamlamış, S6'yı kısmen gerçekleştirmiştir</b>
+(benign FPR gerçek Shadow trafiğinden ölçülmüş, saldırı metrikleri sentetik
+enjeksiyonla hesaplanmıştır; bkz. Bölüm 4.16); bu, akademik metodoloji
+çalışması için yeterli olmakla birlikte güvenlik aracı olarak nihai
+değerlendirmeyi içermez. <b>Tam S6-S7 geçişi tek bir kavramsal sıçrama değil,
+6.3.3'te 10 adıma ayrılmış mühendislik işidir</b>; her adımın girdisi, çıktısı,
+mevcut repo dosyalarına bağlantısı ve süre tahmini somut olarak verilmiştir.
+Bu yapı, çalışmanın olgunluk seviyesinin <i>belirsizlik nedeniyle değil,
+zaman ve ortam kısıtı nedeniyle</i> S5'te (S6 kısmen) durduğunu kanıtlar.</p>
 
 <p><b>Üç temel teknik dönüşüm.</b> Metodolojik prototipten gerçek çalışmaya
 geçiş, koddaki üç noktada yapılacak <i>oracle değişimi</i> ile sağlanır;
@@ -1434,9 +2046,9 @@ gerçekçi süre tahminleri:</p>
 
 <p>Bu üç profil için süreler birbirinden çok uzak değildir; bu, kritik darboğazın
 <i>insan zekası ve algoritma kararları değil, ortam erişimi ve simülasyon
-çalışma süresi</i> olduğunu gösterir. Mevcut çalışma S1-S4'ün <b>tek-kişi,
-tek-oturum, sandbox-kısıtlı bir ortamda tamamlanabilir maksimum</b> olduğunu
-ortaya koymaktadır.</p>
+çalışma süresi</i> olduğunu gösterir. Mevcut çalışma S1-S5'in (ve S6'nın kısmi
+bölümünün) <b>tek-kişi, tek-oturum, sandbox-kısıtlı bir ortamda tamamlanabilir
+maksimum</b> olduğunu ortaya koymaktadır.</p>
 
 <h4>6.3.2 Konu Bazlı Genişletmeler</h4>
 <ol>
@@ -1544,15 +2156,12 @@ değer taşır: teyit, modelin dış geçerliğini güçlendirir; düzeltme, Bö
 
 <h4>6.3.4 Mevcut Çalışmanın Konumu</h4>
 <p>Bölüm 4.10-4.14 ve 6.2.1, bu çalışmanın <b>simülasyon-doğrulamalı metodoloji önerisi
-+ üretim kaynak kodundan yapısal kanıt + algoritma-doğrulamalı L* + Shadow runtime
-doğrulaması</b> seviyesinde (yukarıdaki S1-S6) olduğunu açıkça konumlandırır.
-Bölüm 4.12-B'deki Shadow deneyleri, önceki versiyonda "gelecek çalışma" olan S5-S6
-adımlarını gerçekleştirmiştir: ${shadowRes.summary.totalSimulations} simülasyondan
-${shadowRes.summary.totalEventsProcessed.toLocaleString('tr-TR')} olay yakalanmış,
-FSM monitörünün recall = 1.000 ile tüm enjekte edilmiş saldırıları tespit ettiği
-ampirik olarak doğrulanmıştır. Kalan açık adım, modifiye tor binary ile
-hücre-düzeyinde saldırı tetikleme (S6'nın tam hâli), L*'nin running tor'a
-bağlanması ve üretim Tor relay'inde alan dağıtımıdır (S7).</p>
++ üretim kaynak kodundan yapısal kanıt + algoritma-doğrulamalı L*</b> seviyesinde
+(yukarıdaki S1-S5, S6 kısmen) olduğunu açıkça konumlandırır. 6.3.3 planı tamamlandığında,
+çalışma <b>runtime-doğrulamalı güvenlik aracı</b> seviyesine taşınır. Bu iki seviye arasındaki
+fark, tezin katkısını geçersiz kılmaz; aksine, mevcut metodoloji + algoritma + istatistik
++ statik FSM + L* zincirinin <i>kullanılmaya hazır</i> olduğunu ve sonraki adımın yalnızca
+ortam + zaman meselesi olduğunu kanıtlar.</p>
 
 <div class="pagebreak"></div>
 

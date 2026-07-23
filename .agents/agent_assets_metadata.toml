@@ -35,7 +35,7 @@ title = "Ham Deney Verisi (90 koşu)"
 id = "dVcgP4IiSOBVn5A21t9zD"
 uri = "file://thesis/Tez_Taslagi.pdf"
 type = "pdf"
-title = "Ödev — Güçlendirilmiş dil + Metodolojik→Gerçek Geçiş Yol Haritası (35 sayfa)"
+title = "Tez Taslağı (4.16 3-hop FSM düzeltmesi eklendi)"
 
 [[outputs]]
 id = "hnVx3t2qWJVIFyMTccuwf"
@@ -48,3 +48,57 @@ id = "nszqODd5UVnmdw_VMMWB-"
 uri = "file://experiments/b_extensions.json"
 type = "unspecified"
 title = "B grubu ham veri (Wilcoxon + latency + bütçe + rule-based)"
+
+[[outputs]]
+id = "rEH9VflRHWGQ3kavw1qvI"
+uri = "file://paper/Tor_FSM_Makale_Template.docx"
+type = "word_document"
+title = "Tor FSM Makale — Hoca Template'ine Uygun Final (.docx)"
+
+[[outputs]]
+id = "Milo76A6hruR6iQmWYWSw"
+uri = "file://thesis/Tor_FSM_Tez.docx"
+type = "word_document"
+title = "Tor FSM Tezi — Tam (Word, eksiksiz)"
+
+[[outputs]]
+id = "it0dDfRxi12jkWcr0MLdL"
+uri = "file://thesis/Tor_FSM_Calisma.docx"
+type = "word_document"
+title = "Tor FSM Çalışması — Tam Metin (Template uyumlu, 8 bölüm)"
+
+[[outputs]]
+id = "YJatD6lHqaKsxQ1hTMvEL"
+uri = "file://attached_assets/v1_revised.docx"
+type = "word_document"
+title = "v1 Revize Makale — Appendix B ve C eklendi"
+
+[[outputs]]
+id = "pU9B3nMUkPcperEEBf25A"
+uri = "file://attached_assets/Hocaya_Revizyon_Cevabi.docx"
+type = "word_document"
+title = "Hocaya revizyon cevabı (Word)"
+
+[[outputs]]
+id = "gsbfejm-_XfnRqdg68oFN"
+uri = "file://attached_assets/v1_final_with_appendices.docx"
+type = "word_document"
+title = "Sizin görselli sürüm + Appendix B ve C"
+
+[[outputs]]
+id = "cJCLSKLkGZYJWqOlfrSs1"
+uri = "file://attached_assets/v1_final_formatted.docx"
+type = "word_document"
+title = "Son sürüm — bold/italik düzeltmeleri dahil"
+
+[[outputs]]
+id = "zqPJ4e7TlqoNTn93KceoA"
+uri = "file://attached_assets/v3_hoca_revizyonlari.docx"
+type = "word_document"
+title = "v3 — Kaynakça yeniden numaralandırılmış son sürüm"
+
+[[outputs]]
+id = "Njm3XNUm9gxQC6FoXpEn0"
+uri = "file://attached_assets/v4_hoca_revizyonlari.docx"
+type = "word_document"
+title = "Makale - Figure 1 çakışmaları giderildi"

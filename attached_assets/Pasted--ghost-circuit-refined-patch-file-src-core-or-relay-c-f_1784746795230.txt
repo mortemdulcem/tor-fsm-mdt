@@ -1,0 +1,22 @@
+{
+  "ghost_circuit_refined_patch": {
+    "file": "src/core/or/relay.c",
+    "function": "circuit_package_relay_cell",
+    "status": "ready_for_vm",
+    "code": "if (getenv(\"TOR_FSM_ATTACK_GHOST\")) {\n  static int ghost_trigger = 0;\n  if (++ghost_trigger % 10 == 0 && circ->n_chan) {\n    cell_t ghost_cell;\n    memset(&ghost_cell, 0, sizeof(cell_t));\n    ghost_cell.circ_id = circ->n_circ_id + 0x1000;\n    ghost_cell.command = CELL_RELAY;\n    crypto_rand((char*)ghost_cell.payload, RELAY_PAYLOAD_SIZE);\n    append_cell_to_circuit_queue(circ, circ->n_chan, &ghost_cell,\n                                 CELL_DIRECTION_OUT, 0);\n  }\n}"
+  },
+  "circuit_bypass_logic": {
+    "hypothesis": "A BYPASS attack is detectable via the organic log 'Circuits must be open before sending relay cells.' if we force packaging on a BUILDING circuit.",
+    "distinction_from_premature": "PREMATURE targets stream_id validation on DATA cells; BYPASS targets the state invariant (BUILDING vs OPEN). They represent different FSM transition violations.",
+    "verification_command": "sed -n '423,470p' src/core/or/relay.c"
+  },
+  "code_inspection_expected_context": {
+    "lines_423_470": "int\ncircuit_package_relay_cell(cell_t *cell, circuit_t *circ,\n                           cell_direction_t cell_direction,\n                           crypt_path_t *layer_hint,\n                           char *payload)\n{\n  channel_t *chan; /* ... */\n\n  if (circ->state != CIRCUIT_STATE_OPEN) {\n    if (cell_direction == CELL_DIRECTION_OUT &&\n        circ->state == CIRCUIT_STATE_CHAN_WAIT) {\n       /* ... legal edge case ... */\n    } else {\n      log_fn(LOG_PROTOCOL_WARN, LD_PROTOCOL,\n             \"Circuits must be open before sending relay cells.\");\n      return -1;\n    }\n  }\n  /* ... rest of the function ... */\n}",
+    "analysis": "The check at line 451 is guarded by circ->state != CIRCUIT_STATE_OPEN. To trigger this organically, the attack hook must call this function while the circuit is in CIRCUIT_STATE_BUILDING. If this bypasses the crypt_path_t (layer_hint) initialization, the 'signal' will be exactly this log line."
+  },
+  "execution_plan": {
+    "step_1": "Apply refined GHOST patch and run full_pipeline.sh for 5/7 verification.",
+    "step_2": "Examine the sed output to confirm the BYPASS hook location (likely inside relay_send_command_from_edge).",
+    "step_3": "Determine if forcing a relay cell on a BUILDING circuit causes a crash due to uninitialized crypto keys (layer_hint == NULL) or just the protocol warning."
+  }
+}

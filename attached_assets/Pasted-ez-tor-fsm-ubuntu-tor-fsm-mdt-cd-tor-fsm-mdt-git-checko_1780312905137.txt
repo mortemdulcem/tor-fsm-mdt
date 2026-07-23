@@ -1,0 +1,92 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd ~/tor-fsm-mdt
+git checkout stash@{0} -- experiments/shadow_harness.mjs
+ls -l experiments/shadow_harness.mjs        # artik var olmali
+bash experiments/full_pipeline.sh
+-rw-rw-r-- 1 tez tez 21853 Haz  1 14:19 experiments/shadow_harness.mjs
+
+=== 0) On kosullar ===
+  [var]  create_flood hook'u kaynakta mevcut
+  [var]  circuit_hijack hook'u kaynakta mevcut
+  [var]  premature_data hook'u kaynakta mevcut
+
+=== 1) Tor build (tek sefer) ===
+
+=== 2) Harness'i import-guvenli + export'lu yap (idempotent) ===
+
+=== 3) cf_test (Shadow calisma dizini) hazirligi ===
+
+=== 4) Coklu-seed kosular ===
+--- seed=42 ---
+  BENIGN seed=42 EXIT=0
+  ATTACK create_flood seed=42 EXIT=0
+    create_flood seed=42: native attack=18 benign=9
+  ATTACK circuit_hijack seed=42 EXIT=0
+    circuit_hijack seed=42: native attack=18 benign=9
+  ATTACK premature_data seed=42 EXIT=0
+    premature_data seed=42: native attack=12 benign=0
+--- seed=137 ---
+  BENIGN seed=137 EXIT=0
+  ATTACK create_flood seed=137 EXIT=0
+    create_flood seed=137: native attack=18 benign=9
+  ATTACK circuit_hijack seed=137 EXIT=0
+    circuit_hijack seed=137: native attack=20 benign=9
+  ATTACK premature_data seed=137 EXIT=0
+    premature_data seed=137: native attack=12 benign=0
+--- seed=2718 ---
+  BENIGN seed=2718 EXIT=0
+  ATTACK create_flood seed=2718 EXIT=0
+    create_flood seed=2718: native attack=18 benign=9
+^C  ATTACK circuit_hijack seed=2718 EXIT=1
+    circuit_hijack seed=2718: native attack=16 benign=9
+  ATTACK premature_data seed=2718 EXIT=0
+    premature_data seed=2718: native attack=12 benign=0
+
+=== 5) Metrikler ===
+results.jsonl satir sayisi: 18
+=== Coklu-seed gercek-saldiri metrikleri (non-circular) ===
+
+# circuit_hijack  (seed: 42, 137, 2718 | n=3)
+  [confusion matrix — devre bazli, seed ortalamasi]
+    TP: ort=9.000 ± 1.000 (n=3), %95 GA [6.516, 11.484]
+    FN: ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+    FP: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+    TN: ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+    Precision: ort=0.499 ± 0.028 (n=3), %95 GA [0.430, 0.568]
+    Recall   : ort=1.000 ± 0.000 (n=3), %95 GA [1.000, 1.000]
+    F1       : ort=0.665 ± 0.025 (n=3), %95 GA [0.604, 0.727]
+    FPR      : ort=1.000 ± 0.000 (n=3), %95 GA [1.000, 1.000]
+  [non-circular] organik CREATE log satir sayisi (attack vs benign):
+    ATTACK: ort=18.000 ± 2.000 (n=3), %95 GA [13.031, 22.969]
+    BENIGN: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+
+# create_flood  (seed: 42, 137, 2718 | n=3)
+  [confusion matrix — devre bazli, seed ortalamasi]
+    TP: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+    FN: ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+    FP: ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+    TN: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+    Precision: ort=1.000 ± 0.000 (n=3), %95 GA [1.000, 1.000]
+    Recall   : ort=1.000 ± 0.000 (n=3), %95 GA [1.000, 1.000]
+    F1       : ort=1.000 ± 0.000 (n=3), %95 GA [1.000, 1.000]
+    FPR      : ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+  [non-circular] organik CREATE log satir sayisi (attack vs benign):
+    ATTACK: ort=18.000 ± 0.000 (n=3), %95 GA [18.000, 18.000]
+    BENIGN: ort=9.000 ± 0.000 (n=3), %95 GA [9.000, 9.000]
+
+# premature_data  (seed: 42, 137, 2718 | n=3)
+  [non-circular] Tor native relay logu (zero-stream-id) satir sayisi:
+    ATTACK: ort=12.000 ± 0.000 (n=3), %95 GA [12.000, 12.000]
+    BENIGN: ort=0.000 ± 0.000 (n=3), %95 GA [0.000, 0.000]
+  [dedektor FPR] begin-noise yanlis-pozitif (benign): noise/circuits:
+    FPR: ort=0.481 ± 0.064 (n=3), %95 GA [0.322, 0.641]
+  [yari-dongusel — uyari] marker-tabanli recall = injected/markers:
+    recall*: ort=0.472 ± 0.096 (n=3), %95 GA [0.233, 0.711]
+    * marker saldirinin kendi yazdigi sinyaldir; bas sonuc DEGIL.
+
+
+=== BITTI ===
+Kalici loglar: experiments/runs/<attack>/seed<seed>/  ve  experiments/runs/_benign/seed<seed>/
+Ham sonuc:    experiments/runs/results.jsonl
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ git checkout attack-scenarios -- experiments/shadow_harness.mjs
+fatal: geçersiz başvuru: attack-scenarios
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 

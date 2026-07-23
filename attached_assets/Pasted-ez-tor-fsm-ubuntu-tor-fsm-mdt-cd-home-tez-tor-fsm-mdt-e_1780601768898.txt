@@ -1,0 +1,58 @@
+ez@tor-fsm-ubuntu:~/tor-fsm-mdt$ cd /home/tez/tor-fsm-mdt
+echo "=== template dizin yapısı ==="
+find /tmp/cf_test/shadow.data.template -maxdepth 2 | sort
+echo "=== template/hosts/torclient içeriği ==="
+ls -la /tmp/cf_test/shadow.data.template/hosts/torclient/ 2>/dev/null || echo "(yok)"
+echo "=== YAML torclient süreç argümanları (-f / graphml / path) ==="
+grep -nE "torclient|torrc|graphml|args|path:|- path" /tmp/cf_test/shadow_benign.yaml | head -40
+=== template dizin yapısı ===
+/tmp/cf_test/shadow.data.template
+/tmp/cf_test/shadow.data.template/hosts
+/tmp/cf_test/shadow.data.template/hosts/4uthority
+/tmp/cf_test/shadow.data.template/hosts/exit1
+/tmp/cf_test/shadow.data.template/hosts/exit2
+/tmp/cf_test/shadow.data.template/hosts/relay1
+/tmp/cf_test/shadow.data.template/hosts/relay2
+/tmp/cf_test/shadow.data.template/hosts/relay3
+/tmp/cf_test/shadow.data.template/hosts/relay4
+/tmp/cf_test/shadow.data.template/hosts/torclient
+/tmp/cf_test/shadow.data.template/hosts/torflowauthority
+=== template/hosts/torclient içeriği ===
+toplam 12
+drwxrwxr-x  2 tez tez 4096 Haz  4 21:53 .
+drwxrwxr-x 11 tez tez 4096 Haz  4 21:53 ..
+-rw-rw-r--  1 tez tez    0 Haz  4 21:53 torrc
+-rw-rw-r--  1 tez tez   80 Haz  4 21:53 torrc-defaults
+=== YAML torclient süreç argümanları (-f / graphml / path) ===
+26:    - path: tgen
+29:      args: ../../../conf/tgen.server.graphml.xml
+36:    - path: tor
+37:      args: --Address 4uthority --Nickname 4uthority
+38:            --defaults-torrc torrc-defaults -f torrc
+44:    - path: tor
+45:      args: --Address exit1 --Nickname exit1
+46:            --defaults-torrc torrc-defaults -f torrc
+52:    - path: tor
+53:      args: --Address exit2 --Nickname exit2
+54:            --defaults-torrc torrc-defaults -f torrc
+60:    - path: tor
+61:      args: --Address relay1 --Nickname relay1
+62:            --defaults-torrc torrc-defaults -f torrc
+68:    - path: tor
+69:      args: --Address relay2 --Nickname relay2
+70:            --defaults-torrc torrc-defaults -f torrc
+76:    - path: tor
+77:      args: --Address relay3 --Nickname relay3
+78:            --defaults-torrc torrc-defaults -f torrc
+84:    - path: tor
+85:      args: --Address relay4 --Nickname relay4
+86:            --defaults-torrc torrc-defaults -f torrc
+92:    - path: tgen
+95:      args: ../../../conf/tgen.client.graphml.xml
+97:  torclient:
+100:    - path: /home/tez/tor-0.4.6.10/src/app/tor
+102:      args: --Address torclient --Nickname torclient
+103:            --defaults-torrc torrc-defaults -f torrc
+106:    - path: tgen
+109:      args: ../../../conf/tgen.torclient.graphml.xml
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 

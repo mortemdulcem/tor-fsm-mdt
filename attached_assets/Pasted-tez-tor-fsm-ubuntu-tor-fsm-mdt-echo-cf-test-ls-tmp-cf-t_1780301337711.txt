@@ -1,0 +1,38 @@
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ echo "[cf_test]"; ls /tmp/cf_test 2>/dev/null || echo MISSING; echo "[benign yaml diskte]"; find / -name 'shadow_benign.yaml' 2>/dev/null; echo "[shadow ornek dizini]"; find ~ /home -type d -path '*examples*tor*' 2>/dev/null | head; echo "[herhangi shadow yaml]"; find ~ /home -name 'shadow*.yaml' 2>/dev/null | head -20
+[cf_test]
+MISSING
+[benign yaml diskte]
+[shadow ornek dizini]
+/home/tez/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap-4.5.48/examples/tutorial_derive
+/home/tez/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap-4.5.48/examples/tutorial_builder
+/home/tez/shadow/examples/docs/tor
+/home/tez/shadow/examples/docs/tor/conf
+/home/tez/shadow/examples/docs/tor/shadow.data.template
+/home/tez/shadow/examples/docs/tor/shadow.data.template/hosts
+/home/tez/shadow/examples/docs/tor/shadow.data.template/hosts/relay1
+/home/tez/shadow/examples/docs/tor/shadow.data.template/hosts/relay1/keys
+/home/tez/shadow/examples/docs/tor/shadow.data.template/hosts/4uthority
+/home/tez/shadow/examples/docs/tor/shadow.data.template/hosts/4uthority/keys
+[herhangi shadow yaml]
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/replay_attack/run_seed2718/shadow.yaml
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/replay_attack/run_seed42/shadow.yaml
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/replay_attack/run_seed137/shadow.yaml
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/circuit_bypass/run_seed2718/shadow.yaml
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/circuit_bypass/run_seed42/shadow.yaml
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/circuit_bypass/run_seed137/shadow.yaml
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed2718/shadow.yaml
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed42/shadow.yaml
+/home/tez/tor-fsm-mdt/experiments/shadow_runs/benign/run_seed137/shadow.yaml
+/home/tez/shadow/examples/apps/jetty/shadow.yaml
+/home/tez/shadow/examples/apps/iperf-2/shadow.yaml
+/home/tez/shadow/examples/apps/wget2/shadow.yaml
+/home/tez/shadow/examples/apps/nginx/shadow.yaml
+/home/tez/shadow/examples/apps/etcd/shadow.yaml
+/home/tez/shadow/examples/apps/http-server/shadow.yaml
+/home/tez/shadow/examples/apps/curl/shadow.yaml
+/home/tez/shadow/examples/docs/tor/shadow.yaml
+/home/tez/shadow/examples/docs/traffic-generation/shadow.yaml
+/home/tez/shadow/examples/docs/basic-file-transfer/shadow.yaml
+/home/tez/shadow/build/examples/apps/jetty/shadow.yaml
+tez@tor-fsm-ubuntu:~/tor-fsm-mdt$ 
+

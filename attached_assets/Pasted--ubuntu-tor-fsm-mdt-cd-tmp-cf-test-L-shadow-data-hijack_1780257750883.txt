@@ -1,0 +1,83 @@
+-ubuntu:~/tor-fsm-mdt$ cd /tmp/cf_test
+L=shadow.data.hijack/hosts/torclient/tor.1000.stdout
+echo "---assert/bug/err---"
+grep -nE "assert|Assertion|Bug|tor_bug|abort|Segmentation|n_circ_id|\[err\]|\[warn\]" "$L" | tail -30
+echo "---son 25 satir---"
+tail -25 "$L"
+echo "---shadow log---"
+grep -iE "error|fail|signal|kill|exit|state" shadow_hijack.log | tail -15
+---assert/bug/err---
+4426:Jan 01 00:29:26.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 3267021432
+4428:Jan 01 00:29:26.200 [warn] got extended when circ already built? Closing.
+4457:Jan 01 00:29:28.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 3722512596
+4459:Jan 01 00:29:28.200 [warn] got extended when circ already built? Closing.
+4486:Jan 01 00:29:29.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2663234589
+4488:Jan 01 00:29:29.200 [warn] got extended when circ already built? Closing.
+4515:Jan 01 00:29:30.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2436724507
+4517:Jan 01 00:29:30.200 [warn] got extended when circ already built? Closing.
+4544:Jan 01 00:29:31.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2901007693
+4546:Jan 01 00:29:31.200 [warn] got extended when circ already built? Closing.
+4575:Jan 01 00:29:33.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2339955012
+4577:Jan 01 00:29:33.200 [warn] got extended when circ already built? Closing.
+4608:Jan 01 00:29:36.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 3980687935
+4610:Jan 01 00:29:36.200 [warn] got extended when circ already built? Closing.
+4641:Jan 01 00:29:39.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2609086908
+4643:Jan 01 00:29:39.200 [warn] got extended when circ already built? Closing.
+4676:Jan 01 00:29:43.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2282861654
+4678:Jan 01 00:29:43.200 [warn] got extended when circ already built? Closing.
+4707:Jan 01 00:29:44.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2558513011
+4709:Jan 01 00:29:44.200 [warn] got extended when circ already built? Closing.
+4739:Jan 01 00:29:45.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 4289033772
+4741:Jan 01 00:29:45.200 [warn] got extended when circ already built? Closing.
+4770:Jan 01 00:29:47.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 4185702542
+4772:Jan 01 00:29:47.200 [warn] got extended when circ already built? Closing.
+4807:Jan 01 00:29:52.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2848873126
+4809:Jan 01 00:29:52.200 [warn] got extended when circ already built? Closing.
+4846:Jan 01 00:29:58.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 3212585621
+4848:Jan 01 00:29:58.200 [warn] got extended when circ already built? Closing.
+4875:Jan 01 00:29:59.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2879416025
+4877:Jan 01 00:29:59.200 [warn] got extended when circ already built? Closing.
+---son 25 satir---
+Jan 01 00:29:59.000 [info] connection_ap_make_link(): Making internal direct tunnel to 100.0.0.1:9111 ...
+Jan 01 00:29:59.000 [info] connection_ap_make_link(): ... application connection created and linked.
+Jan 01 00:29:59.000 [info] directory_send_command(): Downloading consensus from 100.0.0.1:9111 using /tor/status-vote/current/consensus-microdesc/BA3FDA.z
+Jan 01 00:29:59.000 [info] origin_circuit_new(): Circuit 109 chose an idle timeout of 1926 based on 1925 seconds of predictive building remaining.
+Jan 01 00:29:59.000 [info] onion_pick_cpath_exit(): Using requested exit node '$A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1~A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1 at 100.0.0.1'
+Jan 01 00:29:59.000 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE_FAST cell to '<unnamed>'
+Jan 01 00:29:59.000 [info] connection_edge_process_inbuf(): data from edge while in 'waiting for circuit' state. Leaving it on buffer.
+Jan 01 00:29:59.000 [info] connection_edge_process_inbuf(): data from edge while in 'waiting for circuit' state. Leaving it on buffer.
+Jan 01 00:29:59.100 [info] circuit_finish_handshake(): Finished building circuit hop:
+Jan 01 00:29:59.100 [info] internal circ (length 1, last hop A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1): $A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1(open)
+Jan 01 00:29:59.100 [info] circuit_send_first_onion_skin(): First hop: finished sending CREATE_FAST cell to '<unnamed>'
+Jan 01 00:29:59.100 [info] circuit_build_no_more_hops(): circuit built!
+Jan 01 00:29:59.100 [info] internal circ (length 1): $A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1(open)
+Jan 01 00:29:59.100 [info] link_apconn_to_circ(): Looks like completed circuit to <null> does allow optimistic data for connection to 100.0.0.1
+Jan 01 00:29:59.100 [info] connection_ap_handshake_send_begin(): Sending relay cell 1 on circ 2879416025 to begin stream 40468.
+Jan 01 00:29:59.100 [info] connection_ap_handshake_send_begin(): Address/port sent, ap socket -1, n_circ_id 2879416025
+Jan 01 00:29:59.100 [info] connection_ap_handshake_send_begin(): Sending up to 134 + 0 bytes of queued-up data
+Jan 01 00:29:59.200 [warn] got extended when circ already built? Closing.
+Jan 01 00:29:59.200 [info] circuit_mark_for_close_(): Circuit 2879416025 (id: 109) marked for close at src/core/or/command.c:434 (orig reason: 1, new reason: 0)
+Jan 01 00:29:59.200 [info] command_process_destroy_cell(): unknown circuit 2879416025 on connection from 100.0.0.1:9111 ID=<none> RSA_ID=A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1. Dropping.
+Jan 01 00:29:59.200 [info] connection_edge_destroy(): CircID 0: At an edge. Marking connection for close.
+Jan 01 00:29:59.200 [info] circuit_free_(): Circuit 0 (id: 109) has been freed.
+Jan 01 00:29:59.200 [info] connection_free_minimal(): Freeing linked Socks connection [waiting for connect response] with 0 bytes on inbuf, 0 on outbuf.
+Jan 01 00:29:59.200 [info] connection_dir_client_reached_eof(): 'fetch' response not all here, but we're at eof. Closing.
+Jan 01 00:29:59.200 [info] connection_free_minimal(): Freeing linked Directory connection [client reading] with 0 bytes on inbuf, 0 on outbuf.
+---shadow log---
+00:00:00.473455 [54820:shadow-worker] 00:01:00.000000000 [WARN] [exit2:11.0.0.3] [regular_file.c:393] [regularfile_openat] Opening unsupported proc file. Contents may incorrectly refer to native process instead of emulated, and/or have nondeterministic contents: /proc/meminfo
+00:00:00.473693 [54820:shadow-worker] 00:01:00.000000000 [WARN] [exit2:11.0.0.3] [regular_file.c:393] [regularfile_openat] Opening unsupported proc file. Contents may incorrectly refer to native process instead of emulated, and/or have nondeterministic contents: /proc/meminfo
+00:00:07.286763 [54817:shadow-worker] 00:30:00.000000000 [ERROR] [torclient:11.0.0.9] [process.rs:1557] [shadow_rs::host::process] process 'torclient.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+Error: process 'torclient.tgen.1001' exited with status StoppedByShadow; expected end state was exited: 0 but was running
+00:00:07.308230 [54804:shadow] n/a [INFO] [n/a] [manager.rs:586] [shadow_rs::core::manager] Global syscall counts: {write:128920, read:34014, epoll_wait:26481, getpid:9603, epoll_ctl:5047, getrandom:4609, close:3145, getsockopt:2476, newfstatat:2351, readlink:2239, open:2180, ioctl:1944, recvfrom:1603, futex:1570, rename:1290, setsockopt:1164, sendto:1040, unlink:696, mmap:685, munmap:625, socket:584, brk:568, connect:553, accept4:541, fstat:481, stat:240, lseek:238, mprotect:134, rt_sigaction:122, openat:85, getgid:75, getuid:75, rt_sigprocmask:63, fcntl:51, uname:49, madvise:44, prctl:42, getcwd:33, geteuid:32, getsockname:30, unknown-syscall:29, mremap:28, shutdown:28, bind:24, getegid:24, listen:24, timerfd_create:22, timerfd_settime:22, accept:20, getdents64:20, fchmod:15, clone3:14, rseq:14, set_robust_list:14, epoll_create1:8, flock:8, getrlimit:8, mkdir:8, pipe2:8, setrlimit:8, sysinfo:8, eventfd2:7, access:6, epoll_create:6, sched_getaffinity:3, exit_group:1}
+00:00:07.309664 [54804:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export] Failed to run the simulation
+Error: Failed to run the simulation
+00:00:07.309992 [54804:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export] 
+Error: 
+00:00:07.310163 [54804:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export] Caused by:
+Error: Caused by:
+00:00:07.310414 [54804:shadow] n/a [ERROR] [n/a] [shadow.rs:477] [shadow_rs::shadow::export]     1 managed processes in unexpected final state
+Error:     1 managed processes in unexpected final state
+** Shadow did not complete successfully: Failed to run the simulation
+**   1 managed processes in unexpected final state
+tez@tor-fsm-ubuntu:/tmp/cf_test$ 
+
