@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { format } from "date-fns";
-import { ShieldAlert, AlertTriangle, TerminalSquare, Plus, Activity, ServerCrash, FileDown, Cpu, Target, Bug, Gauge } from "lucide-react";
+import { ShieldAlert, AlertTriangle, TerminalSquare, Plus, Activity, ServerCrash, Cpu, Target, Bug, Gauge } from "lucide-react";
 import { useTestRuns, useCreateTestRun } from "@/hooks/use-test-runs";
 import { useAllViolations } from "@/hooks/use-violations";
 import { useFsmSpec, useRunMetrics, useRunMdt } from "@/hooks/use-mdt";
@@ -76,12 +76,6 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
-          <a href="/api/download/proposal" download>
-            <Button variant="outline" className="shrink-0" data-testid="button-download-proposal">
-              <FileDown className="w-4 h-4 mr-2" />
-              Proje Onerisi (DOCX)
-            </Button>
-          </a>
           <Button onClick={handleCreateRun} disabled={isCreating} variant="outline" className="shrink-0" data-testid="button-create-random">
             {isCreating ? <Activity className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
             {isCreating ? "Init..." : "Random Sim"}

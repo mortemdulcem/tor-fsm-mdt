@@ -1,6 +1,5 @@
 import type { Express } from "express";
 import type { Server } from "http";
-import path from "path";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
@@ -312,11 +311,6 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     if (!run) return res.status(404).json({ message: "Test run not found" });
     const metrics = await computeMetricsForRun(id);
     res.json(metrics);
-  });
-
-  app.get("/api/download/proposal", (_req, res) => {
-    const filePath = path.resolve("client/public/Proje_Onerisi_Plani.docx");
-    res.download(filePath, "Proje_Onerisi_Plani.docx");
   });
 
   return httpServer;
