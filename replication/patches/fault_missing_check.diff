@@ -1,0 +1,6 @@
+18a19
+> #include <stdlib.h>
+66c67
+<   if (circ->n_chan) {
+---
+>   if (!getenv("TOR_FSM_FAULT_MISSING") && circ->n_chan) {

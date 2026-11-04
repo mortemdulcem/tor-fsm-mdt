@@ -1,0 +1,18 @@
+48a49
+> #include <stdlib.h>
+715a717,722
+>   /* TOR_FSM_ATTACK_REPLAY: capture the fully-formed relay cell before it is
+>    * packaged (before onion encryption) so a faithful duplicate can be
+>    * injected after the real cell is sent. */
+>   cell_t fsm_replay_cell = cell;
+>   int fsm_do_replay = (getenv("TOR_FSM_ATTACK_REPLAY") != NULL);
+> 
+727a735,742
+>   }
+> 
+>   if (fsm_do_replay) {
+>     log_info(LD_OR, "[FSM-REPLAY] duplicate relay cell injected: "
+>              "stream_id=%u relay_command=%u",
+>              (unsigned)stream_id, (unsigned)relay_command);
+>     circuit_package_relay_cell(&fsm_replay_cell, circ, cell_direction,
+>                                cpath_layer, stream_id, filename, lineno);
