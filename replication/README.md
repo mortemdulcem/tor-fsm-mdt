@@ -8,3 +8,5 @@ Code, scripts and run evidence for the implementation-level experiments reported
 - `patches/` — single-point, reversible Tor source deviations (`fault_missing_check.diff`, `patch_tor_0.4.9.14_replay.diff`).
 - `scripts/` — build/run scripts for the AFLNet feasibility and coverage runs (`run_exp4_*.sh`).
 - `evidence/` — retained run outputs for the missing-guard comparison (`net_correct/`, `net_faulty/`). Large raw Chutney/Shadow logs are omitted due to size and are available on request.
+
+- `evidence/run_evidence.tgz` — archived per-run outputs (replay rebuild, Chutney replay incl. managed, missing-guard net_correct/net_faulty).
