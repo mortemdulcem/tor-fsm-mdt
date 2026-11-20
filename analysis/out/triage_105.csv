@@ -1,0 +1,106 @@
+state,event,class,rule,reason,prelim_family,prelim_priority,final_family,final_priority
+IDLE,TLS_OK,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P2,,
+IDLE,TLS_FAIL,Unreachable,U1,link failure without a link,GHST,P1,,
+IDLE,SEND_CREATE,Unreachable,U1,cell on a link that does not exist yet,HSKP,P3,,
+IDLE,RECV_CREATED,Unreachable,U1,cell on a link that does not exist yet,GHST,P3,,
+IDLE,SEND_EXTEND,Unreachable,U1,cell on a link that does not exist yet,HSKP,P2,,
+IDLE,RECV_EXTENDED,Unreachable,U1,cell on a link that does not exist yet,HSKP,P2,,
+IDLE,SEND_RELAY_DATA,Unreachable,U1,cell on a link that does not exist yet,BYPS,P4,,
+IDLE,RECV_RELAY_DATA,Unreachable,U1,cell on a link that does not exist yet,BYPS,P4,,
+IDLE,SEND_DESTROY,Unreachable,U1,cell on a link that does not exist yet,REPL,P2,,
+IDLE,RECV_DESTROY,Unreachable,U1,cell on a link that does not exist yet,REPL,P2,,
+IDLE,CIRCUIT_CLOSED,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,
+IDLE,TIMEOUT,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,
+CONNECTING,CONNECT,Model revision,R1,a further OR connection or a new lifecycle is permitted; single-instance abstraction,CFLD,P1,,
+CONNECTING,SEND_CREATE,Unreachable,U1,cell on a link that does not exist yet,HSKP,P3,,
+CONNECTING,RECV_CREATED,Unreachable,U1,cell on a link that does not exist yet,HSKP,P3,,
+CONNECTING,SEND_EXTEND,Unreachable,U1,cell on a link that does not exist yet,HSKP,P2,,
+CONNECTING,RECV_EXTENDED,Unreachable,U1,cell on a link that does not exist yet,HSKP,P2,,
+CONNECTING,SEND_RELAY_DATA,Unreachable,U1,cell on a link that does not exist yet,BYPS,P4,,
+CONNECTING,RECV_RELAY_DATA,Unreachable,U1,cell on a link that does not exist yet,BYPS,P4,,
+CONNECTING,SEND_DESTROY,Unreachable,U1,cell on a link that does not exist yet,REPL,P2,,
+CONNECTING,RECV_DESTROY,Unreachable,U1,cell on a link that does not exist yet,REPL,P2,,
+CONNECTING,CIRCUIT_CLOSED,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,
+TLS_HANDSHAKE,CONNECT,Model revision,R1,a further OR connection or a new lifecycle is permitted; single-instance abstraction,CFLD,P1,,
+TLS_HANDSHAKE,TLS_OK,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P2,,
+TLS_HANDSHAKE,RECV_CREATED,Conformance-negative,C1,cell refers to a circuit that does not exist; specified handling is to drop it,HIJK,P1,,
+TLS_HANDSHAKE,SEND_EXTEND,Conformance-negative,C1,cell refers to a circuit that does not exist; specified handling is to drop it,HSKP,P2,,
+TLS_HANDSHAKE,RECV_EXTENDED,Conformance-negative,C1,cell refers to a circuit that does not exist; specified handling is to drop it,HSKP,P2,,
+TLS_HANDSHAKE,SEND_RELAY_DATA,Conformance-negative,C1,cell refers to a circuit that does not exist; specified handling is to drop it,HSKP,P3,,
+TLS_HANDSHAKE,RECV_RELAY_DATA,Conformance-negative,C1,cell refers to a circuit that does not exist; specified handling is to drop it,HSKP,P3,,
+TLS_HANDSHAKE,SEND_DESTROY,Conformance-negative,C1,cell refers to a circuit that does not exist; specified handling is to drop it,REPL,P2,,
+TLS_HANDSHAKE,RECV_DESTROY,Conformance-negative,C1,cell refers to a circuit that does not exist; specified handling is to drop it,REPL,P2,,
+TLS_HANDSHAKE,CIRCUIT_CLOSED,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,
+CREATE_SENT,CONNECT,Model revision,R1,a further OR connection or a new lifecycle is permitted; single-instance abstraction,CFLD,P1,,
+CREATE_SENT,TLS_OK,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P2,,
+CREATE_SENT,TLS_FAIL,Model revision,R2,the relay may close the OR link at any time; link loss modeled only before CREATE2,GHST,P1,,
+CREATE_SENT,SEND_CREATE,Security-relevant candidate,S3,second CREATE2 while the first is pending: relay-side resource allocation,CFLD,P2,CFLD,P2
+CREATE_SENT,SEND_EXTEND,Security-relevant candidate,S1,would bind key material or a hop outside the matching setup step,HSKP,P2,HSKP,P2
+CREATE_SENT,RECV_EXTENDED,Security-relevant candidate,S1,would bind key material or a hop outside the matching setup step,HSKP,P2,HSKP,P2
+CREATE_SENT,SEND_RELAY_DATA,Security-relevant candidate,S2,relay data on a circuit that is not yet established or already torn down,PDAT,P3,PDAT,P3
+CREATE_SENT,RECV_RELAY_DATA,Security-relevant candidate,S2,relay data on a circuit that is not yet established or already torn down,PDAT,P3,PDAT,P3
+CREATE_SENT,SEND_DESTROY,Model revision,R3,either side may tear a circuit down during construction,REPL,P2,,
+CREATE_SENT,RECV_DESTROY,Model revision,R3,either side may tear a circuit down during construction,REPL,P2,,
+CREATE_SENT,CIRCUIT_CLOSED,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,
+CIRCUIT_BUILDING,CONNECT,Model revision,R1,a further OR connection or a new lifecycle is permitted; single-instance abstraction,CFLD,P1,,
+CIRCUIT_BUILDING,TLS_OK,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P2,,
+CIRCUIT_BUILDING,TLS_FAIL,Model revision,R2,the relay may close the OR link at any time; link loss modeled only before CREATE2,GHST,P1,,
+CIRCUIT_BUILDING,SEND_CREATE,Security-relevant candidate,S1,would bind key material or a hop outside the matching setup step,HIJK,P4,HIJK,P4
+CIRCUIT_BUILDING,RECV_CREATED,Security-relevant candidate,S1,would bind key material or a hop outside the matching setup step,HIJK,P4,HIJK,P4
+CIRCUIT_BUILDING,SEND_RELAY_DATA,Security-relevant candidate,S2,relay data on a circuit that is not yet established or already torn down,PDAT,P3,PDAT,P3
+CIRCUIT_BUILDING,RECV_RELAY_DATA,Security-relevant candidate,S2,relay data on a circuit that is not yet established or already torn down,PDAT,P3,PDAT,P3
+CIRCUIT_BUILDING,SEND_DESTROY,Model revision,R3,either side may tear a circuit down during construction,REPL,P2,,
+CIRCUIT_BUILDING,RECV_DESTROY,Model revision,R3,either side may tear a circuit down during construction,REPL,P2,,
+CIRCUIT_BUILDING,CIRCUIT_CLOSED,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,
+CIRCUIT_READY,CONNECT,Model revision,R1,a further OR connection or a new lifecycle is permitted; single-instance abstraction,CFLD,P1,,
+CIRCUIT_READY,TLS_OK,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P2,,
+CIRCUIT_READY,TLS_FAIL,Model revision,R2,the relay may close the OR link at any time; link loss modeled only before CREATE2,GHST,P1,,
+CIRCUIT_READY,SEND_CREATE,Security-relevant candidate,S1,would bind key material or a hop outside the matching setup step,HIJK,P4,HIJK,P4
+CIRCUIT_READY,RECV_CREATED,Security-relevant candidate,S1,would bind key material or a hop outside the matching setup step,HIJK,P4,HIJK,P4
+CIRCUIT_READY,SEND_EXTEND,Model revision,R5,"an open circuit may be extended by a further hop (e.g., cannibalization)",HIJK,P4,,
+CIRCUIT_READY,RECV_EXTENDED,Security-relevant candidate,S1,would bind key material or a hop outside the matching setup step,HIJK,P4,HIJK,P4
+CIRCUIT_READY,CIRCUIT_CLOSED,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,
+TRANSMITTING,CONNECT,Model revision,R1,a further OR connection or a new lifecycle is permitted; single-instance abstraction,CFLD,P1,,
+TRANSMITTING,TLS_OK,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P2,,
+TRANSMITTING,TLS_FAIL,Model revision,R2,the relay may close the OR link at any time; link loss modeled only before CREATE2,GHST,P1,,
+TRANSMITTING,SEND_CREATE,Security-relevant candidate,S1,would bind key material or a hop outside the matching setup step,HIJK,P4,HIJK,P4
+TRANSMITTING,RECV_CREATED,Security-relevant candidate,S1,would bind key material or a hop outside the matching setup step,HIJK,P4,HIJK,P4
+TRANSMITTING,SEND_EXTEND,Model revision,R5,"an open circuit may be extended by a further hop (e.g., cannibalization)",HIJK,P4,,
+TRANSMITTING,RECV_EXTENDED,Security-relevant candidate,S1,would bind key material or a hop outside the matching setup step,HIJK,P4,HIJK,P4
+TRANSMITTING,CIRCUIT_CLOSED,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,
+CLOSING,CONNECT,Model revision,R1,a further OR connection or a new lifecycle is permitted; single-instance abstraction,CFLD,P1,,
+CLOSING,TLS_OK,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P2,,
+CLOSING,TLS_FAIL,Model revision,R2,the relay may close the OR link at any time; link loss modeled only before CREATE2,GHST,P1,,
+CLOSING,SEND_CREATE,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,REPL,P3,,
+CLOSING,RECV_CREATED,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,REPL,P3,,
+CLOSING,SEND_EXTEND,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,REPL,P2,,
+CLOSING,RECV_EXTENDED,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,REPL,P2,,
+CLOSING,SEND_RELAY_DATA,Security-relevant candidate,S2,relay data on a circuit that is not yet established or already torn down,PDAT,P2,PDAT,P2
+CLOSING,RECV_RELAY_DATA,Security-relevant candidate,S2,relay data on a circuit that is not yet established or already torn down,PDAT,P2,PDAT,P2
+CLOSING,SEND_DESTROY,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,GHST,P2,,
+CLOSING,RECV_DESTROY,Model revision,R4,DESTROY cells may cross; a DESTROY can arrive after one was sent,GHST,P2,,
+CLOSED,CONNECT,Model revision,R1,a further OR connection or a new lifecycle is permitted; single-instance abstraction,REPL,P2,,
+CLOSED,TLS_OK,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P2,,
+CLOSED,TLS_FAIL,Model revision,R2,the relay may close the OR link at any time; link loss modeled only before CREATE2,GHST,P1,,
+CLOSED,SEND_CREATE,Model revision,R6,a new circuit may be created on a link after the modeled circuit is gone,REPL,P3,,
+CLOSED,RECV_CREATED,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,REPL,P3,,
+CLOSED,SEND_EXTEND,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,REPL,P3,,
+CLOSED,RECV_EXTENDED,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,REPL,P3,,
+CLOSED,SEND_RELAY_DATA,Security-relevant candidate,S2,relay data on a circuit that is not yet established or already torn down,REPL,P4,GHST,P4
+CLOSED,RECV_RELAY_DATA,Security-relevant candidate,S2,relay data on a circuit that is not yet established or already torn down,GHST,P3,GHST,P3
+CLOSED,SEND_DESTROY,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,GHST,P2,,
+CLOSED,RECV_DESTROY,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,GHST,P2,,
+CLOSED,CIRCUIT_CLOSED,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,
+CLOSED,TIMEOUT,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,
+ERROR,CONNECT,Model revision,R1,a further OR connection or a new lifecycle is permitted; single-instance abstraction,REPL,P2,,
+ERROR,TLS_OK,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P2,,
+ERROR,TLS_FAIL,Model revision,R2,the relay may close the OR link at any time; link loss modeled only before CREATE2,GHST,P1,,
+ERROR,SEND_CREATE,Model revision,R6,a new circuit may be created on a link after the modeled circuit is gone,REPL,P3,,
+ERROR,RECV_CREATED,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,REPL,P3,,
+ERROR,SEND_EXTEND,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,REPL,P3,,
+ERROR,RECV_EXTENDED,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,REPL,P3,,
+ERROR,SEND_RELAY_DATA,Security-relevant candidate,S2,relay data on a circuit that is not yet established or already torn down,GHST,P3,GHST,P3
+ERROR,RECV_RELAY_DATA,Security-relevant candidate,S2,relay data on a circuit that is not yet established or already torn down,GHST,P3,GHST,P3
+ERROR,SEND_DESTROY,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,GHST,P2,,
+ERROR,RECV_DESTROY,Conformance-negative,C2,control cell for a circuit that is being or has been torn down; dropped,GHST,P2,,
+ERROR,TIMEOUT,Unreachable,U2,local stack/timer event outside the condition that produces it,GHST,P1,,

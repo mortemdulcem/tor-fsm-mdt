@@ -1,0 +1,44 @@
+{
+ "properties": {
+  "P1 CREATE2 only after the link handshake": {
+   "abstraction": "holds",
+   "refinement": "holds"
+  },
+  "P2 CREATED2 only after CREATE2": {
+   "abstraction": "holds",
+   "refinement": "holds"
+  },
+  "P3 EXTEND2 only after CREATED2": {
+   "abstraction": "holds",
+   "refinement": "holds"
+  },
+  "P4 relay data only after the circuit is ready": {
+   "abstraction": "holds",
+   "refinement": "holds"
+  },
+  "P5 no relay data or circuit cell after DESTROY": {
+   "abstraction": "holds",
+   "refinement": "holds"
+  },
+  "P6 every EXTENDED2 answers an outstanding EXTEND2": {
+   "abstraction": "violated: CONNECT TLS_OK SEND_CREATE RECV_CREATED RECV_EXTENDED",
+   "refinement": "holds"
+  },
+  "P7 at most one EXTEND2 outstanding (hop by hop)": {
+   "abstraction": "violated: CONNECT TLS_OK SEND_CREATE RECV_CREATED SEND_EXTEND SEND_EXTEND",
+   "refinement": "holds"
+  },
+  "P8 ready only after the planned number of hops (3)": {
+   "abstraction": "violated: CONNECT TLS_OK SEND_CREATE RECV_CREATED RECV_EXTENDED",
+   "refinement": "holds"
+  }
+ },
+ "over_accepted": [
+  "CONNECT TLS_OK SEND_CREATE RECV_CREATED RECV_EXTENDED",
+  "CONNECT TLS_OK SEND_CREATE RECV_CREATED SEND_EXTEND SEND_EXTEND",
+  "CONNECT TLS_OK SEND_CREATE RECV_CREATED SEND_EXTEND RECV_EXTENDED SEND_RELAY_DATA",
+  "CONNECT TLS_OK SEND_CREATE RECV_CREATED SEND_EXTEND RECV_EXTENDED RECV_RELAY_DATA",
+  "CONNECT TLS_OK SEND_CREATE RECV_CREATED SEND_EXTEND RECV_EXTENDED SEND_DESTROY",
+  "CONNECT TLS_OK SEND_CREATE RECV_CREATED SEND_EXTEND RECV_EXTENDED RECV_DESTROY"
+ ]
+}

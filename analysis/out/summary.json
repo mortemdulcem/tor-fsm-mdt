@@ -1,0 +1,100 @@
+{
+ "classes": {
+  "Unreachable": 37,
+  "Model revision": 25,
+  "Conformance-negative": 22,
+  "Security-relevant candidate": 21
+ },
+ "rules": {
+  "U2": 20,
+  "U1": 17,
+  "R1": 9,
+  "C1": 7,
+  "R2": 7,
+  "S3": 1,
+  "S1": 10,
+  "S2": 10,
+  "R3": 4,
+  "R5": 2,
+  "C2": 15,
+  "R4": 1,
+  "R6": 2
+ },
+ "SR_families": {
+  "HIJK": 8,
+  "HSKP": 2,
+  "PDAT": 6,
+  "GHST": 4,
+  "CFLD": 1
+ },
+ "SR_priorities": {
+  "P4": 9,
+  "P2": 5,
+  "P3": 7
+ },
+ "suite_sizes": {
+  "W": [
+   382,
+   2510
+  ],
+  "Wp": [
+   258,
+   1822
+  ],
+  "UIO": [
+   130,
+   743
+  ]
+ },
+ "W": [
+  [
+   "TLS_FAIL",
+   "TIMEOUT",
+   "CIRCUIT_CLOSED"
+  ],
+  [
+   "CONNECT",
+   "TLS_OK",
+   "RECV_CREATED"
+  ],
+  [
+   "SEND_EXTEND"
+  ]
+ ],
+ "UIO": {
+  "IDLE": [
+   "CONNECT"
+  ],
+  "CONNECTING": [
+   "TLS_OK"
+  ],
+  "TLS_HANDSHAKE": [
+   "SEND_CREATE"
+  ],
+  "CREATE_SENT": [
+   "RECV_CREATED"
+  ],
+  "CIRCUIT_BUILDING": [
+   "SEND_EXTEND"
+  ],
+  "CIRCUIT_READY": [
+   "SEND_RELAY_DATA"
+  ],
+  "TRANSMITTING": [
+   "SEND_RELAY_DATA"
+  ],
+  "CLOSING": [
+   "TIMEOUT",
+   "CIRCUIT_CLOSED"
+  ],
+  "CLOSED": [
+   "CONNECT",
+   "CIRCUIT_CLOSED",
+   "TIMEOUT"
+  ],
+  "ERROR": [
+   "TIMEOUT",
+   "CIRCUIT_CLOSED"
+  ]
+ }
+}
