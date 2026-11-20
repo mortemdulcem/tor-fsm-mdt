@@ -37,6 +37,6 @@ Shadow results are not used in the paper.
 ## Note on earlier repository content
 Earlier development material (web dashboard, thesis and proposal build files, unrelated course material, pasted logs
 and AI-agent working notes) has been removed from `main` to keep the repository limited to the study; it remains in
-the git history (tag `pre-cleanup-2026-11-20`). No result of the paper comes from the excluded `feature/attack-scenarios` branch.
+the git history (last commit before the clean-up: `b851c27`). No result of the paper comes from the excluded `feature/attack-scenarios` branch.
 
 Checksums of all files: `SHA256SUMS`.
